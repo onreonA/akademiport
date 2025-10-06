@@ -21,7 +21,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "check-all": "npm run type-check && npm run lint && npm run format:check",
-    "prepare": "husky install",
+    "prepare": "husky install || true",
     "track:progress": "echo '📊 İlerleme takibi için GUNLUK_ILERLEME.md dosyasını kontrol edin'",
     "track:roadmap": "echo '🗺️ Yol haritası için PROJE_YOL_HARITASI.md dosyasını kontrol edin'",
     "track:review": "echo '📋 Haftalık review için HAFTALIK_REVIEW_TEMPLATE.md dosyasını kullanın'"
