@@ -1,0 +1,2 @@
+INSERT INTO auth.users (id, email, encrypted_password, email_confirmed_at, created_at, updated_at, role, aud, confirmation_token, email_change_token_new, recovery_token) VALUES (gen_random_uuid(), 'info@sarmobi.com', crypt('Sarmobi123!', gen_salt('bf')), NOW(), NOW(), NOW(), 'authenticated', 'authenticated', '', '', '');
+INSERT INTO users (id, email, full_name, role, created_at, updated_at) SELECT au.id, au.email, 'Sarmobi Firma Kullanıcısı', 'user', NOW(), NOW() FROM auth.users au WHERE au.email = 'info@sarmobi.com';

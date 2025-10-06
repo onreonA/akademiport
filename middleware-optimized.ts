@@ -1,0 +1,117 @@
+// =====================================================
+// OPTIMIZED ROUTE PROTECTION MIDDLEWARE
+// =====================================================
+// Next.js middleware for route protection - PERFORMANCE OPTIMIZED
+import { NextResponse, type NextRequest } from 'next/server';
+// Pre-compiled route patterns for better performance
+const PROTECTED_ROUTE_PATTERN = /^\/(admin|firma|api\/(projects|companies|v2))/;
+const ADMIN_ROUTE_PATTERN = /^\/(admin|api\/admin)/;
+const COMPANY_ROUTE_PATTERN = /^\/(firma|api\/firma)/;
+const PUBLIC_ROUTE_PATTERN =
+  /^\/(giris|kayit|sss|iletisim|program-hakkinda|platform-ozellikleri|destekler|basari-hikayeleri|kariyer|test-components|test-softui)$/;
+const STATIC_PATTERN =
+  /^\/(_next|static|favicon|api\/(auth|debug|upload|socket))/;
+// Role-based access control
+const ADMIN_ROLES = new Set(['admin', 'master_admin']);
+const COMPANY_ROLES = new Set([
+  'user',
+  'operator',
+  'manager',
+  'admin',
+  'master_admin',
+]);
+export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  // Fast path: Skip middleware for static files and public API routes
+  if (STATIC_PATTERN.test(pathname)) {
+    return NextResponse.next();
+  }
+  // Fast path: Check public routes first (most common case)
+  if (pathname === '/' || PUBLIC_ROUTE_PATTERN.test(pathname)) {
+    return NextResponse.next();
+  }
+  // Fast path: Check if route is protected
+  if (!PROTECTED_ROUTE_PATTERN.test(pathname)) {
+    return NextResponse.next();
+  }
+  // Get authentication info from cookies (single read)
+  const userEmail = request.cookies.get('auth-user-email')?.value;
+  const userRole = request.cookies.get('auth-user-role')?.value;
+  // Fast path: No authentication
+  if (!userEmail) {
+    return handleUnauthenticated(request, pathname);
+  }
+  // Fast path: Admin routes
+  if (ADMIN_ROUTE_PATTERN.test(pathname)) {
+    return handleAdminRoute(request, pathname, userRole);
+  }
+  // Fast path: Company routes
+  if (COMPANY_ROUTE_PATTERN.test(pathname)) {
+    return handleCompanyRoute(request, pathname, userRole);
+  }
+  // Default: Allow access
+  return NextResponse.next();
+}
+// Optimized handlers
+function handleUnauthenticated(request: NextRequest, pathname: string) {
+  if (pathname.startsWith('/admin') || pathname.startsWith('/firma')) {
+    const loginUrl = new URL('/giris', request.url);
+    loginUrl.searchParams.set('redirect', pathname);
+    return NextResponse.redirect(loginUrl);
+  }
+  if (pathname.startsWith('/api/')) {
+    return NextResponse.json(
+      { error: 'Authentication required' },
+      { status: 401 }
+    );
+  }
+  return NextResponse.next();
+}
+function handleAdminRoute(
+  request: NextRequest,
+  pathname: string,
+  userRole: string | undefined
+) {
+  if (!ADMIN_ROLES.has(userRole || '')) {
+    if (pathname.startsWith('/api/')) {
+      return NextResponse.json(
+        { error: 'Admin access required' },
+        { status: 403 }
+      );
+    }
+    // Redirect non-admin users to their appropriate dashboard
+    if (COMPANY_ROLES.has(userRole || '')) {
+      return NextResponse.redirect(new URL('/firma', request.url));
+    }
+    return NextResponse.redirect(new URL('/giris', request.url));
+  }
+  return NextResponse.next();
+}
+function handleCompanyRoute(
+  request: NextRequest,
+  pathname: string,
+  userRole: string | undefined
+) {
+  if (!COMPANY_ROLES.has(userRole || '')) {
+    if (pathname.startsWith('/api/')) {
+      return NextResponse.json(
+        { error: 'Company access required' },
+        { status: 403 }
+      );
+    }
+    return NextResponse.redirect(new URL('/giris', request.url));
+  }
+  return NextResponse.next();
+}
+export const config = {
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - public folder
+     */
+    '/((?!_next/static|_next/image|favicon.ico|public/).*)',
+  ],
+};

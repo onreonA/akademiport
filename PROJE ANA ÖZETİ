@@ -1,0 +1,171 @@
+BAŞLAMADAN ÖNCE :
+tüm bu notlarımda istediğim şey, anlam bozuklukları, olması gereken iyileştirmeler, eklenmesi gereken ek bilgilerin neler olması gerektiği gibi bir analiz yapmanı istiyorum. Burada önemli olan vurgu şu, buradaki yazdığım işleri aslında geçmişte çok uzun zaman harcayarak aslında yaptık. Yapmadığımız yerleri zaten notlarımın içerisinde vurguladım. Bu yüzden tüm daha öncesinde ilgili bölümlerle ilgili yapılan işlemleri cursorun detaylı olarak analiz etmesini, ardından burdaki notları da detaylı olarak anlayarak sistemde güncellemeleri yapmasını istiyorum.
+Burada önemli olan şey, artık bu projede kaybedecek zamanım kalmadı ve bu iş benim için hayat memat meselesine döndü. Bu yüzden en doğru şekilde adımlarımı atmam lazım ki bugün bu işi artık bitirmeliyim.
+Aşağıdaki bu notlarda lütfen en doğru adımları belirle. Bir de hatırlatmam gereken bir şey var, o da eğer bir işi firma ya da admin kısmında yazdıysam bunlar muhakkak karşılıklı olmalı. Yani firmada bir şey görmek istiyorsak bunun admin tarafından yönetilebilmesi gerektiğini lütfen atlama, veya eğer adminde istediğimiz bir şey varsa bunun da firmayı ilgilendiriyorsa firmanın ilgili sayfasında veya bölümünde ollması gerektiğini unutma.
+Bu düzenlemeleri yaparken geçmişte yaptığımız bölümleri atlayıpta sıfırdan bir yapı kurmanı istemiyorum. Seni sayfalarda veya modüllerde doğru isimler kullanarak yönlendirememiş olabilirim, bu kısımda senin zekana güveniyorum. Eğer anlamadın bir yer olursa da lütfen bana sor.
+
+
+
+Şimdi Tüm Projeyle ilgili sana bir özet geçmek istiyorum ki, senin de bütünü yakalamanı istiyorum.
+
+Öncelikle Projede 3 Ana başlık var.
+1. Web sitesi bölümü  : www.ihracatakademi.com / localhost:3000 ile giriş yaptığımız yer. Bu bölümde çeşitli sayfalar var. Site içerisinde çeşitli iletişim formları vb olacak ama şimdilik sadece bunlardan Kariyer sayfasındaki formları aktif edip /admin bölümü ile bağladık. Burda adminin onayladığı başvurulardan Stajer ve Firma temsilcisi formlarını /firma kısmında da görünmesini sağladık, ama diğer formları yapmadık.
+
+2. Admin Bölümü :  /admin
+Bu bölüme sadece master admin girişi ve danışmanlar giriş yapabilsinler istiyorum. Danışmanlar ise sadece master admin tarafından verilen yetkileri kadar siteye erişim sağlayabilsinler istiyorum.
+Admin Kısmı tüm projenin yönetimini sağlayan bir beyin, merkez pozisyonunda olacak.
+
+
+3. Firma Bölümü /Firma:
+/admin bölümünde açılan tüm modüllerdeki yine admin ve danışman tarafından üretilecek içerikleri görecek, danışman ile iletişime geçip mesajlaşabileceği bir alan. Buradaki kullanıcılar admin tarafından /admin/firma-yonetimi sayfasından açılan kullanıcılar tarafından giriş yapılabilen bir alan.
+
+# KULLANICILAR : #
+ - Master Admin : Tüm sistemi kontrol edip yönetebilecek.
+ - Danışman : Master admin tarafından hangi modüle erişebileceği, hangi işlemleri yapabileceği belirlenecek. Bu modüllerde ekleme/değiştirme/silme vb işlemler için yetki alacak.
+
+- Firma Admin : Master admin tarafından (admin@ihracatakademi.com) açılan firmalarda ilk oluşturulan hesap olacak. Bunu bu zamana kadar yaptığımız çalışmalarda user olarak tanımladık. Örneğin : info@sahbaz.com , info@rosehan.com gibi… Bu kişiler aslında firmanın ana admin kullanıcısı olacak ve kendi firmaları için de 2 alt kullanıcı açabilecek. Bu alt kullanıcılar da tüm sistemi görebilecek, ve kendi içlerinde proje yönetimi gibi alanlarda yetkilendirmeye tabi tutulabilecek. Örneğin firma admin tarafından bir ana proje veya alt proje bir firma alt kullanıcısına atanabilecek. Firma admin ve alt kullacıları da kendi aralarında sohbet ve iletişim kurabilecek ( bunu mevcut şu ana kadar yapılan çalışmada hiç düşünmemiştik, yeni bir geliştirme yapacağız, ve tavsiyelerin benim için önemli. )
+
+Burda önemli olan ve şu anda sistemde hatalı çalışan kısım şurası : mevcutta admin kısmına maalesef info@mundo.com gibi kullanıcılar giriş yapabiliyor. Firma olarak açılan hiçbir Firma admin ( user) kullanıcısı admin sistemine erişememeli.
+
+Yine bu zamana kadar yapmamıştık, ama ilerleyen aşamalarda /admin dashboard sayfasında firmaların tamamını İlerleme tablosu gibi bir tabloda listeleyeceğiz, burada bir sekme ile firma yerine davran gibi bir buton ile yeni sekmede açılan pencerede admin veya danışman firmanın hesabına şifre veya kullanucu adı girmeden erişebilmeli. Eriştiği hesap firma kullanıcısı (user) yani firma admin bölümü olmalı.
+
+- Gözlemci (hiç eklenmedi) burada sadece dashboard sayfası olacak ve bakanlık veya üst çatı kuruluş olan sanayi odaları gibi yerlerden bazı yöneticilere açacağımız bu gözlemci hesabı ile sadece bu dashboard sayfasına erişim sağlamaları sağlanacak. Bu sayede projedeki ilerlemeyi onlara şeffaf bir şekilde göstermiş olacağız.
+
+
+
+Şimdi Genel Modüller ile ilgili bilgilendirmeleri yapayım.
+# PROJE YÖNETİMİ : #
+
+Bu bölüm projeninin en önemli kısımlarından birisi, bu yüzden biraz detaylı anlatmaya çalışacağım sana.
+	- Firmaların B2C, B2B pazaryerlerinin kurulumundan yönetimine kadar tüm süreci planlayacağımız bir alan olacak. Ve ana kurgu şu şekilde olacak. Örneğin : B2C Pazaryeri kurulu ve yönetimi adından ana bir projemiz var. Bu ana başlığın altında yaklaşık 10-15 farklı alt başlıklar var: Pazar Araştırması , Hesap açılışı gibi. Bu alt başlıkların da altında adım adım yapılacak alt işlemler/görevler var. Örneğin hesap açılışı işinde : - kayıt başvurusu, Kimlik ve Varlık Doğrulama, Ödeme Alt yapısı gibi alt işlemler var. Burada danışman bu işlemlerin nasıl yapılacağı ile ilgili açıklamalar yapabilecek. Eğitim bölümünde hazırlanan videolar ve dökümanlar bölümü vardı, eğer buralarda ilgili daha önce yüklenmiş eğitim video ve dökümanları varsa bunlara da yönlendirme yapılabilirse şahane olur.
+	- /firma kullanıcıları admin tarafından açılan tüm bu proje adımlarını görebilecek ve hedeflenen deadline içerisinde kendi görevlerini yerine getirmeye çalışacaklar. Herhangi bir görevi tamamladığında bunla ilgili işlemi tamamladım diye durum bildirecek. Bu bilgi admin / danışman kısmına gidecek. Ve admin onayından sonra tamamlandı olarak kaydedilecek. Yani bir görevin tamamlanması danışman onayına bağlı olacak. Bu görevlerde firmalar danışmana görevler anında soru sormak isteyebilirler, bu işlemi görevin altındaki yorum/soru bölümünde yazabilir. Danışman ise bu görevle ilgili firmaya cevap verebilir.
+	- Proje Ana Proje – Alt Proje ve Görevler başlığında ilerliyor. Burada her alt proje tamamlandığında danışman tarafından Alt Proje Tamamlanma yazısı yazmasını istiyoruz. Bu alt proje raporları daha sonrasında tüm firmaların ilerleme raporlarında kullanılacak.
+	- Bu arada firmaların tüm görev ve proje ilerleme tarihleri önemli, bu loglar ve kayıtlarla Firma Proje değerlendirme raporu bölümü hazırlanırken buradaki bilgiler bizim için hayati olacak .
+	- En önemli durumlardan birisi danışman veya admin tarafından açılacak bu ana – alt projeler ve görevler her firmaya ayrı ayrı atanacak. Ve her firmanın kendi ilerlemesi takip edilebilecek.
+	- Projelerin bitiş tarihine göre firmalara bildirim ve e-mail gibi hatırlatmalar yapılacak.
+	- Danışmandan yazılan her görev açıklaması firmaya yine bildirim olarak gidecek.
+
+# EĞİTİM YÖNETİMİ #
+
+Bu kısım 2 ana başlıktan oluşuyor.
+	- Videolar
+	- Dökümanlar
+
+## Videolar ##
+İki başlıkta da Eğitim setleri Bölümü olacak. Örneğin Videolar Kısmında: “Alibaba Yönetimi” adı altında bir eğitim seti olacak. Ve bu bölümün içinde videolar olacak. Burada istediğimiz ana özellik şu olacak. /admin bölümünde  Youtube linki ile eklediğimiz videoları sırasıyla izlemeden diğer eğitim videolarına geçemeyek. Burada eğitimlerin tamamının eksiksiz izlenmesi bizim ana amacımız.
+Firmalar tüm eğitim setlerini ekranlarında görebilsinler istiyoruz, fakat master admin veya danışman tarafından her firmaya eğitim setlerinin ataması olsun istiyoruz. Yani danışman tarafından eğer yetki veya izin verilmemişse ilgili setteki videoların ne olduğunu görsünler, ama açamasınlar.
+- Önemli noktalardan birisi de burada da performans takibi yapacağız aslında. Her firmanın kendi ilerlemesini hem firma görecek, hem de admin tarafından izlenebilecek.
+
+## Dökümanlar ##
+Videolar başlığında olduğu gibi burada da eğitim setleri olacak. Örneğin Alibaba dökümanları, Pazaryeri araştırma dökümanları, amazon dökümanları gibi.
+Her bir setin içerisinde /admin tarafından yüklenmiş pdf, word gibi belgeler olacak. Firmalar bu belgeleri hem önizleme yapabilecekler, hem de kendi bilgisayarlarına indirebilecekler.
+
+Burada admin tarafından hangi dökümanın hangi firma tarafından önizleme yapıldığını veya indirildiğini raporlamamız gerekecek. Bu sayede firmanın projeye olan ilgisini ölçmek istiyorum.
+
+#ETKİNLİKLER#
+
+- Admin ve danışman tarafından offline görüşme, webinar, online toplantı vb gibi etkinlikler açılabilecek. Her etkinliğe hangi firmaların davet edilebileceği belirlenecek. Etkinlikle ilgili varsa açıklama, belge vb içerikler yüklenebilecek. Eğer bir etkinlik offline ise bunla ilgili danışman tarafından konum bilgisi de paylaşabilecek. Online bir toplantı ise zoom ile sistemin entegre olmasını isteyeceğiz ve buradan danışman online bir etkinlik açtığında zoom linki de oluşturulabilecek.
+
+- Firma tarafından bu etkinlikler görüntülenebilecek, ve etkinlik öncesi ön katılım bilgisi istenecek. Katılacağım / Katılamayacağım şeklinde. Katılamayacaksa bunun nedeni öğrenilecek.
+- Etkinlik sonrasında danışman katılan / katılmayan firmaları listeleyecek. Ve bu listeleme de bizim için çok önemli, çünkü bunu da raporlama ve firma ilerleme , liderlik tabloları ( firmalar arası hoş bir rekabet sağlamak için ana dashboard sayfasında yapacağımız bir alan, detayları sonra vereceğim ) gibi alanlarda bu katılım durumu raporlaması bizim için önemli olacak.
+
+- Hem admin hem de firma kısımlarında bu etkinlikler sayfasında güzel ve dinamik bir takvime ihtiyacım var. Evet etkinlikler güzel bir kart tasarım ile sayfada zaten görünecek ama aynı sayfanın üst kısmındaki bu takvimde de bütünü görebilsin firmalar.
+
+# RANDEVU YÖNETİMİ #
+
+- Firmalar danışmanlardan randevu talep edeceği bir modül olacak bu kısım. Randevular sayfasında bir takvim olacak. Firma danışmanın takvimindeki boş saatler için randevu talep edebilecek. (Ortak takvim sistemi ile ilgili daha sonra detaylı açıklama yapacağım )
+- Aynı işlem danışman tarafından da yapılabilecek, yani danışman da firmadan randevu talep edebilecek.
+- Randevular offline görüşme, firma ziyareti, online toplantı vb şeklilerinde olacak. Offline için konum bilgisi, online için zoom entegrasyonu toplantı linki oluşturulacak.
+- Firma tarafından yapılan talep eğer danışman tarafından onaylanırsa bu durumda online toplantı linki oluşacak.
+- Firma veya danışman tarafından oluşturulan randevu sadece 1 kez revize istenebilecek. Revize tarihi ve saati yine danışmanın boş olan saatleri içerisinden seçilebilecek. 1 Kez revize edilmiş randevu bir kez daha değiştirilemeyecek ve eğer katılamayacaksa iptal e dönecek.
+- Firmanın talep ettiği randevu eğer ilgili saatte gerçekleşmemişse danışman tarafından yine raporlanacak. Gerçekleşti, gerçekleşmedi şeklinde. Ve burada danışman tarafından gerçekleşmeme nedeni seçilecek ve yine danışman tarafından kısa bir değerlendirme raporu yazılabilecek.
+- Her randevu kartı üzerinde not bölümü olacak. Burada randevuyu talep eden ve randevu talep eden tarafından bu kart üzerinden mesajlaşma sağlanabilecek.
+- Randevuyu firma veya danışman iptal etmek isterse iptal edebilecek, ama açıklama yazma zorunluluğu olacak.
+- Randevularım sayfasında da güzel ve etkili bir takvim istiyorum. Burada firmalar danışmanın takviminin dolu olduğu gün ve saatleri görebilecek, ama kiminle veya neden dolu olduğu gibi bilgilere erişemeyecek, sadece takvimde o danışmanın takviminin dolu olduğu kısmı görünecek.
+
+
+## Etkinlik yönetimi ve Randevularım kısmı için TAKVİM ek bilgisi ##
+- Etkinliklerde sadece etkinlik saat ve bilgilerinin görünmesi yeterli.
+- danışman istediği zaman kendi çalışma saatleri içerisinde takvimi kapatabilmeli. Örneğin Perşembe günü 13:00 – 15:00 arasında meşgul olduğunu takviminde işaretleyebilmeli.
+- randevularım kısmında firma randevu talep edecekken takvimde etkinlikleri ve danışmanın kendi takviminde işaretlediği dolu saatleri görebilmeli. Ama detaylarını göremesin, sadece o saatlerin dolu olduğunu görsün ki, danışmanın boş saatlerine göre randevu talep edebilsin.
+
+
+
+## Proje Yönetimi, Eğitim yönetimi, Etkinlikler, Randevu Yönetimi sayfaları için performans değerlendirme ek bilgisi ##
+
+Bu sayfalarda firmaların ilerlemesi veya etkinlik veya randevulardaki performansları bizim için çok önemli. Her biri kendi içerisinde ayrı ayrı değerlendirilip ardından da tüm firmaların kendi dashboardlarında ana sayfada bir Liderlik Tablosu gibi bir tabloda hoş bir rekabet tablosu oluşturmak istiyorum. Bu yüzden tüm bu 4 ana başlıktaki değerlendirmeler ve ölçümlemeler bizim için çok önemli. 4 başlık için bir puanlama sistemi mi olur, başka bir şekilde mi hesaplama olur bilmiyorum ( burada senin fikirlerin çok önemli ) ama önemli bir iş olduğunu bilmeni istiyorum.
+
+Skorlama/Liderlik (öneri, ama senin önerilerine de açığım)
+•	Her modül 0-100 normalize puan üretsin; liderlikte ağırlıklı ortalama:
+o	Proje Yönetimi 0.4 = tamamlanan görev oranı (%), onay gecikmesi SLA sapması, yorum yanıt süresi.
+o	Eğitim 0.25 = izleme tamamlama (% video), okunan doküman oranı.
+o	Etkinlik 0.2 = katılım oranı, “katılmayacağım” gerekçesi bildirme oranı.
+o	Randevu 0.15 = gerçekleşme oranı, no-show oranı, tek seferlik revize uyumu.
+
+
+# FİRMA YÖNETİMİ#
+- Daha öncesinde /admin/firma-yonetimi kısmında firmaların temel bilinmesi gereken alanları ile ilgili tablar altında form alanları açmıştık. Buraları admin veya danışmanın da firmalardan hangi bilgileri talep edecekse ekleyip düzenleyebileceği bir form olulşturma alanına dönüştürebilirsek eğer çok güzel olur.
+- Firmalardan talep edilecek belgeler olacak. Bunları da firmalar bu kısımda kendi alanlarına ekleyecekler. Bu belgeler bölümü tablar şeklinde olabilir. Örneğin : Genel belgeleler, SGS Belgeleri, Pazaryeri Belgeleri, Dijital Pazarlama için istenen belgeler gibi tablar şeklinde olurs a firmalarda bu sayede hangi firma hangi işlem için belge istendiğini daha net olarak görmüş olur. Bir de bu tab alanlarının altında da kısa bir açıklama alanı olabilir.
+
+
+#PROFİL YÖNETİMİ#
+- Özellikle firma kısmını ilgilendiren bu kısımda admin tarafından kullanıcı açılınca bu kullanıcıya ait kişisel bilgilerin firma admin kullanıcısının tarafından doldurulacağı bir alan olmalı. Doğum tarihi gibi bilgileri de almalıyız ki, o tarihlerde doğum günü tebriği yapabilelim.
+
+
+#KULLANICI YÖNETİMİ#
+- /firma tarafında Firma Admin (user) kullanıcısı tarafından en fazla 2 alt kullanıcı tanımlayabileceği alan. Burada bu kullanıcıların hangi bölümlere girebileceği ve Ekleme/değiştirme/silme gibi yetkileri vereceği bir alan olmalı. Bunla ilgili geçmişte zaten bir çalışma yapmıştık. Ama tüm sistemin detaylı olarak analiz edilmesini ve gerekli geliştirmelerin yapılmasını istiyorum.
+- Admin kısmında da bu alt firma kullanıcılarının bilgileri görüntülenebilmesi, bunların yaptığı işlemlerin ilgili modüllerde log kayıtları ile birlikte görünmesi lazım.
+- Firma admini tarafından da bu kullanıcılar aktif / pasif hale getirilebilmeli, ama silme yapılamamalı. Çünkü o kişinin sistemde ilgili log kayıtlarının silinmesini istemeyiz.
+- Bu durumda firma en fazla 2 alt kullanıcı tanımlamalı kısmını şöyle revize edelim, firma en fazla 2 aktif alt kullanıcı bulundurabilmeli. Eski bir kullanıcı, veya işten çıkan bir kullanıcı varsa örneğin, bu kullanıcıyı pasif e çekip, ondan sonra yeni aktif kullanıcı ekleyebilmeli.
+
+
+
+
+
+# GENEL FRONTEND AYARLARI #
+Belki de bu kısım senin ilk eline alman gereken, öncelik vermen gereken yer olacak. Ama karar senin.
+
+Projenin en başından beri hem /admin hem de /firma tarafından header ve sidebar işini çözemedim. Son yaptığımız tasarımları yeri geldi tüm /firma veya /admin içerisindeki bütün sayfalara uygula desemde uygulanmadı. Yeni oluşturulan bir sayfa olmuşsa bunlarda hiçbir şekilde hidebar veya sidebar gelmedi. Ve bu header ve sidebar işinde geçmişte bir standartlaştırma yapamadığımız için de çok zaman kaybettik. Ama artık zamanım kalmadı, bu iş benim için artık hayat memat meselesi haline geldi. Burda neyi eksik yaptım bilmiyorum, seni nasıl yönlendireceğimi bilemedim. Ama artık bu kısmı gerçekten bir standart kalıp haline getirmek ve buralarda bir daha zaman kaybetmek istemiyorum.
+
+Ayrıca tüm sayfalardaki genel tasarımlar neredeyse hiçbir şekilde tutarlı değil. Yazı fontlarından tutta, kart tiplerine, dashboard grafiklerine kadar maalesef hiçbir sayfada tutarlı bir tasarım yapamadık. Bu en büyük sıkıntılarımdan birisi. Fakat seni nasıl yönlendireceğimi de bilmiyorum. Bu kısma gelene kadar tüm sistemde frontend optimizasyonları vs yaptın. Keşke bana önce tüm tasarım içeriklerini, tablo, header, sidebar, fontlar, kutu tasarımları gibi bunları görebileceğim, ive içerisinden seçtiklerimle tüm tasarımlarda artık bir standart tasarım yapısını kurabileceğimiz bir çalışma yapsak. Sürekli tasarım düzenlemeleri ile uğraşmak gerçekten çok sıkıcı çünkü.
+
+#Bildirim sistemi#
+Sistemin tamamında her yeni eklenen içerik, haber, proje, etkinlik, firmanın kendi özelindeki randevular gibi olması gereken tüm bildirim sistemlerini aktif etmemiz lazım. Üst header tarafında bir ikonla son bildirimleri kısa yoldan görebilecekleri gibi firmalar ve admin veya danışman da ana sayfa dashboard kısmında son bildirimler gibi bir alanda bunları görmeli.
+
+Ayrıca e-mail alt yapısı kurduk galiba ama bunu nasıl yöneteceğimi bilmiyorum. Burda yönlendirmelerine ihtiyacım var.
+
+#ZOOM ENTEGRASYONU#
+bunla ilgili de alt yapıda galiba çalışmalar yaptın, ama genel durumunun analiz edilip sonrasında doğru sistemin kurulması lazım.
+
+
+
+ 
+
+## Bu bölümden sonraki kısımlar biraz daha önem derecesi düşük olan işlemler olduğu için daha kısa açıklamalara sahip : ##
+
+#FORUM#
+Zaten mevcut sistemde de yaptığımız bir alan ama gerekli iyileştirme ve geliştirmelere açığım. Ana amacı katılımcı firmaların tamamı bu forum alanında kendi başlıklarını açıp diğer firmalarla etkileşim içerisine girebildikleri bir alan olacak. Admin veya danışman tarafından da bu bölüm de başlık açılabilecek. Genel olarak bir forum yönetiminde olması gereken klasik içerikler olacak.
+
+#HABERLER#
+Admin veya danışman tarafından e-ticaret, e-ihracat, teknoloji gibi kategorilerde haberler açılabilecek. Amaç firmaların bu projede biraz daha keyifli zaman geçirebilmeleri ve güncel haberleri takip etmeleri. Daha önce bunla ilgili zaten bir alt yapı yaptık, sadece tasarımsal olarak geliştirmeler veya önereceğin içeriksel olarak geliştirmelere açığım.
+her bir haberin altında da yine yorum kısmı açık olacak.
+
+#KARİYER#
+http://localhost:3000/kariyer bu sayfada 3 farklı tabda başvuru formu alıyoruz.
+- danışman : bu sadece admin veya danışmanın değerlendireceği başvurular olacak.
+- Stajyer ve Firma İK tablarından alınan başvurular ise admin danışman tarafından onaylanırsa eğer firmaların İK Havuzu kısmında görüntülenebilecek. Ve eğer bir firma bu başvurulardan birisini işe almışsa işe alındı diye işaretleyebilecek, ve admin onayından sonra o kişinin Başvurusu firmaların tamamının İK havuzu bölümünden kaldırılacak. Ve admin tarafında işe alınanlar bölümü olarak ayrıca gruplanacak.
+
+#RAPORLARIM#
+- Mevcut durum : Firma için hazırlanmış olan ara değerlendirme, sektör analizi, pazaryeri analizi, ürün analizi gibi raporların firma ile paylaşılacağı bir alan olacak. Bu paylaşımlar admin veya danışman tarafından yapılacak, dökümanlar bölümünde olduğu gibi firmalar da burada kendisi ile paylaşılan raporları izleme veya indirme yapabilecek.
+- Geliştirme kısmında ise daha önce de proje yönetiminde bahsettiğim gibi firmanın danışman veya admin tarafından yapılan değerlendirmelerine ve ilerlemelerine göre farklı başlıklarda raporlar isteyeceğiz. Bunun gerekli alt yapısı kurulmuştu ama geliştirme kısmı ile ilgili adımları daha sonra aktaracağım.
+
+#N8N Entegrasyonu#
+Şimdi değil ama en son yapılacaklar listesinde bu var. Örneğin haberler gibi kısımlarda otomasyon sistemleri ile önce içeriklerin üretilmesini sağlayıp, sonra bunları admin bölümünde listelenmesini sağlayıp, ardından da firmalar kısmında görüntülenmesini isteyeceğim.
+
+- Ayrıca bir chatbot kurmak istiyorum, burada eğittiğimiz bu chat robotu firmaların tüm sorularına cevap verebilir hale gelecek.
+
+- ilerde kuracağımız VAPİ entegrasyonu ile firmaların destek hattını aramasını, ve destek hattında yapay zeka ile yaptığı görüşmeleri raporlamak isteyeceğiz admin bölümünde.
+
+Ayrıca daha sonrasından benim ekleyeceğim, veya senin önereceğin sistemleri de entegre edebilir halde olmamızı istiyorum.
+
+

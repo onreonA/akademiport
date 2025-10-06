@@ -1,0 +1,223 @@
+import { NextRequest, NextResponse } from 'next/server';
+
+import { createClient } from '@/lib/supabase/server';
+
+/**
+ * POST /api/consultant/tasks/[id]/approve
+ * Danışman görev tamamlamasını onaylama
+ */
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const supabase = createClient();
+    const { id: taskId } = await params;
+
+    // Kullanıcı kimlik doğrulama
+    const userEmail = request.cookies.get('auth-user-email')?.value;
+    const userRole = request.cookies.get('auth-user-role')?.value;
+
+    if (!userEmail) {
+      return NextResponse.json(
+        { error: 'Kullanıcı kimlik doğrulaması gerekli' },
+        { status: 401 }
+      );
+    }
+
+    // Danışman kontrolü
+    if (
+      userRole !== 'danışman' &&
+      userRole !== 'admin' &&
+      userRole !== 'master_admin'
+    ) {
+      return NextResponse.json(
+        { error: 'Bu işlem için danışman yetkisi gerekli' },
+        { status: 403 }
+      );
+    }
+
+    // Request body'den onay bilgilerini al
+    const body = await request.json();
+    const { approvalNote, qualityScore } = body;
+
+    // Kullanıcı bilgilerini al (danışman veya admin)
+    const { data: user, error: userError } = await supabase
+      .from('users')
+      .select('id, full_name, email')
+      .eq('email', userEmail)
+      .single();
+
+    if (userError || !user) {
+      return NextResponse.json(
+        { error: 'Kullanıcı bilgisi bulunamadı' },
+        { status: 404 }
+      );
+    }
+
+    // Görev tamamlama kaydını bul
+    const { data: completionRecord, error: completionError } = await supabase
+      .from('task_completions')
+      .select(
+        `
+        id,
+        task_id,
+        completed_by,
+        completion_note,
+        completion_date,
+        actual_hours,
+        status,
+        tasks(
+          id,
+          title,
+          description,
+          status,
+          project_id,
+          sub_project_id,
+          projects(
+            id,
+            name,
+            companies(
+              id,
+              name
+            )
+          )
+        )
+      `
+      )
+      .eq('task_id', taskId)
+      .eq('status', 'pending_approval')
+      .single();
+
+    if (completionError || !completionRecord) {
+      return NextResponse.json(
+        { error: 'Onay bekleyen görev tamamlama kaydı bulunamadı' },
+        { status: 404 }
+      );
+    }
+
+    // Görev tamamlama durumunu güncelle
+    const { data: updatedCompletion, error: updateCompletionError } =
+      await supabase
+        .from('task_completions')
+        .update({
+          status: 'approved',
+          approved_by: user.id,
+          approved_at: new Date().toISOString(),
+          approval_note: approvalNote || 'Görev onaylandı',
+          quality_score: qualityScore || null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', completionRecord.id)
+        .select()
+        .single();
+
+    if (updateCompletionError) {
+      return NextResponse.json(
+        { error: 'Görev onayı güncellenirken hata oluştu' },
+        { status: 500 }
+      );
+    }
+
+    // Görev durumunu tamamlandı olarak güncelle
+    const { data: updatedTask, error: updateTaskError } = await supabase
+      .from('tasks')
+      .update({
+        status: 'completed',
+        progress: 100,
+        completed_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', taskId)
+      .select()
+      .single();
+
+    if (updateTaskError) {
+      // Görev durumu güncellenemedi ama onay kaydedildi
+    }
+
+    // Görev geçmişine kayıt ekle
+    const { error: historyError } = await supabase.from('task_history').insert({
+      task_id: taskId,
+      action: 'approved',
+      old_value: 'pending_approval',
+      new_value: 'approved',
+      user_id: user.id,
+      notes: approvalNote || 'Görev danışman tarafından onaylandı',
+    });
+
+    if (historyError) {
+      // History record error - non-critical
+    }
+
+    // Firma kullanıcısına bildirim gönder
+    const { data: companyUser, error: companyUserError } = await supabase
+      .from('company_users')
+      .select('id, name, email, company_id')
+      .eq('id', completionRecord.completed_by)
+      .single();
+
+    if (companyUser && !companyUserError) {
+      const { error: notificationError } = await supabase
+        .from('notifications')
+        .insert({
+          user_id: companyUser.id,
+          title: 'Görev Onaylandı',
+          message: `${(completionRecord.tasks as any).title} görevi onaylandı`,
+          type: 'task_approved',
+          entity_type: 'task',
+          entity_id: taskId,
+          metadata: {
+            task_title: (completionRecord.tasks as any).title,
+            approved_by: user.full_name,
+            approval_note: approvalNote,
+            quality_score: qualityScore,
+          },
+        });
+
+      if (notificationError) {
+        // Notification error - non-critical
+      }
+    }
+
+    // Proje ilerlemesini güncelle
+    const { error: projectProgressError } = await supabase.rpc(
+      'update_project_progress',
+      {
+        project_id: (completionRecord.tasks as any).project_id,
+      }
+    );
+
+    if (projectProgressError) {
+      // Project progress update error - non-critical
+    }
+
+    const response = {
+      success: true,
+      message: 'Görev başarıyla onaylandı',
+      task: {
+        id: updatedTask?.id || taskId,
+        title: (completionRecord.tasks as any).title,
+        status: 'completed',
+        approvedAt: updatedCompletion.approved_at,
+        approvedBy: user.full_name,
+      },
+      completion: {
+        id: updatedCompletion.id,
+        status: updatedCompletion.status,
+        approvalNote: updatedCompletion.approval_note,
+        qualityScore: updatedCompletion.quality_score,
+      },
+    };
+
+    return NextResponse.json(response);
+  } catch (error) {
+    return NextResponse.json(
+      {
+        error: 'Sunucu hatası',
+        details: error instanceof Error ? error.message : 'Bilinmeyen hata',
+      },
+      { status: 500 }
+    );
+  }
+}

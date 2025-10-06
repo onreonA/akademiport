@@ -1,0 +1,173 @@
+# IA-6 Proje Kuralları
+
+## 🚨 KRİTİK KURALLAR - ASLA ATLAMA
+- AdminLayout component'inde title prop'u ZORUNLU - hiçbir sayfada title olmadan AdminLayout kullanma
+- Console.log kullanımı YASAK (production'da) - debug için console.log kullanıyorsan production'da kaldır
+- Import order kurallarına UY - next/link, react, sonra diğer import'lar
+- Next.js 15 async params pattern'ini kullan - `const { id } = await params;`
+- Error handling'de unknown type guard'ları kullan - `(error instanceof Error ? error.message : 'Bilinmeyen hata')`
+- **VERSİYON TAKİP ZORUNLU** - Her git commit'inden sonra CHANGELOG.md, VERSION_HISTORY.md, PROJECT_LOG.md güncelle
+
+## 🔍 DOSYA TARAMA KURALLARI - ÖNEMLİ
+- Herhangi bir migration/refactoring öncesi MUTLAKA glob_file_search kullan
+- Dinamik route'ları ( [id], [slug] ) ASLA gözden kaçırma
+- Nested route'ları ( alt-projeler/[id]/gorevler ) kontrol et
+- Sadece statik dosya listesi YETERLİ DEĞİL - tüm page.tsx dosyalarını tara
+- Migration stratejisi oluştururken glob pattern kullan: `**/firma/**/page.tsx`
+- Admin sayfaları için: `**/admin/**/page.tsx`
+- Her kategori için ayrı glob search yap
+- **DETAY SAYFALARI İÇİN ÖZEL KURAL**: `find app/firma -name "page.tsx" | grep -E "\[.*\]"` komutu ile tüm detay sayfalarını tespit et
+- **NESTED SAYFALAR**: Client component'leri de kontrol et (VideoDetailClient.tsx, VideoPlayerClient.tsx gibi)
+
+## 🏗️ LAYOUT KURALLARI - ÖNEMLİ
+- Layout component'lerini sadece UI ile ilgilen - API logic'ine DOKUNMA
+- Layout değişikliklerinde sadece wrapper component'leri değiştir - sayfa içeriğine dokunma
+- FirmaLayout ve AdminLayout'u tutarlı kullan - her sayfada aynı layout
+- Sidebar menü yapısını merkezi tut - her sayfada farklı menü YASAK
+- Layout component'lerinde state management YASAK - sadece UI state'i
+- Layout değişikliklerinde API call'larına DOKUNMA - sadece UI değişikliği yap
+
+## 🏗️ YAPISAL KURALLAR
+- Interface'leri merkezi types/ klasöründe tanımla - aynı veri yapısı için farklı interface'ler yazma
+- Component prop'larını esnek tasarla - union type'ları genişlet, yeni değerler ekle
+- Database schema ile API'yi senkronize tut - type assertion yerine doğru schema kullan
+- Generic component'leri tercih et - benzer component'leri tekrar yazma
+- Props interface'lerini component dosyasında tanımla - external type import'u tercih et
+
+## 🎨 TASARIM KURALLAR
+- Tailwind CSS utility'lerini kullan - inline style YASAK
+- Responsive design'ı unutma - mobile-first yaklaşım
+- Component'lerde tutarlı spacing kullan - p-4, m-6 gibi standart değerler
+- Color palette'i standartlaştır - primary, secondary, accent renkler
+- Card tasarımlarını tutarlı yap - border, shadow, radius standartları
+- Font size'ları standartlaştır - text-sm, text-base, text-lg
+
+## 🔧 TEKNİK KURALLAR
+- TypeScript strict mode'u kullan - any type'dan kaçın
+- ESLint kurallarına uy - pre-commit hook'ları bypass etme
+- Git commit mesajlarını standartlaştır - fix:, feat:, refactor: prefix'leri kullan
+- API route'larında error handling yap - try-catch blokları kullan
+- Loading state'leri ekle - kullanıcı deneyimi için önemli
+- Error boundary'ler kullan - component crash'lerini önle
+
+## 📁 DOSYA YAPISI
+- Components: /components/* - reusable component'ler
+- Types: /types/* - merkezi type tanımları
+- API Routes: /api/* - backend endpoint'leri
+- Admin: /admin/* - admin paneli sayfaları
+- Firma: /firma/* - firma paneli sayfaları
+- Lib: /lib/* - utility fonksiyonları
+
+## 🚫 YASAK DURUMLAR
+- Console.log kullanımı (production'da)
+- Any type kullanımı (mümkünse)
+- Hardcoded string'ler (i18n kullan)
+- Inline style'lar (Tailwind kullan)
+- Nested ternary operator'lar (okunabilirlik için)
+- Props drilling (context kullan)
+- useEffect dependency array'lerini boş bırakma
+- **YENİ SAYFA OLUŞTURURKEN LAYOUT KULLANMAMAK** - Her yeni sayfa MUTLAKA FirmaLayout veya AdminLayout kullanmalı
+- **DETAY SAYFALARINDA LAYOUT EKSİKLİĞİ** - Tüm nested/detay sayfaları da layout kullanmalı
+
+## ✅ ZORUNLU DURUMLAR
+- Error boundary'ler - component crash'lerini önle
+- Loading state'leri - kullanıcı deneyimi
+- Type safety - TypeScript strict mode
+- Responsive design - mobile-first
+- Accessibility - aria-label, alt text
+- Form validation - client ve server side
+- API error handling - try-catch blokları
+- **LAYOUT STANDARDİZASYONU** - Her sayfa MUTLAKA FirmaLayout veya AdminLayout kullanmalı
+- **DETAY SAYFALARI KONTROLÜ** - Yeni detay sayfası oluştururken layout kullanımını kontrol et
+
+## 🔄 SÜREKLİ TEKRAR EDEN HATALAR
+- AdminLayout title prop eksikliği - HER ZAMAN title prop'u ekle
+- Console.log temizliği - production'da kaldır
+- Import order düzenlemesi - gruplar arası boş satır
+- Async params handling - await params kullan
+- Error type handling - unknown type guard'ları
+- Image element'leri - next/image kullan
+- **VERSİYON TAKİP EKSİKLİĞİ** - Git commit'inden sonra versiyon dosyalarını güncellemeyi unutma
+
+## 📊 PROJE ÖZEL KURALLAR
+- Türkçe arayüz, İngilizce kod - UI metinleri Türkçe, değişken isimleri İngilizce
+- Supabase backend - PostgreSQL database kullan
+- Next.js 15 App Router - pages/ değil app/ kullan
+- Zustand state management - Redux yerine Zustand
+- Tailwind CSS - utility-first CSS framework
+
+## 🎯 PERFORMANS KURALLAR
+- Lazy loading kullan - büyük component'ler için
+- Image optimization - next/image kullan
+- Bundle size'ı kontrol et - gereksiz import'ları kaldır
+- API call'ları optimize et - caching kullan
+- Component re-render'ları minimize et - useMemo, useCallback
+
+## 🔍 CODE REVIEW KONTROL LİSTESİ
+- [ ] AdminLayout title prop'u var mı?
+- [ ] Console.log'lar temizlendi mi?
+- [ ] Import order doğru mu?
+- [ ] Error handling yapıldı mı?
+- [ ] Type safety sağlandı mı?
+- [ ] Responsive design kontrol edildi mi?
+- [ ] Loading state'leri eklendi mi?
+- [ ] ESLint hataları var mı?
+
+## 🚀 GELİŞTİRME SÜRECİ
+1. Önce interface'leri tanımla
+2. Component'i yaz
+3. Props'ları kontrol et
+4. Error handling ekle
+5. Loading state'leri ekle
+6. Responsive design kontrol et
+7. ESLint hatalarını düzelt
+8. Test et
+9. **ZORUNLU: Git commit yap**
+10. **ZORUNLU: Versiyon dosyalarını güncelle (CHANGELOG.md, VERSION_HISTORY.md, PROJECT_LOG.md)**
+
+## 📝 COMMIT MESAJ FORMATI
+- fix: Hata düzeltmeleri
+- feat: Yeni özellikler
+- refactor: Kod yeniden düzenleme
+- docs: Dokümantasyon
+- style: Tasarım değişiklikleri
+- perf: Performans iyileştirmeleri
+- test: Test eklemeleri
+- chore: Genel bakım işlemleri
+
+## 🔄 VERSİYON TAKİP KURALLARI - ZORUNLU
+- **HER GİT COMMIT'İNDEN SONRA** versiyon dosyalarını güncelle
+- **CHANGELOG.md** güncelle - [Unreleased] bölümünü temizle, yeni versiyon ekle
+- **VERSION_HISTORY.md** güncelle - yeni versiyon detaylarını ekle
+- **PROJECT_LOG.md** güncelle - günlük aktiviteleri kaydet
+- **VERSİYON NUMARALAMA**:
+  - Major (1.0.0): Breaking changes, büyük değişiklikler
+  - Minor (1.1.0): Yeni özellikler, önemli iyileştirmeler
+  - Patch (1.1.1): Bug fixes, küçük düzeltmeler
+- **COMMIT SONRASI ZORUNLU ADIMLAR**:
+  1. `git add CHANGELOG.md VERSION_HISTORY.md PROJECT_LOG.md`
+  2. `git commit -m "docs: Update version tracking files for vX.X.X"`
+  3. Versiyon dosyalarını her zaman ayrı commit olarak yap
+- **VERSİYON GÜNCELLEME ŞABLONU**:
+  ```markdown
+  ## [X.X.X] - YYYY-MM-DD - Kategori
+  
+  ### ✨ Added / 🔧 Changed / 🐛 Fixed / 🗑️ Removed
+  - Değişiklik açıklaması
+  
+  ### 📊 Impact Statistics
+  - Files Changed: X
+  - Lines Added: +X
+  - Lines Removed: -X
+  
+  ### 🔗 Commit Details
+  - Commit Hash: XXXXXXX
+  - Commit Type: feat/fix/docs/etc
+  ```
+
+## ⚠️ ÖNEMLİ HATIRLATMALAR
+- Bu proje hayat memat meselesi - dikkatli ol
+- Zaman kaybetme - doğru adımları at
+- Tutarlılık önemli - standartlara uy
+- Test et - her değişiklikten sonra kontrol et
+- Dokümantasyon - değişiklikleri not al

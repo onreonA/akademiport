@@ -1,0 +1,49 @@
+config:
+  target: 'http://localhost:3000'
+  phases:
+    - duration: 30
+      arrivalRate: 2
+      name: 'Warm up'
+    - duration: 60
+      arrivalRate: 5
+      name: 'Ramp up'
+    - duration: 60
+      arrivalRate: 10
+      name: 'Peak load'
+    - duration: 30
+      arrivalRate: 2
+      name: 'Cool down'
+
+scenarios:
+  - name: 'API Load Test - IA-6'
+    weight: 100
+    flow:
+      - get:
+          url: '/api/firma/dashboard-stats'
+          headers:
+            Cookie: 'auth-user-email=info@mundo.com; auth-user-role=firma'
+          capture:
+            - json: '$'
+              as: 'dashboard_response'
+
+      - think: 1
+
+      - get:
+          url: '/api/firma/me'
+          headers:
+            Cookie: 'auth-user-email=info@mundo.com; auth-user-role=firma'
+          capture:
+            - json: '$'
+              as: 'me_response'
+
+      - think: 1
+
+      - get:
+          url: '/api/projects'
+          headers:
+            Cookie: 'auth-user-email=info@mundo.com; auth-user-role=firma'
+          capture:
+            - json: '$'
+              as: 'projects_response'
+
+      - think: 2
