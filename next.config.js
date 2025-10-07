@@ -20,6 +20,12 @@ const nextConfig = {
 
   // Bundle optimization
   webpack: (config, { dev, isServer }) => {
+    // Add path aliases
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': require('path').resolve(__dirname),
+    };
+
     // Production optimizations
     if (!dev && !isServer) {
       // Tree shaking optimization
