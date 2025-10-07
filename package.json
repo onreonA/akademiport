@@ -82,6 +82,7 @@
     "tailwindcss": "^3.4.17",
     "postcss": "^8.5.5",
     "autoprefixer": "^10.4.21",
+    "typescript": "^5",
     "xlsx": "^0.18.5",
     "zod": "^3.25.76",
     "zustand": "^4.5.7"
@@ -101,7 +102,6 @@
     "eslint-config-prettier": "^10.1.8",
     "husky": "^9.1.7",
     "lint-staged": "^16.1.6",
-    "prettier": "^3.6.2",
-    "typescript": "^5"
+    "prettier": "^3.6.2"
   }
 }
