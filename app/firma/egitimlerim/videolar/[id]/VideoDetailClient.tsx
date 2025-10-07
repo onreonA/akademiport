@@ -34,9 +34,7 @@ export default function VideoDetailClient({ setId }: VideoDetailClientProps) {
   const [activeTab, setActiveTab] = useState<
     'overview' | 'videos' | 'progress'
   >('overview');
-  useEffect(() => {
-    fetchEducationSetDetails();
-  }, [fetchEducationSetDetails]);
+  
   const fetchEducationSetDetails = useCallback(async () => {
     try {
       setLoading(true);
@@ -118,6 +116,11 @@ export default function VideoDetailClient({ setId }: VideoDetailClientProps) {
       setLoading(false);
     }
   }, [setId]);
+
+  useEffect(() => {
+    fetchEducationSetDetails();
+  }, [fetchEducationSetDetails]);
+
   const formatDuration = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
