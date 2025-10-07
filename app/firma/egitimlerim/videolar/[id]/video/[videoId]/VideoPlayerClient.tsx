@@ -60,6 +60,7 @@ export default function VideoPlayerClient({
   const fetchVideoDetails = async () => {
     try {
       setLoading(true);
+      console.log('🔍 VideoPlayerClient - fetchVideoDetails:', { setId, videoId });
       const response = await fetch(`/api/videos/${videoId}`, {
         headers: {
           'X-User-Email': 'info@mundo.com',

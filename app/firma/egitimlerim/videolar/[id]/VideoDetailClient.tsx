@@ -34,7 +34,7 @@ export default function VideoDetailClient({ setId }: VideoDetailClientProps) {
   const [activeTab, setActiveTab] = useState<
     'overview' | 'videos' | 'progress'
   >('overview');
-  
+
   const fetchEducationSetDetails = useCallback(async () => {
     try {
       setLoading(true);
@@ -309,6 +309,7 @@ export default function VideoDetailClient({ setId }: VideoDetailClientProps) {
                       <Link
                         href={`/firma/egitimlerim/videolar/${setId}/video/${video.id}`}
                         className='text-lg font-medium text-gray-900 hover:text-blue-600'
+                        onClick={() => console.log('🔍 Video Link Click:', { setId, videoId: video.id, href: `/firma/egitimlerim/videolar/${setId}/video/${video.id}` })}
                       >
                         {video.order_index}. {video.title}
                       </Link>
@@ -320,6 +321,7 @@ export default function VideoDetailClient({ setId }: VideoDetailClientProps) {
                       <Link
                         href={`/firma/egitimlerim/videolar/${setId}/video/${video.id}`}
                         className='inline-flex items-center px-3 py-1 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50'
+                        onClick={() => console.log('🔍 İzle Button Click:', { setId, videoId: video.id, href: `/firma/egitimlerim/videolar/${setId}/video/${video.id}` })}
                       >
                         İzle
                       </Link>
