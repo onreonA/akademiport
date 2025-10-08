@@ -15,6 +15,13 @@ interface DashboardStats {
   completedTasks: number;
   monthlyRevenue: number;
   growthRate: number;
+  // Education Stats
+  totalEducationSets: number;
+  totalVideos: number;
+  totalDocuments: number;
+  activeEducationAssignments: number;
+  completedEducationAssignments: number;
+  averageEducationProgress: number;
 }
 interface RecentActivity {
   id: string;
@@ -44,6 +51,13 @@ export default function AdminDashboard() {
     completedTasks: 0,
     monthlyRevenue: 0,
     growthRate: 0,
+    // Education Stats
+    totalEducationSets: 0,
+    totalVideos: 0,
+    totalDocuments: 0,
+    activeEducationAssignments: 0,
+    completedEducationAssignments: 0,
+    averageEducationProgress: 0,
   });
   const [loading, setLoading] = useState(true);
   // Fetch real dashboard stats
@@ -51,20 +65,54 @@ export default function AdminDashboard() {
     const fetchDashboardStats = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/api/admin/dashboard-stats', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-        if (response.ok) {
-          const result = await response.json();
+
+        // Fetch both project stats and education stats in parallel
+        const [projectStatsRes, educationStatsRes] = await Promise.all([
+          fetch('/api/admin/dashboard-stats', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }),
+          fetch('/api/admin/education-stats', {
+            method: 'GET',
+            headers: {
+              'X-User-Email': 'admin@ihracatakademi.com',
+            },
+          }),
+        ]);
+
+        let projectStats = {};
+        let educationStats = {};
+
+        if (projectStatsRes.ok) {
+          const result = await projectStatsRes.json();
           if (result.success && result.data) {
-            setStats(result.data);
+            projectStats = result.data;
           }
-        } else {
         }
+
+        if (educationStatsRes.ok) {
+          const result = await educationStatsRes.json();
+          if (result.success && result.data) {
+            educationStats = result.data;
+          }
+        }
+
+        // Merge stats
+        setStats(prev => ({
+          ...prev,
+          ...projectStats,
+          totalEducationSets: educationStats.total_sets || 0,
+          totalVideos: educationStats.total_videos || 0,
+          totalDocuments: educationStats.total_documents || 0,
+          activeEducationAssignments: educationStats.active_assignments || 0,
+          completedEducationAssignments:
+            educationStats.completed_assignments || 0,
+          averageEducationProgress: educationStats.average_progress || 0,
+        }));
       } catch (error) {
+        console.error('Dashboard stats fetch error:', error);
       } finally {
         setLoading(false);
       }
@@ -319,6 +367,65 @@ export default function AdminDashboard() {
           </div>
         </div>
       </div>
+
+      {/* Education Stats Grid */}
+      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8'>
+        <div className='bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow'>
+          <div className='flex items-center justify-between'>
+            <div>
+              <p className='text-gray-600 text-sm font-medium'>
+                Eğitim Setleri
+              </p>
+              <p className='text-3xl font-bold text-gray-900'>
+                {stats.totalEducationSets}
+              </p>
+              <p className='text-indigo-600 text-sm font-medium'>Toplam set</p>
+            </div>
+            <div className='w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center'>
+              <i className='ri-book-open-line text-indigo-600 text-xl'></i>
+            </div>
+          </div>
+        </div>
+
+        <div className='bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow'>
+          <div className='flex items-center justify-between'>
+            <div>
+              <p className='text-gray-600 text-sm font-medium'>
+                Video İçerikleri
+              </p>
+              <p className='text-3xl font-bold text-gray-900'>
+                {stats.totalVideos}
+              </p>
+              <p className='text-pink-600 text-sm font-medium'>
+                +{stats.totalDocuments} doküman
+              </p>
+            </div>
+            <div className='w-12 h-12 bg-pink-100 rounded-xl flex items-center justify-center'>
+              <i className='ri-video-line text-pink-600 text-xl'></i>
+            </div>
+          </div>
+        </div>
+
+        <div className='bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow'>
+          <div className='flex items-center justify-between'>
+            <div>
+              <p className='text-gray-600 text-sm font-medium'>
+                Eğitim İlerlemesi
+              </p>
+              <p className='text-3xl font-bold text-gray-900'>
+                %{stats.averageEducationProgress}
+              </p>
+              <p className='text-teal-600 text-sm font-medium'>
+                {stats.completedEducationAssignments} tamamlandı
+              </p>
+            </div>
+            <div className='w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center'>
+              <i className='ri-graduation-cap-line text-teal-600 text-xl'></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Revenue and Growth */}
       <div className='grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8'>
         <div className='bg-white rounded-xl shadow-sm border border-gray-200 p-6'>

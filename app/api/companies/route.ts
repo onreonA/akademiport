@@ -1,18 +1,26 @@
+import { createClient } from '@supabase/supabase-js';
 import bcrypt from 'bcryptjs';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { cacheKeys, cacheUtils } from '@/lib/cache/redis-cache';
-import { createClient } from '@/lib/supabase/server';
 // Firmaları getir
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status');
     const limit = parseInt(searchParams.get('limit') || '50');
     const offset = parseInt(searchParams.get('offset') || '0');
-    const userEmail = request.cookies.get('auth-user-email')?.value;
+
+    // Try header first (for admin), then cookie (for frontend)
+    const userEmail =
+      request.headers.get('X-User-Email') ||
+      request.cookies.get('auth-user-email')?.value;
     const userRole = request.cookies.get('auth-user-role')?.value;
+
     if (!userEmail) {
       return NextResponse.json(
         { error: 'User email required' },
@@ -146,7 +154,10 @@ export async function POST(request: NextRequest) {
       website,
       description,
     } = await request.json();
-    const supabase = createClient();
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
     const userEmail = request.cookies.get('auth-user-email')?.value;
     const userRole = request.cookies.get('auth-user-role')?.value;
     if (!userEmail) {

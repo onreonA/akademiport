@@ -180,11 +180,30 @@ export default function FirmaDashboard() {
       try {
         const response = await fetch('/api/firma/dashboard-stats');
         if (response.ok) {
-          const stats = await response.json();
-          setDashboardStats(stats);
+          const result = await response.json();
+          if (result.success && result.data) {
+            // Map API response to frontend format
+            setDashboardStats({
+              totalEducation: result.data.education?.total || 0,
+              completedEducation: result.data.education?.completed || 0,
+              inProgressEducation:
+                (result.data.education?.total || 0) -
+                (result.data.education?.completed || 0),
+              successRate: result.data.education?.progress || 0,
+              // Project stats
+              totalProjects: result.data.projects?.total || 0,
+              activeProjects: result.data.projects?.active || 0,
+              completedProjects: result.data.projects?.completed || 0,
+              projectProgress: result.data.projects?.overallProgress || 0,
+              // Task stats
+              totalTasks:
+                result.data.tasks?.active + result.data.tasks?.completed || 0,
+              completedTasks: result.data.tasks?.completed || 0,
+            });
+          }
         }
       } catch (err) {
-        // Error fetching dashboard stats
+        console.error('Dashboard stats fetch error:', err);
       }
     };
 
