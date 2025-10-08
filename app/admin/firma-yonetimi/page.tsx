@@ -448,7 +448,6 @@ export default function CompanyManagement() {
   const consultants = [...new Set(companies.map(c => c.consultant))];
   // Handler functions
   const handleGoToCompany = async (companyId: string, companyName: string) => {
-    console.log('🚀 handleGoToCompany called:', { companyId, companyName });
     try {
       // Generate auto-login token for the company
       const response = await fetch('/api/auth/auto-login', {
@@ -463,23 +462,17 @@ export default function CompanyManagement() {
         }),
       });
 
-      console.log('📡 Auto-login API response status:', response.status);
 
       if (response.ok) {
         const data = await response.json();
-        console.log('✅ Auto-login token generated:', data);
         // Open new tab with auto-login URL
         const autoLoginUrl = `/firma?token=${data.token}&company=${encodeURIComponent(companyName)}`;
-        console.log('🔗 Opening URL:', autoLoginUrl);
-        console.log('🔗 Full URL:', window.location.origin + autoLoginUrl);
 
         // Test: First try to navigate in the same tab to see what happens
-        console.log('🧪 Testing navigation in same tab first...');
         window.location.href = autoLoginUrl; // Test navigation in same tab
 
         // Then open in new tab
         // const newTab = window.open(autoLoginUrl, '_blank');
-        // console.log('🔗 New tab opened:', newTab);
       } else {
         console.error('❌ Auto-login token generation failed');
         alert('Otomatik giriş yapılamadı. Lütfen tekrar deneyin.');

@@ -30,7 +30,6 @@ export async function GET(request: NextRequest) {
 
     if (isCompanyUser && userCompanyId) {
       // Firma kullanıcısı için: Sadece project_company_assignments'ta aktif olan projeler
-      console.log('🔍 API - Company user detected:', {
         userCompanyId,
         userRole,
       });
@@ -66,14 +65,12 @@ export async function GET(request: NextRequest) {
         error = null;
       }
 
-      console.log('🔍 API - Company user assigned projects:', {
         projects: projects?.length,
         error,
       });
 
       // Debug: Her projenin raw verilerini kontrol et
       projects?.forEach((project: any, index: number) => {
-        console.log(`🔍 API - Project ${index + 1} Raw Data:`, {
           id: project.id,
           name: project.name,
           end_date: project.end_date,
@@ -84,7 +81,6 @@ export async function GET(request: NextRequest) {
       });
     } else {
       // Admin/consultant için normal query
-      console.log('🔍 API - Admin user detected:', { userRole });
 
       let query = supabase.from('projects').select(
         `

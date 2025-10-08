@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 interface Document {
   id: string;
   title: string;
@@ -23,6 +23,7 @@ export default function DocumentAssignmentPage() {
   const [assigning, setAssigning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [assignments, setAssignments] = useState<any[]>([]);
   useEffect(() => {
     fetchData();
   }, []);
@@ -51,6 +52,19 @@ export default function DocumentAssignmentPage() {
         const companiesResult = await companiesResponse.json();
         if (companiesResult.success) {
           setCompanies(companiesResult.companies || []);
+        }
+      }
+
+      // Fetch assignments
+      const assignmentsResponse = await fetch('/api/documents/assign', {
+        headers: {
+          'X-User-Email': 'admin@ihracatakademi.com',
+        },
+      });
+      if (assignmentsResponse.ok) {
+        const assignmentsResult = await assignmentsResponse.json();
+        if (assignmentsResult.success) {
+          setAssignments(assignmentsResult.data || []);
         }
       }
     } catch (err) {
@@ -85,9 +99,11 @@ export default function DocumentAssignmentPage() {
       });
       const result = await response.json();
       if (result.success) {
-        setSuccess(result.data.message);
+        setSuccess(result.message || 'Atama işlemi başarılı!');
         setSelectedCompanies([]);
         setSelectedDocument('');
+        // Refresh assignments
+        await fetchAssignments();
       } else {
         setError(result.error || 'Atama işlemi başarısız');
       }
@@ -119,9 +135,11 @@ export default function DocumentAssignmentPage() {
       });
       const result = await response.json();
       if (result.success) {
-        setSuccess(result.data.message);
+        setSuccess(result.message || 'Tüm firmalara atama başarılı!');
         setSelectedCompanies([]);
         setSelectedDocument('');
+        // Refresh assignments
+        await fetchAssignments();
       } else {
         setError(result.error || 'Toplu atama işlemi başarısız');
       }
@@ -131,6 +149,58 @@ export default function DocumentAssignmentPage() {
       setAssigning(false);
     }
   };
+
+  const handleRemoveAssignment = async (
+    documentId: string,
+    companyId: string
+  ) => {
+    try {
+      setAssigning(true);
+      const response = await fetch('/api/documents/assign/remove', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-User-Email': 'admin@ihracatakademi.com',
+        },
+        body: JSON.stringify({
+          document_id: documentId,
+          company_id: companyId,
+        }),
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        setSuccess(result.message || 'Atama kaldırıldı!');
+        // Refresh assignments
+        await fetchAssignments();
+      } else {
+        setError(result.error || 'Atama kaldırma işlemi başarısız');
+      }
+    } catch (err) {
+      setError('Atama kaldırma işlemi sırasında hata oluştu');
+    } finally {
+      setAssigning(false);
+    }
+  };
+
+  const fetchAssignments = async () => {
+    try {
+      const assignmentsResponse = await fetch('/api/documents/assign', {
+        headers: {
+          'X-User-Email': 'admin@ihracatakademi.com',
+        },
+      });
+      if (assignmentsResponse.ok) {
+        const assignmentsResult = await assignmentsResponse.json();
+        if (assignmentsResult.success) {
+          setAssignments(assignmentsResult.data || []);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch assignments:', err);
+    }
+  };
+
   const toggleCompany = (companyId: string) => {
     setSelectedCompanies(prev =>
       prev.includes(companyId)
@@ -141,6 +211,28 @@ export default function DocumentAssignmentPage() {
   const activeCompanies = companies.filter(
     company => company.status === 'active'
   );
+
+  // Helper functions
+  const isDocumentAssignedToCompany = (
+    documentId: string,
+    companyId: string
+  ) => {
+    return assignments.some(
+      assignment =>
+        assignment.document_id === documentId &&
+        assignment.company_id === companyId &&
+        assignment.status === 'Aktif'
+    );
+  };
+
+  const getAssignedCompaniesForDocument = (documentId: string) => {
+    return assignments
+      .filter(
+        assignment =>
+          assignment.document_id === documentId && assignment.status === 'Aktif'
+      )
+      .map(assignment => assignment.company_id);
+  };
   if (loading) {
     return (
       <div className='min-h-screen bg-gray-50 flex items-center justify-center'>
@@ -289,10 +381,51 @@ export default function DocumentAssignmentPage() {
                         {company.name}
                       </p>
                       <p className='text-sm text-gray-600'>{company.email}</p>
+                      {selectedDocument &&
+                        isDocumentAssignedToCompany(
+                          selectedDocument,
+                          company.id
+                        ) && (
+                          <p className='text-xs text-blue-600 mt-1'>
+                            ✓ Bu döküman atanmış
+                          </p>
+                        )}
                     </div>
-                    <span className='px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs'>
-                      Aktif
-                    </span>
+                    <div className='flex flex-col gap-1'>
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs ${
+                          company.status === 'active' ||
+                          company.status === 'Aktif'
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-gray-100 text-gray-800'
+                        }`}
+                      >
+                        {company.status === 'active' ? 'Aktif' : company.status}
+                      </span>
+                      {selectedDocument &&
+                        isDocumentAssignedToCompany(
+                          selectedDocument,
+                          company.id
+                        ) && (
+                          <div className='flex flex-col gap-1'>
+                            <span className='px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs'>
+                              Atanmış
+                            </span>
+                            <button
+                              onClick={() =>
+                                handleRemoveAssignment(
+                                  selectedDocument,
+                                  company.id
+                                )
+                              }
+                              disabled={assigning}
+                              className='px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs hover:bg-red-200 disabled:opacity-50'
+                            >
+                              Kaldır
+                            </button>
+                          </div>
+                        )}
+                    </div>
                   </label>
                 ))}
               </div>

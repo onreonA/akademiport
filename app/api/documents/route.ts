@@ -79,23 +79,24 @@ export async function GET(request: NextRequest) {
     if (companyId) {
       // For company users, only show documents assigned to their company
       const { data: assignedDocuments, error: assignmentError } = await supabase
-        .from('company_education_assignments')
+        .from('company_document_assignments')
         .select('document_id')
         .eq('company_id', companyId)
         .eq('status', 'Aktif');
 
       if (assignmentError) {
         console.error('Assignment query error:', assignmentError);
-        return NextResponse.json(
-          { error: 'Failed to fetch assigned documents' },
-          { status: 500 }
-        );
+        // If no assignments found, return empty array instead of error
+        return NextResponse.json({
+          success: true,
+          data: [],
+        });
       }
 
-      // Filter documents to only show assigned ones
       const assignedIds = assignedDocuments?.map(ad => ad.document_id) || [];
       const filteredDocuments =
         documents?.filter(doc => assignedIds.includes(doc.id)) || [];
+
 
       return NextResponse.json({
         success: true,
@@ -181,6 +182,122 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Document POST error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
+// PATCH /api/documents?id={id} - Update document
+export async function PATCH(request: NextRequest) {
+  try {
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
+    const userEmail = request.headers.get('X-User-Email');
+    if (!userEmail) {
+      return NextResponse.json(
+        { error: 'User email required' },
+        { status: 400 }
+      );
+    }
+
+    // Get document ID from URL
+    const { searchParams } = new URL(request.url);
+    const documentId = searchParams.get('id');
+
+    if (!documentId) {
+      return NextResponse.json(
+        { error: 'Document ID required' },
+        { status: 400 }
+      );
+    }
+
+    const body = await request.json();
+    const { title, description, status } = body;
+
+    // Update document
+    const { data: document, error } = await supabase
+      .from('documents')
+      .update({
+        title,
+        description,
+        status,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', documentId)
+      .select()
+      .single();
+
+    if (error) {
+      return NextResponse.json(
+        { error: 'Failed to update document', details: error.message },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      data: document,
+    });
+  } catch (error) {
+    console.error('Document PATCH error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
+// DELETE /api/documents/{id} - Delete document
+export async function DELETE(request: NextRequest) {
+  try {
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
+    const userEmail = request.headers.get('X-User-Email');
+    if (!userEmail) {
+      return NextResponse.json(
+        { error: 'User email required' },
+        { status: 400 }
+      );
+    }
+
+    // Get document ID from URL path
+    const pathname = new URL(request.url).pathname;
+    const documentId = pathname.split('/').pop();
+
+    if (!documentId) {
+      return NextResponse.json(
+        { error: 'Document ID required' },
+        { status: 400 }
+      );
+    }
+
+    // Delete document
+    const { error } = await supabase
+      .from('documents')
+      .delete()
+      .eq('id', documentId);
+
+    if (error) {
+      return NextResponse.json(
+        { error: 'Failed to delete document', details: error.message },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: 'Document deleted successfully',
+    });
+  } catch (error) {
+    console.error('Document DELETE error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

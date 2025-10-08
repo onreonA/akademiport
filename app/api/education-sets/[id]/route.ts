@@ -40,3 +40,60 @@ export async function GET(
     );
   }
 }
+
+// DELETE - Eğitim setini sil
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const userEmail = request.headers.get('X-User-Email');
+
+    if (!userEmail) {
+      return NextResponse.json(
+        { success: false, error: "Kullanıcı email'i gerekli" },
+        { status: 400 }
+      );
+    }
+
+    // Önce eğitim setinin var olup olmadığını kontrol et
+    const { data: educationSet, error: fetchError } = await supabase
+      .from('education_sets')
+      .select('id, name')
+      .eq('id', id)
+      .single();
+
+    if (fetchError || !educationSet) {
+      return NextResponse.json(
+        { success: false, error: 'Eğitim seti bulunamadı' },
+        { status: 404 }
+      );
+    }
+
+    // Eğitim setini sil
+    const { error: deleteError } = await supabase
+      .from('education_sets')
+      .delete()
+      .eq('id', id);
+
+    if (deleteError) {
+      console.error('Education set delete error:', deleteError);
+      return NextResponse.json(
+        { success: false, error: 'Eğitim seti silinirken hata oluştu' },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: 'Eğitim seti başarıyla silindi',
+    });
+  } catch (error) {
+    console.error('Education set DELETE error:', error);
+    return NextResponse.json(
+      { success: false, error: 'Sunucu hatası' },
+      { status: 500 }
+    );
+  }
+}

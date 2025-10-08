@@ -364,8 +364,6 @@ export default function CompanyProjectManagement() {
         throw new Error('Projeler yüklenirken hata oluştu');
       }
       const data = await response.json();
-      console.log('🔍 CompanyProjectManagement - API Response:', data);
-      console.log('🔍 CompanyProjectManagement - Projects:', data.projects);
       setProjects(data.projects || []);
     } catch (err) {
       console.error('❌ CompanyProjectManagement - API Error:', err);

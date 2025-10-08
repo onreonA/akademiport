@@ -65,31 +65,48 @@ export async function GET(request: NextRequest) {
         { status: 500 }
       );
     }
-    // Transform data to match frontend expectations
-    const transformedData = data?.map(assignment => ({
-      id: assignment.id,
-      name: assignment.education_sets?.name,
-      description: assignment.education_sets?.description,
-      category: assignment.education_sets?.category,
-      assignedDate: assignment.assigned_at,
-      totalVideos: assignment.education_sets?.video_count || 0,
-      completedVideos: Math.floor(
-        ((assignment.progress_percentage || 0) *
-          (assignment.education_sets?.video_count || 0)) /
-          100
-      ),
-      completionPercentage: assignment.progress_percentage || 0,
-      status:
-        assignment.status === 'completed'
-          ? 'Tamamlandı'
-          : assignment.status === 'active'
-            ? 'Devam Ediyor'
-            : 'Kilitli',
-      estimatedDuration: assignment.education_sets?.total_duration || 0,
-      lastWatched: assignment.last_accessed_at,
-      isLocked: assignment.status === 'inactive',
-      set_id: assignment.set_id,
-    }));
+    // Transform data to match frontend expectations with real video counts
+    const transformedData = await Promise.all(
+      data?.map(async assignment => {
+        // Get actual video count
+        const { data: videos } = await supabase
+          .from('videos')
+          .select('id')
+          .eq('set_id', assignment.set_id)
+          .eq('status', 'Aktif');
+
+        const { data: documents } = await supabase
+          .from('documents')
+          .select('id')
+          .eq('set_id', assignment.set_id)
+          .eq('status', 'Aktif');
+
+        const actualVideoCount = videos?.length || 0;
+
+        return {
+          id: assignment.id,
+          name: assignment.education_sets?.name,
+          description: assignment.education_sets?.description,
+          category: assignment.education_sets?.category,
+          assignedDate: assignment.assigned_at,
+          totalVideos: actualVideoCount,
+          completedVideos: Math.floor(
+            ((assignment.progress_percentage || 0) * actualVideoCount) / 100
+          ),
+          completionPercentage: assignment.progress_percentage || 0,
+          status:
+            assignment.status === 'completed'
+              ? 'Tamamlandı'
+              : assignment.status === 'active'
+                ? 'Devam Ediyor'
+                : 'Kilitli',
+          estimatedDuration: assignment.education_sets?.total_duration || 0,
+          lastWatched: assignment.last_accessed_at,
+          isLocked: assignment.status === 'inactive',
+          set_id: assignment.set_id,
+        };
+      }) || []
+    );
     return NextResponse.json({
       data: transformedData,
       count,

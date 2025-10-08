@@ -33,20 +33,23 @@ export default function DocumentDetailClient({
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
   const [showPdfViewer, setShowPdfViewer] = useState(false);
-  useEffect(() => {
-    fetchDocument();
-  }, [fetchDocument]);
+
+  // fetchDocument fonksiyonunu useCallback ile tanımla
   const fetchDocument = useCallback(async () => {
     try {
       setLoading(true);
+      setError(null);
+
       const response = await fetch(`/api/documents?id=${documentId}`, {
         headers: {
           'X-User-Email': 'info@mundo.com',
         },
       });
+
       if (!response.ok) {
-        throw new Error('Döküman getirilemedi');
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
+
       const result = await response.json();
       if (result.success && result.data.length > 0) {
         const doc = result.data[0];
@@ -75,6 +78,12 @@ export default function DocumentDetailClient({
       setLoading(false);
     }
   }, [documentId]);
+
+  // useEffect'i fetchDocument'tan sonra çağır
+  useEffect(() => {
+    fetchDocument();
+  }, [fetchDocument]);
+
   const updateProgress = async (newProgress: number) => {
     try {
       const response = await fetch('/api/document-progress', {

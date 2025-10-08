@@ -25,7 +25,6 @@ export async function PUT(
     const body = await request.json();
     const { action, approval_notes, company_id } = body;
 
-    console.log('🔍 Admin Approval Debug - Request body:', {
       action,
       approval_notes,
       company_id,
@@ -71,7 +70,6 @@ export async function PUT(
     // DO NOT update tasks table as it affects all companies
     const companyTaskStatusUpdate =
       action === 'approve' ? 'Tamamlandı' : 'Reddedildi';
-    console.log('🔍 Admin approval debug:', {
       taskId,
       company_id,
       action,
@@ -87,7 +85,6 @@ export async function PUT(
       .eq('company_id', company_id)
       .single();
 
-    console.log('🔍 Admin Approval - Existing status check:', {
       existingStatus,
       checkError,
       exists: !!existingStatus,
@@ -104,7 +101,6 @@ export async function PUT(
       updated_at: new Date().toISOString(),
     };
 
-    console.log('🔍 Admin Approval - Upsert data:', upsertData);
 
     const { error: companyStatusError } = await supabase
       .from('company_task_statuses')
@@ -112,7 +108,6 @@ export async function PUT(
         onConflict: 'task_id,company_id',
       });
 
-    console.log('🔍 Company status update result:', {
       error: companyStatusError,
       success: !companyStatusError,
     });
@@ -153,7 +148,6 @@ async function updateCompanyProjectProgress(
   taskId: string,
   companyId: string
 ) {
-  console.log('🔍 updateCompanyProjectProgress DISABLED - RLS issues');
   return;
 
   /* DISABLED CODE - RLS issues
@@ -195,7 +189,6 @@ async function updateCompanyProjectProgress(
       (completedTasks / allTaskIds.length) * 100
     );
 
-    console.log('🔍 Updating company project progress:', {
       projectId,
       companyId,
       totalTasks: allTaskIds.length,

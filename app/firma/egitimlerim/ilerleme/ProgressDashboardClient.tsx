@@ -84,10 +84,85 @@ export default function ProgressDashboardClient() {
         return;
       }
 
-      // Mock data for now since APIs are not ready
-      setEducationSets([]);
-      setDocuments([]);
-      setVideos([]);
+      // Fetch progress data from unified API
+      const progressResponse = await fetch('/api/progress', {
+        headers: {
+          'X-User-Email': userEmail,
+        },
+      });
+
+      if (progressResponse.ok) {
+        const progressResult = await progressResponse.json();
+        if (progressResult.success) {
+          setEducationSets(progressResult.data.educationSets || []);
+          setDocuments(progressResult.data.documents || []);
+          setVideos(progressResult.data.videos || []);
+        }
+      } else {
+        // Fallback to individual APIs if progress API fails
+
+        // Fetch education sets
+        const educationSetsResponse = await fetch('/api/education-sets', {
+          headers: {
+            'X-User-Email': userEmail,
+          },
+        });
+        if (educationSetsResponse.ok) {
+          const educationSetsResult = await educationSetsResponse.json();
+          if (educationSetsResult.success) {
+            // Add default progress data
+            const setsWithProgress = (educationSetsResult.data || []).map(
+              (set: any) => ({
+                ...set,
+                progress_percentage: 0, // Default progress
+              })
+            );
+            setEducationSets(setsWithProgress);
+          }
+        }
+
+        // Fetch documents
+        const documentsResponse = await fetch('/api/documents', {
+          headers: {
+            'X-User-Email': userEmail,
+          },
+        });
+        if (documentsResponse.ok) {
+          const documentsResult = await documentsResponse.json();
+          if (documentsResult.success) {
+            // Add default progress data
+            const docsWithProgress = (documentsResult.data || []).map(
+              (doc: any) => ({
+                ...doc,
+                progress_percentage: 0, // Default progress
+                is_completed: false, // Default completion status
+              })
+            );
+            setDocuments(docsWithProgress);
+          }
+        }
+
+        // Fetch videos
+        const videosResponse = await fetch('/api/videos', {
+          headers: {
+            'X-User-Email': userEmail,
+          },
+        });
+        if (videosResponse.ok) {
+          const videosResult = await videosResponse.json();
+          if (videosResult.success) {
+            // Add default progress data
+            const videosWithProgress = (videosResult.data || []).map(
+              (video: any) => ({
+                ...video,
+                progress_percentage: 0, // Default progress
+                is_completed: false, // Default completion status
+              })
+            );
+            setVideos(videosWithProgress);
+          }
+        }
+      }
     } catch (err) {
       setError('İlerleme verileri yüklenirken hata oluştu');
     } finally {

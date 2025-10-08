@@ -35,6 +35,7 @@ export default function DocumentManagement() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [editingDocument, setEditingDocument] = useState<Document | null>(null);
   const [documents, setDocuments] = useState<Document[]>([]);
   const [educationSets, setEducationSets] = useState<EducationSet[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -42,6 +43,25 @@ export default function DocumentManagement() {
   const [selectedFileType, setSelectedFileType] = useState<string>('');
   const [selectedStatus, setSelectedStatus] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(
+    null
+  );
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    set_id: '',
+    file_type: 'PDF',
+    file_url: '',
+    file_size: 1024000,
+    status: 'Aktif',
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showAssignModal, setShowAssignModal] = useState(false);
+  const [assigningDocument, setAssigningDocument] = useState<Document | null>(
+    null
+  );
+  const [companies, setCompanies] = useState<any[]>([]);
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string>('');
 
   useEffect(() => {
     fetchDocuments();
@@ -84,6 +104,24 @@ export default function DocumentManagement() {
       }
     } catch (err) {
       console.error('Education sets fetch error:', err);
+    }
+  };
+
+  const fetchCompanies = async () => {
+    try {
+      const response = await fetch('/api/companies', {
+        headers: {
+          'X-User-Email': 'admin@ihracatakademi.com',
+        },
+      });
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          setCompanies(result.data || []);
+        }
+      }
+    } catch (err) {
+      console.error('Companies fetch error:', err);
     }
   };
 
@@ -133,6 +171,125 @@ export default function DocumentManagement() {
     setSelectedFileType('');
     setSelectedStatus('');
     setSearchQuery('');
+  };
+
+  const handleEdit = (doc: Document) => {
+    setEditingDocument(doc);
+    setFormData({
+      title: doc.title,
+      description: doc.description || '',
+      set_id: doc.set_id,
+      file_type: doc.file_type,
+      file_url: doc.file_url,
+      file_size: doc.file_size,
+      status: doc.status,
+    });
+    setShowCreateForm(true);
+  };
+
+  const handleNewDocument = () => {
+    setEditingDocument(null);
+    setFormData({
+      title: '',
+      description: '',
+      set_id: '',
+      file_type: 'PDF',
+      file_url: '',
+      file_size: 1024000,
+      status: 'Aktif',
+    });
+    setShowCreateForm(true);
+  };
+
+  const handleDelete = async (docId: string) => {
+    try {
+      const response = await fetch(`/api/documents/${docId}`, {
+        method: 'DELETE',
+        headers: {
+          'X-User-Email': 'admin@ihracatakademi.com',
+        },
+      });
+
+      if (response.ok) {
+        setDocuments(documents.filter(d => d.id !== docId));
+        setShowDeleteConfirm(null);
+      } else {
+        alert('Döküman silinemedi. Lütfen tekrar deneyin.');
+      }
+    } catch (err) {
+      alert('Silme işlemi sırasında hata oluştu.');
+    }
+  };
+
+  const handleCreateOrUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      if (editingDocument) {
+        // Update existing document
+        const response = await fetch(
+          `/api/documents?id=${editingDocument.id}`,
+          {
+            method: 'PATCH',
+            headers: {
+              'X-User-Email': 'admin@ihracatakademi.com',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              title: formData.title,
+              description: formData.description,
+              status: formData.status,
+            }),
+          }
+        );
+
+        if (response.ok) {
+          alert('✅ Döküman başarıyla güncellendi!');
+          setShowCreateForm(false);
+          setEditingDocument(null);
+          fetchDocuments();
+        } else {
+          const error = await response.json();
+          alert(`❌ Hata: ${error.error || 'Güncelleme başarısız'}`);
+        }
+      } else {
+        // Create new document
+        const response = await fetch('/api/documents', {
+          method: 'POST',
+          headers: {
+            'X-User-Email': 'admin@ihracatakademi.com',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            ...formData,
+            order_index: documents.length + 1,
+          }),
+        });
+
+        if (response.ok) {
+          alert('✅ Döküman başarıyla oluşturuldu!');
+          setShowCreateForm(false);
+          setFormData({
+            title: '',
+            description: '',
+            set_id: '',
+            file_type: 'PDF',
+            file_url: '',
+            file_size: 1024000,
+            status: 'Aktif',
+          });
+          fetchDocuments();
+        } else {
+          const error = await response.json();
+          alert(`❌ Hata: ${error.error || 'Oluşturma başarısız'}`);
+        }
+      }
+    } catch (err) {
+      alert('❌ İşlem sırasında bir hata oluştu!');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -224,7 +381,7 @@ export default function DocumentManagement() {
             </div>
 
             <button
-              onClick={() => setShowCreateForm(true)}
+              onClick={handleNewDocument}
               className='bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-6 py-3 rounded-xl font-medium flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
             >
               <i className='ri-add-line text-lg'></i>
@@ -423,10 +580,16 @@ export default function DocumentManagement() {
                       >
                         Detay
                       </Link>
-                      <button className='flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-2 px-3 rounded-lg font-medium transition-all duration-200 text-xs shadow-sm hover:shadow-md'>
+                      <button
+                        onClick={() => handleEdit(doc)}
+                        className='flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-2 px-3 rounded-lg font-medium transition-all duration-200 text-xs shadow-sm hover:shadow-md'
+                      >
                         Düzenle
                       </button>
-                      <button className='flex-1 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white py-2 px-3 rounded-lg font-medium transition-all duration-200 text-xs shadow-sm hover:shadow-md'>
+                      <button
+                        onClick={() => setShowDeleteConfirm(doc.id)}
+                        className='flex-1 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white py-2 px-3 rounded-lg font-medium transition-all duration-200 text-xs shadow-sm hover:shadow-md'
+                      >
                         Sil
                       </button>
                     </div>
@@ -438,30 +601,64 @@ export default function DocumentManagement() {
         </div>
       </div>
 
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className='fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4'>
+          <div className='bg-white rounded-xl shadow-2xl w-full max-w-md'>
+            <div className='p-6'>
+              <div className='w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4'>
+                <i className='ri-delete-bin-line text-red-600 text-3xl'></i>
+              </div>
+              <h3 className='text-xl font-semibold text-gray-900 text-center mb-2'>
+                Dökümanı Sil
+              </h3>
+              <p className='text-gray-600 text-center mb-6'>
+                Bu dökümanı silmek istediğinizden emin misiniz? Bu işlem geri
+                alınamaz.
+              </p>
+              <div className='flex gap-3'>
+                <button
+                  type='button'
+                  onClick={() => setShowDeleteConfirm(null)}
+                  className='flex-1 px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors'
+                >
+                  İptal
+                </button>
+                <button
+                  type='button'
+                  onClick={() => handleDelete(showDeleteConfirm)}
+                  className='flex-1 px-6 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-200 shadow-lg hover:shadow-xl'
+                >
+                  Sil
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Create/Edit Document Modal */}
       {showCreateForm && (
         <div className='fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4'>
           <div className='bg-white rounded-xl shadow-2xl w-full max-w-2xl'>
             <div className='p-6 border-b border-gray-200'>
               <h3 className='text-xl font-semibold text-gray-900'>
-                Yeni Döküman Ekle
+                {editingDocument ? 'Döküman Düzenle' : 'Yeni Döküman Ekle'}
               </h3>
             </div>
-            <form
-              onSubmit={e => {
-                e.preventDefault();
-                // Handle form submission
-                setShowCreateForm(false);
-              }}
-              className='p-6 space-y-6'
-            >
+            <form onSubmit={handleCreateOrUpdate} className='p-6 space-y-6'>
               <div>
                 <label className='block text-sm font-medium text-gray-700 mb-2'>
                   Döküman Başlığı <span className='text-red-500'>*</span>
                 </label>
                 <input
                   type='text'
+                  value={formData.title}
+                  onChange={e =>
+                    setFormData({ ...formData, title: e.target.value })
+                  }
                   className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                  placeholder='Örn: E-ihracat Stratejileri Rehberi'
                   required
                 />
               </div>
@@ -471,6 +668,10 @@ export default function DocumentManagement() {
                 </label>
                 <textarea
                   rows={3}
+                  value={formData.description}
+                  onChange={e =>
+                    setFormData({ ...formData, description: e.target.value })
+                  }
                   className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
                   placeholder='Döküman hakkında kısa açıklama...'
                 />
@@ -480,6 +681,10 @@ export default function DocumentManagement() {
                   Eğitim Seti <span className='text-red-500'>*</span>
                 </label>
                 <select
+                  value={formData.set_id}
+                  onChange={e =>
+                    setFormData({ ...formData, set_id: e.target.value })
+                  }
                   className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
                   required
                 >
@@ -493,26 +698,59 @@ export default function DocumentManagement() {
               </div>
               <div>
                 <label className='block text-sm font-medium text-gray-700 mb-2'>
-                  Dosya <span className='text-red-500'>*</span>
+                  Dosya URL <span className='text-red-500'>*</span>
                 </label>
                 <input
-                  type='file'
-                  accept='.pdf,.docx,.pptx,.xlsx'
+                  type='url'
+                  value={formData.file_url}
+                  onChange={e =>
+                    setFormData({ ...formData, file_url: e.target.value })
+                  }
                   className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                  placeholder='https://example.com/document.pdf'
                   required
                 />
                 <p className='text-sm text-gray-500 mt-1'>
-                  Desteklenen formatlar: PDF, DOCX, PPTX, XLSX (Maksimum 50MB)
+                  🎯 Test için örnek URL: https://example.com/test-document.pdf
                 </p>
               </div>
-              <div>
-                <label className='block text-sm font-medium text-gray-700 mb-2'>
-                  Durum
-                </label>
-                <select className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'>
-                  <option value='Aktif'>Aktif</option>
-                  <option value='Pasif'>Pasif</option>
-                </select>
+              <div className='grid grid-cols-2 gap-4'>
+                <div>
+                  <label className='block text-sm font-medium text-gray-700 mb-2'>
+                    Dosya Türü <span className='text-red-500'>*</span>
+                  </label>
+                  <select
+                    value={formData.file_type}
+                    onChange={e =>
+                      setFormData({ ...formData, file_type: e.target.value })
+                    }
+                    className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                    required
+                  >
+                    <option value='PDF'>PDF</option>
+                    <option value='DOCX'>DOCX</option>
+                    <option value='DOC'>DOC</option>
+                    <option value='PPTX'>PPTX</option>
+                    <option value='PPT'>PPT</option>
+                    <option value='XLSX'>XLSX</option>
+                    <option value='XLS'>XLS</option>
+                  </select>
+                </div>
+                <div>
+                  <label className='block text-sm font-medium text-gray-700 mb-2'>
+                    Durum
+                  </label>
+                  <select
+                    value={formData.status}
+                    onChange={e =>
+                      setFormData({ ...formData, status: e.target.value })
+                    }
+                    className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                  >
+                    <option value='Aktif'>Aktif</option>
+                    <option value='Pasif'>Pasif</option>
+                  </select>
+                </div>
               </div>
               <div className='flex justify-end gap-3 pt-4'>
                 <button
@@ -524,9 +762,19 @@ export default function DocumentManagement() {
                 </button>
                 <button
                   type='submit'
-                  className='px-6 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl'
+                  disabled={isSubmitting}
+                  className='px-6 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2'
                 >
-                  Oluştur
+                  {isSubmitting ? (
+                    <>
+                      <div className='w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin'></div>
+                      {editingDocument
+                        ? 'Güncelleniyor...'
+                        : 'Oluşturuluyor...'}
+                    </>
+                  ) : (
+                    <>{editingDocument ? 'Güncelle' : 'Oluştur'}</>
+                  )}
                 </button>
               </div>
             </form>

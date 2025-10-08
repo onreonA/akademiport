@@ -378,13 +378,9 @@ export default function EnhancedProjectList() {
 
         const data = await response.json();
 
-        console.log('🔍 Frontend - Full API Response:', data);
-        console.log('🔍 Frontend - API Response projects:', data.projects);
-        console.log('🔍 Frontend - API Response success:', data.success);
 
         // Debug: Her projenin raw verilerini kontrol et
         data.projects?.forEach((project: any, index: number) => {
-          console.log(`🔍 Project ${index + 1} Raw Data:`, {
             id: project.id,
             name: project.name,
             end_date: project.end_date,
@@ -650,7 +646,6 @@ export default function EnhancedProjectList() {
       projects.reduce((sum, p) => sum + (p.progress_percentage || 0), 0) / total
     );
 
-    console.log('🔍 Frontend - Statistics calculation:', {
       total,
       active,
       completed,

@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import React, { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 interface EducationSet {
   id: string;
   name: string;
@@ -147,6 +147,59 @@ export default function EducationSetsManagement() {
       setAssignLoading(false);
     }
   };
+
+  // Handle assignment removal
+  const handleRemoveAssignment = async (companyId: string) => {
+    if (!selectedSetForAssignment) return;
+
+    const companyName =
+      companies.find(c => c.id === companyId)?.name || 'Firma';
+
+    if (
+      !confirm(
+        `${companyName} firmasından bu eğitim setini kaldırmak istediğinizden emin misiniz?`
+      )
+    ) {
+      return;
+    }
+
+    try {
+      setAssignLoading(true);
+      const response = await fetch('/api/education-sets/assign', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-User-Email': 'admin@ihracatakademi.com',
+        },
+        body: JSON.stringify({
+          set_id: selectedSetForAssignment.id,
+          company_id: companyId,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Kaldırma işlemi başarısız');
+      }
+
+      const result = await response.json();
+      if (result.success) {
+        // Refresh assignments
+        await fetchAssignments(selectedSetForAssignment.id);
+        // Show success message
+        alert(`Başarılı: ${result.message}`);
+      } else {
+        throw new Error(result.error || 'Kaldırma işlemi başarısız');
+      }
+    } catch (error) {
+      alert(
+        `Hata: ${error instanceof Error ? error.message : 'Bilinmeyen hata'}`
+      );
+    } finally {
+      setAssignLoading(false);
+    }
+  };
+
   // Handle open assignment modal
   const handleOpenAssignModal = (set: EducationSet) => {
     setSelectedSetForAssignment(set);
@@ -716,14 +769,25 @@ export default function EducationSetsManagement() {
                     {assignments.map(assignment => (
                       <div
                         key={assignment.id}
-                        className='flex items-center justify-between text-sm'
+                        className='flex items-center justify-between text-sm p-2 bg-white rounded border'
                       >
-                        <span className='text-blue-800'>
-                          {assignment.companies.name}
-                        </span>
-                        <span className='text-blue-600'>
-                          {assignment.progress_percentage}% tamamlandı
-                        </span>
+                        <div className='flex flex-col'>
+                          <span className='text-blue-800 font-medium'>
+                            {assignment.companies.name}
+                          </span>
+                          <span className='text-blue-600 text-xs'>
+                            {assignment.progress_percentage}% tamamlandı
+                          </span>
+                        </div>
+                        <button
+                          onClick={() =>
+                            handleRemoveAssignment(assignment.company_id)
+                          }
+                          disabled={assignLoading}
+                          className='px-2 py-1 bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white rounded text-xs font-medium transition-colors cursor-pointer'
+                        >
+                          {assignLoading ? 'İşleniyor...' : 'Kaldır'}
+                        </button>
                       </div>
                     ))}
                   </div>

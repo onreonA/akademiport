@@ -885,7 +885,6 @@ export default function ProjectDetailClient({
     endDate: string
   ) => {
     try {
-      console.log('🔍 Saving project dates:', {
         projectId,
         startDate,
         endDate,

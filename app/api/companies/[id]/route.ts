@@ -254,7 +254,6 @@ export async function DELETE(
       return NextResponse.json({ error: 'Company not found' }, { status: 404 });
     }
 
-    console.log(
       `⚠️ ADMIN DELETION: Company "${existingCompany.name}" (${id}) is being deleted by ${userEmail}`
     );
     // First, delete consultant assignments

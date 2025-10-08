@@ -91,7 +91,6 @@ export default function ProjectDetailPage() {
       }
 
       setProject(data.project);
-      console.log('🔍 Frontend - API Response subProjects:', data.subProjects);
       setSubProjects(data.subProjects || []);
       setTasks(data.tasks || []);
     } catch (err) {
@@ -218,7 +217,6 @@ export default function ProjectDetailPage() {
   ).length;
   const totalSubProjects = subProjects.length;
 
-  console.log('🔍 Sub-project completion calculation:', {
     totalSubProjects,
     completedSubProjects,
     subProjects: subProjects.map(sp => ({
@@ -598,7 +596,6 @@ export default function ProjectDetailPage() {
                           subProject.progress_percentage ||
                           subProject.progress ||
                           0;
-                        console.log(
                           '🔍 Frontend - Sub-project progress render:',
                           {
                             subProjectId: subProject.id,

@@ -1,6 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
+
 interface Document {
   id: string;
   title: string;
@@ -24,9 +25,11 @@ interface Document {
     category: string;
   };
 }
+
 interface AdminDocumentDetailClientProps {
   documentId: string;
 }
+
 export default function AdminDocumentDetailClient({
   documentId,
 }: AdminDocumentDetailClientProps) {
@@ -40,38 +43,51 @@ export default function AdminDocumentDetailClient({
     description: '',
     status: 'Aktif',
   });
-  useEffect(() => {
-    fetchDocument();
-  }, [documentId, fetchDocument]);
+
+  // fetchDocument fonksiyonunu useCallback ile tanımla
   const fetchDocument = useCallback(async () => {
     try {
       setLoading(true);
+      setError(null);
+
       const response = await fetch(`/api/documents?id=${documentId}`, {
         headers: {
           'X-User-Email': 'admin@ihracatakademi.com',
         },
       });
+
       if (!response.ok) {
-        throw new Error('Döküman getirilemedi');
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
+
       const result = await response.json();
-      if (result.success && result.data.length > 0) {
+
+      if (result.success && result.data && result.data.length > 0) {
         const doc = result.data[0];
         setDocument(doc);
         setFormData({
-          title: doc.title,
+          title: doc.title || '',
           description: doc.description || '',
-          status: doc.status,
+          status: doc.status || 'Aktif',
         });
       } else {
         setError('Döküman bulunamadı');
       }
     } catch (err) {
-      setError('Döküman yüklenirken hata oluştu');
+      console.error('fetchDocument error:', err);
+      setError(
+        err instanceof Error ? err.message : 'Döküman yüklenirken hata oluştu'
+      );
     } finally {
       setLoading(false);
     }
   }, [documentId]);
+
+  // useEffect'i fetchDocument'tan sonra çağır
+  useEffect(() => {
+    fetchDocument();
+  }, [fetchDocument]);
+
   const handleUpdate = async () => {
     if (!document) return;
     try {
@@ -156,26 +172,29 @@ export default function AdminDocumentDetailClient({
   };
   if (loading) {
     return (
-      <div className='min-h-screen bg-gray-50 flex items-center justify-center'>
+      <div className='min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center'>
         <div className='text-center'>
-          <div className='w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4'></div>
-          <p className='text-gray-600'>Döküman yükleniyor...</p>
+          <div className='w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4'></div>
+          <p className='text-slate-600 font-medium'>Döküman yükleniyor...</p>
         </div>
       </div>
     );
   }
+
   if (error || !document) {
     return (
-      <div className='min-h-screen bg-gray-50 flex items-center justify-center'>
-        <div className='text-center'>
-          <div className='w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4'>
-            <i className='ri-error-warning-line text-red-600 text-2xl'></i>
+      <div className='min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center'>
+        <div className='text-center bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-white/20'>
+          <div className='w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4'>
+            <i className='ri-error-warning-line text-red-600 text-xl'></i>
           </div>
-          <h3 className='text-lg font-medium text-red-900 mb-2'>Hata Oluştu</h3>
+          <h3 className='text-lg font-semibold text-red-900 mb-2'>
+            Hata Oluştu
+          </h3>
           <p className='text-red-700 mb-6'>{error || 'Döküman bulunamadı'}</p>
           <Link
             href='/admin/egitim-yonetimi/dokumanlar'
-            className='bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-medium transition-colors cursor-pointer'
+            className='bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl font-medium transition-all duration-200 hover:shadow-lg cursor-pointer'
           >
             Geri Dön
           </Link>
@@ -184,74 +203,61 @@ export default function AdminDocumentDetailClient({
     );
   }
   const fileIcon = getFileIcon(document.file_type);
+
   return (
-    <div className='min-h-screen bg-gray-50'>
-      {/* Header */}
-      <header className='bg-white shadow-sm border-b border-gray-200'>
-        <div className='px-4 sm:px-6 lg:px-8'>
-          <div className='flex justify-between items-center py-4'>
-            <div className='flex items-center gap-6'>
-              <Link
-                href='/admin/egitim-yonetimi/dokumanlar'
-                className='flex items-center gap-2 text-gray-600 hover:text-blue-600'
-              >
-                <i className='ri-arrow-left-line'></i>
-                <span>Geri Dön</span>
-              </Link>
-              <nav className='hidden md:flex items-center text-sm text-gray-500'>
-                <Link
-                  href='/admin'
-                  className='hover:text-blue-600 cursor-pointer'
-                >
-                  Ana Panel
-                </Link>
-                <i className='ri-arrow-right-s-line mx-1'></i>
-                <Link
-                  href='/admin/egitim-yonetimi/dokumanlar'
-                  className='hover:text-blue-600 cursor-pointer'
-                >
-                  Eğitim Dökümanları
-                </Link>
-                <i className='ri-arrow-right-s-line mx-1'></i>
-                <span className='text-gray-900 font-medium'>
-                  {document.title}
-                </span>
-              </nav>
-            </div>
+    <div className='min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50'>
+      <div className='px-3 sm:px-4 lg:px-6 py-4'>
+        <div className='max-w-6xl mx-auto space-y-4'>
+          {/* Modern Breadcrumb */}
+          <div className='flex items-center gap-2 text-sm text-slate-600 bg-white/60 backdrop-blur-sm rounded-xl px-4 py-2 shadow-sm border border-white/20'>
+            <Link
+              href='/admin'
+              className='hover:text-blue-600 cursor-pointer transition-colors duration-200'
+            >
+              Ana Panel
+            </Link>
+            <i className='ri-arrow-right-s-line text-slate-400'></i>
+            <Link
+              href='/admin/egitim-yonetimi/dokumanlar'
+              className='hover:text-blue-600 cursor-pointer transition-colors duration-200'
+            >
+              Eğitim Dökümanları
+            </Link>
+            <i className='ri-arrow-right-s-line text-slate-400'></i>
+            <span className='text-slate-900 font-semibold'>
+              {document.title}
+            </span>
           </div>
-        </div>
-      </header>
-      {/* Main Content */}
-      <div className='px-4 sm:px-6 lg:px-8 py-8'>
-        <div className='max-w-4xl mx-auto'>
-          {/* Document Header */}
-          <div className='bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6'>
+          {/* Modern Document Header */}
+          <div className='bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6 hover:shadow-2xl transition-all duration-300'>
             <div className='flex items-start justify-between mb-4'>
               <div className='flex items-center gap-4'>
                 <div
-                  className={`w-16 h-16 rounded-xl flex items-center justify-center ${fileIcon.color}`}
+                  className={`w-14 h-14 rounded-2xl flex items-center justify-center ${fileIcon.color} shadow-lg`}
                 >
-                  <i className={`${fileIcon.icon} text-2xl`}></i>
+                  <i className={`${fileIcon.icon} text-xl`}></i>
                 </div>
                 <div>
-                  <h1 className='text-2xl font-bold text-gray-900 mb-2'>
+                  <h1 className='text-xl font-bold text-slate-900 mb-2'>
                     {document.title}
                   </h1>
-                  <div className='flex items-center gap-4 text-sm text-gray-600'>
-                    <span className='px-3 py-1 bg-purple-100 text-purple-800 rounded-full'>
+                  <div className='flex flex-wrap items-center gap-2 text-xs'>
+                    <span className='px-2 py-1 bg-gradient-to-r from-purple-100 to-purple-200 text-purple-800 rounded-full font-medium'>
                       {document.education_sets?.category || 'B2B'}
                     </span>
                     <span
-                      className={`px-3 py-1 rounded-full ${
+                      className={`px-2 py-1 rounded-full font-medium ${
                         document.status === 'Aktif'
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-gray-100 text-gray-800'
+                          ? 'bg-gradient-to-r from-green-100 to-green-200 text-green-800'
+                          : 'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800'
                       }`}
                     >
                       {document.status}
                     </span>
-                    <span>{formatFileSize(document.file_size)}</span>
-                    <span>
+                    <span className='px-2 py-1 bg-slate-100 text-slate-700 rounded-full'>
+                      {formatFileSize(document.file_size)}
+                    </span>
+                    <span className='px-2 py-1 bg-slate-100 text-slate-700 rounded-full'>
                       {new Date(document.created_at).toLocaleDateString(
                         'tr-TR'
                       )}
@@ -260,45 +266,50 @@ export default function AdminDocumentDetailClient({
                 </div>
               </div>
             </div>
+
             {document.description && (
-              <p className='text-gray-600 mb-6'>{document.description}</p>
+              <p className='text-slate-600 mb-4 text-sm leading-relaxed'>
+                {document.description}
+              </p>
             )}
-            {/* Action Buttons */}
-            <div className='flex gap-3'>
+
+            {/* Modern Action Buttons */}
+            <div className='flex flex-wrap gap-2'>
               {document.file_type.toUpperCase() === 'PDF' && (
                 <button
                   onClick={() => setShowPdfViewer(true)}
-                  className='bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium flex items-center gap-2 transition-colors'
+                  className='bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 py-2 rounded-xl font-medium flex items-center gap-2 transition-all duration-200 hover:shadow-lg hover:scale-105'
                 >
-                  <i className='ri-eye-line'></i>
+                  <i className='ri-eye-line text-sm'></i>
                   PDF Görüntüle
                 </button>
               )}
               <button
                 onClick={() => setEditing(!editing)}
-                className='bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium flex items-center gap-2 transition-colors'
+                className='bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-4 py-2 rounded-xl font-medium flex items-center gap-2 transition-all duration-200 hover:shadow-lg hover:scale-105'
               >
-                <i className='ri-edit-line'></i>
+                <i className='ri-edit-line text-sm'></i>
                 {editing ? 'İptal' : 'Düzenle'}
               </button>
               <button
                 onClick={handleDelete}
-                className='bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium flex items-center gap-2 transition-colors'
+                className='bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-4 py-2 rounded-xl font-medium flex items-center gap-2 transition-all duration-200 hover:shadow-lg hover:scale-105'
               >
-                <i className='ri-delete-bin-line'></i>
+                <i className='ri-delete-bin-line text-sm'></i>
                 Sil
               </button>
             </div>
           </div>
-          {/* Edit Form */}
+          {/* Modern Edit Form */}
           {editing && (
-            <div className='bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6'>
-              <h3 className='text-lg font-semibold text-gray-900 mb-4'>
+            <div className='bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6 hover:shadow-2xl transition-all duration-300'>
+              <h3 className='text-lg font-bold text-slate-900 mb-4 flex items-center gap-2'>
+                <i className='ri-edit-line text-blue-600'></i>
                 Döküman Düzenle
               </h3>
               <div className='space-y-4'>
                 <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-2'>
+                  <label className='block text-sm font-semibold text-slate-700 mb-2'>
                     Döküman Başlığı
                   </label>
                   <input
@@ -307,11 +318,11 @@ export default function AdminDocumentDetailClient({
                     onChange={e =>
                       setFormData({ ...formData, title: e.target.value })
                     }
-                    className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                    className='w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white/50 backdrop-blur-sm transition-all duration-200'
                   />
                 </div>
                 <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-2'>
+                  <label className='block text-sm font-semibold text-slate-700 mb-2'>
                     Açıklama
                   </label>
                   <textarea
@@ -320,11 +331,11 @@ export default function AdminDocumentDetailClient({
                       setFormData({ ...formData, description: e.target.value })
                     }
                     rows={3}
-                    className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                    className='w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white/50 backdrop-blur-sm transition-all duration-200'
                   />
                 </div>
                 <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-2'>
+                  <label className='block text-sm font-semibold text-slate-700 mb-2'>
                     Durum
                   </label>
                   <select
@@ -332,95 +343,120 @@ export default function AdminDocumentDetailClient({
                     onChange={e =>
                       setFormData({ ...formData, status: e.target.value })
                     }
-                    className='w-full px-3 py-2 pr-8 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                    className='w-full px-4 py-3 pr-8 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white/50 backdrop-blur-sm transition-all duration-200'
                   >
                     <option value='Aktif'>Aktif</option>
                     <option value='Pasif'>Pasif</option>
                   </select>
                 </div>
-                <div className='flex gap-3'>
+                <div className='flex flex-wrap gap-2 pt-2'>
                   <button
                     onClick={handleUpdate}
-                    className='bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors'
+                    className='bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 hover:shadow-lg hover:scale-105 flex items-center gap-2'
                   >
+                    <i className='ri-save-line text-sm'></i>
                     Güncelle
                   </button>
                   <button
                     onClick={() => setEditing(false)}
-                    className='bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg font-medium transition-colors'
+                    className='bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 hover:shadow-lg hover:scale-105 flex items-center gap-2'
                   >
+                    <i className='ri-close-line text-sm'></i>
                     İptal
                   </button>
                 </div>
               </div>
             </div>
           )}
-          {/* PDF Viewer Modal */}
+          {/* Modern PDF Viewer Modal */}
           {showPdfViewer && document.file_type.toUpperCase() === 'PDF' && (
-            <div className='fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4'>
-              <div className='bg-white rounded-xl shadow-2xl w-full max-w-6xl h-5/6 flex flex-col'>
-                <div className='p-4 border-b border-gray-200 flex justify-between items-center'>
-                  <h3 className='text-lg font-semibold text-gray-900'>
+            <div className='fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4'>
+              <div className='bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl w-full max-w-7xl h-5/6 flex flex-col border border-white/20'>
+                <div className='p-6 border-b border-slate-200/50 flex justify-between items-center bg-gradient-to-r from-slate-50 to-blue-50 rounded-t-3xl'>
+                  <h3 className='text-xl font-bold text-slate-900 flex items-center gap-2'>
+                    <i className='ri-file-pdf-line text-red-600'></i>
                     {document.title}
                   </h3>
                   <button
                     onClick={() => setShowPdfViewer(false)}
-                    className='text-gray-500 hover:text-gray-700'
+                    className='text-slate-500 hover:text-slate-700 hover:bg-slate-100 p-2 rounded-xl transition-all duration-200'
                   >
                     <i className='ri-close-line text-xl'></i>
                   </button>
                 </div>
-                <div className='flex-1 p-4'>
+                <div className='flex-1 p-6'>
                   <iframe
                     src={`${document.file_url}#toolbar=1&navpanes=1&scrollbar=1`}
-                    className='w-full h-full border-0 rounded-lg'
+                    className='w-full h-full border-0 rounded-2xl shadow-inner'
                     title={document.title}
                   />
                 </div>
               </div>
             </div>
           )}
-          {/* Document Info */}
-          <div className='bg-white rounded-xl shadow-sm border border-gray-100 p-6'>
-            <h3 className='text-lg font-semibold text-gray-900 mb-4'>
+          {/* Modern Document Info */}
+          <div className='bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6 hover:shadow-2xl transition-all duration-300'>
+            <h3 className='text-lg font-bold text-slate-900 mb-6 flex items-center gap-2'>
+              <i className='ri-information-line text-blue-600'></i>
               Döküman Bilgileri
             </h3>
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-              <div>
-                <h4 className='font-medium text-gray-900 mb-2'>Eğitim Seti</h4>
-                <p className='text-gray-600'>
+            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+              <div className='bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 border border-blue-200/50'>
+                <h4 className='font-semibold text-blue-900 mb-2 flex items-center gap-2'>
+                  <i className='ri-book-line text-blue-600'></i>
+                  Eğitim Seti
+                </h4>
+                <p className='text-blue-800 font-medium'>
                   {document.education_sets?.name || 'Bilinmiyor'}
                 </p>
               </div>
-              <div>
-                <h4 className='font-medium text-gray-900 mb-2'>Dosya Türü</h4>
-                <p className='text-gray-600'>
+
+              <div className='bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4 border border-green-200/50'>
+                <h4 className='font-semibold text-green-900 mb-2 flex items-center gap-2'>
+                  <i className='ri-file-line text-green-600'></i>
+                  Dosya Türü
+                </h4>
+                <p className='text-green-800 font-medium'>
                   {document.file_type.toUpperCase()}
                 </p>
               </div>
-              <div>
-                <h4 className='font-medium text-gray-900 mb-2'>Dosya Boyutu</h4>
-                <p className='text-gray-600'>
+
+              <div className='bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4 border border-purple-200/50'>
+                <h4 className='font-semibold text-purple-900 mb-2 flex items-center gap-2'>
+                  <i className='ri-file-size-line text-purple-600'></i>
+                  Dosya Boyutu
+                </h4>
+                <p className='text-purple-800 font-medium'>
                   {formatFileSize(document.file_size)}
                 </p>
               </div>
-              <div>
-                <h4 className='font-medium text-gray-900 mb-2'>Yayın Tarihi</h4>
-                <p className='text-gray-600'>
+
+              <div className='bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-4 border border-orange-200/50'>
+                <h4 className='font-semibold text-orange-900 mb-2 flex items-center gap-2'>
+                  <i className='ri-calendar-line text-orange-600'></i>
+                  Yayın Tarihi
+                </h4>
+                <p className='text-orange-800 font-medium'>
                   {new Date(document.created_at).toLocaleDateString('tr-TR')}
                 </p>
               </div>
-              <div>
-                <h4 className='font-medium text-gray-900 mb-2'>
+
+              <div className='bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-xl p-4 border border-indigo-200/50'>
+                <h4 className='font-semibold text-indigo-900 mb-2 flex items-center gap-2'>
+                  <i className='ri-download-line text-indigo-600'></i>
                   Toplam İndirme
                 </h4>
-                <p className='text-gray-600'>
+                <p className='text-indigo-800 font-medium'>
                   {document.total_downloads || 0} kez
                 </p>
               </div>
-              <div>
-                <h4 className='font-medium text-gray-900 mb-2'>Son İndirme</h4>
-                <p className='text-gray-600'>
+
+              <div className='bg-gradient-to-br from-teal-50 to-teal-100 rounded-xl p-4 border border-teal-200/50'>
+                <h4 className='font-semibold text-teal-900 mb-2 flex items-center gap-2'>
+                  <i className='ri-time-line text-teal-600'></i>
+                  Son İndirme
+                </h4>
+                <p className='text-teal-800 font-medium'>
                   {document.last_downloaded_at
                     ? new Date(document.last_downloaded_at).toLocaleDateString(
                         'tr-TR'
@@ -428,17 +464,29 @@ export default function AdminDocumentDetailClient({
                     : 'Henüz indirilmemiş'}
                 </p>
               </div>
-              <div>
-                <h4 className='font-medium text-gray-900 mb-2'>Dosya URL</h4>
-                <p className='text-gray-600 text-sm break-all'>
-                  {document.file_url}
-                </p>
-              </div>
-              <div>
-                <h4 className='font-medium text-gray-900 mb-2'>Storage Path</h4>
-                <p className='text-gray-600 text-sm break-all'>
-                  {document.storage_path || 'Belirtilmemiş'}
-                </p>
+            </div>
+
+            {/* Technical Details */}
+            <div className='mt-6 pt-6 border-t border-slate-200/50'>
+              <h4 className='font-semibold text-slate-900 mb-4 flex items-center gap-2'>
+                <i className='ri-code-line text-slate-600'></i>
+                Teknik Detaylar
+              </h4>
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                <div className='bg-slate-50 rounded-xl p-4 border border-slate-200/50'>
+                  <h5 className='font-medium text-slate-700 mb-2'>Dosya URL</h5>
+                  <p className='text-slate-600 text-sm break-all font-mono bg-white/50 p-2 rounded-lg'>
+                    {document.file_url}
+                  </p>
+                </div>
+                <div className='bg-slate-50 rounded-xl p-4 border border-slate-200/50'>
+                  <h5 className='font-medium text-slate-700 mb-2'>
+                    Storage Path
+                  </h5>
+                  <p className='text-slate-600 text-sm break-all font-mono bg-white/50 p-2 rounded-lg'>
+                    {document.storage_path || 'Belirtilmemiş'}
+                  </p>
+                </div>
               </div>
             </div>
           </div>

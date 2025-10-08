@@ -42,15 +42,16 @@ export function middleware(request: NextRequest) {
     const companyName = request.nextUrl.searchParams.get('company');
 
     if (autoLoginToken && companyName) {
-      console.log(
         '🚀 Middleware: Auto-login token found, bypassing auth check'
       );
       return NextResponse.next();
     }
   }
 
-  // Get authentication info from cookies (single read)
-  const userEmail = request.cookies.get('auth-user-email')?.value;
+  // Get authentication info from cookies or headers (for API calls)
+  const userEmail =
+    request.cookies.get('auth-user-email')?.value ||
+    request.headers.get('X-User-Email');
   const userRole = request.cookies.get('auth-user-role')?.value;
   // Fast path: No authentication
   if (!userEmail) {

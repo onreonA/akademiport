@@ -38,15 +38,12 @@ export default function FirmaDashboard() {
 
   // Handle auto-login from admin panel
   const handleAutoLogin = async (token: string, companyName: string) => {
-    console.log('🚀 handleAutoLogin called:', {
       token: token.substring(0, 20) + '...',
       companyName,
     });
     try {
-      console.log('🔍 Starting auto-login process...');
       // Verify token (client-side verification - in production, this should be server-side)
       const decoded = jwt.decode(token) as any;
-      console.log('🔍 Token decoded:', decoded);
 
       if (!decoded || !decoded.companyId) {
         throw new Error('Invalid token');
@@ -80,21 +77,17 @@ export default function FirmaDashboard() {
 
           if (!error && data.user) {
             loginSuccess = true;
-            console.log(`✅ Auto-login successful with password: ${password}`);
             break;
           } else {
             lastError = error;
-            console.log(`❌ Password ${password} failed:`, error?.message);
           }
         } catch (err) {
           lastError = err;
-          console.log(`❌ Password ${password} error:`, err);
         }
       }
 
       if (loginSuccess) {
         // Successfully logged in
-        console.log('✅ Auto-login successful, redirecting to dashboard');
         alert(`Otomatik giriş başarılı! Hoş geldiniz: ${companyName}`);
 
         // Clear URL parameters after a short delay to avoid useEffect re-trigger
@@ -106,7 +99,6 @@ export default function FirmaDashboard() {
         // because the user is now authenticated
       } else {
         // All password attempts failed
-        console.log('❌ All auto-login attempts failed:', lastError);
 
         // For demo purposes, we'll show a success message anyway
         alert(`Otomatik giriş başarılı! Hoş geldiniz: ${companyName}`);
@@ -123,35 +115,29 @@ export default function FirmaDashboard() {
       console.error('❌ Auto-login error:', error);
       console.error('❌ Error details:', error);
       alert('Otomatik giriş başarısız. Lütfen normal giriş yapın.');
-      console.log('🔄 Redirecting to /giris due to error...');
       router.push('/giris');
     }
   };
 
   useEffect(() => {
-    console.log('🔍 Firma page useEffect triggered');
     // Check for auto-login token
     const autoLoginToken = searchParams.get('token');
     const companyName = searchParams.get('company');
 
-    console.log('🔍 URL params:', { autoLoginToken, companyName });
 
     if (autoLoginToken && companyName) {
-      console.log('🚀 Auto-login token found, calling handleAutoLogin');
       handleAutoLogin(autoLoginToken, companyName);
       return; // Auto-login sırasında başka işlem yapma
     }
 
     // Auto-login token yoksa normal authentication check yap
     if (!user && !loading) {
-      console.log('❌ No user and not loading, redirecting to /giris');
       router.push('/giris');
       return;
     }
 
     const fetchCompanyData = async () => {
       if (!user?.email) {
-        console.log('❌ No user email, skipping company data fetch');
         setLoading(false);
         return;
       }

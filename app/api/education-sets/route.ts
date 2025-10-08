@@ -39,8 +39,31 @@ export async function GET(request: NextRequest) {
         { status: 500 }
       );
     }
+    // Calculate actual video counts
+    const dataWithActualCounts = await Promise.all(
+      data?.map(async (set: any) => {
+        const { data: videos, error: videoError } = await supabase
+          .from('videos')
+          .select('id')
+          .eq('set_id', set.id)
+          .eq('status', 'Aktif');
+
+        const { data: documents, error: docError } = await supabase
+          .from('documents')
+          .select('id')
+          .eq('set_id', set.id)
+          .eq('status', 'Aktif');
+
+        return {
+          ...set,
+          video_count: videos?.length || 0,
+          document_count: documents?.length || 0,
+        };
+      }) || []
+    );
+
     return NextResponse.json({
-      data,
+      data: dataWithActualCounts,
       count,
       success: true,
     });

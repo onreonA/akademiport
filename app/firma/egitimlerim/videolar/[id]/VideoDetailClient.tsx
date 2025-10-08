@@ -60,7 +60,6 @@ export default function VideoDetailClient({
   const fetchEducationSetDetails = useCallback(async () => {
     try {
       setLoading(true);
-      console.log('🔍 VideoDetailClient - fetchEducationSetDetails:', {
         setId,
       });
 

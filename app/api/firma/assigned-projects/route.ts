@@ -141,7 +141,6 @@ export async function GET(request: NextRequest) {
         project.progress = companyProgress;
         project.progress_percentage = companyProgress;
 
-        console.log('🔍 Firma Projects API - Project progress calculation:', {
           projectId,
           projectName: project.name,
           totalTasks: projectTasks?.length || 0,

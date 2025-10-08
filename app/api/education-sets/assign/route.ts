@@ -204,3 +204,49 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Sunucu hatası' }, { status: 500 });
   }
 }
+
+// DELETE - Eğitim seti atamasını kaldır
+export async function DELETE(request: NextRequest) {
+  try {
+    const userEmail = request.headers.get('X-User-Email');
+    if (!userEmail) {
+      return NextResponse.json(
+        { error: 'Kullanıcı email gerekli' },
+        { status: 401 }
+      );
+    }
+
+    const body = await request.json();
+    const { set_id, company_id } = body;
+
+    if (!set_id || !company_id) {
+      return NextResponse.json(
+        { error: 'Eğitim seti ID ve Firma ID gerekli' },
+        { status: 400 }
+      );
+    }
+
+    // Atamayı kaldır
+    const { error: deleteError } = await supabase
+      .from('company_education_assignments')
+      .delete()
+      .eq('set_id', set_id)
+      .eq('company_id', company_id);
+
+    if (deleteError) {
+      console.error('Assignment removal error:', deleteError);
+      return NextResponse.json(
+        { error: 'Atama kaldırma işlemi başarısız' },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: 'Eğitim seti ataması başarıyla kaldırıldı',
+    });
+  } catch (error) {
+    console.error('Education set assignment removal error:', error);
+    return NextResponse.json({ error: 'Sunucu hatası' }, { status: 500 });
+  }
+}

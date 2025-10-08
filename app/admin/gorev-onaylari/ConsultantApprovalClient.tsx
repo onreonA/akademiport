@@ -202,7 +202,6 @@ export default function ConsultantApprovalClient() {
     let retryCount = 0;
 
     const attemptApproval = async (): Promise<Response> => {
-      console.log(`🔍 Frontend Admin Approval - Attempt ${retryCount + 1}:`, {
         taskId: completion.taskId,
         company_id: completion.company_id,
         approval_notes: approvalForm.approvalNote,
@@ -241,7 +240,6 @@ export default function ConsultantApprovalClient() {
 
         retryCount++;
         if (retryCount < maxRetries) {
-          console.log(`🔄 Retry ${retryCount}/${maxRetries} for task approval`);
           await new Promise(resolve => setTimeout(resolve, 1000 * retryCount)); // Exponential backoff
         }
       }
