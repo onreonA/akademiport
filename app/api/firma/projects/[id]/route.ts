@@ -233,6 +233,7 @@ export async function GET(
           .eq('company_id', companyId);
 
         if (!statusError && companyTaskStatuses) {
+          console.log(
             '🔍 Firma API - Company task statuses found:',
             companyTaskStatuses
           );
@@ -242,6 +243,7 @@ export async function GET(
               cts => cts.task_id === task.id
             );
             if (companyStatus) {
+              console.log('Company task status update:', {
                 taskId: task.id,
                 status: companyStatus.status,
                 approval_note: companyStatus.approval_note,
@@ -304,6 +306,7 @@ export async function GET(
           ? Math.round((completedTasks / allTaskIds.length) * 100)
           : 0;
 
+      console.log('Project progress calculation:', {
         totalTasks: allTaskIds.length,
         completedTasks,
         companyProgress,
@@ -341,6 +344,7 @@ export async function GET(
               )
             : 0;
 
+        console.log('Sub-project progress calculation:', {
           subProjectId: subProject.id,
           subProjectName: subProject.name,
           totalTasks: subProjectTaskIds.length,

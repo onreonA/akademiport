@@ -97,7 +97,6 @@ export async function GET(request: NextRequest) {
       const filteredDocuments =
         documents?.filter(doc => assignedIds.includes(doc.id)) || [];
 
-
       return NextResponse.json({
         success: true,
         data: filteredDocuments,

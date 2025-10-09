@@ -885,6 +885,7 @@ export default function ProjectDetailClient({
     endDate: string
   ) => {
     try {
+      console.log('Updating project dates:', {
         projectId,
         startDate,
         endDate,

@@ -42,6 +42,7 @@ export function middleware(request: NextRequest) {
     const companyName = request.nextUrl.searchParams.get('company');
 
     if (autoLoginToken && companyName) {
+      console.log(
         '🚀 Middleware: Auto-login token found, bypassing auth check'
       );
       return NextResponse.next();

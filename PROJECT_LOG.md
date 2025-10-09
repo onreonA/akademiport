@@ -30,7 +30,7 @@ Eğitim sistemini tamamen implement etmek, modern UI/UX tasarımı uygulamak ve 
 
 4. **JavaScript Hoisting Errors Fixed**
    - VideoDetailClient.tsx'de fetchEducationSetDetails hatası
-   - Documents page'de fetchDocuments hatası  
+   - Documents page'de fetchDocuments hatası
    - Progress dashboard'da calculateStats hatası
    - useCallback ve useEffect sıralaması düzeltildi
 

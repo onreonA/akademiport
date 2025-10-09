@@ -25,12 +25,20 @@ export async function PUT(
     const body = await request.json();
     const { action, approval_notes, company_id } = body;
 
+    console.log('Approval payload:', {
       action,
       approval_notes,
       company_id,
       taskId,
       userEmail,
       userRole,
+    });
+
+    console.log('Task approval request:', {
+      action,
+      approval_notes,
+      company_id,
+      taskId,
     });
 
     if (!action || !['approve', 'reject'].includes(action)) {
@@ -70,6 +78,8 @@ export async function PUT(
     // DO NOT update tasks table as it affects all companies
     const companyTaskStatusUpdate =
       action === 'approve' ? 'Tamamlandı' : 'Reddedildi';
+
+    console.log('Updating company task status:', {
       taskId,
       company_id,
       action,
@@ -85,6 +95,7 @@ export async function PUT(
       .eq('company_id', company_id)
       .single();
 
+    console.log('Company task status check:', {
       existingStatus,
       checkError,
       exists: !!existingStatus,
@@ -101,13 +112,13 @@ export async function PUT(
       updated_at: new Date().toISOString(),
     };
 
-
     const { error: companyStatusError } = await supabase
       .from('company_task_statuses')
       .upsert(upsertData, {
         onConflict: 'task_id,company_id',
       });
 
+    console.log('Company task status update result:', {
       error: companyStatusError,
       success: !companyStatusError,
     });

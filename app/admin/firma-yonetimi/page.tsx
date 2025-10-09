@@ -462,7 +462,6 @@ export default function CompanyManagement() {
         }),
       });
 
-
       if (response.ok) {
         const data = await response.json();
         // Open new tab with auto-login URL

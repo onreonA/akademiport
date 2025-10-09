@@ -217,6 +217,7 @@ export default function ProjectDetailPage() {
   ).length;
   const totalSubProjects = subProjects.length;
 
+  console.log('Sub project stats:', {
     totalSubProjects,
     completedSubProjects,
     subProjects: subProjects.map(sp => ({
@@ -596,6 +597,7 @@ export default function ProjectDetailPage() {
                           subProject.progress_percentage ||
                           subProject.progress ||
                           0;
+                        console.log(
                           '🔍 Frontend - Sub-project progress render:',
                           {
                             subProjectId: subProject.id,

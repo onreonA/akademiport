@@ -136,12 +136,14 @@ export async function POST(
     }
 
     // Firma bazlı görev durumunu güncelle
+    console.log('Task completion request:', {
       taskId,
       companyUser,
       completionNote,
     });
 
     // Re-enable company_task_statuses with detailed error logging
+    console.log('Company user info:', {
       id: companyUser.id,
       company_id: companyUser.company_id,
       name: companyUser.name,
@@ -165,6 +167,7 @@ export async function POST(
       })
       .select();
 
+    console.log('Company task status result:', {
       companyTaskStatus,
       statusError,
     });

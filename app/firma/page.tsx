@@ -38,6 +38,7 @@ export default function FirmaDashboard() {
 
   // Handle auto-login from admin panel
   const handleAutoLogin = async (token: string, companyName: string) => {
+    console.log('Auto-login attempt:', {
       token: token.substring(0, 20) + '...',
       companyName,
     });
@@ -123,7 +124,6 @@ export default function FirmaDashboard() {
     // Check for auto-login token
     const autoLoginToken = searchParams.get('token');
     const companyName = searchParams.get('company');
-
 
     if (autoLoginToken && companyName) {
       handleAutoLogin(autoLoginToken, companyName);

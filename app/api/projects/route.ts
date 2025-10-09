@@ -30,6 +30,7 @@ export async function GET(request: NextRequest) {
 
     if (isCompanyUser && userCompanyId) {
       // Firma kullanıcısı için: Sadece project_company_assignments'ta aktif olan projeler
+      console.log('Company user projects request:', {
         userCompanyId,
         userRole,
       });
@@ -65,12 +66,14 @@ export async function GET(request: NextRequest) {
         error = null;
       }
 
+      console.log('Projects fetched:', {
         projects: projects?.length,
         error,
       });
 
       // Debug: Her projenin raw verilerini kontrol et
       projects?.forEach((project: any, index: number) => {
+        console.log(`Project ${index}:`, {
           id: project.id,
           name: project.name,
           end_date: project.end_date,
