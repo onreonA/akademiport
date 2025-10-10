@@ -18,7 +18,8 @@ interface CareerApplication {
   created_at: string;
 }
 interface Candidate {
-  id: string;
+  id: string; // HR pool ID (unique key)
+  application_id?: string; // Başvuru ID'si
   name: string;
   email: string;
   phone: string;
@@ -128,7 +129,8 @@ const HRPoolPage = () => {
           // API verilerini frontend formatına dönüştür
           const formattedCandidates: Candidate[] = result.data.map(
             (item: any) => ({
-              id: item.application_id,
+              id: item.id, // HR pool ID'sini kullan (unique key için)
+              application_id: item.application_id, // Başvuru ID'sini ayrı tut
               name: item.career_applications.name,
               email: item.career_applications.email,
               phone: item.career_applications.phone,
