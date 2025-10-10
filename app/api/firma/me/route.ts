@@ -46,7 +46,13 @@ export async function GET(request: NextRequest) {
       success: true,
       data: company,
     });
-  } catch (error) {
+  } catch (error: any) {
+    // Handle authentication errors specifically
+    if (error.message === 'Authentication required' || 
+        error.message === 'Company access required') {
+      return createAuthErrorResponse(error.message, 401);
+    }
+    
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -56,23 +62,13 @@ export async function GET(request: NextRequest) {
 // PUT /api/firma/me - Update current firm's data
 export async function PUT(request: NextRequest) {
   try {
+    // JWT Authentication - Company users only
+    const user = await requireCompany(request);
+    
     const supabase = createClient();
-    // Get user from request headers
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-    // Extract user email from token or session
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
     // Get request body
     const body = await request.json();
-    // Find company by email
+    // Find company by email from JWT token
     const { data: company, error: companyError } = await supabase
       .from('companies')
       .select('id')
