@@ -17,7 +17,7 @@ const inter = Inter({
 });
 export const metadata: Metadata = {
   title:
-    "İhracat Akademi - Türkiye'nin E-İhracat Kapasitesini Birlikte Yükseltiyoruz",
+    "Akademi Port - Türkiye'nin E-İhracat Kapasitesini Birlikte Yükseltiyoruz",
   description:
     'Ticaret Bakanlığı destekleriyle, sanayi ve ticaret odalarının organizasyonunda yürütülen e-ihracat dönüşüm programı',
 };

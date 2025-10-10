@@ -23,7 +23,7 @@ export default function ModernFooter() {
                     <i className='ri-global-line text-white text-xl w-6 h-6 flex items-center justify-center'></i>
                   </div>
                   <span className="font-['Pacifico'] text-2xl text-white">
-                    İhracat Akademi
+                    Akademi Port
                   </span>
                 </div>
                 <p className='text-gray-300 text-lg leading-relaxed mb-6'>
@@ -250,7 +250,7 @@ export default function ModernFooter() {
               {/* Copyright */}
               <div className='flex items-center space-x-4'>
                 <p className='text-gray-400'>
-                  © 2024 İhracat Akademi. Tüm hakları saklıdır.
+                  © 2024 Akademi Port. Tüm hakları saklıdır.
                 </p>
                 <div className='flex items-center space-x-2'>
                   <div className='w-2 h-2 bg-green-400 rounded-full animate-pulse'></div>

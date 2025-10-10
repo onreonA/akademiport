@@ -278,7 +278,7 @@ export default function PlatformOzellikleri() {
               <span className='text-gray-900'>Altyapısı</span>
             </h1>
             <p className='text-xl text-gray-600 mb-8 max-w-4xl mx-auto leading-relaxed'>
-              İhracat Akademi&apos;nin güçlü teknoloji altyapısı, yapay zeka
+              Akademi Port&apos;un güçlü teknoloji altyapısı, yapay zeka
               destekli araçları ve kapsamlı yönetim modülleriyle işinizi bir üst
               seviyeye taşıyın.
             </p>

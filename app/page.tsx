@@ -190,7 +190,7 @@ export default function Home() {
             </h2>
             <div className='w-24 h-1 bg-gradient-to-r from-blue-600 to-purple-600 mx-auto mb-6'></div>
             <p className='text-xl text-gray-600 max-w-3xl mx-auto'>
-              İhracat Akademi programının 3 ana bileşeni ile firmanızı küresel
+              Akademi Port programının 3 ana bileşeni ile firmanızı küresel
               pazarlarda başarıya ulaştırın.
             </p>
           </div>
@@ -320,7 +320,7 @@ export default function Home() {
           <div className='bg-white rounded-2xl shadow-lg p-8 border border-gray-100'>
             <div className='text-center'>
               <h4 className='text-2xl font-bold text-gray-900 mb-4'>
-                Neden İhracat Akademi?
+                Neden Akademi Port?
               </h4>
               <p className='text-gray-600 mb-6 max-w-4xl mx-auto'>
                 Türkiye&apos;nin en kapsamlı e-ihracat programı ile firmanızı
@@ -842,8 +842,8 @@ export default function Home() {
             </h2>
             <div className='w-24 h-1 bg-gradient-to-r from-green-600 to-blue-600 mx-auto mb-6'></div>
             <p className='text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed'>
-              İhracat Akademi ile dönüşüm yaşayan firmaların gerçek deneyimleri
-              ve başarı öykülerini keşfedin.
+              Akademi Port ile dönüşüm yaşayan firmaların gerçek deneyimleri ve
+              başarı öykülerini keşfedin.
             </p>
           </div>
           {/* Slider Container */}

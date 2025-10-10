@@ -387,7 +387,7 @@ export default function LoginPage() {
                 <i className='ri-global-line text-white text-2xl w-7 h-7 flex items-center justify-center'></i>
               </div>
               <span className="font-['Inter'] font-black text-2xl bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent tracking-tight">
-                İHRACAT AKADEMİ
+                AKADEMİ PORT
               </span>
             </div>
             <p className='text-gray-300 text-lg leading-relaxed mb-6 max-w-2xl mx-auto'>

@@ -8,9 +8,9 @@ const faqData = {
   genel: [
     {
       id: 1,
-      question: 'İhracat Akademi nedir ve nasıl çalışır?',
+      question: 'Akademi Port nedir ve nasıl çalışır?',
       answer:
-        'İhracat Akademi, firmaların dijital dönüşüm ve e-ihracat süreçlerinde başarılı olmalarını sağlayan kapsamlı bir eğitim ve danışmanlık platformudur. Uzman danışmanlar eşliğinde, firmanızın ihtiyaçlarına özel eğitim programları, proje yönetimi araçları ve analitik raporlama sistemleri sunuyoruz.',
+        'Akademi Port, firmaların dijital dönüşüm ve e-ihracat süreçlerinde başarılı olmalarını sağlayan kapsamlı bir eğitim ve danışmanlık platformudur. Uzman danışmanlar eşliğinde, firmanızın ihtiyaçlarına özel eğitim programları, proje yönetimi araçları ve analitik raporlama sistemleri sunuyoruz.',
       link: '/program-hakkinda',
     },
     {

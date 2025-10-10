@@ -132,7 +132,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h2 className='text-2xl font-bold text-gray-900'>
-                      İhracat Akademi
+                      Akademi Port
                     </h2>
                     <p className='text-blue-600 font-medium'>
                       E-İhracat Dönüşüm Platformu
@@ -188,8 +188,8 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <h4 className='font-semibold text-gray-900'>E-posta</h4>
-                      <p className='text-gray-600'>info@ihracatakademi.com</p>
-                      <p className='text-gray-600'>destek@ihracatakademi.com</p>
+                      <p className='text-gray-600'>info@akademiport.com</p>
+                      <p className='text-gray-600'>destek@akademiport.com</p>
                     </div>
                   </div>
                   {/* Working Hours */}
@@ -443,7 +443,7 @@ export default function ContactPage() {
                       className={`text-sm ${errors.kvkkOnay ? 'text-red-600' : 'text-gray-600'}`}
                     >
                       <span className='text-red-500'>*</span> Kişisel
-                      verilerimin İhracat Akademi tarafından işlenmesini ve
+                      verilerimin Akademi Port tarafından işlenmesini ve
                       <a href='#' className='text-blue-600 hover:underline'>
                         {' '}
                         Gizlilik Politikası
@@ -563,7 +563,7 @@ export default function ContactPage() {
               <div className='w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-800 rounded-xl flex items-center justify-center'>
                 <i className='ri-global-line text-white text-2xl w-7 h-7 flex items-center justify-center'></i>
               </div>
-              <span className='font-bold text-2xl'>İhracat Akademi</span>
+              <span className='font-bold text-2xl'>Akademi Port</span>
             </div>
             <p className='text-gray-400 mb-6'>
               Türk firmalarının global başarısı için teknoloji ve uzmanlık

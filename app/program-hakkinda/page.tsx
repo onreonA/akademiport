@@ -386,7 +386,7 @@ export default function ProgramHakkinda() {
               Tasarlandı?
             </h2>
             <p className='text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed'>
-              İhracat Akademi, Türkiye&apos;nin dijital ihracat ekosistemini
+              Akademi Port, Türkiye&apos;nin dijital ihracat ekosistemini
               güçlendirmek için farklı sektörlerden aktörleri bir araya getiren
               kapsamlı bir platformdur.
             </p>

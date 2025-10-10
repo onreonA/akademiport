@@ -317,7 +317,7 @@ export default function KariyerPage() {
                 <span className='text-orange-400'> İster misin?</span>
               </h1>
               <p className='text-xl text-blue-100 mb-8 leading-relaxed'>
-                İhracat Akademi olarak, Türkiye&apos;nin e-ihracat vizyonuna güç
+                Akademi Port olarak, Türkiye&apos;nin e-ihracat vizyonuna güç
                 katacak danışmanlar, stajyerler ve üretken firma çalışanlarıyla
                 çalışmak istiyoruz.
               </p>
@@ -979,7 +979,7 @@ export default function KariyerPage() {
               Bizi Neden Tercih Etmelisin?
             </h2>
             <p className='text-xl text-blue-100 max-w-3xl mx-auto'>
-              İhracat Akademi&apos;de çalışmanın size sunacağı eşsiz fırsatları
+              Akademi Port&apos;ta çalışmanın size sunacağı eşsiz fırsatları
               keşfedin ve kariyerinizi bir üst seviyeye taşıyın
             </p>
           </div>
