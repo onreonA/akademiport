@@ -160,7 +160,7 @@ export default function AnimatedSidebar({
 
   const getColorClasses = (color: string, isActive: boolean = false) => {
     const baseClasses =
-      'transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg';
+      'transition-all duration-300 transform hover:scale-[1.01] hover:shadow-md';
 
     if (isActive) {
       // Aktif durum için modern gradient renkler
@@ -214,7 +214,7 @@ export default function AnimatedSidebar({
       // Collapsed durumda tek tip gri renk
       const collapsedStyle = collapsed ? 'text-gray-600 border border-gray-200' : iconColorMap[color] || iconColorMap['gray'];
       
-      return `w-7 h-7 rounded-lg flex items-center justify-start pl-1 transition-all duration-300 hover:scale-105 bg-white/40 hover:bg-white/60 ${collapsedStyle}`;
+      return `w-7 h-7 rounded-lg flex items-center justify-start pl-1 transition-all duration-300 hover:scale-102 bg-white/40 hover:bg-white/60 ${collapsedStyle}`;
     }
   };
 
@@ -222,7 +222,7 @@ export default function AnimatedSidebar({
     <div
       className={`transition-all duration-300 ease-in-out min-h-full ${collapsed ? 'w-16' : 'w-52'} bg-white/60 backdrop-blur-sm border-r border-white/30`}
     >
-      <nav className='p-2 space-y-0.5 pt-4'>
+      <nav className='p-2 space-y-0 pt-4'>
         {/* Ana Menü Öğeleri */}
         {menuItems.map(item => {
           const isActive = pathname === item.href;
