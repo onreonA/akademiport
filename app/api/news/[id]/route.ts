@@ -92,33 +92,37 @@ export async function PUT(
       status,
     } = body;
 
-    // Validation
-    if (!title || !content) {
+    // Validation - only require title and content for full updates
+    // Allow partial updates for image_url only
+    if (image_url === undefined && (!title || !content)) {
       return NextResponse.json(
         { success: false, error: 'Başlık ve içerik zorunludur' },
         { status: 400 }
       );
     }
 
+    // Prepare update data - only update provided fields
     const updateData: any = {
-      title,
-      content,
-      excerpt: excerpt || '',
-      summary: summary || '',
-      category: category || '',
-      tags: tags || [],
-      image_url: image_url || '',
-      video_url: video_url || '',
-      podcast_url: podcast_url || '',
-      reading_time: reading_time || 5,
-      difficulty_level: difficulty_level || 'Başlangıç',
-      expert_author_id: expert_author_id || null,
-      is_featured: is_featured || false,
-      seo_keywords: seo_keywords || '',
-      source_url: source_url || '',
-      status: status || 'draft',
       updated_at: new Date().toISOString(),
     };
+
+    // Only include fields that are provided
+    if (title !== undefined) updateData.title = title;
+    if (content !== undefined) updateData.content = content;
+    if (excerpt !== undefined) updateData.excerpt = excerpt;
+    if (summary !== undefined) updateData.summary = summary;
+    if (category !== undefined) updateData.category = category;
+    if (tags !== undefined) updateData.tags = tags;
+    if (image_url !== undefined) updateData.image_url = image_url;
+    if (video_url !== undefined) updateData.video_url = video_url;
+    if (podcast_url !== undefined) updateData.podcast_url = podcast_url;
+    if (reading_time !== undefined) updateData.reading_time = reading_time;
+    if (difficulty_level !== undefined) updateData.difficulty_level = difficulty_level;
+    if (expert_author_id !== undefined) updateData.expert_author_id = expert_author_id;
+    if (is_featured !== undefined) updateData.is_featured = is_featured;
+    if (seo_keywords !== undefined) updateData.seo_keywords = seo_keywords;
+    if (source_url !== undefined) updateData.source_url = source_url;
+    if (status !== undefined) updateData.status = status;
 
     // Eğer status published ise published_at'i güncelle
     if (status === 'published') {
