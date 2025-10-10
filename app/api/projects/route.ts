@@ -1,38 +1,37 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { createClient } from '@/lib/supabase/server';
+import { requireAuth, createAuthErrorResponse } from '@/lib/jwt-utils';
 // GET /api/projects - Get projects with optional company filter
 export async function GET(request: NextRequest) {
   try {
+    // JWT Authentication
+    const user = await requireAuth(request);
+    
     const supabase = createClient();
-    // Get user email from cookies (middleware sets this)
-    const userEmail = request.cookies.get('auth-user-email')?.value;
-    const userRole = request.cookies.get('auth-user-role')?.value;
-    const userCompanyId = request.cookies.get('auth-user-company-id')?.value;
-    if (!userEmail) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    
     // Get query parameters
     const { searchParams } = new URL(request.url);
     const companyId = searchParams.get('company_id');
     const status = searchParams.get('status');
     const limit = searchParams.get('limit');
+    
     // Check if user is a company user
     const isCompanyUser = [
       'user',
       'operator',
       'manager',
       'firma_admin',
-      'firma_kullanıcı',
-    ].includes(userRole || '');
+      'firma_kullanici',
+    ].includes(user.role || '');
 
     let projects, error;
 
-    if (isCompanyUser && userCompanyId) {
+    if (isCompanyUser && user.company_id) {
       // Firma kullanıcısı için: Sadece project_company_assignments'ta aktif olan projeler
       console.log('Company user projects request:', {
-        userCompanyId,
-        userRole,
+        companyId: user.company_id,
+        role: user.role,
       });
 
       const { data: assignedProjects, error: assignedError } = await supabase
@@ -55,7 +54,7 @@ export async function GET(request: NextRequest) {
           )
         `
         )
-        .eq('company_id', userCompanyId)
+        .eq('company_id', user.company_id)
         .eq('status', 'active');
 
       if (assignedError) {
@@ -128,7 +127,12 @@ export async function GET(request: NextRequest) {
       projects: projects || [],
       message: 'Projeler başarıyla getirildi',
     });
-  } catch (error) {
+  } catch (error: any) {
+    // Handle authentication errors specifically
+    if (error.message === 'Authentication required') {
+      return createAuthErrorResponse(error.message, 401);
+    }
+    
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -138,15 +142,13 @@ export async function GET(request: NextRequest) {
 // POST /api/projects - Create new project
 export async function POST(request: NextRequest) {
   try {
+    // JWT Authentication - Only admin users can create projects
+    const user = await requireAuth(request);
+    
     const supabase = createClient();
-    // Get user email from cookies (middleware sets this)
-    const userEmail = request.cookies.get('auth-user-email')?.value;
-    const userRole = request.cookies.get('auth-user-role')?.value;
-    if (!userEmail) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    
     // Only admin and consultant can create projects
-    if (!['admin', 'consultant', 'master_admin'].includes(userRole || '')) {
+    if (!['admin', 'consultant', 'master_admin', 'danisman'].includes(user.role || '')) {
       return NextResponse.json({ error: 'Access denied' }, { status: 403 });
     }
     const body = await request.json();
@@ -199,7 +201,12 @@ export async function POST(request: NextRequest) {
       updated_at: project.updated_at,
     };
     return NextResponse.json({ project: formattedProject });
-  } catch (error) {
+  } catch (error: any) {
+    // Handle authentication errors specifically
+    if (error.message === 'Authentication required') {
+      return createAuthErrorResponse(error.message, 401);
+    }
+    
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -209,15 +216,13 @@ export async function POST(request: NextRequest) {
 // DELETE /api/projects - Delete project
 export async function DELETE(request: NextRequest) {
   try {
+    // JWT Authentication - Only admin users can delete projects
+    const user = await requireAuth(request);
+    
     const supabase = createClient();
-    // Get user email from cookies (middleware sets this)
-    const userEmail = request.cookies.get('auth-user-email')?.value;
-    const userRole = request.cookies.get('auth-user-role')?.value;
-    if (!userEmail) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    
     // Only admin and consultant can delete projects
-    if (!['admin', 'consultant', 'master_admin'].includes(userRole || '')) {
+    if (!['admin', 'consultant', 'master_admin', 'danisman'].includes(user.role || '')) {
       return NextResponse.json({ error: 'Access denied' }, { status: 403 });
     }
     const { searchParams } = new URL(request.url);
@@ -237,7 +242,12 @@ export async function DELETE(request: NextRequest) {
       );
     }
     return NextResponse.json({ message: 'Project deleted successfully' });
-  } catch (error) {
+  } catch (error: any) {
+    // Handle authentication errors specifically
+    if (error.message === 'Authentication required') {
+      return createAuthErrorResponse(error.message, 401);
+    }
+    
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -247,16 +257,13 @@ export async function DELETE(request: NextRequest) {
 // PATCH /api/projects - Update project
 export async function PATCH(request: NextRequest) {
   try {
-    // Debug
+    // JWT Authentication - Only admin users can update projects
+    const user = await requireAuth(request);
+    
     const supabase = createClient();
-    // Get user email from cookies (middleware sets this)
-    const userEmail = request.cookies.get('auth-user-email')?.value;
-    const userRole = request.cookies.get('auth-user-role')?.value; // Debug
-    if (!userEmail) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    
     // Only admin and consultant can update projects
-    if (!['admin', 'consultant', 'master_admin'].includes(userRole || '')) {
+    if (!['admin', 'consultant', 'master_admin', 'danisman'].includes(user.role || '')) {
       return NextResponse.json({ error: 'Access denied' }, { status: 403 });
     }
     const body = await request.json();
@@ -281,7 +288,12 @@ export async function PATCH(request: NextRequest) {
       );
     }
     return NextResponse.json({ project });
-  } catch (error) {
+  } catch (error: any) {
+    // Handle authentication errors specifically
+    if (error.message === 'Authentication required') {
+      return createAuthErrorResponse(error.message, 401);
+    }
+    
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
