@@ -3,7 +3,9 @@ import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import {
   RiArrowDownLine,
+  RiArrowDownSLine,
   RiArrowLeftLine,
+  RiArrowUpSLine,
   RiBarChartLine,
   RiCalendarLine,
   RiCheckboxCircleLine,
@@ -481,90 +483,88 @@ export default function ProjectDetailPage() {
             </h3>
           </div>
           <div className='p-4 space-y-3'>
-            {filteredSubProjects.map(subProject => (
+            {filteredSubProjects.map((subProject, index) => (
               <div
                 key={subProject.id}
-                className='bg-gray-50 rounded-xl border border-gray-200 p-4 hover:bg-gray-100 transition-colors'
+                className='bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md transition-all duration-200'
               >
-                <div className='flex items-center justify-between mb-3'>
-                  <h4 className='font-semibold text-gray-900 text-base'>
-                    {subProject.name}
-                  </h4>
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(subProject.status)}`}
-                  >
-                    {subProject.status === 'active'
-                      ? 'Aktif'
-                      : subProject.status}
-                  </span>
-                </div>
+                {/* Forum Style Sub-Project Header */}
+                <div className='flex items-start gap-3'>
+                  {/* Avatar */}
+                  <div className='flex-shrink-0'>
+                    <div className='w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center shadow-sm'>
+                      <span className='text-white font-bold text-sm'>U</span>
+                    </div>
+                  </div>
+                  
+                  {/* Content */}
+                  <div className='flex-1 min-w-0'>
+                    <div className='flex items-center gap-2 mb-2'>
+                      <span className='font-semibold text-gray-900'>
+                        {subProject.name}
+                      </span>
+                      <span className='text-gray-500 text-sm'>
+                        {new Date(subProject.startDate || Date.now()).toLocaleDateString('tr-TR')}
+                      </span>
+                    </div>
+                    
+                    {subProject.description && (
+                      <p className='text-gray-700 leading-relaxed mb-3'>
+                        {subProject.description}
+                      </p>
+                    )}
+                    
+                    {/* Status and Priority Badges */}
+                    <div className='flex items-center gap-2 mb-3'>
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(subProject.status)}`}
+                      >
+                        {subProject.status === 'active' ? 'Aktif' : subProject.status}
+                      </span>
+                      <span className='px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800'>
+                        {(() => {
+                          const progress = subProject.progress_percentage || subProject.progress || 0;
+                          return `${progress}% Tamamlandı`;
+                        })()}
+                      </span>
+                    </div>
 
-                {/* Sub Project Details */}
-                <div className='grid grid-cols-1 md:grid-cols-3 gap-3 text-sm mb-3'>
-                  <div>
-                    <span className='text-gray-600'>Açıklama:</span>
-                    <p className='font-medium text-gray-900 mt-1 text-xs'>
-                      {subProject.description || 'Açıklama yok'}
-                    </p>
+                    {/* Progress Bar */}
+                    <div className='mb-3'>
+                      <div className='w-full bg-gray-200 rounded-full h-2'>
+                        <div
+                          className={`h-2 rounded-full transition-all duration-300 ${
+                            (subProject.progress_percentage || subProject.progress || 0) >= 80
+                              ? 'bg-green-500'
+                              : (subProject.progress_percentage || subProject.progress || 0) >= 50
+                                ? 'bg-yellow-500'
+                                : (subProject.progress_percentage || subProject.progress || 0) >= 20
+                                  ? 'bg-orange-500'
+                                  : 'bg-red-500'
+                          }`}
+                          style={{
+                            width: `${subProject.progress_percentage || subProject.progress || 0}%`,
+                          }}
+                        ></div>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <span className='text-gray-600'>Başlangıç:</span>
-                    <p className='font-medium text-gray-900 mt-1 text-xs'>
-                      {subProject.startDate
-                        ? new Date(subProject.startDate).toLocaleDateString(
-                            'tr-TR'
-                          )
-                        : 'N/A'}
-                    </p>
-                  </div>
-                  <div>
-                    <span className='text-gray-600'>Bitiş:</span>
-                    <p className='font-medium text-gray-900 mt-1 text-xs'>
-                      {subProject.endDate
-                        ? new Date(subProject.endDate).toLocaleDateString(
-                            'tr-TR'
-                          )
-                        : 'N/A'}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Progress Bar */}
-                <div className='mb-3'>
-                  <div className='flex justify-between text-xs mb-1'>
-                    <span className='text-gray-600'>İlerleme</span>
-                    <span className='font-medium text-gray-900'>
-                      {(() => {
-                        const progress =
-                          subProject.progress_percentage ||
-                          subProject.progress ||
-                          0;
-                        return progress;
-                      })()}
-                      %
+                  
+                  {/* Post Number and Expand Button */}
+                  <div className='flex-shrink-0 flex items-center gap-3'>
+                    <span className='text-gray-400 text-sm font-medium'>
+                      #{index + 1}
                     </span>
-                  </div>
-                  <div className='w-full bg-gray-200 rounded-full h-1.5'>
-                    <div
-                      className={`h-1.5 rounded-full transition-all duration-300 ${
-                        (subProject.progress_percentage ||
-                          subProject.progress ||
-                          0) >= 80
-                          ? 'bg-green-500'
-                          : (subProject.progress_percentage ||
-                                subProject.progress ||
-                                0) >= 50
-                            ? 'bg-yellow-500'
-                            : (subProject.progress_percentage ||
-                                  subProject.progress ||
-                                  0) >= 20
-                              ? 'bg-orange-500'
-                              : 'bg-red-500'
-                      }`}
-                      style={{
-                        width: `${subProject.progress_percentage || subProject.progress || 0}%`,
-                      }}
-                    ></div>
+                    <button
+                      onClick={() => toggleSubProject(subProject.id)}
+                      className='flex-shrink-0 p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200'
+                    >
+                      {expandedSubProjects.has(subProject.id) ? (
+                        <RiArrowUpSLine className='w-5 h-5 text-gray-600' />
+                      ) : (
+                        <RiArrowDownSLine className='w-5 h-5 text-gray-600' />
+                      )}
+                    </button>
                   </div>
                 </div>
 
@@ -593,48 +593,73 @@ export default function ProjectDetailPage() {
                   </button>
 
                   {expandedSubProjects.has(subProject.id) && (
-                    <div className='mt-3 space-y-2'>
+                    <div className='mt-3 ml-12 space-y-2'>
                       {tasks
                         .filter(task => task.subProject.id === subProject.id)
-                        .map(task => (
+                        .map((task, index) => (
                           <div
                             key={task.id}
                             className='bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden'
                           >
-                            {/* Task Header */}
-                            <div className='p-3 border-b border-gray-100 bg-gray-50'>
-                              <div className='flex items-start justify-between'>
+                            {/* Forum Style Task Header */}
+                            <div className='p-4'>
+                              <div className='flex items-start gap-3'>
+                                {/* Avatar */}
+                                <div className='flex-shrink-0'>
+                                  <div className='w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-sm'>
+                                    <span className='text-white font-bold text-sm'>M</span>
+                                  </div>
+                                </div>
+                                
+                                {/* Content */}
                                 <div className='flex-1 min-w-0'>
-                                  <h6 className='font-semibold text-gray-900 text-sm mb-1 leading-tight'>
+                                  <div className='flex items-center gap-2 mb-2'>
+                                    <span className='font-semibold text-gray-900'>
+                                      {task.assigned_to || 'Atanmamış'}
+                                    </span>
+                                    <span className='text-gray-500 text-sm'>
+                                      {new Date(task.start_date || Date.now()).toLocaleDateString('tr-TR')}
+                                    </span>
+                                  </div>
+                                  <h6 className='font-semibold text-gray-900 text-base mb-2 leading-tight'>
                                     {task.title}
                                   </h6>
                                   {task.description && (
-                                    <p className='text-xs text-gray-600 leading-relaxed line-clamp-2'>
+                                    <p className='text-gray-700 leading-relaxed mb-3'>
                                       {task.description}
                                     </p>
                                   )}
+                                  
+                                  {/* Status and Priority Badges */}
+                                  <div className='flex items-center gap-2 mb-3'>
+                                    <span
+                                      className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(task.priority)}`}
+                                    >
+                                      {task.priority}
+                                    </span>
+                                    <span
+                                      className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(task.status)}`}
+                                    >
+                                      {task.status === 'completed'
+                                        ? 'Tamamlandı'
+                                        : task.status === 'pending_approval'
+                                          ? 'Onaya Gönderildi'
+                                          : 'Aktif'}
+                                    </span>
+                                  </div>
                                 </div>
-                                <div className='flex items-center gap-2 ml-3'>
-                                  <span
-                                    className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(task.priority)}`}
-                                  >
-                                    {task.priority}
-                                  </span>
-                                  <span
-                                    className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(task.status)}`}
-                                  >
-                                    {task.status === 'completed'
-                                      ? 'Tamamlandı'
-                                      : task.status === 'pending_approval'
-                                        ? 'Onaya Gönderildi'
-                                        : 'Aktif'}
+                                
+                                {/* Post Number */}
+                                <div className='flex-shrink-0'>
+                                  <span className='text-gray-400 text-sm font-medium'>
+                                    #{index + 1}
                                   </span>
                                 </div>
                               </div>
                             </div>
 
                             {/* Task Content */}
-                            <div className='p-3'>
+                            <div className='px-4 pb-4'>
                               {/* Timeline Section */}
                               {(task.start_date || task.due_date) && (
                                 <div className='mb-3'>
@@ -773,7 +798,7 @@ export default function ProjectDetailPage() {
                               )}
 
                               {/* Action Section */}
-                              <div className='flex items-center justify-end pt-2 border-t border-gray-100'>
+                              <div className='flex items-center justify-end pt-3 border-t border-gray-100'>
                                 {task.status === 'completed' && (
                                   <div className='flex items-center gap-2 px-3 py-1.5 bg-green-100 text-green-800 rounded-lg border border-green-200'>
                                     <div className='w-1.5 h-1.5 bg-green-500 rounded-full'></div>
