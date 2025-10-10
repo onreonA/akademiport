@@ -181,8 +181,8 @@ export default function HaberlerPage() {
   // Load data
   useEffect(() => {
     const loadData = async () => {
-      try {
-        setLoading(true);
+    try {
+      setLoading(true);
         
         // Fetch real data from API
         const [newsResponse, categoriesResponse, expertsResponse] = await Promise.all([
@@ -209,7 +209,7 @@ export default function HaberlerPage() {
 
         if (expertsData.success) {
           setExperts(expertsData.data);
-        } else {
+      } else {
           setExperts(mockExperts); // Fallback to mock data
         }
       } catch (err) {
@@ -218,10 +218,10 @@ export default function HaberlerPage() {
         setNews(mockNews);
         setCategories(mockCategories);
         setExperts(mockExperts);
-      } finally {
-        setLoading(false);
-      }
-    };
+    } finally {
+      setLoading(false);
+    }
+  };
     loadData();
   }, []);
   // Filter news based on category and search
@@ -301,7 +301,7 @@ export default function HaberlerPage() {
     });
   };
   if (loading) {
-    return (
+  return (
       <FirmaLayout
         title='Haberler'
         description='Sektör haberlerini ve güncel gelişmeleri takip edin'
@@ -310,20 +310,20 @@ export default function HaberlerPage() {
           <div className='animate-pulse'>
             <div className='h-8 bg-gray-200 rounded w-1/4 mb-6'></div>
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-              {[...Array(6)].map((_, i) => (
-                <div
-                  key={i}
+                    {[...Array(6)].map((_, i) => (
+                      <div
+                        key={i}
                   className='bg-white rounded-xl shadow-sm border border-gray-100 p-6'
                 >
                   <div className='h-4 bg-gray-200 rounded w-3/4 mb-4'></div>
                   <div className='h-6 bg-gray-200 rounded w-full mb-2'></div>
                   <div className='h-4 bg-gray-200 rounded w-2/3 mb-4'></div>
                   <div className='h-4 bg-gray-200 rounded w-1/2'></div>
+              </div>
+                    ))}
+                  </div>
+                  </div>
                 </div>
-              ))}
-            </div>
-          </div>
-        </div>
       </FirmaLayout>
     );
   }
@@ -349,7 +349,7 @@ export default function HaberlerPage() {
               Tekrar Dene
             </button>
           </div>
-        </div>
+            </div>
       </FirmaLayout>
     );
   }
@@ -358,224 +358,301 @@ export default function HaberlerPage() {
       title='Haberler'
       description='Sektör haberlerini ve güncel gelişmeleri takip edin'
     >
-      <div className='max-w-7xl mx-auto'>
-        <div className='mb-8'>
-          <div className='flex items-center justify-between'>
-            <div>
-              <h1 className='text-3xl font-bold text-gray-900 mb-2'>
-                Haberler 📰
-              </h1>
-              <p className='text-gray-600'>
-                E-ihracat ve e-ticaret dünyasından en güncel haberler
-              </p>
-            </div>
-          </div>
-        </div>
-        {/* Filters */}
-        <div className='bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6'>
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4'>
-            {/* Search */}
-            <div>
-              <label className='block text-sm font-medium text-gray-700 mb-2'>
-                Arama
-              </label>
-              <input
-                type='text'
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                placeholder='Haber ara...'
-                className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-              />
-            </div>
-            {/* Category Filter */}
-            <div>
-              <label className='block text-sm font-medium text-gray-700 mb-2'>
-                Kategori
-              </label>
-              <select
-                value={selectedCategory}
-                onChange={e => setSelectedCategory(e.target.value)}
-                className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-              >
-                <option value='all'>Tüm Kategoriler</option>
-                {categories.map(category => (
-                  <option key={category.id} value={category.name}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            {/* Sort */}
-            <div>
-              <label className='block text-sm font-medium text-gray-700 mb-2'>
-                Sıralama
-              </label>
-              <select
-                value={sortBy}
-                onChange={e =>
-                  setSortBy(e.target.value as 'latest' | 'popular' | 'trending')
-                }
-                className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-              >
-                <option value='latest'>En Yeni</option>
-                <option value='popular'>En Popüler</option>
-                <option value='trending'>Trend</option>
-              </select>
-            </div>
-            {/* Results Count */}
-            <div className='flex items-end'>
-              <div className='text-sm text-gray-600'>
-                {sortedNews.length} haber bulundu
+      {/* Modern Hero Section */}
+      <div className='relative bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 overflow-hidden'>
+        <div className='absolute inset-0 bg-black/10'></div>
+        <div className='absolute inset-0'>
+          <div className='absolute top-0 left-0 w-full h-full'>
+            <div className='absolute top-10 left-10 w-32 h-32 bg-white/5 rounded-full blur-xl'></div>
+            <div className='absolute top-32 right-20 w-24 h-24 bg-white/5 rounded-full blur-lg'></div>
+            <div className='absolute bottom-20 left-1/3 w-40 h-40 bg-white/5 rounded-full blur-2xl'></div>
               </div>
             </div>
-          </div>
-        </div>
-        {/* News Grid */}
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-          {sortedNews.map(item => (
-            <div
-              key={item.id}
-              className='bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow'
-            >
-              {/* Image */}
-              {item.image_url && (
-                <div className='aspect-video bg-gray-200'>
-                  <Image
-                    src={item.image_url}
-                    alt={item.title}
-                    width={400}
-                    height={225}
-                    className='w-full h-full object-cover'
-                  />
-                </div>
-              )}
-              {/* Content */}
-              <div className='p-6'>
-                {/* Category */}
-                <div className='flex items-center gap-2 mb-3'>
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium ${categories.find(c => c.name === item.category)?.color || 'bg-gray-100 text-gray-800'}`}
-                  >
-                    {item.category}
-                  </span>
-                  {item.is_featured && (
-                    <span className='px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium'>
-                      Öne Çıkan
-                    </span>
-                  )}
-                </div>
-                {/* Title */}
-                <h3 className='text-lg font-semibold text-gray-900 mb-2 line-clamp-2'>
-                  {item.title}
-                </h3>
-                {/* Excerpt */}
-                <p className='text-gray-600 text-sm mb-4 line-clamp-3'>
-                  {item.excerpt}
-                </p>
-                {/* Meta */}
-                <div className='flex items-center justify-between text-xs text-gray-500 mb-4'>
-                  <div className='flex items-center gap-4'>
-                    <span>
-                      <i className='ri-eye-line mr-1'></i>
-                      {item.view_count}
-                    </span>
-                    <span>
-                      <i className='ri-time-line mr-1'></i>
-                      {item.reading_time} dk
-                    </span>
-                    <span>
-                      <i className='ri-calendar-line mr-1'></i>
-                      {formatDate(item.published_at)}
-                    </span>
-                  </div>
-                  <span
-                    className={`px-2 py-1 rounded text-xs ${
-                      item.difficulty_level === 'Başlangıç'
-                        ? 'bg-green-100 text-green-800'
-                        : item.difficulty_level === 'Orta'
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-red-100 text-red-800'
-                    }`}
-                  >
-                    {item.difficulty_level}
-                  </span>
-                </div>
-                {/* Expert */}
-                {item.news_experts && (
-                  <div className='flex items-center gap-3 mb-4 p-3 bg-gray-50 rounded-lg'>
-                    <div className='w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center'>
-                      <i className='ri-user-line text-blue-600 text-sm'></i>
+        
+        <div className='relative px-3 sm:px-4 lg:px-6 py-8'>
+          <div className='max-w-7xl mx-auto'>
+            <div className='flex items-center justify-between'>
+              <div className='flex-1'>
+                <div className='flex items-center gap-3 mb-4'>
+                  <div className='w-12 h-12 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center border border-white/20'>
+                    <i className='ri-newspaper-line text-white text-2xl'></i>
                     </div>
                     <div>
-                      <div className='text-sm font-medium text-gray-900'>
-                        {item.news_experts.name}
-                      </div>
-                      <div className='text-xs text-gray-500'>
-                        {item.news_experts.title}
-                      </div>
+                    <h1 className='text-2xl sm:text-3xl font-bold text-white mb-1'>
+                      Haberler 📰
+                    </h1>
+                    <p className='text-blue-100 text-sm sm:text-base'>
+                      {sortedNews.length} haber • En güncel gelişmeler
+                      </p>
                     </div>
                   </div>
+                <p className='text-white/90 text-sm sm:text-base max-w-2xl leading-relaxed'>
+                  E-ihracat ve e-ticaret dünyasından en güncel haberler, trendler ve uzman görüşleri
+                </p>
+                    </div>
+              <div className='hidden lg:flex flex-shrink-0'>
+                <div className='w-20 h-20 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center border border-white/20'>
+                  <i className='ri-global-line text-white text-3xl'></i>
+                  </div>
+              </div>
+            </div>
+        </div>
+      </div>
+    </div>
+
+      <div className='px-3 sm:px-4 lg:px-6 py-6'>
+        <div className='max-w-7xl mx-auto'>
+          {/* Modern Filters */}
+          <div className='bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8'>
+            <div className='flex items-center justify-between mb-6'>
+              <div className='flex items-center gap-3'>
+                <div className='w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-200'>
+                  <i className='ri-filter-line text-white text-lg'></i>
+                      </div>
+                  <div>
+                  <h3 className='text-lg font-semibold text-gray-900'>Filtreler</h3>
+                  <p className='text-sm text-gray-500'>{sortedNews.length} haber bulundu</p>
+                  </div>
+                </div>
+              <button
+                onClick={() => {
+                  setSelectedCategory('all');
+                  setSearchQuery('');
+                  setSortBy('latest');
+                }}
+                className='flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-all duration-200'
+              >
+                <i className='ri-refresh-line text-sm'></i>
+                Sıfırla
+              </button>
+              </div>
+
+            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
+                  {/* Search */}
+                  <div>
+                <label className='block text-sm font-medium text-gray-700 mb-2'>
+                  <i className='ri-search-line mr-2'></i>Arama
+                    </label>
+                <div className='relative'>
+                    <input
+                    type='text'
+                    value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                    placeholder='Haber başlığı veya içerik ara...'
+                    className='w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white'
+                  />
+                  <i className='ri-search-line absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400'></i>
+                </div>
+                  </div>
+
+                  {/* Category Filter */}
+                  <div>
+                <label className='block text-sm font-medium text-gray-700 mb-2'>
+                  <i className='ri-folder-line mr-2'></i>Kategori
+                    </label>
+                    <select
+                      value={selectedCategory}
+                      onChange={e => setSelectedCategory(e.target.value)}
+                  className='w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white appearance-none cursor-pointer'
+                    >
+                  <option value='all'>Tüm Kategoriler</option>
+                      {categories.map(category => (
+                        <option key={category.id} value={category.name}>
+                          {category.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+              {/* Sort */}
+                  <div>
+                <label className='block text-sm font-medium text-gray-700 mb-2'>
+                  <i className='ri-sort-desc mr-2'></i>Sıralama
+                    </label>
+                    <select
+                  value={sortBy}
+                  onChange={e =>
+                    setSortBy(e.target.value as 'latest' | 'popular' | 'trending')
+                  }
+                  className='w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white appearance-none cursor-pointer'
+                >
+                  <option value='latest'>En Yeni</option>
+                  <option value='popular'>En Popüler</option>
+                  <option value='trending'>Trend</option>
+                    </select>
+                  </div>
+                  </div>
+                </div>
+          {/* Modern News Grid */}
+          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
+            {sortedNews.map(item => (
+              <div
+                key={item.id}
+                className='group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl hover:scale-105 hover:border-blue-200 transition-all duration-300'
+              >
+                {/* Image */}
+                {item.image_url ? (
+                  <div className='aspect-video bg-gradient-to-br from-gray-100 to-gray-200 relative overflow-hidden'>
+                    <Image
+                      src={item.image_url}
+                      alt={item.title}
+                      width={400}
+                      height={225}
+                      className='w-full h-full object-cover group-hover:scale-110 transition-transform duration-500'
+                    />
+                    <div className='absolute inset-0 bg-gradient-to-t from-black/20 to-transparent'></div>
+                    {item.is_featured && (
+                      <div className='absolute top-4 right-4'>
+                        <span className='px-3 py-1 bg-yellow-400 text-yellow-900 rounded-full text-xs font-semibold shadow-lg'>
+                          ⭐ Öne Çıkan
+                    </span>
+                </div>
+                    )}
+              </div>
+                ) : (
+                  <div className='aspect-video bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center'>
+                    <i className='ri-newspaper-line text-blue-400 text-4xl'></i>
+                  </div>
                 )}
-                {/* Actions */}
-                <div className='flex items-center justify-between'>
-                  <div className='flex items-center gap-2'>
+                
+                {/* Content */}
+                <div className='p-6'>
+                  {/* Category & Meta */}
+                  <div className='flex items-center justify-between mb-4'>
+                      <span
+                      className={`px-3 py-1 rounded-full text-xs font-semibold ${categories.find(c => c.name === item.category)?.color || 'bg-gray-100 text-gray-800'}`}
+                    >
+                      {item.category}
+                      </span>
+                    <div className='flex items-center gap-3 text-xs text-gray-500'>
+                      <span className='flex items-center gap-1'>
+                        <i className='ri-eye-line'></i>
+                        {item.view_count}
+                        </span>
+                      <span className='flex items-center gap-1'>
+                        <i className='ri-time-line'></i>
+                        {item.reading_time}d
+                      </span>
+                    </div>
+                    </div>
+
+                    {/* Title */}
+                  <h3 className='text-lg font-bold text-gray-900 mb-3 line-clamp-2 group-hover:text-blue-600 transition-colors'>
+                    {item.title}
+                    </h3>
+
+                    {/* Excerpt */}
+                  <p className='text-gray-600 text-sm mb-4 line-clamp-3 leading-relaxed'>
+                    {item.excerpt}
+                  </p>
+                  
+                  {/* Expert */}
+                  {item.news_experts && (
+                    <div className='flex items-center gap-3 mb-4 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100'>
+                      <div className='w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-200'>
+                        <i className='ri-user-line text-white text-sm'></i>
+                        </div>
+                        <div>
+                        <div className='text-sm font-semibold text-gray-900'>
+                          {item.news_experts.name}
+                        </div>
+                        <div className='text-xs text-gray-500'>
+                          {item.news_experts.title}
+                      </div>
+                      </div>
+                      </div>
+                    )}
+
+                  {/* Date & Difficulty */}
+                  <div className='flex items-center justify-between mb-4'>
+                    <span className='text-xs text-gray-500 flex items-center gap-1'>
+                      <i className='ri-calendar-line'></i>
+                      {formatDate(item.published_at)}
+                        </span>
+                    <span
+                      className={`px-2 py-1 rounded-lg text-xs font-medium ${
+                        item.difficulty_level === 'Başlangıç'
+                          ? 'bg-green-100 text-green-700'
+                          : item.difficulty_level === 'Orta'
+                            ? 'bg-yellow-100 text-yellow-700'
+                            : 'bg-red-100 text-red-700'
+                      }`}
+                    >
+                      {item.difficulty_level}
+                        </span>
+              </div>
+
+                  {/* Actions */}
+                  <div className='flex items-center justify-between'>
+                    <div className='flex items-center gap-3'>
+                      <button
+                        onClick={() => handleLike(item.id)}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                          likedNews.has(item.id)
+                            ? 'bg-red-50 text-red-600 border border-red-200'
+                            : 'bg-gray-50 text-gray-600 border border-gray-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200'
+                        }`}
+                      >
+                        <i
+                          className={`ri-heart-${likedNews.has(item.id) ? 'fill' : 'line'} text-base`}
+                        ></i>
+                        {item.like_count + (likedNews.has(item.id) ? 1 : 0)}
+                      </button>
                     <button
-                      onClick={() => handleLike(item.id)}
-                      className={`flex items-center gap-1 px-3 py-1 rounded-lg text-sm transition-colors ${
-                        likedNews.has(item.id)
-                          ? 'bg-red-100 text-red-600'
-                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      onClick={() =>
+                          setShowComments(
+                            showComments === item.id ? null : item.id
+                          )
+                      }
+                        className='flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-gray-50 text-gray-600 border border-gray-200 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all duration-200'
+                    >
+                        <i className='ri-chat-3-line text-base'></i>
+                        {item.comment_count + (comments[item.id]?.length || 0)}
+                    </button>
+                    </div>
+                      <button
+                      onClick={() => handleBookmark(item.id)}
+                      className={`p-3 rounded-xl transition-all duration-200 ${
+                        bookmarkedNews.has(item.id)
+                          ? 'bg-blue-50 text-blue-600 border border-blue-200'
+                          : 'bg-gray-50 text-gray-600 border border-gray-200 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200'
                       }`}
                     >
                       <i
-                        className={`ri-heart-${likedNews.has(item.id) ? 'fill' : 'line'}`}
+                        className={`ri-bookmark-${bookmarkedNews.has(item.id) ? 'fill' : 'line'} text-base`}
                       ></i>
-                      {item.like_count + (likedNews.has(item.id) ? 1 : 0)}
-                    </button>
-                    <button
-                      onClick={() =>
-                        setShowComments(
-                          showComments === item.id ? null : item.id
-                        )
-                      }
-                      className='flex items-center gap-1 px-3 py-1 rounded-lg text-sm bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors'
-                    >
-                      <i className='ri-chat-3-line'></i>
-                      {item.comment_count + (comments[item.id]?.length || 0)}
-                    </button>
+                      </button>
                   </div>
-                  <button
-                    onClick={() => handleBookmark(item.id)}
-                    className={`p-2 rounded-lg transition-colors ${
-                      bookmarkedNews.has(item.id)
-                        ? 'bg-blue-100 text-blue-600'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                    }`}
-                  >
-                    <i
-                      className={`ri-bookmark-${bookmarkedNews.has(item.id) ? 'fill' : 'line'}`}
-                    ></i>
-                  </button>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
-        {/* No Results */}
-        {sortedNews.length === 0 && (
-          <div className='text-center py-12'>
-            <div className='w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4'>
-              <i className='ri-newspaper-line text-gray-400 text-2xl'></i>
-            </div>
-            <h3 className='text-lg font-medium text-gray-900 mb-2'>
-              Haber Bulunamadı
-            </h3>
-            <p className='text-gray-500'>
-              Arama kriterlerinize uygun haber bulunamadı.
-            </p>
+            ))}
           </div>
-        )}
-      </div>
+          {/* Modern No Results */}
+          {sortedNews.length === 0 && (
+            <div className='text-center py-16'>
+              <div className='w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg'>
+                <i className='ri-newspaper-line text-gray-400 text-3xl'></i>
+              </div>
+              <h3 className='text-xl font-bold text-gray-900 mb-3'>
+                Haber Bulunamadı
+              </h3>
+              <p className='text-gray-500 mb-6 max-w-md mx-auto'>
+                Arama kriterlerinize uygun haber bulunamadı. Filtreleri değiştirmeyi deneyin.
+              </p>
+                    <button
+                onClick={() => {
+                  setSelectedCategory('all');
+                  setSearchQuery('');
+                  setSortBy('latest');
+                }}
+                className='inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl'
+              >
+                <i className='ri-refresh-line text-base'></i>
+                Filtreleri Sıfırla
+                    </button>
+                </div>
+              )}
+            </div>
     </FirmaLayout>
   );
 }
