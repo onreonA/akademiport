@@ -3,7 +3,7 @@
 // =====================================================
 // Next.js middleware for route protection - PERFORMANCE OPTIMIZED
 import { NextResponse, type NextRequest } from 'next/server';
-import jwt from 'jsonwebtoken';
+import { jwtVerify } from 'jose';
 // Pre-compiled route patterns for better performance
 const PROTECTED_ROUTE_PATTERN = /^\/(admin|firma|api\/(projects|companies|v2))/;
 const ADMIN_ROUTE_PATTERN = /^\/(admin|api\/admin)/;
@@ -16,7 +16,7 @@ const STATIC_PATTERN =
 const ADMIN_ROLES = new Set(['admin', 'master_admin', 'danisman']);
 const COMPANY_ROLES = new Set(['firma_admin', 'firma_kullanici']);
 const OBSERVER_ROLES = new Set(['gozlemci']);
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   // Fast path: Skip middleware for static files and public API routes
   if (STATIC_PATTERN.test(pathname)) {
@@ -41,16 +41,21 @@ export function middleware(request: NextRequest) {
     return handleUnauthenticated(request, pathname);
   }
 
-  // JWT token doğrula
+  // JWT token doğrula (jose kullanarak - Edge Runtime uyumlu)
   let userEmail: string | null = null;
   let userRole: string | null = null;
   
   try {
-    const decoded = jwt.verify(authToken, process.env.JWT_SECRET || 'your-secret-key-change-in-production') as any;
-    userEmail = decoded.email;
-    userRole = decoded.role;
+    const secret = new TextEncoder().encode(
+      process.env.JWT_SECRET || 'your-secret-key-change-in-production'
+    );
+    const { payload } = await jwtVerify(authToken, secret);
+    userEmail = payload.email as string;
+    userRole = payload.role as string;
+    console.log('✅ Middleware: JWT verified', { email: userEmail, role: userRole });
   } catch (error) {
     // Token geçersiz - çıkış yap
+    console.error('❌ Middleware: JWT verification failed', error);
     const response = NextResponse.redirect(new URL('/giris', request.url));
     response.cookies.delete('auth-token');
     return response;

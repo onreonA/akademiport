@@ -19,16 +19,16 @@ export async function POST(request: NextRequest) {
         email: result.user.email,
         role: result.user.role,
         company_id: result.user.company_id,
-        exp: Math.floor(Date.now() / 1000) + (60 * 60 * 2), // 2 saat
       },
-      process.env.JWT_SECRET || 'your-secret-key-change-in-production'
+      process.env.JWT_SECRET || 'your-secret-key-change-in-production',
+      { expiresIn: '2h' } // 2 saat
     );
 
     // Güvenli authentication cookie set et
     response.cookies.set('auth-token', jwtToken, {
       httpOnly: true, // XSS koruması
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict', // CSRF koruması
+      sameSite: 'lax', // CSRF koruması (strict çok katı, lax yeterli)
       maxAge: 60 * 60 * 2, // 2 saat
       path: '/'
     });

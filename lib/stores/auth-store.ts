@@ -98,6 +98,7 @@ export const useAuthStore = create<AuthState>()(
             headers: {
               'Content-Type': 'application/json',
             },
+            credentials: 'include', // Cookie almak için gerekli
             body: JSON.stringify({ email, password }),
           });
           const result = await response.json();
@@ -118,14 +119,8 @@ export const useAuthStore = create<AuthState>()(
               state.loading = false;
               state.error = null;
             });
-            // Set auth cookies for middleware access
-            if (typeof window !== 'undefined') {
-              document.cookie = `auth-user-email=${result.user.email}; path=/; max-age=86400; SameSite=Lax`;
-              document.cookie = `auth-user-role=${result.user.role}; path=/; max-age=86400; SameSite=Lax`;
-              if (result.user.company_id) {
-                document.cookie = `auth-user-company-id=${result.user.company_id}; path=/; max-age=86400; SameSite=Lax`;
-              }
-            }
+            // JWT token cookie is set by server (httpOnly)
+            // No need to set cookies from client side
           } else {
             throw new Error('Invalid response format');
           }
@@ -137,21 +132,23 @@ export const useAuthStore = create<AuthState>()(
           throw error;
         }
       },
-      signOut: () => {
+      signOut: async () => {
         set(state => {
           state.user = null;
           state.session = null;
           state.loading = false;
           state.error = null;
         });
-        // Clear auth cookies
+        // Call logout API to clear httpOnly cookie
         if (typeof window !== 'undefined') {
-          document.cookie =
-            'auth-user-email=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
-          document.cookie =
-            'auth-user-role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
-          document.cookie =
-            'auth-user-company-id=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+          try {
+            await fetch('/api/auth/logout', {
+              method: 'POST',
+              credentials: 'include',
+            });
+          } catch (error) {
+            console.error('Logout error:', error);
+          }
           // Redirect to login page
           window.location.href = '/giris';
         }
