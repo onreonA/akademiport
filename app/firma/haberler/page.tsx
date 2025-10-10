@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 
 import FirmaLayout from '@/components/firma/FirmaLayout';
 import { useAuthStore } from '@/lib/stores/auth-store';
+
 interface News {
   id: string;
   title: string;
@@ -29,6 +30,7 @@ interface News {
     avatar_url?: string;
   };
 }
+
 interface Comment {
   id: string;
   content: string;
@@ -37,6 +39,7 @@ interface Comment {
   created_at: string;
   updated_at: string;
 }
+
 interface Category {
   id: string;
   name: string;
@@ -44,6 +47,7 @@ interface Category {
   icon: string;
   color: string;
 }
+
 interface Expert {
   id: string;
   name: string;
@@ -52,6 +56,7 @@ interface Expert {
   bio: string;
   expertise_areas: string[];
 }
+
 export default function HaberlerPage() {
   const [news, setNews] = useState<News[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -60,23 +65,21 @@ export default function HaberlerPage() {
   const [error, setError] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState<'latest' | 'popular' | 'trending'>(
-    'latest'
-  );
+  const [sortBy, setSortBy] = useState<'latest' | 'popular' | 'trending'>('latest');
   const [showComments, setShowComments] = useState<string | null>(null);
   const [comments, setComments] = useState<{ [key: string]: Comment[] }>({});
   const [newComment, setNewComment] = useState('');
   const [likedNews, setLikedNews] = useState<Set<string>>(new Set());
   const [bookmarkedNews, setBookmarkedNews] = useState<Set<string>>(new Set());
-  const { signIn } = useAuthStore();
+  const { signIn, user } = useAuthStore();
+
   // Mock data for demonstration
   const mockNews: News[] = [
     {
       id: '1',
       title: 'E-ihracat Sektöründe Yeni Dönem: Dijital Dönüşüm',
       content: 'E-ihracat sektöründe yaşanan dijital dönüşüm...',
-      excerpt:
-        'E-ihracat sektöründe yaşanan dijital dönüşüm hakkında detaylı analiz.',
+      excerpt: 'E-ihracat sektöründe yaşanan dijital dönüşüm hakkında detaylı analiz.',
       summary: 'Dijital dönüşüm e-ihracat sektörünü nasıl etkiliyor?',
       published_at: '2024-01-15T10:00:00Z',
       category: 'E-ihracat',
@@ -130,6 +133,7 @@ export default function HaberlerPage() {
       image_url: '/images/news/digital-marketing-trends.jpg',
     },
   ];
+
   const mockCategories: Category[] = [
     {
       id: '1',
@@ -160,6 +164,7 @@ export default function HaberlerPage() {
       color: 'bg-orange-100 text-orange-800',
     },
   ];
+
   const mockExperts: Expert[] = [
     {
       id: '1',
@@ -178,6 +183,7 @@ export default function HaberlerPage() {
       expertise_areas: ['E-ticaret', 'Amazon', 'Shopify'],
     },
   ];
+
   // Load data
   useEffect(() => {
     const loadData = async () => {
@@ -188,16 +194,15 @@ export default function HaberlerPage() {
         const userEmail = user?.email || '';
 
         // Fetch real data from API with authentication
-        const [newsResponse, categoriesResponse, expertsResponse] =
-          await Promise.all([
-            fetch('/api/news', {
+        const [newsResponse, categoriesResponse, expertsResponse] = await Promise.all([
+          fetch('/api/news', {
         headers: {
-                'X-User-Email': userEmail,
-              },
-            }),
-            fetch('/api/news/categories'),
-            fetch('/api/news/experts'),
-          ]);
+              'X-User-Email': userEmail,
+            },
+          }),
+          fetch('/api/news/categories'),
+          fetch('/api/news/experts'),
+        ]);
 
         const newsData = await newsResponse.json();
         const categoriesData = await categoriesResponse.json();
@@ -229,27 +234,24 @@ export default function HaberlerPage() {
       } finally {
         setLoading(false);
       }
-      };
-      loadData();
-    }, [user]);
+    };
+    loadData();
+  }, [user]);
+
   // Filter news based on category and search
   const filteredNews = news.filter(item => {
-    const matchesCategory =
-      selectedCategory === 'all' || item.category === selectedCategory;
-    const matchesSearch =
-      searchQuery === '' ||
+    const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory;
+    const matchesSearch = searchQuery === '' || 
       item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
+
   // Sort news
   const sortedNews = [...filteredNews].sort((a, b) => {
     switch (sortBy) {
       case 'latest':
-        return (
-          new Date(b.published_at).getTime() -
-          new Date(a.published_at).getTime()
-        );
+        return new Date(b.published_at).getTime() - new Date(a.published_at).getTime();
       case 'popular':
         return b.view_count - a.view_count;
       case 'trending':
@@ -258,6 +260,7 @@ export default function HaberlerPage() {
         return 0;
     }
   });
+
   // Handle like
   const handleLike = (newsId: string) => {
     if (likedNews.has(newsId)) {
@@ -270,6 +273,7 @@ export default function HaberlerPage() {
       setLikedNews(prev => new Set(prev).add(newsId));
     }
   };
+
   // Handle bookmark
   const handleBookmark = (newsId: string) => {
     if (bookmarkedNews.has(newsId)) {
@@ -282,6 +286,7 @@ export default function HaberlerPage() {
       setBookmarkedNews(prev => new Set(prev).add(newsId));
     }
   };
+
   // Handle comment
   const handleComment = (newsId: string) => {
     if (newComment.trim()) {
@@ -300,6 +305,7 @@ export default function HaberlerPage() {
       setNewComment('');
     }
   };
+
   // Format date
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('tr-TR', {
@@ -308,6 +314,7 @@ export default function HaberlerPage() {
       day: 'numeric',
     });
   };
+
   if (loading) {
   return (
       <FirmaLayout
@@ -319,10 +326,7 @@ export default function HaberlerPage() {
             <div className='h-8 bg-gray-200 rounded w-1/4 mb-6'></div>
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
               {[...Array(6)].map((_, i) => (
-                <div
-                  key={i}
-                  className='bg-white rounded-xl shadow-sm border border-gray-100 p-6'
-                >
+                <div key={i} className='bg-white rounded-xl shadow-sm border border-gray-100 p-6'>
                   <div className='h-4 bg-gray-200 rounded w-3/4 mb-4'></div>
                   <div className='h-6 bg-gray-200 rounded w-full mb-2'></div>
                   <div className='h-4 bg-gray-200 rounded w-2/3 mb-4'></div>
@@ -335,6 +339,7 @@ export default function HaberlerPage() {
       </FirmaLayout>
     );
   }
+
   if (error) {
     return (
       <FirmaLayout
@@ -361,6 +366,7 @@ export default function HaberlerPage() {
       </FirmaLayout>
     );
   }
+
   return (
     <FirmaLayout
       title='Haberler'
@@ -395,8 +401,7 @@ export default function HaberlerPage() {
                     </div>
                   </div>
                 <p className='text-white/90 text-sm sm:text-base max-w-2xl leading-relaxed'>
-                  E-ihracat ve e-ticaret dünyasından en güncel haberler,
-                  trendler ve uzman görüşleri
+                  E-ihracat ve e-ticaret dünyasından en güncel haberler, trendler ve uzman görüşleri
                 </p>
                     </div>
               <div className='hidden lg:flex flex-shrink-0'>
@@ -484,11 +489,7 @@ export default function HaberlerPage() {
                     </label>
                     <select
                   value={sortBy}
-                  onChange={e =>
-                    setSortBy(
-                      e.target.value as 'latest' | 'popular' | 'trending'
-                    )
-                  }
+                  onChange={e => setSortBy(e.target.value as 'latest' | 'popular' | 'trending')}
                   className='w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white appearance-none cursor-pointer'
                 >
                   <option value='latest'>En Yeni</option>
@@ -498,6 +499,7 @@ export default function HaberlerPage() {
                   </div>
                   </div>
                 </div>
+
           {/* Modern News Grid */}
           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
             {sortedNews.map(item => (
@@ -535,7 +537,9 @@ export default function HaberlerPage() {
                   {/* Category & Meta */}
                   <div className='flex items-center justify-between mb-4'>
                       <span
-                      className={`px-3 py-1 rounded-full text-xs font-semibold ${categories.find(c => c.name === item.category)?.color || 'bg-gray-100 text-gray-800'}`}
+                      className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                        categories.find(c => c.name === item.category)?.color || 'bg-gray-100 text-gray-800'
+                      }`}
                     >
                       {item.category}
                       </span>
@@ -573,8 +577,8 @@ export default function HaberlerPage() {
                         </div>
                         <div className='text-xs text-gray-500'>
                           {item.news_experts.title}
-                      </div>
-                      </div>
+                        </div>
+                        </div>
                       </div>
                     )}
 
@@ -583,8 +587,8 @@ export default function HaberlerPage() {
                     <span className='text-xs text-gray-500 flex items-center gap-1'>
                       <i className='ri-calendar-line'></i>
                       {formatDate(item.published_at)}
-                        </span>
-                    <span
+                    </span>
+                          <span
                       className={`px-2 py-1 rounded-lg text-xs font-medium ${
                         item.difficulty_level === 'Başlangıç'
                           ? 'bg-green-100 text-green-700'
@@ -594,8 +598,8 @@ export default function HaberlerPage() {
                       }`}
                     >
                       {item.difficulty_level}
-                        </span>
-              </div>
+                          </span>
+                      </div>
 
                   {/* Actions */}
                   <div className='flex items-center justify-between'>
@@ -608,24 +612,18 @@ export default function HaberlerPage() {
                             : 'bg-gray-50 text-gray-600 border border-gray-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200'
                         }`}
                       >
-                        <i
-                          className={`ri-heart-${likedNews.has(item.id) ? 'fill' : 'line'} text-base`}
-                        ></i>
+                        <i className={`ri-heart-${likedNews.has(item.id) ? 'fill' : 'line'} text-base`}></i>
                         {item.like_count + (likedNews.has(item.id) ? 1 : 0)}
                       </button>
-                    <button
-                      onClick={() =>
-                          setShowComments(
-                            showComments === item.id ? null : item.id
-                          )
-                      }
+                      <button
+                        onClick={() => setShowComments(showComments === item.id ? null : item.id)}
                         className='flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-gray-50 text-gray-600 border border-gray-200 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all duration-200'
-                    >
+                      >
                         <i className='ri-chat-3-line text-base'></i>
                         {item.comment_count + (comments[item.id]?.length || 0)}
-                    </button>
-                    </div>
-                      <button
+                      </button>
+                      </div>
+                    <button
                       onClick={() => handleBookmark(item.id)}
                       className={`p-3 rounded-xl transition-all duration-200 ${
                         bookmarkedNews.has(item.id)
@@ -633,15 +631,14 @@ export default function HaberlerPage() {
                           : 'bg-gray-50 text-gray-600 border border-gray-200 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200'
                       }`}
                     >
-                      <i
-                        className={`ri-bookmark-${bookmarkedNews.has(item.id) ? 'fill' : 'line'} text-base`}
-                      ></i>
-                      </button>
+                      <i className={`ri-bookmark-${bookmarkedNews.has(item.id) ? 'fill' : 'line'} text-base`}></i>
+                    </button>
+                      </div>
+                    </div>
                   </div>
-                </div>
+                ))}
               </div>
-            ))}
-          </div>
+
           {/* Modern No Results */}
           {sortedNews.length === 0 && (
             <div className='text-center py-16'>
@@ -652,8 +649,7 @@ export default function HaberlerPage() {
                 Haber Bulunamadı
               </h3>
               <p className='text-gray-500 mb-6 max-w-md mx-auto'>
-                Arama kriterlerinize uygun haber bulunamadı. Filtreleri
-                değiştirmeyi deneyin.
+                Arama kriterlerinize uygun haber bulunamadı. Filtreleri değiştirmeyi deneyin.
               </p>
                     <button
                 onClick={() => {

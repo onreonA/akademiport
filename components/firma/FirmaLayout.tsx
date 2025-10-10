@@ -31,7 +31,9 @@ export default function FirmaLayout({
   showHeader = false,
 }: FirmaLayoutProps) {
   const router = useRouter();
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  // Simple state management - always collapsed by default
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -59,6 +61,7 @@ export default function FirmaLayout({
       document.head.appendChild(style);
     }
   }, []);
+
 
   // Authentication kontrolü
   useEffect(() => {
@@ -120,21 +123,22 @@ export default function FirmaLayout({
     }
   }, [mounted, router]);
 
-  // Auto-collapse timer logic - basit versiyon
+  // Auto-collapse timer logic - 10 saniye sonra daralt
   useEffect(() => {
     if (
       typeof window !== 'undefined' &&
       window.innerWidth >= 768 &&
       !sidebarCollapsed &&
-      !isHovered
+      !isHovered &&
+      mounted
     ) {
       const timer = setTimeout(() => {
         setSidebarCollapsed(true);
-      }, 5000);
+      }, 10000); // 10 saniye
 
       return () => clearTimeout(timer);
     }
-  }, [sidebarCollapsed, isHovered]);
+  }, [sidebarCollapsed, isHovered, mounted]);
 
   const handleSidebarToggle = () => {
     if (typeof window !== 'undefined' && window.innerWidth < 768) {
@@ -258,8 +262,9 @@ export default function FirmaLayout({
       {/* Main Content */}
       <div
         className={`
-          ${sidebarCollapsed && !isHovered ? 'md:ml-12' : 'md:ml-52'}
+          ${sidebarCollapsed && !isHovered ? 'md:ml-16' : 'md:ml-52'}
           pt-8
+          transition-all duration-300 ease-in-out
         `}
       >
         {/* Page Content */}
