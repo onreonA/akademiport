@@ -16,8 +16,7 @@ export async function GET(
       .select(
         `
         *,
-        users(email, full_name),
-        companies(name, email)
+        users(email, full_name)
       `
       )
       .eq('id', id)
@@ -54,27 +53,34 @@ export async function PUT(
     const { id } = await params;
     const body = await request.json();
     const { content, is_solution, is_hidden } = body;
-    // Validasyon
-    if (!content) {
+    // Validasyon - content opsiyonel (partial update için)
+    if (
+      content === undefined &&
+      is_solution === undefined &&
+      is_hidden === undefined
+    ) {
       return NextResponse.json(
-        { success: false, error: 'İçerik gerekli' },
+        { success: false, error: 'En az bir alan güncellenmelidir' },
         { status: 400 }
       );
     }
+    // Sadece sağlanan alanları güncelle
+    const updateData: any = {
+      updated_at: new Date().toISOString(),
+    };
+
+    if (content !== undefined) updateData.content = content;
+    if (is_solution !== undefined) updateData.is_solution = is_solution;
+    if (is_hidden !== undefined) updateData.is_hidden = is_hidden;
+
     const { data, error } = await supabase
       .from('forum_replies')
-      .update({
-        content,
-        is_solution: is_solution || false,
-        is_hidden: is_hidden || false,
-        updated_at: new Date().toISOString(),
-      })
+      .update(updateData)
       .eq('id', id)
       .select(
         `
         *,
-        users(email, full_name),
-        companies(name, email)
+        users(email, full_name)
       `
       )
       .single();
@@ -85,8 +91,9 @@ export async function PUT(
           { status: 404 }
         );
       }
+      console.log('Forum reply update error:', error);
       return NextResponse.json(
-        { success: false, error: 'Yanıt güncellenemedi' },
+        { success: false, error: 'Yanıt güncellenemedi', details: error },
         { status: 500 }
       );
     }
