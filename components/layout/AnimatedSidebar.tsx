@@ -214,7 +214,7 @@ export default function AnimatedSidebar({
       // Collapsed durumda tek tip gri renk
       const collapsedStyle = collapsed ? 'text-gray-600 border border-gray-200' : iconColorMap[color] || iconColorMap['gray'];
       
-      return `w-7 h-7 rounded-lg flex items-center justify-start pl-1.5 transition-all duration-300 hover:scale-105 bg-white/40 hover:bg-white/60 ${collapsedStyle}`;
+      return `w-7 h-7 rounded-lg flex items-center justify-start pl-1 transition-all duration-300 hover:scale-105 bg-white/40 hover:bg-white/60 ${collapsedStyle}`;
     }
   };
 
@@ -222,7 +222,7 @@ export default function AnimatedSidebar({
     <div
       className={`transition-all duration-300 ease-in-out min-h-full ${collapsed ? 'w-16' : 'w-52'} bg-white/60 backdrop-blur-sm border-r border-white/30`}
     >
-      <nav className='p-3 space-y-0.5 pt-4'>
+      <nav className='p-2 space-y-0.5 pt-4'>
         {/* Ana Menü Öğeleri */}
         {menuItems.map(item => {
           const isActive = pathname === item.href;
@@ -233,10 +233,10 @@ export default function AnimatedSidebar({
               {item.hasSubmenu ? (
                 <div>
                   <div
-                    className={`group relative flex items-center px-3 py-2 text-sm font-medium cursor-pointer ${getColorClasses(item.color, isActive)}`}
+                    className={`group relative flex items-center px-2 py-2 text-sm font-medium cursor-pointer ${getColorClasses(item.color, isActive)}`}
                     onClick={() => toggleExpanded(item.id)}
                   >
-                    <div className='flex items-center justify-start mr-3 relative'>
+                    <div className='flex items-center justify-start mr-2 relative'>
                       <div className={getIconClasses(item.color, isActive)}>
                         <item.icon className='w-5 h-5' />
                       </div>
@@ -276,7 +276,7 @@ export default function AnimatedSidebar({
                         <Link
                           key={index}
                           href={subItem.href}
-                          className='block px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors duration-200'
+                          className='block px-2 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors duration-200'
                         >
                           {subItem.title}
                         </Link>
@@ -287,9 +287,9 @@ export default function AnimatedSidebar({
               ) : (
                 <Link href={item.href}>
                   <div
-                    className={`group relative flex items-center px-3 py-2 text-sm font-medium cursor-pointer ${getColorClasses(item.color, isActive)}`}
+                    className={`group relative flex items-center px-2 py-2 text-sm font-medium cursor-pointer ${getColorClasses(item.color, isActive)}`}
                   >
-                    <div className='flex items-center justify-start mr-3 relative'>
+                    <div className='flex items-center justify-start mr-2 relative'>
                       <div className={getIconClasses(item.color, isActive)}>
                         <item.icon className='w-5 h-5' />
                       </div>
@@ -324,7 +324,7 @@ export default function AnimatedSidebar({
         {/* Ayarlar Bölümü */}
         {!collapsed && (
           <div className='my-4 border-t border-white/20'>
-            <div className='px-3 py-2'>
+            <div className='px-2 py-2'>
               <h3 className='text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gradient-to-r from-gray-600 to-gray-800 bg-clip-text text-transparent'>
                 AYARLAR
               </h3>
@@ -339,9 +339,9 @@ export default function AnimatedSidebar({
           return (
             <Link key={item.id} href={item.href}>
               <div
-                className={`group relative flex items-center px-3 py-2 text-sm font-medium cursor-pointer ${getColorClasses(item.color, isActive)}`}
+                className={`group relative flex items-center px-2 py-2 text-sm font-medium cursor-pointer ${getColorClasses(item.color, isActive)}`}
               >
-                <div className='flex items-center justify-center mr-3'>
+                <div className='flex items-center justify-center mr-2'>
                   <div className={getIconClasses(item.color, isActive)}>
                     <item.icon className='w-5 h-5' />
                   </div>
