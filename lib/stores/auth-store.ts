@@ -12,10 +12,10 @@ export interface AuthUser {
   full_name?: string;
   role:
     | 'master_admin'
-    | 'danışman'
+    | 'danisman'
     | 'firma_admin'
-    | 'firma_kullanıcı'
-    | 'gözlemci';
+    | 'firma_kullanici'
+    | 'gozlemci';
   company_id?: string;
   created_at: string;
   updated_at: string;
@@ -193,7 +193,7 @@ export const useAuthStore = create<AuthState>()(
       },
       isAdmin: () => {
         const { user } = get();
-        return user?.role === 'master_admin' || user?.role === 'danışman';
+        return user?.role === 'master_admin' || user?.role === 'danisman';
       },
       isMasterAdmin: () => {
         const { user } = get();
@@ -201,19 +201,19 @@ export const useAuthStore = create<AuthState>()(
       },
       isConsultant: () => {
         const { user } = get();
-        return user?.role === 'danışman';
+        return user?.role === 'danisman';
       },
       isObserver: () => {
         const { user } = get();
-        return user?.role === 'gözlemci';
+        return user?.role === 'gozlemci';
       },
       isFirma: () => {
         const { user } = get();
-        return user?.role === 'firma_admin' || user?.role === 'firma_kullanıcı';
+        return user?.role === 'firma_admin' || user?.role === 'firma_kullanici';
       },
       isCompanyUser: () => {
         const { user } = get();
-        return user?.role === 'firma_admin' || user?.role === 'firma_kullanıcı';
+        return user?.role === 'firma_admin' || user?.role === 'firma_kullanici';
       },
       // Reset
       reset: () =>

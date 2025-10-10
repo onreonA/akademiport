@@ -62,50 +62,25 @@ export default function FirmaLayout({
     }
   }, []);
 
-
-  // Authentication kontrolü
+  // Authentication kontrolü - JWT Token kullan
   useEffect(() => {
     const checkAuth = () => {
       try {
-        // Authorization check started
-
-        const userEmail = document.cookie
+        // JWT token kontrolü - middleware ile uyumlu
+        const authToken = document.cookie
           .split('; ')
-          .find(row => row.startsWith('auth-user-email='))
-          ?.split('=')[1];
-        const userRole = document.cookie
-          .split('; ')
-          .find(row => row.startsWith('auth-user-role='))
-          ?.split('=')[1];
-        const userCompanyId = document.cookie
-          .split('; ')
-          .find(row => row.startsWith('auth-user-company-id='))
+          .find(row => row.startsWith('auth-token='))
           ?.split('=')[1];
 
-        // User data retrieved
-
-        if (!userEmail) {
-          // No user found, redirecting to login
+        if (!authToken) {
+          // No JWT token found, redirecting to login
           setError('Kullanıcı oturumu bulunamadı');
           router.push('/giris');
           return;
         }
 
-        // Firma kullanıcıları için role kontrolü - Middleware COMPANY_ROLES ile uyumlu
-        const COMPANY_ROLES = [
-          'user',
-          'operator',
-          'manager',
-          'firma_admin',
-          'firma_kullanıcı',
-        ];
-
-        if (!COMPANY_ROLES.includes(userRole || '')) {
-          // Unauthorized role
-          setError('Firma erişimi gerekli');
-          router.push('/giris');
-          return;
-        }
+        // JWT token var - middleware zaten doğrulamış
+        // FirmaLayout sadece UI render ediyor, authentication middleware'de yapılıyor
 
         // Authorization successful
         setError(null);
@@ -199,6 +174,9 @@ export default function FirmaLayout({
             <div className='flex items-center justify-center h-64'>
               <div className='text-center'>
                 <div className='text-red-600 text-lg mb-2'>⚠️</div>
+                <h3 className='text-sm font-medium text-red-800 mb-2'>
+                  Erişim Engellendi
+                </h3>
                 <p className='text-sm text-gray-600'>{error}</p>
                 <p className='text-xs text-gray-500 mt-1'>
                   Giriş sayfasına yönlendiriliyorsunuz...

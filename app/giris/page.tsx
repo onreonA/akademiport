@@ -21,8 +21,9 @@ export default function LoginPage() {
       setIsLoading(true);
       setFirmError('');
       await signIn(firmEmail, firmPassword);
-      // Başarılı giriş sonrası server-side redirect (cookie'nin set edilmesini bekle)
-      window.location.href = '/firma';
+      // Başarılı giriş sonrası loading'i false yap ve navigate et
+      setIsLoading(false);
+      router.push('/firma');
     } catch (error: any) {
       setFirmError(error.message || 'Firma girişinde bir hata oluştu');
       setIsLoading(false);
@@ -34,8 +35,9 @@ export default function LoginPage() {
       setIsLoading(true);
       setConsultantError('');
       await signIn(consultantEmail, consultantPassword);
-      // Başarılı giriş sonrası server-side redirect (cookie'nin set edilmesini bekle)
-      window.location.href = '/admin';
+      // Başarılı giriş sonrası loading'i false yap ve navigate et
+      setIsLoading(false);
+      router.push('/admin');
     } catch (error: any) {
       setConsultantError(error.message || 'Danışman girişinde bir hata oluştu');
       setIsLoading(false);
