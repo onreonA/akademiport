@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
-import AdminLayout from '@/components/AdminLayout';
+import AdminLayout from '@/components/admin/AdminLayout';
 import CategoryModal from '@/components/modals/CategoryModal';
 import DeleteConfirmModal from '@/components/modals/DeleteConfirmModal';
 interface ForumCategory {
