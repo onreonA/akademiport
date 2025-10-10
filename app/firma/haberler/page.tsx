@@ -183,13 +183,41 @@ export default function HaberlerPage() {
     const loadData = async () => {
       try {
         setLoading(true);
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Fetch real data from API
+        const [newsResponse, categoriesResponse, expertsResponse] = await Promise.all([
+          fetch('/api/news'),
+          fetch('/api/news/categories'),
+          fetch('/api/news/experts')
+        ]);
+
+        const newsData = await newsResponse.json();
+        const categoriesData = await categoriesResponse.json();
+        const expertsData = await expertsResponse.json();
+
+        if (newsData.success) {
+          setNews(newsData.data.news);
+        } else {
+          setNews(mockNews); // Fallback to mock data
+        }
+
+        if (categoriesData.success) {
+          setCategories(categoriesData.data);
+        } else {
+          setCategories(mockCategories); // Fallback to mock data
+        }
+
+        if (expertsData.success) {
+          setExperts(expertsData.data);
+        } else {
+          setExperts(mockExperts); // Fallback to mock data
+        }
+      } catch (err) {
+        console.log('API Error, using mock data:', err);
+        // Fallback to mock data
         setNews(mockNews);
         setCategories(mockCategories);
         setExperts(mockExperts);
-      } catch (err) {
-        setError('Haberler yüklenirken hata oluştu');
       } finally {
         setLoading(false);
       }

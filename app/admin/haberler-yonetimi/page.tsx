@@ -183,7 +183,7 @@ const NewsCard = ({
               <i className='ri-edit-line text-blue-600'></i>
               Düzenle
             </button>
-            {article.status !== 'Yayınlandı' && (
+            {article.status !== 'published' && (
               <button
                 onClick={() => {
                   onPublish(article.id);
@@ -397,23 +397,60 @@ export default function NewsManagement() {
     });
     setShowCreateForm(true);
   };
-  const handleDeleteArticle = (id: string) => {
+  const handleDeleteArticle = async (id: string) => {
     if (confirm('Bu haberi silmek istediğinizden emin misiniz?')) {
-      setArticles(articles.filter(a => a.id !== id));
+      try {
+        const response = await fetch(`/api/news/${id}`, {
+          method: 'DELETE',
+          headers: {
+            'X-User-Email': user?.email || 'admin@akademiport.com',
+          },
+        });
+        const data = await response.json();
+        if (data.success) {
+          setArticles(articles.filter(a => a.id !== id));
+          alert('Haber başarıyla silindi!');
+        } else {
+          alert('Haber silinemedi: ' + data.error);
+        }
+      } catch (error) {
+        alert('Haber silinirken bir hata oluştu.');
+      }
     }
   };
-  const handlePublishArticle = (id: string) => {
-    setArticles(
-      articles.map(a =>
-        a.id === id
-          ? {
-              ...a,
-              status: 'Yayınlandı' as const,
-              publishDate: new Date().toISOString(),
-            }
-          : a
-      )
-    );
+  const handlePublishArticle = async (id: string) => {
+    try {
+      const response = await fetch(`/api/news/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-User-Email': user?.email || 'admin@akademiport.com',
+        },
+        body: JSON.stringify({
+          status: 'published',
+        }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        setArticles(
+          articles.map(a =>
+            a.id === id
+              ? {
+                  ...a,
+                  status: 'published',
+                  published_at: new Date().toISOString(),
+                  is_published: true,
+                }
+              : a
+          )
+        );
+        alert('Haber başarıyla yayınlandı!');
+      } else {
+        alert('Haber yayınlanamadı: ' + data.error);
+      }
+    } catch (error) {
+      alert('Haber yayınlanırken bir hata oluştu.');
+    }
   };
   const handleCreateArticle = async () => {
     try {

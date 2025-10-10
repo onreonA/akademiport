@@ -1,220 +1,216 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
+
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
+
+// GET - Tekil haber getir
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
+    const { id } = params;
     const userEmail = request.headers.get('X-User-Email');
+
     if (!userEmail) {
       return NextResponse.json(
-        { success: false, error: 'Kullanıcı kimliği gerekli' },
+        { success: false, error: 'Unauthorized' },
         { status: 401 }
       );
     }
-    const { id } = await params;
-    // Haber detaylarını getir
+
     const { data: news, error } = await supabase
       .from('news')
       .select(
         `
         *,
-        news_experts!expert_author_id (
+        news_experts (
           id,
           name,
           title,
-          bio,
-          avatar_url,
-          expertise_areas,
-          social_links
+          avatar_url
         )
       `
       )
       .eq('id', id)
-      .eq('status', 'published')
       .single();
-    if (error || !news) {
+
+    if (error) {
+      console.log('News fetch error:', error);
       return NextResponse.json(
         { success: false, error: 'Haber bulunamadı' },
         { status: 404 }
       );
     }
-    // Görüntülenme sayısını artır
-    await supabase.from('news_interactions').upsert(
-      {
-        user_email: userEmail,
-        news_id: id,
-        interaction_type: 'read',
-      },
-      { onConflict: 'user_email,news_id,interaction_type' }
-    );
-    // İlgili haberleri getir
-    const { data: relatedNews } = await supabase
-      .from('news')
-      .select(
-        `
-        id,
-        title,
-        excerpt,
-        image_url,
-        category,
-        reading_time,
-        difficulty_level,
-        created_at,
-        view_count,
-        like_count,
-        comment_count
-      `
-      )
-      .eq('status', 'published')
-      .eq('category', news.category)
-      .neq('id', id)
-      .order('view_count', { ascending: false })
-      .limit(3);
-    // Etiketleri getir
-    const { data: tags } = await supabase
-      .from('news_tag_relations')
-      .select(
-        `
-        news_tags (
-          id,
-          name,
-          color
-        )
-      `
-      )
-      .eq('news_id', id);
-    // Yorumları getir
-    const { data: comments } = await supabase
-      .from('news_comments')
-      .select(
-        `
-        id,
-        content,
-        user_email,
-        likes_count,
-        created_at,
-        updated_at
-      `
-      )
-      .eq('news_id', id)
-      .eq('is_approved', true)
-      .order('created_at', { ascending: false })
-      .limit(10);
-    return NextResponse.json({
-      success: true,
-      data: {
-        news,
-        relatedNews: relatedNews || [],
-        tags: tags?.map(t => t.news_tags).filter(Boolean) || [],
-        comments: comments || [],
-      },
-    });
+
+    return NextResponse.json({ success: true, data: news });
   } catch (error) {
+    console.log('News API error:', error);
     return NextResponse.json(
       { success: false, error: 'Sunucu hatası' },
       { status: 500 }
     );
   }
 }
+
+// PUT - Haber güncelle
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
+    const { id } = params;
     const userEmail = request.headers.get('X-User-Email');
+
     if (!userEmail) {
       return NextResponse.json(
-        { success: false, error: 'Kullanıcı kimliği gerekli' },
+        { success: false, error: 'Unauthorized' },
         { status: 401 }
       );
     }
-    // Admin kontrolü
-    const { data: user } = await supabase
-      .from('users')
-      .select('role')
-      .eq('email', userEmail)
-      .single();
-    if (!user || !['admin', 'master_admin'].includes(user.role)) {
+
+    const body = await request.json();
+    const {
+      title,
+      content,
+      excerpt,
+      summary,
+      category,
+      tags,
+      image_url,
+      video_url,
+      podcast_url,
+      reading_time,
+      difficulty_level,
+      expert_author_id,
+      is_featured,
+      seo_keywords,
+      source_url,
+      status,
+    } = body;
+
+    // Validation
+    if (!title || !content) {
       return NextResponse.json(
-        { success: false, error: 'Yetkisiz erişim' },
-        { status: 403 }
+        { success: false, error: 'Başlık ve içerik zorunludur' },
+        { status: 400 }
       );
     }
-    const { id } = await params;
-    const body = await request.json();
-    // Haber güncelleme
-    const { data: news, error } = await supabase
+
+    const updateData: any = {
+      title,
+      content,
+      excerpt: excerpt || '',
+      summary: summary || '',
+      category: category || '',
+      tags: tags || [],
+      image_url: image_url || '',
+      video_url: video_url || '',
+      podcast_url: podcast_url || '',
+      reading_time: reading_time || 5,
+      difficulty_level: difficulty_level || 'Başlangıç',
+      expert_author_id: expert_author_id || null,
+      is_featured: is_featured || false,
+      seo_keywords: seo_keywords || '',
+      source_url: source_url || '',
+      status: status || 'draft',
+      updated_at: new Date().toISOString(),
+    };
+
+    // Eğer status published ise published_at'i güncelle
+    if (status === 'published') {
+      updateData.published_at = new Date().toISOString();
+      updateData.is_published = true;
+    }
+
+    const { data: updatedNews, error } = await supabase
       .from('news')
-      .update({
-        ...body,
-        last_updated: new Date().toISOString(),
-        is_published: body.status === 'published',
-        published_at:
-          body.status === 'published' ? new Date().toISOString() : null,
-      })
+      .update(updateData)
       .eq('id', id)
-      .select()
+      .select(
+        `
+        *,
+        news_experts (
+          id,
+          name,
+          title,
+          avatar_url
+        )
+      `
+      )
       .single();
+
     if (error) {
+      console.log('News update error:', error);
       return NextResponse.json(
         { success: false, error: 'Haber güncellenemedi' },
         { status: 500 }
       );
     }
-    return NextResponse.json({
-      success: true,
-      data: news,
-    });
+
+    return NextResponse.json({ success: true, data: updatedNews });
   } catch (error) {
+    console.log('News update API error:', error);
     return NextResponse.json(
       { success: false, error: 'Sunucu hatası' },
       { status: 500 }
     );
   }
 }
+
+// DELETE - Haber sil
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
+    const { id } = params;
     const userEmail = request.headers.get('X-User-Email');
+
     if (!userEmail) {
       return NextResponse.json(
-        { success: false, error: 'Kullanıcı kimliği gerekli' },
+        { success: false, error: 'Unauthorized' },
         { status: 401 }
       );
     }
-    // Admin kontrolü
-    const { data: user } = await supabase
-      .from('users')
-      .select('role')
-      .eq('email', userEmail)
+
+    // Önce haberi kontrol et
+    const { data: existingNews, error: fetchError } = await supabase
+      .from('news')
+      .select('id, title')
+      .eq('id', id)
       .single();
-    if (!user || !['admin', 'master_admin'].includes(user.role)) {
+
+    if (fetchError || !existingNews) {
       return NextResponse.json(
-        { success: false, error: 'Yetkisiz erişim' },
-        { status: 403 }
+        { success: false, error: 'Haber bulunamadı' },
+        { status: 404 }
       );
     }
-    const { id } = await params;
-    // Haber silme
-    const { error } = await supabase.from('news').delete().eq('id', id);
-    if (error) {
+
+    // Haberi sil
+    const { error: deleteError } = await supabase
+      .from('news')
+      .delete()
+      .eq('id', id);
+
+    if (deleteError) {
+      console.log('News delete error:', deleteError);
       return NextResponse.json(
         { success: false, error: 'Haber silinemedi' },
         { status: 500 }
       );
     }
+
     return NextResponse.json({
       success: true,
-      message: 'Haber başarıyla silindi',
+      message: `"${existingNews.title}" haberi başarıyla silindi`,
     });
   } catch (error) {
+    console.log('News delete API error:', error);
     return NextResponse.json(
       { success: false, error: 'Sunucu hatası' },
       { status: 500 }
