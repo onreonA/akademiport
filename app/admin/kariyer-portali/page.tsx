@@ -986,152 +986,7 @@ export default function CareerPortal() {
     },
   ];
   const unreadNotifications = notifications.filter(n => n.unread).length;
-  const [jobPostings, setJobPostings] = useState<JobPosting[]>([
-    {
-      id: '1',
-      title: 'İhracat Uzmanı',
-      company: 'İhracat Akademi',
-      department: 'İhracat Geliştirme',
-      location: 'İstanbul, Türkiye',
-      type: 'Tam Zamanlı',
-      level: 'Orta',
-      salary: '15.000 - 25.000 TL',
-      description:
-        'İhracat süreçlerini yönetecek, firma danışmanlıkları yapacak ve pazarlama stratejileri geliştirecek deneyimli İhracat Uzmanı aranıyor.',
-      requirements: [
-        'Uluslararası Ticaret veya İktisat bölümü mezunu',
-        'En az 3 yıl ihracat deneyimi',
-        'İngilizce ileri düzey',
-        'İhracat mevzuatına hakim',
-      ],
-      benefits: [
-        'Sağlık sigortası',
-        'Yemek kartı',
-        'Esnek çalışma saatleri',
-        'Eğitim desteği',
-      ],
-      status: 'Aktif',
-      postedDate: '2024-02-15T10:00:00Z',
-      applicationDeadline: '2024-03-15T23:59:59Z',
-      applicationsCount: 23,
-      viewsCount: 145,
-    },
-    {
-      id: '2',
-      title: 'Dijital Pazarlama Specialistı',
-      company: 'İhracat Akademi',
-      department: 'Pazarlama',
-      location: 'İstanbul, Türkiye (Hibrit)',
-      type: 'Tam Zamanlı',
-      level: 'Giriş',
-      salary: '12.000 - 18.000 TL',
-      description:
-        'E-ticaret platformları ve dijital pazarlama kanallarını yöneterek firmaların online görünürlüğünü artıracak Dijital Pazarlama Uzmanı.',
-      requirements: [
-        'İşletme, Pazarlama veya İletişim bölümü mezunu',
-        'Google Ads ve Facebook Ads deneyimi',
-        'SEO/SEM bilgisi',
-        'Analitik düşünme yetisi',
-      ],
-      benefits: [
-        'Sağlık sigortası',
-        'Performans primi',
-        'Uzaktan çalışma imkanı',
-        'Sertifika programları',
-      ],
-      status: 'Aktif',
-      postedDate: '2024-02-18T14:30:00Z',
-      applicationDeadline: '2024-03-18T23:59:59Z',
-      applicationsCount: 41,
-      viewsCount: 312,
-    },
-    {
-      id: '3',
-      title: 'Yazılım Geliştirici (React/Node.js)',
-      company: 'İhracat Akademi',
-      department: 'Teknoloji',
-      location: 'İstanbul, Türkiye',
-      type: 'Tam Zamanlı',
-      level: 'Orta',
-      salary: '25.000 - 35.000 TL',
-      description:
-        'İhracat platformlarının geliştirilmesi ve sürdürülmesi için React ve Node.js teknolojilerinde deneyimli yazılım geliştirici aranıyor.',
-      requirements: [
-        'Bilgisayar Mühendisliği veya ilgili bölüm mezunu',
-        'React.js ve Node.js deneyimi',
-        'API geliştirme deneyimi',
-        'Git kullanımı',
-      ],
-      benefits: [
-        'Sağlık sigortası',
-        'Yüksek maaş',
-        'Teknoloji eğitimleri',
-        'Startup ortamı',
-      ],
-      status: 'Aktif',
-      postedDate: '2024-02-10T09:00:00Z',
-      applicationDeadline: '2024-03-10T23:59:59Z',
-      applicationsCount: 18,
-      viewsCount: 89,
-    },
-    {
-      id: '4',
-      title: 'İş Geliştirme Stajyeri',
-      company: 'İhracat Akademi',
-      department: 'İş Geliştirme',
-      location: 'İstanbul, Türkiye',
-      type: 'Staj',
-      level: 'Giriş',
-      description:
-        'Firma ilişkileri ve iş geliştirme süreçlerinde deneyim kazanmak isteyen üniversite öğrencileri için staj imkanı.',
-      requirements: [
-        'Üniversite öğrencisi (3. veya 4. sınıf)',
-        'İletişim becerileri güçlü',
-        'Microsoft Office kullanımı',
-        'Öğrenme motivasyonu yüksek',
-      ],
-      benefits: [
-        'SGK ödenir',
-        'Sertifika',
-        'Mentorluk desteği',
-        'Kariyer fırsatı',
-      ],
-      status: 'Aktif',
-      postedDate: '2024-02-20T11:00:00Z',
-      applicationDeadline: '2024-03-20T23:59:59Z',
-      applicationsCount: 7,
-      viewsCount: 156,
-    },
-    {
-      id: '5',
-      title: 'Muhasebe Uzmanı',
-      company: 'İhracat Akademi',
-      department: 'Finans',
-      location: 'İstanbul, Türkiye',
-      type: 'Tam Zamanlı',
-      level: 'Orta',
-      salary: '18.000 - 25.000 TL',
-      description:
-        'Şirket mali işlerini yürütecek, ihracat muhasebesi konusunda deneyimli Muhasebe Uzmanı aranıyor.',
-      requirements: [
-        'İktisat, İşletme veya SBMYO mezunu',
-        'En az 3 yıl muhasebe deneyimi',
-        'İhracat muhasebesi bilgisi',
-        'ERP sistemleri kullanımı',
-      ],
-      benefits: [
-        'Sağlık sigortası',
-        'Yemek kartı',
-        'İkramiye',
-        'Sosyal etkinlikler',
-      ],
-      status: 'Pasif',
-      postedDate: '2024-02-05T08:00:00Z',
-      applicationDeadline: '2024-03-05T23:59:59Z',
-      applicationsCount: 32,
-      viewsCount: 203,
-    },
-  ]);
+  const [jobPostings, setJobPostings] = useState<JobPosting[]>([]);
   const [jobApplications, setJobApplications] = useState<JobApplication[]>([
     {
       id: '1',
@@ -1173,9 +1028,11 @@ export default function CareerPortal() {
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   // Gerçek veri yükleme
   useEffect(() => {
     fetchApplications();
+    fetchJobPostings();
   }, []);
   const fetchApplications = async () => {
     try {
@@ -1232,6 +1089,41 @@ export default function CareerPortal() {
       setError('Sunucu hatası');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchJobPostings = async () => {
+    try {
+      const response = await fetch('/api/career/jobs');
+      const result = await response.json();
+      if (result.success && result.data) {
+        // API verilerini frontend formatına dönüştür
+        const formattedJobs = result.data.map((job: any) => ({
+          id: job.id,
+          title: job.title,
+          company: job.company,
+          department: job.department,
+          location: job.location,
+          type: job.type,
+          level: job.level,
+          salary: job.salary,
+          description: job.description,
+          requirements: job.requirements || [],
+          benefits: job.benefits || [],
+          status: job.status,
+          postedDate: job.created_at,
+          applicationDeadline: job.application_deadline,
+          applicationsCount: job.applications_count || 0,
+          viewsCount: job.views_count || 0,
+        }));
+        setJobPostings(formattedJobs);
+      } else {
+        // API'den veri gelmezse boş array kullan
+        setJobPostings([]);
+      }
+    } catch (error) {
+      console.error('İş ilanları yüklenirken hata:', error);
+      setJobPostings([]);
     }
   };
   const updateApplicationStatus = async (
@@ -1337,21 +1229,56 @@ export default function CareerPortal() {
     setEditingJob(job);
     setShowJobModal(true);
   };
-  const handleDeleteJob = (id: string) => {
+
+  const handleDeleteJob = async (id: string) => {
     if (confirm('Bu iş ilanını silmek istediğinizden emin misiniz?')) {
-      setJobPostings(jobPostings.filter(job => job.id !== id));
+      try {
+        const response = await fetch(`/api/career/jobs/${id}`, {
+          method: 'DELETE',
+        });
+
+        if (response.ok) {
+          setJobPostings(jobPostings.filter(job => job.id !== id));
+          setSuccessMessage('İş ilanı başarıyla silindi');
+          setTimeout(() => setSuccessMessage(''), 3000);
+        } else {
+          setError('İş ilanı silinirken hata oluştu');
+        }
+      } catch (error) {
+        setError('Sunucu hatası');
+      }
     }
   };
+
   const handleViewApplications = (job: JobPosting) => {
     setSelectedJob(job);
     setShowApplicationModal(true);
   };
-  const handleChangeStatus = (id: string, status: string) => {
-    setJobPostings(
-      jobPostings.map(job =>
-        job.id === id ? { ...job, status: status as any } : job
-      )
-    );
+
+  const handleChangeStatus = async (id: string, status: string) => {
+    try {
+      const response = await fetch(`/api/career/jobs/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status }),
+      });
+
+      if (response.ok) {
+        setJobPostings(
+          jobPostings.map(job =>
+            job.id === id ? { ...job, status: status as any } : job
+          )
+        );
+        setSuccessMessage('İş ilanı durumu güncellendi');
+        setTimeout(() => setSuccessMessage(''), 3000);
+      } else {
+        setError('İş ilanı durumu güncellenirken hata oluştu');
+      }
+    } catch (error) {
+      setError('Sunucu hatası');
+    }
   };
   const handleUpdateApplicationStatus = (
     applicationId: string,
@@ -1834,6 +1761,20 @@ export default function CareerPortal() {
         className={`transition-all duration-300 pt-20 ${sidebarCollapsed ? 'ml-16' : 'ml-64'}`}
       >
         <div className='px-4 sm:px-6 lg:px-8 py-8'>
+          {/* Success Message */}
+          {successMessage && (
+            <div className='bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-6'>
+              {successMessage}
+            </div>
+          )}
+
+          {/* Error Message */}
+          {error && (
+            <div className='bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6'>
+              {error}
+            </div>
+          )}
+
           {/* Page Header */}
           <div className='flex justify-between items-center mb-8'>
             <div>

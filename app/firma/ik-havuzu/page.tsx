@@ -1,6 +1,5 @@
 'use client';
-import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import FirmaLayout from '@/components/firma/FirmaLayout';
 import { useAuthStore } from '@/lib/stores/auth-store';
@@ -108,12 +107,57 @@ const HRPoolPage = () => {
     const loadCandidates = async () => {
       try {
         setLoading(true);
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // Gerçek API'den veri çek
+        const response = await fetch(
+          '/api/hr-pool?company_id=6fcc9e92-4169-4b06-9c2f-a8c6cc284d73',
+          {
+            headers: {
+              'X-User-Email': 'info@mundo.com',
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error('API çağrısı başarısız');
+        }
+
+        const result = await response.json();
+
+        if (result.success && result.data) {
+          // API verilerini frontend formatına dönüştür
+          const formattedCandidates: Candidate[] = result.data.map(
+            (item: any) => ({
+              id: item.application_id,
+              name: item.career_applications.name,
+              email: item.career_applications.email,
+              phone: item.career_applications.phone,
+              position: item.career_applications.position || 'Belirtilmemiş',
+              application_type: item.career_applications.application_type,
+              city: item.career_applications.city,
+              education: item.career_applications.education,
+              experience: item.career_applications.experience,
+              interests: item.career_applications.interests,
+              cv_file_name: item.career_applications.cv_file_name,
+              created_at: item.career_applications.created_at,
+              status: item.status === 'available' ? 'pending' : item.status,
+              notes: item.notes,
+            })
+          );
+
+          setCandidates(formattedCandidates);
+          setFilteredCandidates(formattedCandidates);
+        } else {
+          // API'den veri gelmezse mock data kullan
+          setCandidates(mockCandidates);
+          setFilteredCandidates(mockCandidates);
+        }
+      } catch (err) {
+        console.error('API hatası:', err);
+        setError('Adaylar yüklenirken hata oluştu');
+        // Hata durumunda mock data kullan
         setCandidates(mockCandidates);
         setFilteredCandidates(mockCandidates);
-      } catch (err) {
-        setError('Adaylar yüklenirken hata oluştu');
       } finally {
         setLoading(false);
       }
@@ -252,77 +296,84 @@ const HRPoolPage = () => {
       title='İK Havuzu'
       description='İnsan kaynakları adaylarını yönetin ve değerlendirin'
     >
-      <div className='space-y-6'>
-        {/* Header */}
-        <div className='flex items-center justify-between'>
-          <div>
-            <h1 className='text-3xl font-bold text-gray-900 mb-2'>
-              👥 İK Havuzu
-            </h1>
-            <p className='text-gray-600'>
-              İnsan kaynakları adaylarını yönetin ve değerlendirin
-            </p>
-          </div>
-          <div className='flex items-center gap-4'>
-            <div className='text-sm text-gray-600'>
-              Toplam: <span className='font-medium'>{candidates.length}</span>{' '}
-              aday
+      <div className='space-y-4'>
+        {/* Compact Header with Gradient */}
+        <div className='bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl p-6 shadow-lg'>
+          <div className='flex items-center justify-between'>
+            <div className='flex items-center gap-4'>
+              <div className='w-12 h-12 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center'>
+                <i className='ri-team-line text-2xl text-white'></i>
+              </div>
+              <div>
+                <h1 className='text-2xl font-bold text-white mb-1'>
+                  İK Havuzu
+                </h1>
+                <p className='text-purple-100 text-sm'>
+                  Aday yönetimi ve değerlendirme sistemi
+                </p>
+              </div>
             </div>
-            <div className='text-sm text-gray-600'>
-              Filtrelenmiş:{' '}
-              <span className='font-medium'>{filteredCandidates.length}</span>{' '}
-              aday
+            <div className='flex items-center gap-6'>
+              <div className='text-center'>
+                <div className='text-2xl font-bold text-white'>
+                  {candidates.length}
+                </div>
+                <div className='text-xs text-purple-100'>Toplam Aday</div>
+              </div>
+              <div className='text-center'>
+                <div className='text-2xl font-bold text-white'>
+                  {filteredCandidates.length}
+                </div>
+                <div className='text-xs text-purple-100'>Filtrelenmiş</div>
+              </div>
             </div>
           </div>
         </div>
+
         {/* Success Message */}
         {successMessage && (
-          <div className='bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg'>
+          <div className='bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg flex items-center gap-2'>
+            <i className='ri-checkbox-circle-line text-lg'></i>
             {successMessage}
           </div>
         )}
-        {/* Filters */}
-        <div className='bg-white rounded-xl shadow-sm border border-gray-100 p-6'>
-          <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+
+        {/* Compact Filters */}
+        <div className='bg-white rounded-xl shadow-sm border border-gray-100 p-4'>
+          <div className='grid grid-cols-1 md:grid-cols-3 gap-3'>
             {/* Search */}
-            <div>
-              <label className='block text-sm font-medium text-gray-700 mb-2'>
-                Arama
-              </label>
+            <div className='relative'>
+              <i className='ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400'></i>
               <input
                 type='text'
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
-                placeholder='İsim, email veya pozisyon ara...'
-                className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                placeholder='Arama...'
+                className='w-full pl-10 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500'
               />
             </div>
             {/* Type Filter */}
-            <div>
-              <label className='block text-sm font-medium text-gray-700 mb-2'>
-                Tip
-              </label>
+            <div className='relative'>
+              <i className='ri-user-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400'></i>
               <select
                 value={filterType}
                 onChange={e => setFilterType(e.target.value as any)}
-                className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                className='w-full pl-10 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 appearance-none bg-white'
               >
-                <option value='all'>Tümü</option>
+                <option value='all'>Tüm Tipler</option>
                 <option value='hr_staff'>Personel</option>
                 <option value='intern'>Stajyer</option>
               </select>
             </div>
             {/* Status Filter */}
-            <div>
-              <label className='block text-sm font-medium text-gray-700 mb-2'>
-                Durum
-              </label>
+            <div className='relative'>
+              <i className='ri-shield-check-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400'></i>
               <select
                 value={filterStatus}
                 onChange={e => setFilterStatus(e.target.value as any)}
-                className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                className='w-full pl-10 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 appearance-none bg-white'
               >
-                <option value='all'>Tümü</option>
+                <option value='all'>Tüm Durumlar</option>
                 <option value='pending'>Beklemede</option>
                 <option value='reviewed'>İncelendi</option>
                 <option value='interviewed'>Mülakat Yapıldı</option>
@@ -332,58 +383,68 @@ const HRPoolPage = () => {
             </div>
           </div>
         </div>
-        {/* Candidates Grid */}
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+        {/* Modern Candidates Grid */}
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
           {filteredCandidates.map(candidate => (
             <div
               key={candidate.id}
-              className='bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow'
+              className='bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-lg hover:border-purple-200 transition-all duration-300 group'
             >
-              {/* Header */}
-              <div className='flex items-start justify-between mb-4'>
-                <div>
-                  <h3 className='text-lg font-semibold text-gray-900 mb-1'>
-                    {candidate.name}
-                  </h3>
-                  <p className='text-sm text-gray-600'>{candidate.position}</p>
+              {/* Compact Header */}
+              <div className='flex items-start justify-between mb-3'>
+                <div className='flex items-center gap-3'>
+                  <div className='w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-500 rounded-lg flex items-center justify-center text-white font-semibold'>
+                    {candidate.name.charAt(0)}
+                  </div>
+                  <div>
+                    <h3 className='text-base font-semibold text-gray-900 group-hover:text-purple-600 transition-colors'>
+                      {candidate.name}
+                    </h3>
+                    <p className='text-xs text-gray-500'>{candidate.position}</p>
+                  </div>
                 </div>
                 <span
-                  className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(candidate.status)}`}
+                  className={`px-2 py-1 rounded-lg text-xs font-medium ${getStatusColor(candidate.status)}`}
                 >
                   {getStatusText(candidate.status)}
                 </span>
               </div>
-              {/* Info */}
-              <div className='space-y-2 mb-4'>
-                <div className='flex items-center text-sm text-gray-600'>
-                  <i className='ri-mail-line mr-2'></i>
-                  {candidate.email}
+
+              {/* Compact Info */}
+              <div className='space-y-2 mb-3'>
+                <div className='flex items-center text-xs text-gray-600'>
+                  <i className='ri-mail-line mr-2 text-purple-500'></i>
+                  <span className='truncate'>{candidate.email}</span>
                 </div>
-                <div className='flex items-center text-sm text-gray-600'>
-                  <i className='ri-phone-line mr-2'></i>
+                <div className='flex items-center text-xs text-gray-600'>
+                  <i className='ri-phone-line mr-2 text-blue-500'></i>
                   {candidate.phone}
                 </div>
-                <div className='flex items-center text-sm text-gray-600'>
-                  <i className='ri-map-pin-line mr-2'></i>
-                  {candidate.city || 'Belirtilmemiş'}
-                </div>
-                <div className='flex items-center text-sm text-gray-600'>
-                  <i className='ri-user-line mr-2'></i>
-                  {getTypeText(candidate.application_type)}
+                <div className='flex items-center justify-between text-xs'>
+                  <div className='flex items-center text-gray-600'>
+                    <i className='ri-map-pin-line mr-2 text-green-500'></i>
+                    {candidate.city || 'Belirtilmemiş'}
+                  </div>
+                  <span className={`px-2 py-1 rounded-lg font-medium ${
+                    candidate.application_type === 'intern' 
+                      ? 'bg-orange-100 text-orange-700' 
+                      : 'bg-blue-100 text-blue-700'
+                  }`}>
+                    {getTypeText(candidate.application_type)}
+                  </span>
                 </div>
               </div>
-              {/* Rating */}
+
+              {/* Compact Rating */}
               {candidate.rating && (
-                <div className='flex items-center mb-4'>
-                  <span className='text-sm text-gray-600 mr-2'>
-                    Değerlendirme:
-                  </span>
+                <div className='flex items-center justify-between mb-3 pb-3 border-b border-gray-100'>
+                  <span className='text-xs text-gray-600'>Değerlendirme</span>
                   <div className='flex'>
                     {[1, 2, 3, 4, 5].map(star => (
                       <button
                         key={star}
                         onClick={() => handleRatingUpdate(candidate.id, star)}
-                        className={`text-lg ${
+                        className={`text-base ${
                           star <= (candidate.rating || 0)
                             ? 'text-yellow-400'
                             : 'text-gray-300'
@@ -395,15 +456,17 @@ const HRPoolPage = () => {
                   </div>
                 </div>
               )}
-              {/* Actions */}
+
+              {/* Compact Actions */}
               <div className='flex gap-2'>
                 <button
                   onClick={() => {
                     setSelectedCandidate(candidate);
                     setShowDetailModal(true);
                   }}
-                  className='flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors'
+                  className='flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-3 py-2 rounded-lg text-xs font-medium transition-all duration-300 flex items-center justify-center gap-1'
                 >
+                  <i className='ri-eye-line'></i>
                   Detay
                 </button>
                 <select
@@ -411,7 +474,7 @@ const HRPoolPage = () => {
                   onChange={e =>
                     handleStatusUpdate(candidate.id, e.target.value)
                   }
-                  className='px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                  className='px-2 py-2 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white'
                 >
                   <option value='pending'>Beklemede</option>
                   <option value='reviewed'>İncelendi</option>
@@ -423,121 +486,159 @@ const HRPoolPage = () => {
             </div>
           ))}
         </div>
-        {/* No Results */}
+        {/* Modern No Results */}
         {filteredCandidates.length === 0 && (
-          <div className='text-center py-12'>
-            <div className='w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4'>
-              <i className='ri-user-search-line text-gray-400 text-2xl'></i>
+          <div className='bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl p-12 text-center'>
+            <div className='w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg'>
+              <i className='ri-user-search-line text-purple-500 text-3xl'></i>
             </div>
-            <h3 className='text-lg font-medium text-gray-900 mb-2'>
+            <h3 className='text-xl font-semibold text-gray-900 mb-2'>
               Aday Bulunamadı
             </h3>
-            <p className='text-gray-500'>
-              Arama kriterlerinize uygun aday bulunamadı.
+            <p className='text-gray-600'>
+              Arama kriterlerinize uygun aday bulunamadı. Filtreleri değiştirmeyi deneyin.
             </p>
           </div>
         )}
       </div>
-      {/* Detail Modal */}
+      {/* Modern Detail Modal */}
       {showDetailModal && selectedCandidate && (
-        <div className='fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4'>
-          <div className='bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto'>
-            <div className='p-6 border-b border-gray-200'>
+        <div className='fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeIn'>
+          <div className='bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden animate-slideUp'>
+            {/* Modal Header with Gradient */}
+            <div className='bg-gradient-to-r from-purple-600 to-blue-600 p-6'>
               <div className='flex items-center justify-between'>
-                <h3 className='text-xl font-semibold text-gray-900'>
-                  Aday Detayları
-                </h3>
+                <div className='flex items-center gap-4'>
+                  <div className='w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center text-white text-xl font-bold'>
+                    {selectedCandidate.name.charAt(0)}
+                  </div>
+                  <div>
+                    <h3 className='text-2xl font-bold text-white'>
+                      {selectedCandidate.name}
+                    </h3>
+                    <p className='text-purple-100 text-sm'>
+                      {selectedCandidate.position}
+                    </p>
+                  </div>
+                </div>
                 <button
                   onClick={() => setShowDetailModal(false)}
-                  className='text-gray-500 hover:text-gray-700'
+                  className='text-white/80 hover:text-white transition-colors'
                 >
-                  <i className='ri-close-line text-xl'></i>
+                  <i className='ri-close-line text-2xl'></i>
                 </button>
               </div>
             </div>
-            <div className='p-6'>
-              <div className='space-y-4'>
-                <div>
-                  <h4 className='font-medium text-gray-900 mb-2'>
+
+            {/* Modal Content */}
+            <div className='p-6 overflow-y-auto max-h-[calc(90vh-120px)]'>
+              <div className='space-y-6'>
+                {/* Personal Info */}
+                <div className='bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl p-5'>
+                  <h4 className='font-semibold text-gray-900 mb-4 flex items-center gap-2'>
+                    <i className='ri-user-line text-purple-600'></i>
                     Kişisel Bilgiler
                   </h4>
-                  <div className='grid grid-cols-2 gap-4 text-sm'>
-                    <div>
-                      <span className='text-gray-600'>İsim:</span>
-                      <span className='ml-2 font-medium'>
+                  <div className='grid grid-cols-2 gap-4'>
+                    <div className='bg-white rounded-lg p-3'>
+                      <span className='text-xs text-gray-500 block mb-1'>İsim</span>
+                      <span className='text-sm font-medium text-gray-900'>
                         {selectedCandidate.name}
                       </span>
                     </div>
-                    <div>
-                      <span className='text-gray-600'>Email:</span>
-                      <span className='ml-2 font-medium'>
+                    <div className='bg-white rounded-lg p-3'>
+                      <span className='text-xs text-gray-500 block mb-1'>Email</span>
+                      <span className='text-sm font-medium text-gray-900 truncate block'>
                         {selectedCandidate.email}
                       </span>
                     </div>
-                    <div>
-                      <span className='text-gray-600'>Telefon:</span>
-                      <span className='ml-2 font-medium'>
+                    <div className='bg-white rounded-lg p-3'>
+                      <span className='text-xs text-gray-500 block mb-1'>Telefon</span>
+                      <span className='text-sm font-medium text-gray-900'>
                         {selectedCandidate.phone}
                       </span>
                     </div>
-                    <div>
-                      <span className='text-gray-600'>Şehir:</span>
-                      <span className='ml-2 font-medium'>
+                    <div className='bg-white rounded-lg p-3'>
+                      <span className='text-xs text-gray-500 block mb-1'>Şehir</span>
+                      <span className='text-sm font-medium text-gray-900'>
                         {selectedCandidate.city || 'Belirtilmemiş'}
                       </span>
                     </div>
                   </div>
                 </div>
-                <div>
-                  <h4 className='font-medium text-gray-900 mb-2'>
+
+                {/* Job Info */}
+                <div className='bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-5'>
+                  <h4 className='font-semibold text-gray-900 mb-4 flex items-center gap-2'>
+                    <i className='ri-briefcase-line text-blue-600'></i>
                     İş Bilgileri
                   </h4>
-                  <div className='grid grid-cols-2 gap-4 text-sm'>
-                    <div>
-                      <span className='text-gray-600'>Pozisyon:</span>
-                      <span className='ml-2 font-medium'>
+                  <div className='grid grid-cols-2 gap-4'>
+                    <div className='bg-white rounded-lg p-3'>
+                      <span className='text-xs text-gray-500 block mb-1'>Pozisyon</span>
+                      <span className='text-sm font-medium text-gray-900'>
                         {selectedCandidate.position}
                       </span>
                     </div>
-                    <div>
-                      <span className='text-gray-600'>Tip:</span>
-                      <span className='ml-2 font-medium'>
+                    <div className='bg-white rounded-lg p-3'>
+                      <span className='text-xs text-gray-500 block mb-1'>Tip</span>
+                      <span className={`text-sm font-medium inline-block px-2 py-1 rounded ${
+                        selectedCandidate.application_type === 'intern' 
+                          ? 'bg-orange-100 text-orange-700' 
+                          : 'bg-blue-100 text-blue-700'
+                      }`}>
                         {getTypeText(selectedCandidate.application_type)}
                       </span>
                     </div>
-                    <div>
-                      <span className='text-gray-600'>Eğitim:</span>
-                      <span className='ml-2 font-medium'>
+                    <div className='bg-white rounded-lg p-3'>
+                      <span className='text-xs text-gray-500 block mb-1'>Eğitim</span>
+                      <span className='text-sm font-medium text-gray-900'>
                         {selectedCandidate.education || 'Belirtilmemiş'}
                       </span>
                     </div>
-                    <div>
-                      <span className='text-gray-600'>Deneyim:</span>
-                      <span className='ml-2 font-medium'>
+                    <div className='bg-white rounded-lg p-3'>
+                      <span className='text-xs text-gray-500 block mb-1'>Deneyim</span>
+                      <span className='text-sm font-medium text-gray-900'>
                         {selectedCandidate.experience || 'Belirtilmemiş'}
                       </span>
                     </div>
                   </div>
                 </div>
+
+                {/* Interests */}
                 {selectedCandidate.interests && (
-                  <div>
-                    <h4 className='font-medium text-gray-900 mb-2'>
+                  <div className='bg-gradient-to-br from-green-50 to-blue-50 rounded-xl p-5'>
+                    <h4 className='font-semibold text-gray-900 mb-3 flex items-center gap-2'>
+                      <i className='ri-heart-line text-green-600'></i>
                       İlgi Alanları
                     </h4>
-                    <p className='text-sm text-gray-600'>
+                    <p className='text-sm text-gray-700 bg-white rounded-lg p-3'>
                       {selectedCandidate.interests}
                     </p>
                   </div>
                 )}
+
+                {/* CV */}
                 {selectedCandidate.cv_file_name && (
-                  <div>
-                    <h4 className='font-medium text-gray-900 mb-2'>CV</h4>
-                    <div className='flex items-center gap-2'>
+                  <div className='bg-gradient-to-br from-red-50 to-orange-50 rounded-xl p-5'>
+                    <h4 className='font-semibold text-gray-900 mb-3 flex items-center gap-2'>
                       <i className='ri-file-pdf-line text-red-600'></i>
-                      <span className='text-sm text-gray-600'>
-                        {selectedCandidate.cv_file_name}
-                      </span>
-                      <button className='text-blue-600 hover:text-blue-800 text-sm'>
+                      CV Dosyası
+                    </h4>
+                    <div className='bg-white rounded-lg p-4 flex items-center justify-between'>
+                      <div className='flex items-center gap-3'>
+                        <div className='w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center'>
+                          <i className='ri-file-pdf-line text-red-600 text-xl'></i>
+                        </div>
+                        <div>
+                          <p className='text-sm font-medium text-gray-900'>
+                            {selectedCandidate.cv_file_name}
+                          </p>
+                          <p className='text-xs text-gray-500'>PDF Dosyası</p>
+                        </div>
+                      </div>
+                      <button className='bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex items-center gap-2'>
+                        <i className='ri-download-line'></i>
                         İndir
                       </button>
                     </div>
