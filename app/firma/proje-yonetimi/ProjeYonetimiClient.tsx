@@ -30,38 +30,22 @@ export default function ProjeYonetimiClient() {
         description='Projelerinizi yönetin ve organize edin'
         showHeader={false}
       >
-        <div className='space-y-6'>
-          {/* Modern Page Header - Single Source */}
-          <div className='mb-6'>
-            {/* Breadcrumb Navigation */}
-            <div className='mb-3'>
-              <nav className='flex items-center space-x-2 text-sm text-gray-500'>
-                <span className='hover:text-gray-700 cursor-pointer'>
-                  Ana Sayfa
-                </span>
-                <i className='ri-arrow-right-s-line text-xs'></i>
-                <span className='text-gray-900 font-medium'>
-                  Proje Yönetimi
-                </span>
-              </nav>
+        <div className='space-y-4'>
+          {/* Compact Loading Header */}
+          <div className='bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-6 shadow-lg animate-pulse'>
+            <div className='flex items-center justify-between'>
+              <div className='flex items-center gap-4'>
+                <div className='w-12 h-12 bg-white/20 backdrop-blur-sm rounded-lg'></div>
+                <div>
+                  <div className='h-6 w-48 bg-white/30 rounded mb-2'></div>
+                  <div className='h-4 w-64 bg-white/20 rounded'></div>
+                </div>
+              </div>
+              <div className='text-right'>
+                <div className='h-4 w-24 bg-white/20 rounded mb-1'></div>
+                <div className='h-6 w-12 bg-white/30 rounded'></div>
+              </div>
             </div>
-
-            {/* Page Title */}
-            <div className='mb-3'>
-              <h1 className='text-xl md:text-2xl font-bold text-gray-900 tracking-tight'>
-                PROJE YÖNETİMİ
-              </h1>
-            </div>
-
-            {/* Page Description */}
-            <div className='mb-4'>
-              <p className='text-sm text-gray-600 font-medium leading-relaxed'>
-                Projelerinizi yönetin ve organize edin
-              </p>
-            </div>
-
-            {/* Decorative Line */}
-            <div className='w-20 h-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full'></div>
           </div>
 
           <LoadingState
@@ -78,36 +62,28 @@ export default function ProjeYonetimiClient() {
       description='Projelerinizi yönetin ve organize edin'
       showHeader={false}
     >
-      <div className='space-y-6'>
-        {/* Modern Page Header - Single Source */}
-        <div className='mb-6'>
-          {/* Breadcrumb Navigation */}
-          <div className='mb-3'>
-            <nav className='flex items-center space-x-2 text-sm text-gray-500'>
-              <span className='hover:text-gray-700 cursor-pointer'>
-                Ana Sayfa
-              </span>
-              <i className='ri-arrow-right-s-line text-xs'></i>
-              <span className='text-gray-900 font-medium'>Proje Yönetimi</span>
-            </nav>
+      <div className='space-y-4'>
+        {/* Compact Header with Gradient */}
+        <div className='bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-6 shadow-lg'>
+          <div className='flex items-center justify-between'>
+            <div className='flex items-center gap-4'>
+              <div className='w-12 h-12 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center'>
+                <i className='ri-folder-line text-2xl text-white'></i>
+              </div>
+              <div>
+                <h1 className='text-2xl font-bold text-white mb-1'>
+                  Proje Yönetimi
+                </h1>
+                <p className='text-blue-100 text-sm'>
+                  Projelerinizi yönetin ve organize edin
+                </p>
+              </div>
+            </div>
+            <div className='text-right'>
+              <div className='text-sm text-blue-100'>Toplam Proje</div>
+              <div className='text-2xl font-bold text-white'>-</div>
+            </div>
           </div>
-
-          {/* Page Title */}
-          <div className='mb-3'>
-            <h1 className='text-xl md:text-2xl font-bold text-gray-900 tracking-tight'>
-              PROJE YÖNETİMİ
-            </h1>
-          </div>
-
-          {/* Page Description */}
-          <div className='mb-4'>
-            <p className='text-sm text-gray-600 font-medium leading-relaxed'>
-              Projelerinizi yönetin ve organize edin
-            </p>
-          </div>
-
-          {/* Decorative Line */}
-          <div className='w-20 h-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full'></div>
         </div>
 
         {/* Enhanced Project List bileşenini kullan */}
