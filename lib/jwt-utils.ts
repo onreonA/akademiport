@@ -1,6 +1,8 @@
 import { jwtVerify } from 'jose';
 import { NextRequest, NextResponse } from 'next/server';
 
+import { hasPermission, ROLE_GROUPS } from './rbac';
+
 export interface JWTUser {
   id: string;
   email: string;
@@ -57,8 +59,7 @@ export async function requireAuth(request: NextRequest): Promise<JWTUser> {
 export async function requireAdmin(request: NextRequest): Promise<JWTUser> {
   const user = await requireAuth(request);
   
-  const adminRoles = ['admin', 'master_admin', 'danisman'];
-  if (!adminRoles.includes(user.role)) {
+  if (!ROLE_GROUPS.ADMIN_ROLES.includes(user.role)) {
     throw new Error('Admin access required');
   }
   
@@ -71,8 +72,7 @@ export async function requireAdmin(request: NextRequest): Promise<JWTUser> {
 export async function requireCompany(request: NextRequest): Promise<JWTUser> {
   const user = await requireAuth(request);
   
-  const companyRoles = ['firma_admin', 'firma_kullanici'];
-  if (!companyRoles.includes(user.role)) {
+  if (!ROLE_GROUPS.COMPANY_ROLES.includes(user.role)) {
     throw new Error('Company access required');
   }
   
@@ -99,14 +99,69 @@ export async function requireCompanyAccess(
   const user = await requireCompany(request);
   
   // Admin kullanıcılar tüm company'lere erişebilir
-  const adminRoles = ['admin', 'master_admin', 'danisman'];
-  if (adminRoles.includes(user.role)) {
+  if (ROLE_GROUPS.ADMIN_ROLES.includes(user.role)) {
     return user;
   }
   
   // Company kullanıcısı sadece kendi company'sine erişebilir
   if (targetCompanyId && user.company_id !== targetCompanyId) {
     throw new Error('Company access denied');
+  }
+  
+  return user;
+}
+
+/**
+ * Kullanıcının belirli bir izne sahip olup olmadığını kontrol et
+ */
+export async function requirePermission(
+  request: NextRequest,
+  permission: string
+): Promise<JWTUser> {
+  const user = await requireAuth(request);
+  
+  if (!hasPermission(user.role, permission)) {
+    throw new Error(`Permission denied: ${permission}`);
+  }
+  
+  return user;
+}
+
+/**
+ * Kullanıcının belirtilen izinlerden en az birine sahip olup olmadığını kontrol et
+ */
+export async function requireAnyPermission(
+  request: NextRequest,
+  permissions: string[]
+): Promise<JWTUser> {
+  const user = await requireAuth(request);
+  
+  const hasAnyPerm = permissions.some(permission => 
+    hasPermission(user.role, permission)
+  );
+  
+  if (!hasAnyPerm) {
+    throw new Error(`Permission denied: requires one of [${permissions.join(', ')}]`);
+  }
+  
+  return user;
+}
+
+/**
+ * Kullanıcının belirtilen izinlerin tümüne sahip olup olmadığını kontrol et
+ */
+export async function requireAllPermissions(
+  request: NextRequest,
+  permissions: string[]
+): Promise<JWTUser> {
+  const user = await requireAuth(request);
+  
+  const hasAllPerms = permissions.every(permission => 
+    hasPermission(user.role, permission)
+  );
+  
+  if (!hasAllPerms) {
+    throw new Error(`Permission denied: requires all of [${permissions.join(', ')}]`);
   }
   
   return user;
