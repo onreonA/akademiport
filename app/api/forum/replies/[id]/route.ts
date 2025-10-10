@@ -15,8 +15,7 @@ export async function GET(
       .from('forum_replies')
       .select(
         `
-        *,
-        users(email, full_name)
+        *
       `
       )
       .eq('id', id)
@@ -52,12 +51,13 @@ export async function PUT(
   try {
     const { id } = await params;
     const body = await request.json();
-    const { content, is_solution, is_hidden } = body;
+    const { content, is_solution, is_hidden, topic_id } = body;
     // Validasyon - content opsiyonel (partial update için)
     if (
       content === undefined &&
       is_solution === undefined &&
-      is_hidden === undefined
+      is_hidden === undefined &&
+      topic_id === undefined
     ) {
       return NextResponse.json(
         { success: false, error: 'En az bir alan güncellenmelidir' },
@@ -72,6 +72,7 @@ export async function PUT(
     if (content !== undefined) updateData.content = content;
     if (is_solution !== undefined) updateData.is_solution = is_solution;
     if (is_hidden !== undefined) updateData.is_hidden = is_hidden;
+    if (topic_id !== undefined) updateData.topic_id = topic_id;
 
     const { data, error } = await supabase
       .from('forum_replies')
@@ -79,8 +80,7 @@ export async function PUT(
       .eq('id', id)
       .select(
         `
-        *,
-        users(email, full_name)
+        *
       `
       )
       .single();

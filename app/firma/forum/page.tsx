@@ -81,6 +81,20 @@ const fetchTopics = async (categoryId?: string): Promise<ForumTopic[]> => {
     return [];
   }
 };
+
+const fetchTotalReplies = async (): Promise<number> => {
+  try {
+    const response = await fetch('/api/forum/replies?limit=1000');
+    const result = await response.json();
+    if (result.success) {
+      return result.data.length;
+    } else {
+      return 0;
+    }
+  } catch (error) {
+    return 0;
+  }
+};
 const ForumDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -93,18 +107,21 @@ const ForumDashboard = () => {
   const [error, setError] = useState<string | null>(null);
   const [showCreateTopic, setShowCreateTopic] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
+  const [totalReplies, setTotalReplies] = useState(0);
   // Veri yükleme
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
       try {
-        const [categoriesData, topicsData] = await Promise.all([
+        const [categoriesData, topicsData, repliesCount] = await Promise.all([
           fetchCategories(),
           fetchTopics(),
+          fetchTotalReplies(),
         ]);
         setCategories(categoriesData);
         setTopics(topicsData);
         setFilteredTopics(topicsData);
+        setTotalReplies(repliesCount);
       } catch (error) {
         setError('Veriler yüklenirken hata oluştu');
       } finally {
@@ -217,7 +234,9 @@ const ForumDashboard = () => {
               </div>
               <div>
                 <h1 className='text-2xl font-bold text-white'>Forum</h1>
-                <p className='text-blue-100 text-sm'>Toplulukla etkileşim kurun</p>
+                <p className='text-blue-100 text-sm'>
+                  Toplulukla etkileşim kurun
+                </p>
               </div>
             </div>
             <Link href='/firma/forum/yeni-konu'>
@@ -227,14 +246,16 @@ const ForumDashboard = () => {
               </button>
             </Link>
           </div>
-          
+
           {/* Compact Stats */}
           <div className='grid grid-cols-4 gap-4'>
             <div className='bg-white/10 backdrop-blur-sm rounded-xl p-3 border border-white/20'>
               <div className='flex items-center gap-2'>
                 <i className='ri-chat-3-line text-white text-xl'></i>
                 <div>
-                  <p className='text-2xl font-bold text-white'>{topics.length}</p>
+                  <p className='text-2xl font-bold text-white'>
+                    {topics.length}
+                  </p>
                   <p className='text-xs text-blue-100'>Konu</p>
                 </div>
               </div>
@@ -244,7 +265,7 @@ const ForumDashboard = () => {
                 <i className='ri-message-3-line text-white text-xl'></i>
                 <div>
                   <p className='text-2xl font-bold text-white'>
-                    {topics.reduce((sum, topic) => sum + topic.reply_count, 0)}
+                    {totalReplies}
                   </p>
                   <p className='text-xs text-blue-100'>Yanıt</p>
                 </div>
@@ -307,7 +328,7 @@ const ForumDashboard = () => {
                 />
               </div>
             </div>
-            
+
             {/* Category Filter */}
             <div className='flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2.5'>
               <i className='ri-folder-line text-gray-500'></i>
@@ -324,7 +345,7 @@ const ForumDashboard = () => {
                 ))}
               </select>
             </div>
-            
+
             {/* Sort Filter */}
             <div className='flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2.5'>
               <i className='ri-sort-desc text-gray-500'></i>
@@ -343,7 +364,7 @@ const ForumDashboard = () => {
                 <option value='like_count-desc'>En Çok Beğeni</option>
               </select>
             </div>
-            
+
             {/* View Mode Toggle */}
             <div className='flex items-center gap-1 bg-gray-50 rounded-lg p-1'>
               <button
@@ -370,7 +391,13 @@ const ForumDashboard = () => {
           </div>
         </div>
         {/* Modern Topics List */}
-        <div className={viewMode === 'grid' ? 'grid grid-cols-1 lg:grid-cols-2 gap-4' : 'space-y-3'}>
+        <div
+          className={
+            viewMode === 'grid'
+              ? 'grid grid-cols-1 lg:grid-cols-2 gap-4'
+              : 'space-y-3'
+          }
+        >
           {filteredTopics.map(topic => {
             const categoryInfo = getCategoryInfo(topic.category_id);
             return (
@@ -388,12 +415,18 @@ const ForumDashboard = () => {
                         </h3>
                         <div className='flex items-center gap-1 flex-shrink-0'>
                           {topic.is_featured && (
-                            <span className='inline-flex items-center justify-center w-6 h-6 bg-yellow-100 text-yellow-600 rounded-full' title='Öne Çıkan'>
+                            <span
+                              className='inline-flex items-center justify-center w-6 h-6 bg-yellow-100 text-yellow-600 rounded-full'
+                              title='Öne Çıkan'
+                            >
                               <i className='ri-star-fill text-xs'></i>
                             </span>
                           )}
                           {topic.is_solved && (
-                            <span className='inline-flex items-center justify-center w-6 h-6 bg-green-100 text-green-600 rounded-full' title='Çözüldü'>
+                            <span
+                              className='inline-flex items-center justify-center w-6 h-6 bg-green-100 text-green-600 rounded-full'
+                              title='Çözüldü'
+                            >
                               <i className='ri-check-line text-xs'></i>
                             </span>
                           )}
@@ -401,7 +434,8 @@ const ForumDashboard = () => {
                       </div>
                       <p className='text-xs text-gray-500 mb-2'>
                         <i className='ri-user-line mr-1'></i>
-                        {topic.users?.full_name || 'Anonim'} • {getTimeAgo(topic.created_at)}
+                        {topic.users?.full_name || 'Anonim'} •{' '}
+                        {getTimeAgo(topic.created_at)}
                       </p>
                       <p className='text-sm text-gray-600 line-clamp-2 mb-3'>
                         {topic.content}
@@ -421,7 +455,9 @@ const ForumDashboard = () => {
                         </span>
                       ))}
                       {topic.tags.length > 3 && (
-                        <span className='text-xs text-gray-400'>+{topic.tags.length - 3}</span>
+                        <span className='text-xs text-gray-400'>
+                          +{topic.tags.length - 3}
+                        </span>
                       )}
                     </div>
                   )}
@@ -430,9 +466,13 @@ const ForumDashboard = () => {
                   <div className='flex items-center justify-between pt-3 border-t border-gray-100'>
                     <div className='flex items-center gap-1'>
                       {categoryInfo && (
-                        <span className={`inline-flex items-center gap-1 px-2 py-1 ${categoryInfo.color} bg-opacity-10 text-xs font-medium rounded-lg`}>
+                        <span
+                          className={`inline-flex items-center gap-1 px-2 py-1 ${categoryInfo.color} bg-opacity-10 text-xs font-medium rounded-lg`}
+                        >
                           <i className={`${categoryInfo.icon} text-xs`}></i>
-                          <span className='text-gray-700'>{categoryInfo.name}</span>
+                          <span className='text-gray-700'>
+                            {categoryInfo.name}
+                          </span>
                         </span>
                       )}
                     </div>
@@ -483,7 +523,7 @@ const ForumDashboard = () => {
             )}
           </div>
         )}
-        
+
         {/* Compact Forum Rules */}
         {filteredTopics.length > 0 && (
           <div className='bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-xl p-4'>

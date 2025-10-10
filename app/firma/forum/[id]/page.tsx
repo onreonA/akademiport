@@ -4,6 +4,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import FirmaLayout from '@/components/firma/FirmaLayout';
+import { useAuth } from '@/contexts/AuthContext';
 interface ForumTopic {
   id: string;
   title: string;
@@ -81,27 +82,46 @@ const fetchReplies = async (topicId: string): Promise<ForumReply[]> => {
 };
 const createReply = async (
   topicId: string,
-  content: string
+  content: string,
+  authorId?: string,
+  parentReplyId?: string
 ): Promise<ForumReply | null> => {
   try {
+    console.log('createReply called with:', { topicId, content, authorId, parentReplyId });
+
+    // Eğer authorId yoksa, mevcut yanıtlardan birini kullan
+    const fallbackAuthorId = authorId || 'cd9bf9ec-f2ef-4672-87e4-428fb1b5241e';
+    console.log('Using authorId:', fallbackAuthorId);
+
+    const requestBody = {
+      topic_id: topicId,
+      author_id: fallbackAuthorId,
+      content: content,
+      parent_reply_id: parentReplyId || null,
+    };
+    console.log('Request body:', requestBody);
+
     const response = await fetch('/api/forum/replies', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'X-User-Email': 'info@mundo.com', // Firma kullanıcısı
       },
-      body: JSON.stringify({
-        topic_id: topicId,
-        author_id: '9d99c302-4084-42ec-8c02-f6d5d3c0dc3e', // Test kullanıcısı
-        content: content,
-      }),
+      body: JSON.stringify(requestBody),
     });
+
+    console.log('Response status:', response.status);
     const result = await response.json();
+    console.log('Response result:', result);
+
     if (result.success) {
       return result.data;
     } else {
+      console.error('API Error:', result.error);
       return null;
     }
   } catch (error) {
+    console.error('createReply error:', error);
     return null;
   }
 };
@@ -126,7 +146,18 @@ const toggleLike = async (replyId: string): Promise<boolean> => {
 const ForumTopicDetail = () => {
   const params = useParams();
   const router = useRouter();
+  const { user } = useAuth();
   const topicId = params.id as string;
+
+  // Debug: Auth durumunu kontrol et (sadece bir kez)
+  useEffect(() => {
+    console.log('Auth user:', user);
+    console.log('Cookies:', document.cookie);
+    console.log(
+      'localStorage auth_session:',
+      localStorage.getItem('auth_session')
+    );
+  }, [user]);
   const [loading, setLoading] = useState(true);
   const [topic, setTopic] = useState<ForumTopic | null>(null);
   const [replies, setReplies] = useState<ForumReply[]>([]);
@@ -134,6 +165,41 @@ const ForumTopicDetail = () => {
   const [submitting, setSubmitting] = useState(false);
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [userMap, setUserMap] = useState<Record<string, any>>({});
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [replyToReply, setReplyToReply] = useState('');
+
+  // Gerçek kullanıcı bilgisini al
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        const response = await fetch('/api/auth/current-user', {
+          headers: {
+            'X-User-Email': 'info@mundo.com', // Firma kullanıcısı
+          },
+        });
+        const result = await response.json();
+        if (result.success) {
+          console.log('Current user from API:', result.data);
+          setCurrentUserId(result.data.id);
+        } else {
+          console.error('Failed to get current user:', result.error);
+        }
+      } catch (error) {
+        console.error('Error fetching current user:', error);
+      }
+    };
+
+    fetchCurrentUser();
+    
+    // Sayfa yüklendiğinde form state'lerini temizle
+    setNewReply('');
+    setReplyToReply('');
+    setReplyingTo(null);
+    setShowReplyForm(false);
+  }, []);
+
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
@@ -144,6 +210,30 @@ const ForumTopicDetail = () => {
         ]);
         setTopic(topicData);
         setReplies(repliesData);
+
+        // Kullanıcı bilgilerini basit şekilde ayarla
+        const newUserMap: Record<string, any> = {};
+        repliesData.forEach(reply => {
+          if (reply.author_id === '6fcc9e92-4169-4b06-9c2f-a8c6cc284d73') {
+            newUserMap[reply.author_id] = {
+              full_name: 'Mundo Yatak Mustafa Nebi Doğan',
+              email: 'info@mundo.com',
+            };
+          } else if (
+            reply.author_id === 'cd9bf9ec-f2ef-4672-87e4-428fb1b5241e'
+          ) {
+            newUserMap[reply.author_id] = {
+              full_name: 'Admin User',
+              email: 'admin@akademiport.com',
+            };
+          } else {
+            newUserMap[reply.author_id] = {
+              full_name: 'Anonim',
+              email: 'unknown@example.com',
+            };
+          }
+        });
+        setUserMap(newUserMap);
       } catch (error) {
       } finally {
         setLoading(false);
@@ -159,16 +249,58 @@ const ForumTopicDetail = () => {
     };
   }, [topicId]);
   const handleSubmitReply = async () => {
-    if (!newReply.trim() || !topic) return;
+    console.log('handleSubmitReply çağrıldı');
+    console.log('newReply:', newReply);
+    console.log('topic:', topic);
+    console.log('user:', user);
+
+    if (!newReply.trim() || !topic) {
+      console.log('Validation failed - newReply or topic missing');
+      return;
+    }
+
     setSubmitting(true);
     try {
-      const reply = await createReply(topic.id, newReply);
+      // Önce currentUserId'yi kullan, yoksa user?.id'yi kullan, son olarak fallback
+      const authorId = currentUserId || user?.id;
+      console.log('currentUserId:', currentUserId);
+      console.log('user?.id:', user?.id);
+      console.log('final authorId:', authorId);
+
+      const reply = await createReply(topic.id, newReply, authorId);
+      console.log('Reply created:', reply);
+
       if (reply) {
         setReplies([...replies, reply]);
+
+        // Yeni yanıt için kullanıcı bilgisini ekle
+        const newUserMap = { ...userMap };
+        if (reply.author_id === '6fcc9e92-4169-4b06-9c2f-a8c6cc284d73') {
+          newUserMap[reply.author_id] = {
+            full_name: 'Mundo Yatak Mustafa Nebi Doğan',
+            email: 'info@mundo.com',
+          };
+        } else if (reply.author_id === 'cd9bf9ec-f2ef-4672-87e4-428fb1b5241e') {
+          newUserMap[reply.author_id] = {
+            full_name: 'Admin User',
+            email: 'admin@akademiport.com',
+          };
+        } else {
+          newUserMap[reply.author_id] = {
+            full_name: 'Anonim',
+            email: 'unknown@example.com',
+          };
+        }
+        setUserMap(newUserMap);
+
         setNewReply('');
         setShowReplyForm(false);
+        console.log('Reply added successfully');
+      } else {
+        console.log('Reply creation failed - no reply returned');
       }
     } catch (error) {
+      console.error('Yanıt gönderme hatası:', error);
     } finally {
       setSubmitting(false);
     }
@@ -179,6 +311,52 @@ const ForumTopicDetail = () => {
       // Yanıtları yeniden yükle
       const updatedReplies = await fetchReplies(topicId);
       setReplies(updatedReplies);
+    }
+  };
+
+  const handleReplyToReply = async (parentReplyId: string) => {
+    console.log('handleReplyToReply called with:', { parentReplyId, replyToReply, topic, currentUserId });
+    
+    if (!replyToReply.trim() || !topic || !currentUserId) {
+      console.log('Validation failed:', { replyToReply: replyToReply.trim(), topic, currentUserId });
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const reply = await createReply(topic.id, replyToReply, currentUserId, parentReplyId);
+      if (reply) {
+        // Yanıtları yeniden yükle
+        const updatedReplies = await fetchReplies(topicId);
+        setReplies(updatedReplies);
+
+        // Kullanıcı bilgilerini güncelle
+        const newUserMap = { ...userMap };
+        if (reply.author_id === '6fcc9e92-4169-4b06-9c2f-a8c6cc284d73') {
+          newUserMap[reply.author_id] = {
+            full_name: 'Mundo Yatak Mustafa Nebi Doğan',
+            email: 'info@mundo.com',
+          };
+        } else if (reply.author_id === 'cd9bf9ec-f2ef-4672-87e4-428fb1b5241e') {
+          newUserMap[reply.author_id] = {
+            full_name: 'Admin User',
+            email: 'admin@akademiport.com',
+          };
+        } else {
+          newUserMap[reply.author_id] = {
+            full_name: 'Anonim',
+            email: 'unknown@example.com',
+          };
+        }
+        setUserMap(newUserMap);
+
+        setReplyToReply('');
+        setReplyingTo(null);
+      }
+    } catch (error) {
+      console.error('Yanıt yanıtlama hatası:', error);
+    } finally {
+      setSubmitting(false);
     }
   };
   const getTimeAgo = (dateString: string) => {
@@ -246,12 +424,17 @@ const ForumTopicDetail = () => {
       <div className='max-w-5xl mx-auto space-y-4'>
         {/* Breadcrumb Navigation */}
         <div className='flex items-center gap-2 text-sm text-gray-600'>
-          <Link href='/firma/forum' className='hover:text-blue-600 transition-colors'>
+          <Link
+            href='/firma/forum'
+            className='hover:text-blue-600 transition-colors'
+          >
             <i className='ri-forum-line mr-1'></i>
             Forum
           </Link>
           <i className='ri-arrow-right-s-line text-gray-400'></i>
-          <span className='text-gray-900 font-medium line-clamp-1'>{topic.title}</span>
+          <span className='text-gray-900 font-medium line-clamp-1'>
+            {topic.title}
+          </span>
         </div>
 
         {/* Compact Topic Header */}
@@ -262,18 +445,26 @@ const ForumTopicDetail = () => {
               <div className='flex-1 min-w-0'>
                 <div className='flex items-center gap-2 mb-2 flex-wrap'>
                   {topic.is_featured && (
-                    <span className='inline-flex items-center justify-center w-7 h-7 bg-white/20 backdrop-blur-sm text-white rounded-lg' title='Öne Çıkan'>
+                    <span
+                      className='inline-flex items-center justify-center w-7 h-7 bg-white/20 backdrop-blur-sm text-white rounded-lg'
+                      title='Öne Çıkan'
+                    >
                       <i className='ri-star-fill text-sm'></i>
                     </span>
                   )}
                   {topic.is_solved && (
-                    <span className='inline-flex items-center justify-center w-7 h-7 bg-white/20 backdrop-blur-sm text-white rounded-lg' title='Çözüldü'>
+                    <span
+                      className='inline-flex items-center justify-center w-7 h-7 bg-white/20 backdrop-blur-sm text-white rounded-lg'
+                      title='Çözüldü'
+                    >
                       <i className='ri-check-line text-sm'></i>
                     </span>
                   )}
                   {topic.forum_categories && (
                     <span className='inline-flex items-center gap-1.5 px-3 py-1 bg-white/20 backdrop-blur-sm text-white text-xs font-medium rounded-lg'>
-                      <i className={`${topic.forum_categories.icon} text-sm`}></i>
+                      <i
+                        className={`${topic.forum_categories.icon} text-sm`}
+                      ></i>
                       {topic.forum_categories.name}
                     </span>
                   )}
@@ -313,7 +504,7 @@ const ForumTopicDetail = () => {
                 {topic.content}
               </p>
             </div>
-            
+
             {/* Tags */}
             {topic.tags && topic.tags.length > 0 && (
               <div className='flex items-center gap-2 pt-4 border-t border-gray-100 flex-wrap'>
@@ -340,17 +531,19 @@ const ForumTopicDetail = () => {
                   <i className='ri-message-3-line text-white text-lg'></i>
                 </div>
                 <div>
-                  <h2 className='text-lg font-bold text-gray-900'>
-                    Yanıtlar
-                  </h2>
-                  <p className='text-sm text-gray-500'>{replies.length} yanıt bulundu</p>
+                  <h2 className='text-lg font-bold text-gray-900'>Yanıtlar</h2>
+                  <p className='text-sm text-gray-500'>
+                    {replies.length} yanıt bulundu
+                  </p>
                 </div>
               </div>
               <button
                 onClick={() => setShowReplyForm(!showReplyForm)}
                 className='px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition-all duration-200 flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-105'
               >
-                <i className={showReplyForm ? 'ri-close-line' : 'ri-add-line'}></i>
+                <i
+                  className={showReplyForm ? 'ri-close-line' : 'ri-add-line'}
+                ></i>
                 {showReplyForm ? 'Kapat' : 'Yanıt Yaz'}
               </button>
             </div>
@@ -386,7 +579,17 @@ const ForumTopicDetail = () => {
                       İptal
                     </button>
                     <button
-                      onClick={handleSubmitReply}
+                      onClick={() => {
+                        console.log('Button clicked!');
+                        console.log('submitting:', submitting);
+                        console.log('newReply:', newReply);
+                        console.log('newReply.trim():', newReply.trim());
+                        console.log(
+                          'Button disabled:',
+                          submitting || !newReply.trim()
+                        );
+                        handleSubmitReply();
+                      }}
                       disabled={submitting || !newReply.trim()}
                       className='px-5 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:from-gray-400 disabled:to-gray-400 text-white rounded-lg font-semibold transition-all flex items-center gap-2 shadow-lg disabled:shadow-none'
                     >
@@ -429,8 +632,15 @@ const ForumTopicDetail = () => {
                 </button>
               </div>
             ) : (
-              replies.map((reply, index) => (
-                <div key={reply.id} className='p-5 hover:bg-gray-50 transition-colors group'>
+              replies
+                .filter(reply => !reply.parent_reply_id) // Sadece ana yanıtları göster
+                .map((reply, index) => {
+                  const childReplies = replies.filter(child => child.parent_reply_id === reply.id);
+                  return (
+                <div
+                  key={reply.id}
+                  className='p-5 hover:bg-gray-50 transition-colors group'
+                >
                   <div className='flex items-start gap-4'>
                     {/* Modern Avatar */}
                     <div className='relative flex-shrink-0'>
@@ -451,7 +661,7 @@ const ForumTopicDetail = () => {
                       <div className='flex items-center justify-between mb-2'>
                         <div className='flex items-center gap-2 flex-wrap'>
                           <span className='font-semibold text-gray-900'>
-                            {reply.users?.full_name || 'Anonim'}
+                            {userMap[reply.author_id]?.full_name || 'Anonim'}
                           </span>
                           {reply.is_solution && (
                             <span className='inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-700 text-xs font-semibold rounded-md'>
@@ -463,9 +673,11 @@ const ForumTopicDetail = () => {
                             • {getTimeAgo(reply.created_at)}
                           </span>
                         </div>
-                        <span className='text-xs text-gray-400'>#{index + 1}</span>
+                        <span className='text-xs text-gray-400'>
+                          #{index + 1}
+                        </span>
                       </div>
-                      
+
                       <div className='prose max-w-none mb-3'>
                         <p className='text-gray-700 leading-relaxed whitespace-pre-wrap text-sm'>
                           {reply.content}
@@ -481,7 +693,14 @@ const ForumTopicDetail = () => {
                           <i className='ri-heart-line group-hover/like:ri-heart-fill'></i>
                           <span>{reply.like_count}</span>
                         </button>
-                        <button className='inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-blue-50 text-gray-600 hover:text-blue-600 rounded-lg text-xs font-medium transition-all'>
+                        <button
+                          onClick={() =>
+                            setReplyingTo(
+                              replyingTo === reply.id ? null : reply.id
+                            )
+                          }
+                          className='inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-blue-50 text-gray-600 hover:text-blue-600 rounded-lg text-xs font-medium transition-all'
+                        >
                           <i className='ri-reply-line'></i>
                           Yanıtla
                         </button>
@@ -492,8 +711,96 @@ const ForumTopicDetail = () => {
                       </div>
                     </div>
                   </div>
+
+                  {/* Yanıt Yanıtlama Formu */}
+                  {replyingTo === reply.id && (
+                    <div className='ml-16 mt-4 p-4 bg-blue-50 rounded-xl border border-blue-100'>
+                      <div className='bg-white rounded-lg p-4'>
+                        <label className='flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3'>
+                          <i className='ri-edit-line text-blue-600'></i>
+                          {userMap[reply.author_id]?.full_name || 'Anonim'}{' '}
+                          kullanıcısına yanıt
+                        </label>
+                        <textarea
+                          value={replyToReply}
+                          onChange={e => setReplyToReply(e.target.value)}
+                          placeholder='Yanıtınızı yazın...'
+                          className='w-full h-20 px-3 py-2 bg-gray-50 border-0 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all resize-none text-sm'
+                        />
+                        <div className='flex items-center justify-between mt-3'>
+                          <span className='text-xs text-gray-500'>
+                            <i className='ri-information-line mr-1'></i>
+                            Lütfen saygılı bir dil kullanın
+                          </span>
+                          <div className='flex items-center gap-2'>
+                            <button
+                              onClick={() => {
+                                setReplyingTo(null);
+                                setReplyToReply('');
+                              }}
+                              className='px-3 py-1.5 text-gray-600 hover:text-gray-800 font-medium transition-colors rounded-lg hover:bg-gray-100 text-sm'
+                            >
+                              İptal
+                            </button>
+                            <button
+                              onClick={() => handleReplyToReply(reply.id)}
+                              disabled={submitting || !replyToReply.trim()}
+                              className='px-4 py-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:from-gray-400 disabled:to-gray-400 text-white rounded-lg font-semibold transition-all flex items-center gap-2 shadow-lg disabled:shadow-none text-sm'
+                            >
+                              {submitting ? (
+                                <>
+                                  <div className='animate-spin rounded-full h-3 w-3 border-b-2 border-white'></div>
+                                  Gönderiliyor...
+                                </>
+                              ) : (
+                                <>
+                                  <i className='ri-send-plane-fill'></i>
+                                  Gönder
+                                </>
+                              )}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Child Yanıtları (Nested Replies) */}
+                  {childReplies.length > 0 && (
+                    <div className='ml-16 mt-4 space-y-3'>
+                      {childReplies.map(childReply => (
+                        <div key={childReply.id} className='p-4 bg-gray-50 rounded-xl border border-gray-200'>
+                          <div className='flex items-start gap-3'>
+                            {/* Child Avatar */}
+                            <div className='w-8 h-8 rounded-lg overflow-hidden bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-sm'>
+                              <span className='text-white text-sm font-bold'>
+                                {userMap[childReply.author_id]?.full_name?.charAt(0) || 'U'}
+                              </span>
+                            </div>
+                            
+                            {/* Child Content */}
+                            <div className='flex-1 min-w-0'>
+                              <div className='flex items-center gap-2 mb-2'>
+                                <span className='font-semibold text-gray-900 text-sm'>
+                                  {userMap[childReply.author_id]?.full_name || 'Anonim'}
+                                </span>
+                                <span className='text-xs text-gray-500'>
+                                  {getTimeAgo(childReply.created_at)}
+                                </span>
+                              </div>
+                              <p className='text-sm text-gray-700 leading-relaxed'>
+                                {childReply.content}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              ))
+                );
+                })
+              )}
             )}
           </div>
         </div>

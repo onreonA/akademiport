@@ -19,8 +19,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '50');
     const offset = (page - 1) * limit;
     let query = supabase.from('forum_replies').select(`
-        *,
-        users(email, full_name)
+        *
       `);
     // Filtreler
     if (topicId) {
@@ -37,10 +36,8 @@ export async function GET(request: NextRequest) {
     }
     if (parentReplyId) {
       query = query.eq('parent_reply_id', parentReplyId);
-    } else {
-      // Ana yanıtları getir (parent_reply_id null olanlar)
-      query = query.is('parent_reply_id', null);
     }
+    // parentReplyId yoksa tüm yanıtları getir (ana + nested)
     // Sıralama
     query = query.order(sortBy, { ascending: order === 'asc' });
     // Sayfalama
@@ -95,8 +92,7 @@ export async function POST(request: NextRequest) {
       })
       .select(
         `
-        *,
-        users(email, full_name)
+        *
       `
       )
       .single();

@@ -6,4 +6,3 @@ DROP FUNCTION IF EXISTS notify_on_reply();
 
 -- Add comment for future reference
 COMMENT ON TABLE forum_notifications IS 'Notification trigger temporarily disabled - needs user_id -> recipient_id migration';
-
