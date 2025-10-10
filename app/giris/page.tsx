@@ -20,31 +20,23 @@ export default function LoginPage() {
       setLoading(true);
       setError('');
       
-      // API'ye login isteği gönder
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-        credentials: 'include', // Cookie'leri gönder
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Giriş başarısız');
-      }
-
+      // AuthStore'u da güncelle (client-side state için)
+      await signIn(email, password);
+      
       // Başarılı login - role'e göre redirect
+      // signIn içinde zaten API çağrısı yapılıyor ve cookie set ediliyor
       setLoading(false);
       
-      // Role'e göre yönlendirme
-      if (data.user.role.startsWith('firma')) {
-        router.push('/firma');
-      } else {
-        router.push('/admin');
-      }
+      // Role'e göre yönlendirme - AuthStore'dan user bilgisini al
+      // Kısa bir delay ile user state'inin güncellenmesini bekle
+      setTimeout(() => {
+        const currentUser = useAuthStore.getState().user;
+        if (currentUser?.role?.startsWith('firma')) {
+      router.push('/firma');
+        } else {
+          router.push('/admin');
+        }
+      }, 100);
       
     } catch (error: any) {
       setError(error.message || 'Giriş yapılırken bir hata oluştu');
