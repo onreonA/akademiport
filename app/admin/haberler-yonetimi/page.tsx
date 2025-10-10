@@ -318,21 +318,12 @@ export default function NewsManagement() {
   const [categories, setCategories] = useState<any[]>([]);
   const [experts, setExperts] = useState<any[]>([]);
   // API calls
-  useEffect(() => {
-    // Admin sayfasında otomatik olarak admin kullanıcısı olarak giriş yap
-    if (!user) {
-      // login('admin@ihracatakademi.com', 'admin');
-    }
-    fetchNews();
-    fetchCategories();
-    fetchExperts();
-  }, [user, fetchNews]);
   const fetchNews = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch('/api/news', {
         headers: {
-          'X-User-Email': user?.email || 'admin@ihracatakademi.com',
+          'X-User-Email': user?.email || 'admin@akademiport.com',
         },
       });
       const data = await response.json();
@@ -345,6 +336,16 @@ export default function NewsManagement() {
       setLoading(false);
     }
   }, [user?.email]);
+
+  useEffect(() => {
+    // Admin sayfasında otomatik olarak admin kullanıcısı olarak giriş yap
+    if (!user) {
+      // login('admin@ihracatakademi.com', 'admin');
+    }
+    fetchNews();
+    fetchCategories();
+    fetchExperts();
+  }, [user, fetchNews]);
   const fetchCategories = async () => {
     try {
       const response = await fetch('/api/news/categories');
@@ -420,7 +421,7 @@ export default function NewsManagement() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-User-Email': user?.email || 'admin@ihracatakademi.com',
+          'X-User-Email': user?.email || 'admin@akademiport.com',
         },
         body: JSON.stringify(createFormData),
       });
@@ -461,7 +462,7 @@ export default function NewsManagement() {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'X-User-Email': user?.email || 'admin@ihracatakademi.com',
+          'X-User-Email': user?.email || 'admin@akademiport.com',
         },
         body: JSON.stringify(createFormData),
       });
@@ -554,7 +555,7 @@ export default function NewsManagement() {
                 </div>
                 <div className='flex flex-col'>
                   <span className="font-['Pacifico'] text-xl text-blue-900 leading-tight">
-                    İhracat Akademi
+                    Akademi Port
                   </span>
                   <span className='text-xs text-gray-500 font-medium'>
                     Admin Panel
@@ -697,7 +698,7 @@ export default function NewsManagement() {
                     <div className='p-4 border-b border-gray-100'>
                       <p className='font-medium text-gray-900'>Admin User</p>
                       <p className='text-sm text-gray-500'>
-                        admin@ihracatakademi.com
+                        admin@akademiport.com
                       </p>
                     </div>
                     <div className='py-2'>
