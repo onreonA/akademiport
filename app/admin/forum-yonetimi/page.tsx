@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
+import AdminLayout from '@/components/AdminLayout';
 import CategoryModal from '@/components/modals/CategoryModal';
 import DeleteConfirmModal from '@/components/modals/DeleteConfirmModal';
 interface ForumCategory {
@@ -153,7 +154,6 @@ const updateReplyStatus = async (
   }
 };
 const ForumManagementPage = () => {
-  const [currentTime, setCurrentTime] = useState(new Date());
   const [activeTab, setActiveTab] = useState('categories');
   // Data state
   const [categories, setCategories] = useState<ForumCategory[]>([]);
@@ -197,11 +197,6 @@ const ForumManagementPage = () => {
       }
     };
     loadData();
-    // Clock update
-    const clock = setInterval(() => setCurrentTime(new Date()), 1000);
-    return () => {
-      clearInterval(clock);
-    };
   }, []);
   const handleTopicStatusChange = async (
     topicId: string,
@@ -354,58 +349,8 @@ const ForumManagementPage = () => {
     );
   }
   return (
-    <div className='min-h-screen bg-gray-50'>
-      {/* Header */}
-      <header className='bg-white shadow-sm border-b border-gray-200 fixed top-0 left-0 right-0 z-40'>
-        <div className='px-4 sm:px-6 lg:px-8'>
-          <div className='flex justify-between items-center py-4'>
-            {/* Left */}
-            <div className='flex items-center gap-6'>
-              <Link href='/admin' className='flex items-center gap-3'>
-                <div className='w-10 h-10 bg-gradient-to-br from-red-600 to-red-800 rounded-xl flex items-center justify-center shadow-lg'>
-                  <i className='ri-admin-line text-white text-lg w-5 h-5 flex items-center justify-center'></i>
-                </div>
-                <div className='flex flex-col'>
-                  <span className="font-['Pacifico'] text-xl text-red-900 leading-tight">
-                    İhracat Akademi
-                  </span>
-                  <span className='text-xs text-gray-500 font-medium'>
-                    Admin Paneli
-                  </span>
-                </div>
-              </Link>
-              {/* Breadcrumb */}
-              <nav className='hidden md:flex items-center text-sm text-gray-500'>
-                <Link
-                  href='/admin'
-                  className='hover:text-red-600 cursor-pointer'
-                >
-                  Admin Paneli
-                </Link>
-                <i className='ri-arrow-right-s-line mx-1'></i>
-                <span className='text-gray-900 font-medium'>
-                  Forum Yönetimi
-                </span>
-              </nav>
-            </div>
-            {/* Right */}
-            <div className='flex items-center gap-3'>
-              {/* Live Time */}
-              <div className='hidden lg:flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-lg'>
-                <i className='ri-time-line text-gray-400 text-sm'></i>
-                <span
-                  className='text-sm text-gray-600 font-mono'
-                  suppressHydrationWarning={true}
-                >
-                  {currentTime.toLocaleTimeString('tr-TR')}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
+    <AdminLayout title="Forum Yönetimi">
       {/* Main content */}
-      <div className='pt-20'>
         <div className='max-w-7xl mx-auto p-4 sm:p-6 lg:p-8'>
           {/* Page Header */}
           <div className='mb-8'>
@@ -860,7 +805,6 @@ const ForumManagementPage = () => {
             </div>
           </div>
         </div>
-      </div>
       {/* Modals */}
       <CategoryModal
         isOpen={categoryModal.isOpen}
@@ -879,7 +823,7 @@ const ForumManagementPage = () => {
         message={`"${deleteModal.category?.name}" kategorisini silmek istediğinizden emin misiniz?`}
         itemName={deleteModal.category?.name || ''}
       />
-    </div>
+    </AdminLayout>
   );
 };
 export default ForumManagementPage;
