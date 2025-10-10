@@ -181,15 +181,23 @@ export default function HaberlerPage() {
   // Load data
   useEffect(() => {
     const loadData = async () => {
-    try {
-      setLoading(true);
-        
-        // Fetch real data from API
-        const [newsResponse, categoriesResponse, expertsResponse] = await Promise.all([
-          fetch('/api/news'),
-          fetch('/api/news/categories'),
-          fetch('/api/news/experts')
-        ]);
+      try {
+        setLoading(true);
+
+        // Get user email for authentication
+        const userEmail = user?.email || '';
+
+        // Fetch real data from API with authentication
+        const [newsResponse, categoriesResponse, expertsResponse] =
+          await Promise.all([
+            fetch('/api/news', {
+        headers: {
+                'X-User-Email': userEmail,
+              },
+            }),
+            fetch('/api/news/categories'),
+            fetch('/api/news/experts'),
+          ]);
 
         const newsData = await newsResponse.json();
         const categoriesData = await categoriesResponse.json();
@@ -209,7 +217,7 @@ export default function HaberlerPage() {
 
         if (expertsData.success) {
           setExperts(expertsData.data);
-      } else {
+        } else {
           setExperts(mockExperts); // Fallback to mock data
         }
       } catch (err) {
@@ -218,12 +226,12 @@ export default function HaberlerPage() {
         setNews(mockNews);
         setCategories(mockCategories);
         setExperts(mockExperts);
-    } finally {
-      setLoading(false);
-    }
-  };
-    loadData();
-  }, []);
+      } finally {
+        setLoading(false);
+      }
+      };
+      loadData();
+    }, [user]);
   // Filter news based on category and search
   const filteredNews = news.filter(item => {
     const matchesCategory =
@@ -310,9 +318,9 @@ export default function HaberlerPage() {
           <div className='animate-pulse'>
             <div className='h-8 bg-gray-200 rounded w-1/4 mb-6'></div>
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-                    {[...Array(6)].map((_, i) => (
-                      <div
-                        key={i}
+              {[...Array(6)].map((_, i) => (
+                <div
+                  key={i}
                   className='bg-white rounded-xl shadow-sm border border-gray-100 p-6'
                 >
                   <div className='h-4 bg-gray-200 rounded w-3/4 mb-4'></div>
@@ -320,7 +328,7 @@ export default function HaberlerPage() {
                   <div className='h-4 bg-gray-200 rounded w-2/3 mb-4'></div>
                   <div className='h-4 bg-gray-200 rounded w-1/2'></div>
               </div>
-                    ))}
+              ))}
                   </div>
                   </div>
                 </div>
@@ -349,7 +357,7 @@ export default function HaberlerPage() {
               Tekrar Dene
             </button>
           </div>
-        </div>
+            </div>
       </FirmaLayout>
     );
   }
@@ -368,7 +376,7 @@ export default function HaberlerPage() {
             <div className='absolute bottom-20 left-1/3 w-40 h-40 bg-white/5 rounded-full blur-2xl'></div>
               </div>
             </div>
-        
+
         <div className='relative px-3 sm:px-4 lg:px-6 py-8'>
           <div className='max-w-7xl mx-auto'>
             <div className='flex items-center justify-between'>
@@ -387,7 +395,8 @@ export default function HaberlerPage() {
                     </div>
                   </div>
                 <p className='text-white/90 text-sm sm:text-base max-w-2xl leading-relaxed'>
-                  E-ihracat ve e-ticaret dünyasından en güncel haberler, trendler ve uzman görüşleri
+                  E-ihracat ve e-ticaret dünyasından en güncel haberler,
+                  trendler ve uzman görüşleri
                 </p>
                     </div>
               <div className='hidden lg:flex flex-shrink-0'>
@@ -410,8 +419,12 @@ export default function HaberlerPage() {
                   <i className='ri-filter-line text-white text-lg'></i>
                       </div>
                   <div>
-                  <h3 className='text-lg font-semibold text-gray-900'>Filtreler</h3>
-                  <p className='text-sm text-gray-500'>{sortedNews.length} haber bulundu</p>
+                  <h3 className='text-lg font-semibold text-gray-900'>
+                    Filtreler
+                  </h3>
+                  <p className='text-sm text-gray-500'>
+                    {sortedNews.length} haber bulundu
+                    </p>
                   </div>
                 </div>
               <button
@@ -472,7 +485,9 @@ export default function HaberlerPage() {
                     <select
                   value={sortBy}
                   onChange={e =>
-                    setSortBy(e.target.value as 'latest' | 'popular' | 'trending')
+                    setSortBy(
+                      e.target.value as 'latest' | 'popular' | 'trending'
+                    )
                   }
                   className='w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white appearance-none cursor-pointer'
                 >
@@ -514,7 +529,7 @@ export default function HaberlerPage() {
                     <i className='ri-newspaper-line text-blue-400 text-4xl'></i>
                   </div>
                 )}
-                
+
                 {/* Content */}
                 <div className='p-6'>
                   {/* Category & Meta */}
@@ -545,7 +560,7 @@ export default function HaberlerPage() {
                   <p className='text-gray-600 text-sm mb-4 line-clamp-3 leading-relaxed'>
                     {item.excerpt}
                   </p>
-                  
+
                   {/* Expert */}
                   {item.news_experts && (
                     <div className='flex items-center gap-3 mb-4 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100'>
@@ -637,7 +652,8 @@ export default function HaberlerPage() {
                 Haber Bulunamadı
               </h3>
               <p className='text-gray-500 mb-6 max-w-md mx-auto'>
-                Arama kriterlerinize uygun haber bulunamadı. Filtreleri değiştirmeyi deneyin.
+                Arama kriterlerinize uygun haber bulunamadı. Filtreleri
+                değiştirmeyi deneyin.
               </p>
                     <button
                 onClick={() => {
@@ -653,6 +669,7 @@ export default function HaberlerPage() {
                 </div>
               )}
             </div>
+        </div>
     </FirmaLayout>
   );
 }
