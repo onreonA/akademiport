@@ -20,23 +20,25 @@ export default function LoginPage() {
       setLoading(true);
       setError('');
       
-      // AuthStore'u da güncelle (client-side state için)
+      // AuthStore signIn - hem cookie hem state'i güncelliyor
       await signIn(email, password);
       
-      // Başarılı login - role'e göre redirect
-      // signIn içinde zaten API çağrısı yapılıyor ve cookie set ediliyor
-      setLoading(false);
+      // signIn başarılı olduysa, user state'i artık dolu
+      // Direkt olarak user state'inden role'ü oku
+      const currentUser = useAuthStore.getState().user;
       
-      // Role'e göre yönlendirme - AuthStore'dan user bilgisini al
-      // Kısa bir delay ile user state'inin güncellenmesini bekle
-      setTimeout(() => {
-        const currentUser = useAuthStore.getState().user;
-        if (currentUser?.role?.startsWith('firma')) {
-      router.push('/firma');
-        } else {
-          router.push('/admin');
-        }
-      }, 100);
+      if (!currentUser) {
+        throw new Error('Kullanıcı bilgisi alınamadı');
+      }
+      
+      // Role'e göre yönlendirme
+      if (currentUser.role === 'firma_admin' || currentUser.role === 'firma_kullanici') {
+        router.push('/firma');
+      } else {
+        router.push('/admin');
+      }
+      
+      setLoading(false);
       
     } catch (error: any) {
       setError(error.message || 'Giriş yapılırken bir hata oluştu');
