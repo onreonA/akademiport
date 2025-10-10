@@ -27,10 +27,11 @@ export async function POST(request: NextRequest) {
     // Güvenli authentication cookie set et
     response.cookies.set('auth-token', jwtToken, {
       httpOnly: true, // XSS koruması
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax', // CSRF koruması (strict çok katı, lax yeterli)
+      secure: false, // Development için false (production'da true olacak)
+      sameSite: 'lax', // CSRF koruması
       maxAge: 60 * 60 * 2, // 2 saat
-      path: '/'
+      path: '/',
+      domain: undefined // Explicit domain belirtme (localhost için)
     });
     return response;
   } catch (error: any) {

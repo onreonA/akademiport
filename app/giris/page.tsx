@@ -21,11 +21,10 @@ export default function LoginPage() {
       setIsLoading(true);
       setFirmError('');
       await signIn(firmEmail, firmPassword);
-      // Başarılı giriş sonrası yönlendirme
-      router.push('/firma');
+      // Başarılı giriş sonrası server-side redirect (cookie'nin set edilmesini bekle)
+      window.location.href = '/firma';
     } catch (error: any) {
       setFirmError(error.message || 'Firma girişinde bir hata oluştu');
-    } finally {
       setIsLoading(false);
     }
   };
@@ -35,11 +34,10 @@ export default function LoginPage() {
       setIsLoading(true);
       setConsultantError('');
       await signIn(consultantEmail, consultantPassword);
-      // Başarılı giriş sonrası yönlendirme
-      router.push('/admin');
+      // Başarılı giriş sonrası server-side redirect (cookie'nin set edilmesini bekle)
+      window.location.href = '/admin';
     } catch (error: any) {
       setConsultantError(error.message || 'Danışman girişinde bir hata oluştu');
-    } finally {
       setIsLoading(false);
     }
   };
