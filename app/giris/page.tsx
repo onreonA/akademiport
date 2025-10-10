@@ -10,7 +10,8 @@ export default function LoginPage() {
   const [firmPassword, setFirmPassword] = useState('');
   const [consultantEmail, setConsultantEmail] = useState('');
   const [consultantPassword, setConsultantPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [firmLoading, setFirmLoading] = useState(false);
+  const [consultantLoading, setConsultantLoading] = useState(false);
   const [firmError, setFirmError] = useState('');
   const [consultantError, setConsultantError] = useState('');
   const { signIn } = useAuthStore();
@@ -18,29 +19,29 @@ export default function LoginPage() {
   const handleFirmLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      setIsLoading(true);
+      setFirmLoading(true);
       setFirmError('');
       await signIn(firmEmail, firmPassword);
       // Başarılı giriş sonrası loading'i false yap ve navigate et
-      setIsLoading(false);
+      setFirmLoading(false);
       router.push('/firma');
     } catch (error: any) {
       setFirmError(error.message || 'Firma girişinde bir hata oluştu');
-      setIsLoading(false);
+      setFirmLoading(false);
     }
   };
   const handleConsultantLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      setIsLoading(true);
+      setConsultantLoading(true);
       setConsultantError('');
       await signIn(consultantEmail, consultantPassword);
       // Başarılı giriş sonrası loading'i false yap ve navigate et
-      setIsLoading(false);
+      setConsultantLoading(false);
       router.push('/admin');
     } catch (error: any) {
       setConsultantError(error.message || 'Danışman girişinde bir hata oluştu');
-      setIsLoading(false);
+      setConsultantLoading(false);
     }
   };
   return (
@@ -131,10 +132,10 @@ export default function LoginPage() {
                   )}
                   <button
                     type='submit'
-                    disabled={isLoading}
+                    disabled={firmLoading}
                     className='w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 disabled:transform-none shadow-lg hover:shadow-xl'
                   >
-                    {isLoading ? (
+                    {firmLoading ? (
                       <span className='flex items-center justify-center'>
                         <i className='ri-loader-4-line animate-spin mr-2 w-5 h-5 flex items-center justify-center'></i>
                         Giriş Yapılıyor...
@@ -298,10 +299,10 @@ export default function LoginPage() {
                   )}
                   <button
                     type='submit'
-                    disabled={isLoading}
+                    disabled={consultantLoading}
                     className='w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 disabled:transform-none shadow-lg hover:shadow-xl'
                   >
-                    {isLoading ? (
+                    {consultantLoading ? (
                       <span className='flex items-center justify-center'>
                         <i className='ri-loader-4-line animate-spin mr-2 w-5 h-5 flex items-center justify-center'></i>
                         Giriş Yapılıyor...
