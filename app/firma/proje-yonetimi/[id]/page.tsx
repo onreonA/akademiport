@@ -27,6 +27,7 @@ interface Project {
   startDate: string;
   endDate: string;
   progress: number;
+  progressPercentage?: number;
   companies: {
     name: string;
   };
@@ -40,6 +41,7 @@ interface SubProject {
   startDate: string;
   endDate: string;
   progress: number;
+  progress_percentage?: number;
   tasks: Task[];
 }
 
@@ -53,6 +55,7 @@ interface Task {
   due_date: string;
   assigned_to: string;
   progress: number;
+  approval_note?: string;
   subProject: {
     id: string;
     name: string;
@@ -268,213 +271,155 @@ export default function ProjectDetailPage() {
       description='Proje detaylarını görüntüleyin'
       showHeader={false}
     >
-      <div className='space-y-6'>
-        {/* Modern Page Header */}
-        <div className='mb-6'>
-          {/* Breadcrumb Navigation */}
-          <div className='mb-3'>
-            <nav className='flex items-center space-x-2 text-sm text-gray-500'>
-              <span className='hover:text-gray-700 cursor-pointer'>
-                Ana Sayfa
-              </span>
-              <i className='ri-arrow-right-s-line text-xs'></i>
-              <span
-                className='hover:text-gray-700 cursor-pointer'
-                onClick={() => router.push('/firma/proje-yonetimi')}
-              >
-                Proje Yönetimi
-              </span>
-              <i className='ri-arrow-right-s-line text-xs'></i>
-              <span className='text-gray-900 font-medium'>{project?.name}</span>
-            </nav>
-          </div>
-
-          {/* Page Title */}
-          <div className='mb-3'>
-            <div className='flex items-center gap-3'>
+      <div className='space-y-4'>
+        {/* Compact Gradient Header */}
+        <div className='bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-6 shadow-lg'>
+          <div className='flex items-center justify-between'>
+            <div className='flex items-center gap-4'>
               <button
                 onClick={() => router.back()}
-                className='p-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors'
+                className='p-2 bg-white/20 backdrop-blur-sm rounded-lg hover:bg-white/30 transition-colors'
               >
-                <RiArrowLeftLine className='w-4 h-4 text-gray-600' />
+                <RiArrowLeftLine className='w-5 h-5 text-white' />
               </button>
-              <h1 className='text-xl md:text-2xl font-bold text-gray-900 tracking-tight'>
-                {project?.name?.toUpperCase()}
-              </h1>
+              <div className='w-12 h-12 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center'>
+                <RiFolderLine className='text-2xl text-white' />
+              </div>
+              <div>
+                <h1 className='text-2xl font-bold text-white mb-1'>
+                  {project?.name}
+                </h1>
+                <p className='text-blue-100 text-sm'>
+                  {project?.description}
+                </p>
+              </div>
+            </div>
+            <div className='text-right'>
+              <div className='text-sm text-blue-100'>Proje İlerlemesi</div>
+              <div className='text-2xl font-bold text-white'>
+                {project?.progressPercentage || project?.progress || 0}%
+              </div>
             </div>
           </div>
-
-          {/* Page Description */}
-          <div className='mb-4'>
-            <p className='text-sm text-gray-600 font-medium leading-relaxed'>
-              {project?.description}
-            </p>
-          </div>
-
-          {/* Decorative Line */}
-          <div className='w-20 h-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full'></div>
         </div>
 
-        {/* Statistics Cards */}
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4'>
+        {/* Compact Statistics Cards */}
+        <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
           {/* Project Progress */}
-          <div className='bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow'>
-            <div className='flex items-center justify-between mb-2'>
-              <div>
-                <p className='text-sm font-medium text-gray-600'>
-                  Proje İlerlemesi
-                </p>
-                <p className='text-xl font-bold text-gray-900'>
-                  {project?.progressPercentage || project?.progress || 0}%
-                </p>
+          <div className='bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow'>
+            <div className='flex items-center justify-between'>
+              <div className='flex items-center gap-3'>
+                <div className='w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center'>
+                  <RiBarChartLine className='text-white text-lg' />
+                </div>
+                <div>
+                  <div className='text-2xl font-bold text-gray-900'>
+                    {project?.progressPercentage || project?.progress || 0}%
+                  </div>
+                  <div className='text-xs text-gray-500'>İlerleme</div>
+                </div>
               </div>
-              <div className='p-2 bg-blue-100 rounded-lg'>
-                <RiBarChartLine className='w-5 h-5 text-blue-600' />
-              </div>
-            </div>
-            <div className='w-full bg-gray-200 rounded-full h-1.5'>
-              <div
-                className={`h-1.5 rounded-full transition-all duration-300 ${
-                  (project?.progressPercentage || project?.progress || 0) >= 80
-                    ? 'bg-green-500'
-                    : (project?.progressPercentage || project?.progress || 0) >=
-                        50
-                      ? 'bg-yellow-500'
-                      : (project?.progressPercentage ||
-                            project?.progress ||
-                            0) >= 20
-                        ? 'bg-orange-500'
-                        : 'bg-red-500'
-                }`}
-                style={{
-                  width: `${project?.progressPercentage || project?.progress || 0}%`,
-                }}
-              ></div>
             </div>
           </div>
 
           {/* Completed Tasks */}
-          <div className='bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow'>
-            <div className='flex items-center justify-between mb-2'>
-              <div>
-                <p className='text-sm font-medium text-gray-600'>
-                  Tamamlanan Görevler
-                </p>
-                <p className='text-xl font-bold text-gray-900'>
-                  {completedTasks}/{totalTasks}
-                </p>
+          <div className='bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow'>
+            <div className='flex items-center justify-between'>
+              <div className='flex items-center gap-3'>
+                <div className='w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center'>
+                  <RiPlayLine className='text-white text-lg' />
+                </div>
+                <div>
+                  <div className='text-2xl font-bold text-gray-900'>
+                    {completedTasks}/{totalTasks}
+                  </div>
+                  <div className='text-xs text-gray-500'>Görevler</div>
+                </div>
               </div>
-              <div className='p-2 bg-green-100 rounded-lg'>
-                <RiPlayLine className='w-5 h-5 text-green-600' />
-              </div>
-            </div>
-            <div className='text-xs text-gray-500'>
-              {totalTasks > 0
-                ? Math.round((completedTasks / totalTasks) * 100)
-                : 0}
-              % tamamlandı
             </div>
           </div>
 
           {/* Sub Projects */}
-          <div className='bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow'>
-            <div className='flex items-center justify-between mb-2'>
-              <div>
-                <p className='text-sm font-medium text-gray-600'>
-                  Alt Projeler
-                </p>
-                <p className='text-xl font-bold text-gray-900'>
-                  {completedSubProjects}/{totalSubProjects}
-                </p>
+          <div className='bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow'>
+            <div className='flex items-center justify-between'>
+              <div className='flex items-center gap-3'>
+                <div className='w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center'>
+                  <RiFolderLine className='text-white text-lg' />
+                </div>
+                <div>
+                  <div className='text-2xl font-bold text-gray-900'>
+                    {completedSubProjects}/{totalSubProjects}
+                  </div>
+                  <div className='text-xs text-gray-500'>Alt Projeler</div>
+                </div>
               </div>
-              <div className='p-2 bg-purple-100 rounded-lg'>
-                <RiFolderLine className='w-5 h-5 text-purple-600' />
-              </div>
-            </div>
-            <div className='text-xs text-gray-500'>
-              {totalSubProjects > 0
-                ? Math.round((completedSubProjects / totalSubProjects) * 100)
-                : 0}
-              % tamamlandı
             </div>
           </div>
 
           {/* Overdue Tasks */}
-          <div className='bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow'>
-            <div className='flex items-center justify-between mb-2'>
-              <div>
-                <p className='text-sm font-medium text-gray-600'>
-                  Geciken Görevler
-                </p>
-                <p className='text-xl font-bold text-red-600'>{overdueTasks}</p>
+          <div className='bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow'>
+            <div className='flex items-center justify-between'>
+              <div className='flex items-center gap-3'>
+                <div className='w-10 h-10 bg-gradient-to-br from-red-500 to-red-600 rounded-lg flex items-center justify-center'>
+                  <RiTimeLine className='text-white text-lg' />
+                </div>
+                <div>
+                  <div className='text-2xl font-bold text-red-600'>{overdueTasks}</div>
+                  <div className='text-xs text-gray-500'>Geciken</div>
+                </div>
               </div>
-              <div className='p-2 bg-red-100 rounded-lg'>
-                <RiTimeLine className='w-5 h-5 text-red-600' />
-              </div>
-            </div>
-            <div className='text-xs text-gray-500'>
-              {overdueTasks > 0 ? 'Dikkat gerekli' : 'Gecikme yok'}
             </div>
           </div>
         </div>
 
-        {/* Project Info */}
-        <div className='bg-white rounded-lg shadow-sm border border-gray-200 p-4'>
-          <h3 className='text-lg font-semibold text-gray-900 mb-3'>
-            Proje Bilgileri
-          </h3>
-          <div className='grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm'>
-            <div>
+        {/* Compact Project Info */}
+        <div className='bg-white rounded-xl shadow-sm border border-gray-100 p-4'>
+          <div className='grid grid-cols-2 md:grid-cols-4 gap-4 text-sm'>
+            <div className='flex items-center gap-2'>
               <span className='text-gray-600'>Durum:</span>
               <span
-                className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(project?.status || 'planning')}`}
+                className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(project?.status || 'planning')}`}
               >
                 {project?.status === 'active'
                   ? 'Aktif'
                   : project?.status || 'Planlama'}
               </span>
             </div>
-            <div>
+            <div className='flex items-center gap-2'>
               <span className='text-gray-600'>Firma:</span>
-              <span className='ml-2 font-medium text-gray-900'>
+              <span className='font-medium text-gray-900'>
                 {project?.companies?.name || 'N/A'}
               </span>
             </div>
-            <div>
+            <div className='flex items-center gap-2'>
               <span className='text-gray-600'>Başlangıç:</span>
-              <span className='ml-2 font-medium text-gray-900'>
+              <span className='font-medium text-gray-900'>
                 {project?.startDate
                   ? new Date(project.startDate).toLocaleDateString('tr-TR')
                   : 'N/A'}
               </span>
             </div>
-            <div>
+            <div className='flex items-center gap-2'>
               <span className='text-gray-600'>Bitiş:</span>
-              <span className='ml-2 font-medium text-gray-900'>
+              <span className='font-medium text-gray-900'>
                 {project?.endDate
                   ? new Date(project.endDate).toLocaleDateString('tr-TR')
                   : 'N/A'}
               </span>
             </div>
-            <div>
-              <span className='text-gray-600'>İlerleme:</span>
-              <span className='ml-2 font-medium text-gray-900'>
-                {project?.progressPercentage || project?.progress || 0}%
-              </span>
-            </div>
           </div>
 
-          {/* Ana Proje Progress Bar */}
+          {/* Progress Bar */}
           <div className='mt-4'>
-            <div className='flex justify-between text-sm mb-1'>
+            <div className='flex justify-between text-sm mb-2'>
               <span className='text-gray-600'>Proje İlerlemesi</span>
               <span className='font-medium text-gray-900'>
                 {project?.progressPercentage || project?.progress || 0}%
               </span>
             </div>
-            <div className='w-full bg-gray-200 rounded-full h-3'>
+            <div className='w-full bg-gray-200 rounded-full h-2'>
               <div
-                className={`h-3 rounded-full transition-all duration-500 ${
+                className={`h-2 rounded-full transition-all duration-500 ${
                   (project?.progressPercentage || project?.progress || 0) >= 80
                     ? 'bg-gradient-to-r from-green-500 to-green-600'
                     : (project?.progressPercentage || project?.progress || 0) >=
@@ -494,21 +439,18 @@ export default function ProjectDetailPage() {
           </div>
         </div>
 
-        {/* Filters */}
-        <div className='bg-white rounded-lg shadow-sm border border-gray-200 p-4'>
-          <h3 className='text-lg font-semibold text-gray-900 mb-3'>
-            Filtreler
-          </h3>
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+        {/* Compact Filters */}
+        <div className='bg-white rounded-xl shadow-sm border border-gray-100 p-4'>
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
             {/* Search */}
             <div className='relative'>
-              <RiSearchLine className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4' />
+              <RiSearchLine className='absolute left-3 top-1/2 -translate-y-1/2 text-gray-400' />
               <input
                 type='text'
                 placeholder='Alt proje ara...'
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
-                className='w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+                className='w-full pl-10 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
               />
             </div>
 
@@ -517,7 +459,7 @@ export default function ProjectDetailPage() {
               <select
                 value={selectedSubProject || ''}
                 onChange={e => setSelectedSubProject(e.target.value || null)}
-                className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+                className='w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none bg-white'
               >
                 <option value=''>Tüm Alt Projeler</option>
                 {subProjects.map(subProject => (
@@ -530,22 +472,22 @@ export default function ProjectDetailPage() {
           </div>
         </div>
 
-        {/* Sub Projects */}
-        <div className='bg-white rounded-lg shadow-sm border border-gray-200'>
-          <div className='p-4 border-b border-gray-200'>
+        {/* Compact Sub Projects */}
+        <div className='bg-white rounded-xl shadow-sm border border-gray-100'>
+          <div className='p-4 border-b border-gray-100'>
             <h3 className='text-lg font-semibold text-gray-900 flex items-center gap-2'>
               <RiFolderLine className='w-5 h-5 text-blue-600' />
               Alt Projeler ({filteredSubProjects.length})
             </h3>
           </div>
-          <div className='p-4 space-y-4'>
+          <div className='p-4 space-y-3'>
             {filteredSubProjects.map(subProject => (
               <div
                 key={subProject.id}
-                className='bg-gray-50 rounded-lg border border-gray-200 p-4 hover:bg-gray-100 transition-colors'
+                className='bg-gray-50 rounded-xl border border-gray-200 p-4 hover:bg-gray-100 transition-colors'
               >
                 <div className='flex items-center justify-between mb-3'>
-                  <h4 className='font-semibold text-gray-900 text-lg'>
+                  <h4 className='font-semibold text-gray-900 text-base'>
                     {subProject.name}
                   </h4>
                   <span
@@ -561,13 +503,13 @@ export default function ProjectDetailPage() {
                 <div className='grid grid-cols-1 md:grid-cols-3 gap-3 text-sm mb-3'>
                   <div>
                     <span className='text-gray-600'>Açıklama:</span>
-                    <p className='font-medium text-gray-900 mt-1'>
+                    <p className='font-medium text-gray-900 mt-1 text-xs'>
                       {subProject.description || 'Açıklama yok'}
                     </p>
                   </div>
                   <div>
                     <span className='text-gray-600'>Başlangıç:</span>
-                    <p className='font-medium text-gray-900 mt-1'>
+                    <p className='font-medium text-gray-900 mt-1 text-xs'>
                       {subProject.startDate
                         ? new Date(subProject.startDate).toLocaleDateString(
                             'tr-TR'
@@ -577,7 +519,7 @@ export default function ProjectDetailPage() {
                   </div>
                   <div>
                     <span className='text-gray-600'>Bitiş:</span>
-                    <p className='font-medium text-gray-900 mt-1'>
+                    <p className='font-medium text-gray-900 mt-1 text-xs'>
                       {subProject.endDate
                         ? new Date(subProject.endDate).toLocaleDateString(
                             'tr-TR'
@@ -589,7 +531,7 @@ export default function ProjectDetailPage() {
 
                 {/* Progress Bar */}
                 <div className='mb-3'>
-                  <div className='flex justify-between text-sm mb-1'>
+                  <div className='flex justify-between text-xs mb-1'>
                     <span className='text-gray-600'>İlerleme</span>
                     <span className='font-medium text-gray-900'>
                       {(() => {
@@ -597,24 +539,14 @@ export default function ProjectDetailPage() {
                           subProject.progress_percentage ||
                           subProject.progress ||
                           0;
-                        console.log(
-                          '🔍 Frontend - Sub-project progress render:',
-                          {
-                            subProjectId: subProject.id,
-                            subProjectName: subProject.name,
-                            progress_percentage: subProject.progress_percentage,
-                            progress: subProject.progress,
-                            finalProgress: progress,
-                          }
-                        );
                         return progress;
                       })()}
                       %
                     </span>
                   </div>
-                  <div className='w-full bg-gray-200 rounded-full h-2'>
+                  <div className='w-full bg-gray-200 rounded-full h-1.5'>
                     <div
-                      className={`h-2 rounded-full transition-all duration-300 ${
+                      className={`h-1.5 rounded-full transition-all duration-300 ${
                         (subProject.progress_percentage ||
                           subProject.progress ||
                           0) >= 80
@@ -637,12 +569,12 @@ export default function ProjectDetailPage() {
                 </div>
 
                 {/* Tasks for this sub-project */}
-                <div className='mt-4'>
+                <div className='mt-3'>
                   <button
                     onClick={() => toggleSubProject(subProject.id)}
                     className='flex items-center justify-between w-full p-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors'
                   >
-                    <h5 className='font-medium text-gray-700'>
+                    <h5 className='font-medium text-gray-700 text-sm'>
                       Görevler (
                       {
                         tasks.filter(
@@ -661,35 +593,35 @@ export default function ProjectDetailPage() {
                   </button>
 
                   {expandedSubProjects.has(subProject.id) && (
-                    <div className='mt-3 space-y-3'>
+                    <div className='mt-3 space-y-2'>
                       {tasks
                         .filter(task => task.subProject.id === subProject.id)
                         .map(task => (
                           <div
                             key={task.id}
-                            className='bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden'
+                            className='bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden'
                           >
                             {/* Task Header */}
-                            <div className='p-4 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white'>
+                            <div className='p-3 border-b border-gray-100 bg-gray-50'>
                               <div className='flex items-start justify-between'>
                                 <div className='flex-1 min-w-0'>
-                                  <h6 className='font-semibold text-gray-900 text-base mb-1 leading-tight'>
+                                  <h6 className='font-semibold text-gray-900 text-sm mb-1 leading-tight'>
                                     {task.title}
                                   </h6>
                                   {task.description && (
-                                    <p className='text-sm text-gray-600 leading-relaxed line-clamp-2'>
+                                    <p className='text-xs text-gray-600 leading-relaxed line-clamp-2'>
                                       {task.description}
                                     </p>
                                   )}
                                 </div>
                                 <div className='flex items-center gap-2 ml-3'>
                                   <span
-                                    className={`px-2.5 py-1 rounded-full text-xs font-semibold shadow-sm ${getPriorityColor(task.priority)}`}
+                                    className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(task.priority)}`}
                                   >
                                     {task.priority}
                                   </span>
                                   <span
-                                    className={`px-2.5 py-1 rounded-full text-xs font-semibold shadow-sm ${getStatusColor(task.status)}`}
+                                    className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(task.status)}`}
                                   >
                                     {task.status === 'completed'
                                       ? 'Tamamlandı'
@@ -702,18 +634,18 @@ export default function ProjectDetailPage() {
                             </div>
 
                             {/* Task Content */}
-                            <div className='p-4'>
+                            <div className='p-3'>
                               {/* Timeline Section */}
                               {(task.start_date || task.due_date) && (
-                                <div className='mb-4'>
-                                  <div className='flex items-center gap-3 flex-wrap'>
+                                <div className='mb-3'>
+                                  <div className='flex items-center gap-2 flex-wrap'>
                                     {task.start_date && (
                                       <div className='flex items-center gap-2'>
-                                        <div className='flex items-center gap-2 px-3 py-2 bg-blue-50 rounded-lg border border-blue-200'>
-                                          <div className='w-2 h-2 bg-blue-500 rounded-full'></div>
-                                          <RiCalendarLine className='w-4 h-4 text-blue-600' />
-                                          <div className='text-sm'>
-                                            <div className='text-xs text-blue-600 font-medium uppercase tracking-wide'>
+                                        <div className='flex items-center gap-2 px-2 py-1 bg-blue-50 rounded-lg border border-blue-200'>
+                                          <div className='w-1.5 h-1.5 bg-blue-500 rounded-full'></div>
+                                          <RiCalendarLine className='w-3 h-3 text-blue-600' />
+                                          <div className='text-xs'>
+                                            <div className='text-xs text-blue-600 font-medium'>
                                               Başlangıç
                                             </div>
                                             <div className='font-semibold text-blue-800'>
@@ -729,7 +661,7 @@ export default function ProjectDetailPage() {
                                     {task.due_date && (
                                       <div className='flex items-center gap-2'>
                                         <div
-                                          className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${
+                                          className={`flex items-center gap-2 px-2 py-1 rounded-lg border ${
                                             new Date(task.due_date) <
                                               new Date() &&
                                             task.status !== 'completed'
@@ -738,7 +670,7 @@ export default function ProjectDetailPage() {
                                           }`}
                                         >
                                           <div
-                                            className={`w-2 h-2 rounded-full ${
+                                            className={`w-1.5 h-1.5 rounded-full ${
                                               new Date(task.due_date) <
                                                 new Date() &&
                                               task.status !== 'completed'
@@ -747,7 +679,7 @@ export default function ProjectDetailPage() {
                                             }`}
                                           ></div>
                                           <RiTimeLine
-                                            className={`w-4 h-4 ${
+                                            className={`w-3 h-3 ${
                                               new Date(task.due_date) <
                                                 new Date() &&
                                               task.status !== 'completed'
@@ -755,9 +687,9 @@ export default function ProjectDetailPage() {
                                                 : 'text-green-600'
                                             }`}
                                           />
-                                          <div className='text-sm'>
+                                          <div className='text-xs'>
                                             <div
-                                              className={`text-xs font-medium uppercase tracking-wide ${
+                                              className={`text-xs font-medium ${
                                                 new Date(task.due_date) <
                                                   new Date() &&
                                                 task.status !== 'completed'
@@ -793,10 +725,10 @@ export default function ProjectDetailPage() {
                                       ) && (
                                         <div className='flex items-center gap-2'>
                                           <div
-                                            className={`flex items-center gap-2 px-3 py-2 rounded-lg border shadow-sm ${getRemainingTimeDisplay(task.due_date, task.status)?.className}`}
+                                            className={`flex items-center gap-2 px-2 py-1 rounded-lg border ${getRemainingTimeDisplay(task.due_date, task.status)?.className}`}
                                           >
                                             <div
-                                              className={`w-2 h-2 rounded-full ${
+                                              className={`w-1.5 h-1.5 rounded-full ${
                                                 getRemainingTimeDisplay(
                                                   task.due_date,
                                                   task.status
@@ -819,9 +751,9 @@ export default function ProjectDetailPage() {
                                                       : 'bg-green-500'
                                               }`}
                                             ></div>
-                                            <RiTimeLine className='w-4 h-4' />
-                                            <div className='text-sm'>
-                                              <div className='text-xs font-medium uppercase tracking-wide'>
+                                            <RiTimeLine className='w-3 h-3' />
+                                            <div className='text-xs'>
+                                              <div className='text-xs font-medium'>
                                                 Kalan
                                               </div>
                                               <div className='font-bold'>
@@ -841,21 +773,21 @@ export default function ProjectDetailPage() {
                               )}
 
                               {/* Action Section */}
-                              <div className='flex items-center justify-end pt-3 border-t border-gray-100'>
+                              <div className='flex items-center justify-end pt-2 border-t border-gray-100'>
                                 {task.status === 'completed' && (
-                                  <div className='flex items-center gap-2 px-4 py-2 bg-green-100 text-green-800 rounded-lg border border-green-200'>
-                                    <div className='w-2 h-2 bg-green-500 rounded-full'></div>
-                                    <RiPlayLine className='w-4 h-4' />
-                                    <span className='font-medium text-sm'>
+                                  <div className='flex items-center gap-2 px-3 py-1.5 bg-green-100 text-green-800 rounded-lg border border-green-200'>
+                                    <div className='w-1.5 h-1.5 bg-green-500 rounded-full'></div>
+                                    <RiPlayLine className='w-3 h-3' />
+                                    <span className='font-medium text-xs'>
                                       Tamamlandı
                                     </span>
                                   </div>
                                 )}
                                 {task.status === 'Onaya Gönderildi' && (
-                                  <div className='flex items-center gap-2 px-4 py-2 bg-orange-100 text-orange-800 rounded-lg border border-orange-200'>
-                                    <div className='w-2 h-2 bg-orange-500 rounded-full'></div>
-                                    <RiPlayLine className='w-4 h-4' />
-                                    <span className='font-medium text-sm'>
+                                  <div className='flex items-center gap-2 px-3 py-1.5 bg-orange-100 text-orange-800 rounded-lg border border-orange-200'>
+                                    <div className='w-1.5 h-1.5 bg-orange-500 rounded-full'></div>
+                                    <RiPlayLine className='w-3 h-3' />
+                                    <span className='font-medium text-xs'>
                                       Onaya Gönderildi
                                     </span>
                                   </div>
@@ -864,17 +796,17 @@ export default function ProjectDetailPage() {
                                   <div className='flex items-center justify-between w-full'>
                                     {/* Approval Note - Sol taraf */}
                                     {task.approval_note && (
-                                      <div className='flex-1 mr-4'>
-                                        <div className='bg-blue-50 border border-blue-200 rounded-lg p-3'>
+                                      <div className='flex-1 mr-3'>
+                                        <div className='bg-blue-50 border border-blue-200 rounded-lg p-2'>
                                           <div className='flex items-start gap-2'>
                                             <div className='flex-shrink-0 mt-0.5'>
-                                              <RiMessage3Line className='w-4 h-4 text-blue-600' />
+                                              <RiMessage3Line className='w-3 h-3 text-blue-600' />
                                             </div>
                                             <div className='flex-1'>
                                               <p className='text-xs font-medium text-blue-800 mb-1'>
                                                 Admin Notu:
                                               </p>
-                                              <p className='text-sm text-blue-700 leading-relaxed'>
+                                              <p className='text-xs text-blue-700 leading-relaxed'>
                                                 {task.approval_note}
                                               </p>
                                             </div>
@@ -884,10 +816,10 @@ export default function ProjectDetailPage() {
                                     )}
 
                                     {/* Tamamlandı Badge - Sağ taraf */}
-                                    <div className='flex items-center gap-2 px-4 py-2 bg-green-100 text-green-800 rounded-lg border border-green-200 flex-shrink-0'>
-                                      <div className='w-2 h-2 bg-green-500 rounded-full'></div>
-                                      <RiCheckboxCircleLine className='w-4 h-4' />
-                                      <span className='font-medium text-sm'>
+                                    <div className='flex items-center gap-2 px-3 py-1.5 bg-green-100 text-green-800 rounded-lg border border-green-200 flex-shrink-0'>
+                                      <div className='w-1.5 h-1.5 bg-green-500 rounded-full'></div>
+                                      <RiCheckboxCircleLine className='w-3 h-3' />
+                                      <span className='font-medium text-xs'>
                                         Tamamlandı
                                       </span>
                                     </div>
@@ -901,10 +833,10 @@ export default function ProjectDetailPage() {
                                         setSelectedTask(task);
                                         setShowTaskModal(true);
                                       }}
-                                      className='px-4 py-2 bg-gradient-to-r from-gray-500 to-gray-600 text-white text-sm font-semibold rounded-lg hover:from-gray-600 hover:to-gray-700 transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5'
+                                      className='px-3 py-1.5 bg-gray-500 text-white text-xs font-medium rounded-lg hover:bg-gray-600 transition-all duration-200 shadow-sm hover:shadow-md'
                                     >
-                                      <div className='flex items-center gap-2'>
-                                        <RiTimeLine className='w-4 h-4' />
+                                      <div className='flex items-center gap-1.5'>
+                                        <RiTimeLine className='w-3 h-3' />
                                         Bekliyor
                                       </div>
                                     </button>
