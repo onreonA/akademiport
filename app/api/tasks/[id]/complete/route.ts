@@ -1,30 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { createClient } from '@/lib/supabase/server';
+import { requireAuth, createAuthErrorResponse } from '@/lib/jwt-utils';
+
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // JWT Authentication
+    const user = await requireAuth(request);
+    
     const supabase = createClient();
     const { id: taskId } = await params;
-    // Get user info from cookies
-    const userEmail = request.cookies.get('auth-user-email')?.value;
-    const userRole = request.cookies.get('auth-user-role')?.value;
-    const userCompanyId = request.cookies.get('auth-user-company-id')?.value;
-    if (!userEmail || !userRole) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
-    }
     const body = await request.json();
     const { completionNotes, files } = body;
     // Get the current user
     const { data: currentUser, error: userError } = await supabase
       .from('users')
       .select('id, company_id')
-      .eq('email', userEmail)
+      .eq('email', user.email)
       .single();
     if (userError || !currentUser) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
@@ -51,13 +46,13 @@ export async function POST(
       return NextResponse.json({ error: 'Task not found' }, { status: 404 });
     }
     // Check if user has permission to complete this task
-    // Temporarily disabled for testing
-    // if (
-    //   ['firma_admin', 'firma_kullanıcı'].includes(userRole) &&
-    //   task.sub_projects.projects.company_id !== currentUser.company_id
-    // ) {
-    //   return NextResponse.json({ error: 'Access denied' }, { status: 403 });
-    // }
+    const companyRoles = ['firma_admin', 'firma_kullanici'];
+    if (
+      companyRoles.includes(user.role) &&
+      task.sub_projects.projects.company_id !== user.company_id
+    ) {
+      return createAuthErrorResponse('Access denied', 403);
+    }
     // Update task status to completed
     const { data: updatedTask, error: updateError } = await supabase
       .from('tasks')
@@ -108,7 +103,12 @@ export async function POST(
       task: updatedTask,
       message: 'Task completed successfully and sent for approval',
     });
-  } catch (error) {
+  } catch (error: any) {
+    // Handle authentication errors specifically
+    if (error.message === 'Authentication required') {
+      return createAuthErrorResponse(error.message, 401);
+    }
+    
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
