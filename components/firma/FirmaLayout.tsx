@@ -229,10 +229,9 @@ export default function FirmaLayout({
         className={`
                 fixed top-16 left-0 h-[calc(100vh-4rem)] z-60 transition-all duration-300 ease-in-out
                 ${sidebarCollapsed ? 'w-16' : 'w-52'}
-                bg-white shadow-xl border-r border-gray-200
+                bg-white/60 backdrop-blur-sm shadow-xl border-r border-white/30
                 hidden md:block sidebar-fix
               `}
-        style={{ backgroundColor: 'white' }}
         onMouseEnter={handleSidebarMouseEnter}
         onMouseLeave={handleSidebarMouseLeave}
       >
@@ -247,11 +246,10 @@ export default function FirmaLayout({
         className={`
           fixed top-16 left-0 h-[calc(100vh-4rem)] z-50 transition-all duration-300 ease-in-out
           w-52
-          bg-white shadow-xl rounded-tr-2xl border-r border-gray-200
+          bg-white/60 backdrop-blur-sm shadow-xl rounded-tr-lg border-r border-white/30
           md:hidden
           ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
         `}
-        style={{ backgroundColor: 'white' }}
       >
         <AnimatedSidebar
           collapsed={false}
