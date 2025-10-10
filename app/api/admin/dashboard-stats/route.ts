@@ -1,23 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { cacheKeys, cacheUtils } from '@/lib/cache/redis-cache';
-// import { getCurrentUser } from '@/lib/auth-service'; // Commented out
+import { requireAdmin, createAuthErrorResponse } from '@/lib/jwt-utils';
 // GET /api/admin/dashboard-stats - Get real dashboard statistics
 export async function GET(request: NextRequest) {
   try {
-    // SECURITY: Check authentication and authorization
-    // Cookie'lerden kullanıcı bilgilerini oku
-    const userEmail = request.cookies.get('auth-user-email')?.value;
-    const userRole = request.cookies.get('auth-user-role')?.value;
-    if (!userEmail || !userRole) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-    if (!['admin', 'consultant', 'master_admin'].includes(userRole)) {
-      return NextResponse.json(
-        { error: 'Admin access required' },
-        { status: 403 }
-      );
-    }
+    // JWT Authentication - Admin users only
+    const user = await requireAdmin(request);
     // OPTIMIZED: Check cache first
     const cacheKey = cacheKeys.adminStats();
     const cachedData = cacheUtils.get(cacheKey);
@@ -97,7 +86,13 @@ export async function GET(request: NextRequest) {
     // Cache the response
     cacheUtils.set(cacheKey, response, 5 * 60 * 1000); // 5 minutes cache
     return NextResponse.json(response);
-  } catch (error) {
+  } catch (error: any) {
+    // Handle authentication errors specifically
+    if (error.message === 'Authentication required' || 
+        error.message === 'Admin access required') {
+      return createAuthErrorResponse(error.message, 401);
+    }
+    
     return NextResponse.json(
       { error: 'Failed to fetch dashboard statistics' },
       { status: 500 }

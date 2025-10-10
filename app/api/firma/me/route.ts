@@ -1,20 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { createClient } from '@/lib/supabase/server';
+import { requireCompany, createAuthErrorResponse } from '@/lib/jwt-utils';
 // GET /api/firma/me - Get current firm's data
 export async function GET(request: NextRequest) {
   try {
+    // JWT Authentication - Company users only
+    const user = await requireCompany(request);
+    
     const supabase = createClient();
-    // Get user email from X-User-Email header (for custom auth)
-    const userEmail = request.headers.get('x-user-email');
-    if (!userEmail) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
     // Find company by email
     let { data: company, error: companyError } = await supabase
       .from('companies')
       .select('*')
-      .eq('email', userEmail)
+      .eq('email', user.email)
       .single();
     // Eğer companies tablosunda bulunamazsa, company_users tablosundan ana firmayı bul
     if (companyError && companyError.code === 'PGRST116') {
@@ -26,7 +25,7 @@ export async function GET(request: NextRequest) {
           companies (*)
         `
         )
-        .eq('email', userEmail)
+        .eq('email', user.email)
         .single();
       if (userCompanyError) {
         return NextResponse.json(
@@ -100,7 +99,13 @@ export async function PUT(request: NextRequest) {
       success: true,
       data: updatedCompany,
     });
-  } catch (error) {
+  } catch (error: any) {
+    // Handle authentication errors specifically
+    if (error.message === 'Authentication required' || 
+        error.message === 'Company access required') {
+      return createAuthErrorResponse(error.message, 401);
+    }
+    
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

@@ -1,5 +1,5 @@
-import jwt from 'jsonwebtoken';
-import { NextRequest } from 'next/server';
+import { jwtVerify } from 'jose';
+import { NextRequest, NextResponse } from 'next/server';
 
 export interface JWTUser {
   id: string;
@@ -9,10 +9,14 @@ export interface JWTUser {
   exp: number;
 }
 
+const JWT_SECRET = new TextEncoder().encode(
+  process.env.JWT_SECRET || 'your-secret-key-change-in-production'
+);
+
 /**
  * JWT token'dan kullanıcı bilgilerini çıkar
  */
-export function verifyJWTToken(request: NextRequest): JWTUser | null {
+export async function verifyJWTToken(request: NextRequest): Promise<JWTUser | null> {
   try {
     const authToken = request.cookies.get('auth-token')?.value;
     
@@ -20,10 +24,8 @@ export function verifyJWTToken(request: NextRequest): JWTUser | null {
       return null;
     }
 
-    const decoded = jwt.verify(
-      authToken, 
-      process.env.JWT_SECRET || 'your-secret-key-change-in-production'
-    ) as JWTUser;
+    const { payload } = await jwtVerify(authToken, JWT_SECRET);
+    const decoded = payload as JWTUser;
 
     // Token süresi kontrolü
     if (decoded.exp && decoded.exp < Math.floor(Date.now() / 1000)) {
@@ -39,8 +41,8 @@ export function verifyJWTToken(request: NextRequest): JWTUser | null {
 /**
  * API route'ları için authentication middleware
  */
-export function requireAuth(request: NextRequest): JWTUser {
-  const user = verifyJWTToken(request);
+export async function requireAuth(request: NextRequest): Promise<JWTUser> {
+  const user = await verifyJWTToken(request);
   
   if (!user) {
     throw new Error('Authentication required');
@@ -52,8 +54,8 @@ export function requireAuth(request: NextRequest): JWTUser {
 /**
  * Admin yetkisi kontrolü
  */
-export function requireAdmin(request: NextRequest): JWTUser {
-  const user = requireAuth(request);
+export async function requireAdmin(request: NextRequest): Promise<JWTUser> {
+  const user = await requireAuth(request);
   
   const adminRoles = ['admin', 'master_admin', 'danisman'];
   if (!adminRoles.includes(user.role)) {
@@ -66,12 +68,45 @@ export function requireAdmin(request: NextRequest): JWTUser {
 /**
  * Company yetkisi kontrolü
  */
-export function requireCompany(request: NextRequest): JWTUser {
-  const user = requireAuth(request);
+export async function requireCompany(request: NextRequest): Promise<JWTUser> {
+  const user = await requireAuth(request);
   
   const companyRoles = ['firma_admin', 'firma_kullanici'];
   if (!companyRoles.includes(user.role)) {
     throw new Error('Company access required');
+  }
+  
+  return user;
+}
+
+/**
+ * API route'ları için güvenli error handling
+ */
+export function createAuthErrorResponse(error: string, status: number = 401) {
+  return NextResponse.json(
+    { error, success: false },
+    { status }
+  );
+}
+
+/**
+ * Company kullanıcısının belirli bir company_id'ye erişimi var mı kontrol et
+ */
+export async function requireCompanyAccess(
+  request: NextRequest, 
+  targetCompanyId?: string
+): Promise<JWTUser> {
+  const user = await requireCompany(request);
+  
+  // Admin kullanıcılar tüm company'lere erişebilir
+  const adminRoles = ['admin', 'master_admin', 'danisman'];
+  if (adminRoles.includes(user.role)) {
+    return user;
+  }
+  
+  // Company kullanıcısı sadece kendi company'sine erişebilir
+  if (targetCompanyId && user.company_id !== targetCompanyId) {
+    throw new Error('Company access denied');
   }
   
   return user;
