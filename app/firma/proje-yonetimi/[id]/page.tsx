@@ -222,21 +222,7 @@ export default function ProjectDetailPage() {
   ).length;
   const totalSubProjects = subProjects.length;
 
-  console.log('Sub project stats:', {
-    totalSubProjects,
-    completedSubProjects,
-    subProjects: subProjects.map(sp => ({
-      id: sp.id,
-      name: sp.name,
-      status: sp.status,
-      progress_percentage: sp.progress_percentage,
-      progress: sp.progress,
-      isCompleted:
-        sp.status === 'Tamamlandı' ||
-        sp.status === 'completed' ||
-        (sp.progress_percentage || sp.progress || 0) >= 100,
-    })),
-  });
+  // Removed console.log to prevent infinite loop
   const overdueTasks = tasks.filter(
     task => new Date(task.due_date) < new Date() && task.status !== 'Tamamlandı'
   ).length;
@@ -291,9 +277,7 @@ export default function ProjectDetailPage() {
                 <h1 className='text-2xl font-bold text-white mb-1'>
                   {project?.name}
                 </h1>
-                <p className='text-blue-100 text-sm'>
-                  {project?.description}
-                </p>
+                <p className='text-blue-100 text-sm'>{project?.description}</p>
               </div>
             </div>
             <div className='text-right'>
@@ -366,7 +350,9 @@ export default function ProjectDetailPage() {
                   <RiTimeLine className='text-white text-lg' />
                 </div>
                 <div>
-                  <div className='text-2xl font-bold text-red-600'>{overdueTasks}</div>
+                  <div className='text-2xl font-bold text-red-600'>
+                    {overdueTasks}
+                  </div>
                   <div className='text-xs text-gray-500'>Geciken</div>
                 </div>
               </div>
@@ -496,7 +482,7 @@ export default function ProjectDetailPage() {
                       <span className='text-white font-bold text-sm'>U</span>
                     </div>
                   </div>
-                  
+
                   {/* Content */}
                   <div className='flex-1 min-w-0'>
                     <div className='flex items-center gap-2 mb-2'>
@@ -504,26 +490,33 @@ export default function ProjectDetailPage() {
                         {subProject.name}
                       </span>
                       <span className='text-gray-500 text-sm'>
-                        {new Date(subProject.startDate || Date.now()).toLocaleDateString('tr-TR')}
+                        {new Date(
+                          subProject.startDate || Date.now()
+                        ).toLocaleDateString('tr-TR')}
                       </span>
                     </div>
-                    
+
                     {subProject.description && (
                       <p className='text-gray-700 leading-relaxed mb-3'>
                         {subProject.description}
                       </p>
                     )}
-                    
+
                     {/* Status and Priority Badges */}
                     <div className='flex items-center gap-2 mb-3'>
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(subProject.status)}`}
                       >
-                        {subProject.status === 'active' ? 'Aktif' : subProject.status}
+                        {subProject.status === 'active'
+                          ? 'Aktif'
+                          : subProject.status}
                       </span>
                       <span className='px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800'>
                         {(() => {
-                          const progress = subProject.progress_percentage || subProject.progress || 0;
+                          const progress =
+                            subProject.progress_percentage ||
+                            subProject.progress ||
+                            0;
                           return `${progress}% Tamamlandı`;
                         })()}
                       </span>
@@ -534,11 +527,17 @@ export default function ProjectDetailPage() {
                       <div className='w-full bg-gray-200 rounded-full h-2'>
                         <div
                           className={`h-2 rounded-full transition-all duration-300 ${
-                            (subProject.progress_percentage || subProject.progress || 0) >= 80
+                            (subProject.progress_percentage ||
+                              subProject.progress ||
+                              0) >= 80
                               ? 'bg-green-500'
-                              : (subProject.progress_percentage || subProject.progress || 0) >= 50
+                              : (subProject.progress_percentage ||
+                                    subProject.progress ||
+                                    0) >= 50
                                 ? 'bg-yellow-500'
-                                : (subProject.progress_percentage || subProject.progress || 0) >= 20
+                                : (subProject.progress_percentage ||
+                                      subProject.progress ||
+                                      0) >= 20
                                   ? 'bg-orange-500'
                                   : 'bg-red-500'
                           }`}
@@ -549,7 +548,7 @@ export default function ProjectDetailPage() {
                       </div>
                     </div>
                   </div>
-                  
+
                   {/* Post Number and Expand Button */}
                   <div className='flex-shrink-0 flex items-center gap-3'>
                     <span className='text-gray-400 text-sm font-medium'>
@@ -607,10 +606,12 @@ export default function ProjectDetailPage() {
                                 {/* Avatar */}
                                 <div className='flex-shrink-0'>
                                   <div className='w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-sm'>
-                                    <span className='text-white font-bold text-sm'>M</span>
+                                    <span className='text-white font-bold text-sm'>
+                                      M
+                                    </span>
                                   </div>
                                 </div>
-                                
+
                                 {/* Content */}
                                 <div className='flex-1 min-w-0'>
                                   <div className='flex items-center gap-2 mb-2'>
@@ -618,7 +619,9 @@ export default function ProjectDetailPage() {
                                       {task.assigned_to || 'Atanmamış'}
                                     </span>
                                     <span className='text-gray-500 text-sm'>
-                                      {new Date(task.start_date || Date.now()).toLocaleDateString('tr-TR')}
+                                      {new Date(
+                                        task.start_date || Date.now()
+                                      ).toLocaleDateString('tr-TR')}
                                     </span>
                                   </div>
                                   <h6 className='font-semibold text-gray-900 text-base mb-2 leading-tight'>
@@ -629,7 +632,7 @@ export default function ProjectDetailPage() {
                                       {task.description}
                                     </p>
                                   )}
-                                  
+
                                   {/* Status and Priority Badges */}
                                   <div className='flex items-center gap-2 mb-3'>
                                     <span
@@ -648,7 +651,7 @@ export default function ProjectDetailPage() {
                                     </span>
                                   </div>
                                 </div>
-                                
+
                                 {/* Post Number */}
                                 <div className='flex-shrink-0'>
                                   <span className='text-gray-400 text-sm font-medium'>

@@ -14,29 +14,13 @@ export async function POST(
     const supabase = createClient();
     const { id: taskId } = await params;
 
-    // Kullanıcı kimlik doğrulama
-    const userEmail = request.cookies.get('auth-user-email')?.value;
-    const userRole = request.cookies.get('auth-user-role')?.value;
+    // Kullanıcı kimlik doğrulama - Header'dan X-User-Email al
+    const userEmail = request.headers.get('X-User-Email');
 
     if (!userEmail) {
       return NextResponse.json(
         { error: 'Kullanıcı kimlik doğrulaması gerekli' },
         { status: 401 }
-      );
-    }
-
-    // Firma kullanıcısı kontrolü
-    const COMPANY_ROLES = [
-      'user',
-      'operator',
-      'manager',
-      'firma_admin',
-      'firma_kullanıcı',
-    ];
-    if (!COMPANY_ROLES.includes(userRole || '')) {
-      return NextResponse.json(
-        { error: 'Bu işlem için firma kullanıcısı yetkisi gerekli' },
-        { status: 403 }
       );
     }
 

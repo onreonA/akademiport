@@ -57,15 +57,21 @@ export default function TaskCompletionModal({
           description: `Uploaded file: ${file.name}`,
         });
       }
+      // Get user email from auth store
+      const userEmail =
+        typeof window !== 'undefined'
+          ? localStorage.getItem('auth-user-email')
+          : null;
+
       const response = await fetch(`/api/firma/tasks/${task.id}/complete`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'X-User-Email': userEmail || '',
         },
-        credentials: 'include',
         body: JSON.stringify({
-          completionNote: completionNotes, // Fix: completionNotes -> completionNote
-          completionFiles: uploadedFiles, // Fix: files -> completionFiles
+          completionNote: completionNotes,
+          completionFiles: uploadedFiles,
         }),
       });
       if (response.ok) {
