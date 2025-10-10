@@ -3,6 +3,7 @@
 // =====================================================
 // Next.js middleware for route protection - PERFORMANCE OPTIMIZED
 import { NextResponse, type NextRequest } from 'next/server';
+import jwt from 'jsonwebtoken';
 // Pre-compiled route patterns for better performance
 const PROTECTED_ROUTE_PATTERN = /^\/(admin|firma|api\/(projects|companies|v2))/;
 const ADMIN_ROUTE_PATTERN = /^\/(admin|api\/admin)/;
@@ -11,16 +12,10 @@ const PUBLIC_ROUTE_PATTERN =
   /^\/(giris|kayit|sss|iletisim|program-hakkinda|platform-ozellikleri|destekler|basari-hikayeleri|kariyer|test-components|test-softui)$/;
 const STATIC_PATTERN =
   /^\/(_next|static|favicon|api\/(auth|debug|upload|socket))/;
-// Role-based access control - FIXED: Separate admin and company roles
-const ADMIN_ROLES = new Set(['admin', 'master_admin', 'danışman']);
-const COMPANY_ROLES = new Set([
-  'user',
-  'operator',
-  'manager',
-  'firma_admin',
-  'firma_kullanıcı',
-]);
-const OBSERVER_ROLES = new Set(['observer', 'gözlemci']);
+// Role-based access control - STANDARDIZED
+const ADMIN_ROLES = new Set(['admin', 'master_admin', 'danisman']);
+const COMPANY_ROLES = new Set(['firma_admin', 'firma_kullanici']);
+const OBSERVER_ROLES = new Set(['gozlemci']);
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   // Fast path: Skip middleware for static files and public API routes
@@ -36,27 +31,29 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Auto-login token check for /firma route
-  if (pathname.startsWith('/firma')) {
-    const autoLoginToken = request.nextUrl.searchParams.get('token');
-    const companyName = request.nextUrl.searchParams.get('company');
+  // Auto-login token bypass removed for security
 
-    if (autoLoginToken && companyName) {
-      console.log(
-        '🚀 Middleware: Auto-login token found, bypassing auth check'
-      );
-      return NextResponse.next();
-    }
+  // JWT token authentication
+  const authToken = request.cookies.get('auth-token')?.value;
+  
+  // Fast path: No authentication
+  if (!authToken) {
+    return handleUnauthenticated(request, pathname);
   }
 
-  // Get authentication info from cookies or headers (for API calls)
-  const userEmail =
-    request.cookies.get('auth-user-email')?.value ||
-    request.headers.get('X-User-Email');
-  const userRole = request.cookies.get('auth-user-role')?.value;
-  // Fast path: No authentication
-  if (!userEmail) {
-    return handleUnauthenticated(request, pathname);
+  // JWT token doğrula
+  let userEmail: string | null = null;
+  let userRole: string | null = null;
+  
+  try {
+    const decoded = jwt.verify(authToken, process.env.JWT_SECRET || 'your-secret-key-change-in-production') as any;
+    userEmail = decoded.email;
+    userRole = decoded.role;
+  } catch (error) {
+    // Token geçersiz - çıkış yap
+    const response = NextResponse.redirect(new URL('/giris', request.url));
+    response.cookies.delete('auth-token');
+    return response;
   }
   // Fast path: Admin routes
   if (ADMIN_ROUTE_PATTERN.test(pathname)) {

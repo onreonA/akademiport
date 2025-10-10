@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface CompanyDateStats {
   totalProjects: number;
@@ -35,6 +36,7 @@ interface TaskDateInfo {
 }
 
 export default function CompanyDateDashboard() {
+  const { user } = useAuth();
   const [stats, setStats] = useState<CompanyDateStats | null>(null);
   const [projects, setProjects] = useState<ProjectDateInfo[]>([]);
   const [tasks, setTasks] = useState<TaskDateInfo[]>([]);
@@ -42,27 +44,50 @@ export default function CompanyDateDashboard() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchDashboardData();
-  }, []);
+    if (user) {
+      fetchDashboardData();
+    }
+  }, [user]);
 
   const fetchDashboardData = async () => {
+    if (!user?.email) {
+      setError('Kullanıcı bilgisi bulunamadı');
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
 
       // Firma tarih istatistiklerini al
-      const statsResponse = await fetch('/api/firma/date-stats');
+      const statsResponse = await fetch('/api/firma/date-stats', {
+        headers: {
+          'X-User-Email': user.email,
+          'Content-Type': 'application/json',
+        },
+      });
       if (!statsResponse.ok) throw new Error('Stats fetch failed');
       const statsData = await statsResponse.json();
       setStats(statsData);
 
       // Proje tarih bilgilerini al
-      const projectsResponse = await fetch('/api/firma/project-date-info');
+      const projectsResponse = await fetch('/api/firma/project-date-info', {
+        headers: {
+          'X-User-Email': user.email,
+          'Content-Type': 'application/json',
+        },
+      });
       if (!projectsResponse.ok) throw new Error('Projects fetch failed');
       const projectsData = await projectsResponse.json();
       setProjects(projectsData);
 
       // Görev tarih bilgilerini al
-      const tasksResponse = await fetch('/api/firma/task-date-info');
+      const tasksResponse = await fetch('/api/firma/task-date-info', {
+        headers: {
+          'X-User-Email': user.email,
+          'Content-Type': 'application/json',
+        },
+      });
       if (!tasksResponse.ok) throw new Error('Tasks fetch failed');
       const tasksData = await tasksResponse.json();
       setTasks(tasksData);

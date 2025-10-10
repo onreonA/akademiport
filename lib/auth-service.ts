@@ -57,15 +57,12 @@ export class AuthService {
           throw new Error('Invalid login credentials');
         }
 
-        // Company user için role mapping - COMPANY_ROLES'a uygun
+        // Company user için role mapping - STANDARDIZED
         userData = {
           id: companyUser.id,
           email: companyUser.email,
           full_name: companyUser.name,
-          role:
-            companyUser.role === 'admin'
-              ? 'manager' // company_users'taki 'admin' -> middleware'deki 'manager'
-              : companyUser.role || 'operator',
+          role: companyUser.role === 'admin' ? 'firma_admin' : 'firma_kullanici',
           company_id: companyUser.company_id,
           created_at: companyUser.created_at,
           updated_at: companyUser.updated_at,
@@ -88,7 +85,7 @@ export class AuthService {
             throw new Error('Invalid login credentials');
           }
 
-          // Admin user için role mapping - ADMIN_ROLES'a uygun
+          // Admin user için role mapping - STANDARDIZED
           userData = adminUser;
           userData.role = adminUser.role || 'admin';
         } else {
@@ -166,10 +163,7 @@ export class AuthService {
           id: companyUserData.id,
           email: companyUserData.email,
           full_name: companyUserData.name,
-          role:
-            companyUserData.role === 'admin'
-              ? 'manager'
-              : companyUserData.role || 'operator',
+          role: companyUserData.role === 'admin' ? 'firma_admin' : 'firma_kullanici',
           company_id: companyUserData.company_id,
           created_at: companyUserData.created_at,
           updated_at: companyUserData.updated_at,
