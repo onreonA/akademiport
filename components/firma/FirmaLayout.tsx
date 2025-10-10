@@ -38,7 +38,6 @@ export default function FirmaLayout({
   const [mounted, setMounted] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -62,41 +61,14 @@ export default function FirmaLayout({
     }
   }, []);
 
-  // Authentication kontrolü - JWT Token kullan
+  // Authentication kontrolü - Middleware tarafından yapılıyor
+  // FirmaLayout sadece UI render ediyor
   useEffect(() => {
-    const checkAuth = () => {
-      try {
-        // JWT token kontrolü - middleware ile uyumlu
-        const authToken = document.cookie
-          .split('; ')
-          .find(row => row.startsWith('auth-token='))
-          ?.split('=')[1];
-
-        if (!authToken) {
-          // No JWT token found, redirecting to login
-          setError('Kullanıcı oturumu bulunamadı');
-          router.push('/giris');
-          return;
-        }
-
-        // JWT token var - middleware zaten doğrulamış
-        // FirmaLayout sadece UI render ediyor, authentication middleware'de yapılıyor
-
-        // Authorization successful
-        setError(null);
-      } catch (error) {
-        // Auth check error
-        setError('Kimlik doğrulama hatası');
-        router.push('/giris');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
+    // Mounted olduğunda loading'i false yap
     if (mounted) {
-      checkAuth();
+      setIsLoading(false);
     }
-  }, [mounted, router]);
+  }, [mounted]);
 
   // Auto-collapse timer logic - 10 saniye sonra daralt
   useEffect(() => {
@@ -159,35 +131,7 @@ export default function FirmaLayout({
     );
   }
 
-  if (error) {
-    return (
-      <div className='min-h-screen bg-gray-50'>
-        <div className='fixed top-0 left-0 w-full h-16 bg-white border-b border-gray-200 z-50' />
-        <div className='pt-16'>
-          <div className='p-4 sm:p-6 lg:p-8'>
-            <div className='mb-6'>
-              <h1 className='text-xl font-bold text-gray-900'>{title}</h1>
-              {description && (
-                <p className='mt-1 text-xs text-gray-600'>{description}</p>
-              )}
-            </div>
-            <div className='flex items-center justify-center h-64'>
-              <div className='text-center'>
-                <div className='text-red-600 text-lg mb-2'>⚠️</div>
-                <h3 className='text-sm font-medium text-red-800 mb-2'>
-                  Erişim Engellendi
-                </h3>
-                <p className='text-sm text-gray-600'>{error}</p>
-                <p className='text-xs text-gray-500 mt-1'>
-                  Giriş sayfasına yönlendiriliyorsunuz...
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // Error state kaldırıldı - Middleware tarafından yönetiliyor
 
   return (
     <div className='min-h-screen bg-gray-50'>
