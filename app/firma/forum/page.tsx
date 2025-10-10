@@ -207,80 +207,69 @@ const ForumDashboard = () => {
       title='Forum'
       description='Diğer firmalarla deneyimlerinizi paylaşın ve sorularınızı sorun'
     >
-      <div className='max-w-7xl mx-auto'>
-        {/* Page Header */}
-        <div className='mb-8'>
-          <div className='flex items-center justify-between'>
-            <div>
-              <h1 className='text-3xl font-bold text-gray-900 mb-2'>
-                Forum 💬
-              </h1>
-              <p className='text-gray-600'>
-                Diğer firmalarla deneyimlerinizi paylaşın ve sorularınızı sorun
-              </p>
-            </div>
-            {/* Quick Actions */}
-            <div className='flex items-center gap-4'>
-              <Link href='/firma/forum/yeni-konu'>
-                <button className='px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors cursor-pointer whitespace-nowrap flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'>
-                  <i className='ri-add-line'></i>
-                  Yeni Konu Aç
-                </button>
-              </Link>
-            </div>
-          </div>
-        </div>
-        {/* Stats Cards */}
-        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8'>
-          <div className='bg-white rounded-xl border border-gray-200 p-6'>
-            <div className='flex items-center gap-4'>
-              <div className='w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center'>
-                <i className='ri-chat-3-line text-blue-600 text-xl'></i>
+      <div className='max-w-7xl mx-auto space-y-4'>
+        {/* Compact Header with Stats */}
+        <div className='bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 shadow-xl'>
+          <div className='flex items-center justify-between mb-4'>
+            <div className='flex items-center gap-3'>
+              <div className='w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center'>
+                <i className='ri-forum-line text-white text-2xl'></i>
               </div>
               <div>
-                <p className='text-2xl font-bold text-gray-900'>
-                  {topics.length}
-                </p>
-                <p className='text-sm text-gray-600'>Toplam Konu</p>
+                <h1 className='text-2xl font-bold text-white'>Forum</h1>
+                <p className='text-blue-100 text-sm'>Toplulukla etkileşim kurun</p>
               </div>
             </div>
+            <Link href='/firma/forum/yeni-konu'>
+              <button className='px-4 py-2.5 bg-white text-blue-600 hover:bg-blue-50 rounded-xl font-semibold transition-all duration-200 cursor-pointer whitespace-nowrap flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-105'>
+                <i className='ri-add-line text-lg'></i>
+                Yeni Konu
+              </button>
+            </Link>
           </div>
-          <div className='bg-white rounded-xl border border-gray-200 p-6'>
-            <div className='flex items-center gap-4'>
-              <div className='w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center'>
-                <i className='ri-message-3-line text-green-600 text-xl'></i>
-              </div>
-              <div>
-                <p className='text-2xl font-bold text-gray-900'>
-                  {topics.reduce((sum, topic) => sum + topic.reply_count, 0)}
-                </p>
-                <p className='text-sm text-gray-600'>Toplam Yanıt</p>
+          
+          {/* Compact Stats */}
+          <div className='grid grid-cols-4 gap-4'>
+            <div className='bg-white/10 backdrop-blur-sm rounded-xl p-3 border border-white/20'>
+              <div className='flex items-center gap-2'>
+                <i className='ri-chat-3-line text-white text-xl'></i>
+                <div>
+                  <p className='text-2xl font-bold text-white'>{topics.length}</p>
+                  <p className='text-xs text-blue-100'>Konu</p>
+                </div>
               </div>
             </div>
-          </div>
-          <div className='bg-white rounded-xl border border-gray-200 p-6'>
-            <div className='flex items-center gap-4'>
-              <div className='w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center'>
-                <i className='ri-eye-line text-purple-600 text-xl'></i>
-              </div>
-              <div>
-                <p className='text-2xl font-bold text-gray-900'>
-                  {topics.reduce((sum, topic) => sum + topic.view_count, 0)}
-                </p>
-                <p className='text-sm text-gray-600'>Toplam Görüntüleme</p>
+            <div className='bg-white/10 backdrop-blur-sm rounded-xl p-3 border border-white/20'>
+              <div className='flex items-center gap-2'>
+                <i className='ri-message-3-line text-white text-xl'></i>
+                <div>
+                  <p className='text-2xl font-bold text-white'>
+                    {topics.reduce((sum, topic) => sum + topic.reply_count, 0)}
+                  </p>
+                  <p className='text-xs text-blue-100'>Yanıt</p>
+                </div>
               </div>
             </div>
-          </div>
-          <div className='bg-white rounded-xl border border-gray-200 p-6'>
-            <div className='flex items-center gap-4'>
-              <div className='w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center'>
-                <i className='ri-star-line text-orange-600 text-xl'></i>
+            <div className='bg-white/10 backdrop-blur-sm rounded-xl p-3 border border-white/20'>
+              <div className='flex items-center gap-2'>
+                <i className='ri-eye-line text-white text-xl'></i>
+                <div>
+                  <p className='text-2xl font-bold text-white'>
+                    {topics.reduce((sum, topic) => sum + topic.view_count, 0)}
+                  </p>
+                  <p className='text-xs text-blue-100'>Görüntüleme</p>
+                </div>
               </div>
-              <div>
-                <p className='text-2xl font-bold text-gray-900'>
-                  {topics.filter(topic => topic.is_featured).length}
-                </p>
-                <p className='text-sm text-gray-600'>Öne Çıkan</p>
+            </div>
+            <div className='bg-white/10 backdrop-blur-sm rounded-xl p-3 border border-white/20'>
+              <div className='flex items-center gap-2'>
+                <i className='ri-star-line text-white text-xl'></i>
+                <div>
+                  <p className='text-2xl font-bold text-white'>
+                    {topics.filter(topic => topic.is_featured).length}
+                  </p>
+                  <p className='text-xs text-blue-100'>Öne Çıkan</p>
+                </div>
               </div>
             </div>
           </div>
@@ -300,34 +289,32 @@ const ForumDashboard = () => {
             </div>
           </div>
         )}
-        {/* Search and Filters */}
-        <div className='bg-white rounded-xl border border-gray-200 p-6 mb-8'>
-          <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
-            <div className='md:col-span-2'>
-              <label className='block text-sm font-medium text-gray-700 mb-2'>
-                Arama
-              </label>
+        {/* Compact Search and Filters */}
+        <div className='bg-white rounded-xl shadow-sm border border-gray-100 p-4'>
+          <div className='flex flex-wrap items-center gap-3'>
+            {/* Search Bar */}
+            <div className='flex-1 min-w-[280px]'>
               <div className='relative'>
-                <div className='absolute inset-y-0 left-0 pl-3 flex items-center'>
+                <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none'>
                   <i className='ri-search-line text-gray-400'></i>
                 </div>
                 <input
                   type='text'
-                  placeholder='Konu başlığı, içerik veya etiket ara...'
+                  placeholder='Konu ara...'
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
-                  className='w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                  className='w-full pl-10 pr-4 py-2.5 bg-gray-50 border-0 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all'
                 />
               </div>
             </div>
-            <div>
-              <label className='block text-sm font-medium text-gray-700 mb-2'>
-                Kategori
-              </label>
+            
+            {/* Category Filter */}
+            <div className='flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2.5'>
+              <i className='ri-folder-line text-gray-500'></i>
               <select
                 value={selectedCategory}
                 onChange={e => setSelectedCategory(e.target.value)}
-                className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                className='bg-transparent border-0 text-sm font-medium text-gray-700 focus:ring-0 cursor-pointer pr-8'
               >
                 <option value='all'>Tüm Kategoriler</option>
                 {categories.map(category => (
@@ -337,17 +324,17 @@ const ForumDashboard = () => {
                 ))}
               </select>
             </div>
-            <div>
-              <label className='block text-sm font-medium text-gray-700 mb-2'>
-                Sıralama
-              </label>
+            
+            {/* Sort Filter */}
+            <div className='flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2.5'>
+              <i className='ri-sort-desc text-gray-500'></i>
               <select
                 value={`${sortBy}-${sortOrder}`}
                 onChange={e => {
                   const [newSortBy, newSortOrder] = e.target.value.split('-');
                   handleSort(newSortBy, newSortOrder);
                 }}
-                className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                className='bg-transparent border-0 text-sm font-medium text-gray-700 focus:ring-0 cursor-pointer pr-8'
               >
                 <option value='created_at-desc'>En Yeni</option>
                 <option value='created_at-asc'>En Eski</option>
@@ -356,142 +343,188 @@ const ForumDashboard = () => {
                 <option value='like_count-desc'>En Çok Beğeni</option>
               </select>
             </div>
+            
+            {/* View Mode Toggle */}
+            <div className='flex items-center gap-1 bg-gray-50 rounded-lg p-1'>
+              <button
+                onClick={() => setViewMode('list')}
+                className={`p-2 rounded-md transition-all ${
+                  viewMode === 'list'
+                    ? 'bg-white text-blue-600 shadow-sm'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                <i className='ri-list-unordered'></i>
+              </button>
+              <button
+                onClick={() => setViewMode('grid')}
+                className={`p-2 rounded-md transition-all ${
+                  viewMode === 'grid'
+                    ? 'bg-white text-blue-600 shadow-sm'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                <i className='ri-grid-line'></i>
+              </button>
+            </div>
           </div>
         </div>
-        {/* Topics List */}
-        <div className='space-y-6'>
+        {/* Modern Topics List */}
+        <div className={viewMode === 'grid' ? 'grid grid-cols-1 lg:grid-cols-2 gap-4' : 'space-y-3'}>
           {filteredTopics.map(topic => {
             const categoryInfo = getCategoryInfo(topic.category_id);
             return (
-              <div
-                key={topic.id}
-                className='bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-all duration-200'
-              >
-                <div className='flex items-start justify-between mb-4'>
-                  <div className='flex items-center gap-3'>
-                    <div className='w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center'>
-                      <i className='ri-chat-3-line text-blue-600'></i>
+              <Link key={topic.id} href={`/firma/forum/${topic.id}`}>
+                <div className='bg-white rounded-xl border border-gray-100 p-4 hover:border-blue-200 hover:shadow-lg transition-all duration-200 cursor-pointer group'>
+                  {/* Header */}
+                  <div className='flex items-start gap-3 mb-3'>
+                    <div className='w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform'>
+                      <i className='ri-chat-3-line text-white text-lg'></i>
                     </div>
-                    <div>
-                      <h3 className='text-lg font-semibold text-gray-900'>
-                        {topic.title}
-                      </h3>
-                      <p className='text-sm text-gray-500'>
-                        {topic.users?.full_name || 'Anonim'} tarafından{' '}
-                        {getTimeAgo(topic.created_at)}
+                    <div className='flex-1 min-w-0'>
+                      <div className='flex items-start justify-between gap-2 mb-1'>
+                        <h3 className='text-base font-semibold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-1'>
+                          {topic.title}
+                        </h3>
+                        <div className='flex items-center gap-1 flex-shrink-0'>
+                          {topic.is_featured && (
+                            <span className='inline-flex items-center justify-center w-6 h-6 bg-yellow-100 text-yellow-600 rounded-full' title='Öne Çıkan'>
+                              <i className='ri-star-fill text-xs'></i>
+                            </span>
+                          )}
+                          {topic.is_solved && (
+                            <span className='inline-flex items-center justify-center w-6 h-6 bg-green-100 text-green-600 rounded-full' title='Çözüldü'>
+                              <i className='ri-check-line text-xs'></i>
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <p className='text-xs text-gray-500 mb-2'>
+                        <i className='ri-user-line mr-1'></i>
+                        {topic.users?.full_name || 'Anonim'} • {getTimeAgo(topic.created_at)}
+                      </p>
+                      <p className='text-sm text-gray-600 line-clamp-2 mb-3'>
+                        {topic.content}
                       </p>
                     </div>
                   </div>
-                  <div className='flex items-center gap-2'>
-                    {topic.is_featured && (
-                      <span className='inline-flex items-center gap-1 px-2 py-1 bg-yellow-100 text-yellow-800 text-xs font-medium rounded-full'>
-                        <i className='ri-star-line text-xs'></i>Öne Çıkan
+
+                  {/* Tags */}
+                  {topic.tags && topic.tags.length > 0 && (
+                    <div className='flex items-center gap-1.5 mb-3 flex-wrap'>
+                      {topic.tags.slice(0, 3).map(tag => (
+                        <span
+                          key={tag}
+                          className='inline-flex items-center px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-md hover:bg-gray-200 transition-colors'
+                        >
+                          #{tag}
+                        </span>
+                      ))}
+                      {topic.tags.length > 3 && (
+                        <span className='text-xs text-gray-400'>+{topic.tags.length - 3}</span>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Footer */}
+                  <div className='flex items-center justify-between pt-3 border-t border-gray-100'>
+                    <div className='flex items-center gap-1'>
+                      {categoryInfo && (
+                        <span className={`inline-flex items-center gap-1 px-2 py-1 ${categoryInfo.color} bg-opacity-10 text-xs font-medium rounded-lg`}>
+                          <i className={`${categoryInfo.icon} text-xs`}></i>
+                          <span className='text-gray-700'>{categoryInfo.name}</span>
+                        </span>
+                      )}
+                    </div>
+                    <div className='flex items-center gap-4 text-xs text-gray-500'>
+                      <span className='flex items-center gap-1 hover:text-blue-600 transition-colors'>
+                        <i className='ri-message-3-line'></i>
+                        {topic.reply_count}
                       </span>
-                    )}
-                    {topic.is_solved && (
-                      <span className='inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full'>
-                        <i className='ri-check-line text-xs'></i>Çözüldü
+                      <span className='flex items-center gap-1 hover:text-blue-600 transition-colors'>
+                        <i className='ri-eye-line'></i>
+                        {topic.view_count}
                       </span>
-                    )}
-                    {categoryInfo && (
-                      <span
-                        className={`inline-flex items-center gap-1 px-2 py-1 ${categoryInfo.color} text-white text-xs font-medium rounded-full`}
-                      >
-                        <i className={`${categoryInfo.icon} text-xs`}></i>
-                        {categoryInfo.name}
+                      <span className='flex items-center gap-1 hover:text-blue-600 transition-colors'>
+                        <i className='ri-heart-line'></i>
+                        {topic.like_count}
                       </span>
-                    )}
+                    </div>
                   </div>
                 </div>
-                <p className='text-gray-600 text-sm mb-4 line-clamp-2'>
-                  {topic.content}
-                </p>
-                {/* Tags */}
-                {topic.tags && topic.tags.length > 0 && (
-                  <div className='flex items-center gap-2 mb-4 flex-wrap'>
-                    {topic.tags.map(tag => (
-                      <span
-                        key={tag}
-                        className='inline-block px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-md'
-                      >
-                        #{tag}
-                      </span>
-                    ))}
-                  </div>
-                )}
-                {/* Meta */}
-                <div className='flex items-center justify-between text-sm text-gray-500'>
-                  <div className='flex items-center gap-4'>
-                    <span>
-                      <i className='ri-user-line mr-1'></i>
-                      {topic.users?.full_name || 'Anonim'}
-                    </span>
-                  </div>
-                  <div className='flex items-center gap-4'>
-                    <span className='flex items-center gap-1'>
-                      <i className='ri-message-3-line'></i>
-                      {topic.reply_count}
-                    </span>
-                    <span className='flex items-center gap-1'>
-                      <i className='ri-eye-line'></i>
-                      {topic.view_count}
-                    </span>
-                    <span className='flex items-center gap-1'>
-                      <i className='ri-heart-line'></i>
-                      {topic.like_count}
-                    </span>
-                    <Link href={`/firma/forum/${topic.id}`}>
-                      <button className='text-blue-600 hover:text-blue-800 font-medium cursor-pointer'>
-                        Detayları Gör
-                      </button>
-                    </Link>
-                  </div>
-                </div>
-              </div>
+              </Link>
             );
           })}
         </div>
         {filteredTopics.length === 0 && (
-          <div className='p-12 text-center'>
-            <div className='w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4'>
-              <i className='ri-search-line text-gray-400 text-2xl'></i>
+          <div className='bg-white rounded-xl border border-gray-100 p-12 text-center'>
+            <div className='w-20 h-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center mx-auto mb-4'>
+              <i className='ri-inbox-line text-gray-400 text-3xl'></i>
             </div>
-            <h3 className='text-lg font-semibold text-gray-900 mb-2'>
-              Sonuç Bulunamadı
+            <h3 className='text-xl font-bold text-gray-900 mb-2'>
+              Henüz Konu Yok
             </h3>
-            <p className='text-gray-600 mb-4'>
-              Arama kriterlerinize uygun konu bulunamadı. Farklı anahtar
-              kelimeler deneyin.
+            <p className='text-gray-600 mb-6 max-w-md mx-auto'>
+              {searchQuery || selectedCategory !== 'all'
+                ? 'Arama kriterlerinize uygun konu bulunamadı. Farklı filtreler deneyin.'
+                : 'Topluluğa ilk konuyu siz açın ve tartışmayı başlatın!'}
             </p>
-            <button
-              onClick={() => {
-                setSearchQuery('');
-                setSelectedCategory('all');
-              }}
-              className='text-blue-600 hover:text-blue-800 font-medium cursor-pointer'
-            >
-              Filtreleri Temizle
-            </button>
+            {(searchQuery || selectedCategory !== 'all') && (
+              <button
+                onClick={() => {
+                  setSearchQuery('');
+                  setSelectedCategory('all');
+                }}
+                className='inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors'
+              >
+                <i className='ri-restart-line'></i>
+                Filtreleri Sıfırla
+              </button>
+            )}
           </div>
         )}
-        {/* Forum Rules */}
-        <div className='mt-8 bg-blue-50 border border-blue-200 rounded-xl p-6'>
-          <div className='flex items-start gap-3'>
-            <i className='ri-information-line text-blue-600 text-xl mt-1'></i>
-            <div>
-              <h4 className='font-semibold text-blue-900 mb-2'>
-                Forum Kuralları
-              </h4>
-              <ul className='text-sm text-blue-800 space-y-1'>
-                <li>• Saygılı ve yapıcı bir dil kullanın</li>
-                <li>• Spam içerik paylaşmayın</li>
-                <li>• Konuya uygun kategoride paylaşım yapın</li>
-                <li>• Kişisel bilgilerinizi paylaşmayın</li>
-                <li>• Ticari reklamlar yasaktır</li>
-              </ul>
+        
+        {/* Compact Forum Rules */}
+        {filteredTopics.length > 0 && (
+          <div className='bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-xl p-4'>
+            <div className='flex items-start gap-3'>
+              <div className='w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0'>
+                <i className='ri-shield-check-line text-blue-600 text-lg'></i>
+              </div>
+              <div className='flex-1'>
+                <h4 className='font-semibold text-blue-900 mb-2 text-sm'>
+                  Forum Kuralları
+                </h4>
+                <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 text-xs text-blue-800'>
+                  <div className='flex items-center gap-2'>
+                    <i className='ri-checkbox-circle-fill text-blue-600'></i>
+                    <span>Saygılı ve yapıcı dil kullanın</span>
+                  </div>
+                  <div className='flex items-center gap-2'>
+                    <i className='ri-checkbox-circle-fill text-blue-600'></i>
+                    <span>Spam içerik paylaşmayın</span>
+                  </div>
+                  <div className='flex items-center gap-2'>
+                    <i className='ri-checkbox-circle-fill text-blue-600'></i>
+                    <span>Doğru kategoride paylaşım yapın</span>
+                  </div>
+                  <div className='flex items-center gap-2'>
+                    <i className='ri-checkbox-circle-fill text-blue-600'></i>
+                    <span>Kişisel bilgi paylaşmayın</span>
+                  </div>
+                  <div className='flex items-center gap-2'>
+                    <i className='ri-checkbox-circle-fill text-blue-600'></i>
+                    <span>Ticari reklam yasaktır</span>
+                  </div>
+                  <div className='flex items-center gap-2'>
+                    <i className='ri-checkbox-circle-fill text-blue-600'></i>
+                    <span>Topluluk yönergelerine uyun</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </FirmaLayout>
   );

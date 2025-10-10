@@ -243,204 +243,251 @@ const ForumTopicDetail = () => {
       title='Forum Konusu'
       description='Forum konusu detaylarını görüntüleyin'
     >
-      <div className='p-4 sm:p-6 lg:p-8'>
-        {/* Topic Header */}
-        <div className='bg-white rounded-xl shadow-sm border border-gray-100 mb-6'>
-          <div className='p-6 border-b border-gray-100'>
-            <div className='flex items-start justify-between mb-4'>
-              <div className='flex items-center gap-3'>
-                {topic.is_featured && (
-                  <span className='inline-flex items-center gap-1 px-3 py-1 bg-yellow-100 text-yellow-800 text-sm font-medium rounded-full'>
-                    <i className='ri-pushpin-line text-sm'></i>Öne Çıkan
+      <div className='max-w-5xl mx-auto space-y-4'>
+        {/* Breadcrumb Navigation */}
+        <div className='flex items-center gap-2 text-sm text-gray-600'>
+          <Link href='/firma/forum' className='hover:text-blue-600 transition-colors'>
+            <i className='ri-forum-line mr-1'></i>
+            Forum
+          </Link>
+          <i className='ri-arrow-right-s-line text-gray-400'></i>
+          <span className='text-gray-900 font-medium line-clamp-1'>{topic.title}</span>
+        </div>
+
+        {/* Compact Topic Header */}
+        <div className='bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden'>
+          {/* Header Bar */}
+          <div className='bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4'>
+            <div className='flex items-start justify-between gap-4'>
+              <div className='flex-1 min-w-0'>
+                <div className='flex items-center gap-2 mb-2 flex-wrap'>
+                  {topic.is_featured && (
+                    <span className='inline-flex items-center justify-center w-7 h-7 bg-white/20 backdrop-blur-sm text-white rounded-lg' title='Öne Çıkan'>
+                      <i className='ri-star-fill text-sm'></i>
+                    </span>
+                  )}
+                  {topic.is_solved && (
+                    <span className='inline-flex items-center justify-center w-7 h-7 bg-white/20 backdrop-blur-sm text-white rounded-lg' title='Çözüldü'>
+                      <i className='ri-check-line text-sm'></i>
+                    </span>
+                  )}
+                  {topic.forum_categories && (
+                    <span className='inline-flex items-center gap-1.5 px-3 py-1 bg-white/20 backdrop-blur-sm text-white text-xs font-medium rounded-lg'>
+                      <i className={`${topic.forum_categories.icon} text-sm`}></i>
+                      {topic.forum_categories.name}
+                    </span>
+                  )}
+                </div>
+                <h1 className='text-xl font-bold text-white mb-2'>
+                  {topic.title}
+                </h1>
+                <div className='flex items-center gap-4 text-sm text-blue-100'>
+                  <span className='flex items-center gap-1'>
+                    <i className='ri-user-line'></i>
+                    {topic.users?.full_name || 'Anonim'}
                   </span>
-                )}
-                {topic.is_solved && (
-                  <span className='inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-800 text-sm font-medium rounded-full'>
-                    <i className='ri-check-line text-sm'></i>Çözüldü
+                  <span className='flex items-center gap-1'>
+                    <i className='ri-time-line'></i>
+                    {getTimeAgo(topic.created_at)}
                   </span>
-                )}
-                {topic.forum_categories && (
-                  <span
-                    className={`inline-flex items-center gap-1 px-3 py-1 ${topic.forum_categories.color} text-white text-sm font-medium rounded-full`}
-                  >
-                    <i className={`${topic.forum_categories.icon} text-sm`}></i>
-                    {topic.forum_categories.name}
-                  </span>
-                )}
+                </div>
               </div>
-              <span className='text-sm text-gray-500'>
-                {getTimeAgo(topic.created_at)}
-              </span>
+              <div className='flex items-center gap-3 text-white flex-shrink-0'>
+                <div className='text-center'>
+                  <div className='text-2xl font-bold'>{topic.reply_count}</div>
+                  <div className='text-xs text-blue-100'>Yanıt</div>
+                </div>
+                <div className='w-px h-10 bg-white/20'></div>
+                <div className='text-center'>
+                  <div className='text-2xl font-bold'>{topic.view_count}</div>
+                  <div className='text-xs text-blue-100'>Görüntüleme</div>
+                </div>
+              </div>
             </div>
-            <h1 className='text-2xl font-bold text-gray-900 mb-4'>
-              {topic.title}
-            </h1>
+          </div>
+
+          {/* Content */}
+          <div className='p-6'>
+            <div className='prose max-w-none mb-4'>
+              <p className='text-gray-700 leading-relaxed whitespace-pre-wrap'>
+                {topic.content}
+              </p>
+            </div>
+            
             {/* Tags */}
             {topic.tags && topic.tags.length > 0 && (
-              <div className='flex items-center gap-2 mb-4 flex-wrap'>
+              <div className='flex items-center gap-2 pt-4 border-t border-gray-100 flex-wrap'>
+                <i className='ri-price-tag-3-line text-gray-400'></i>
                 {topic.tags.map(tag => (
                   <span
                     key={tag}
-                    className='inline-block px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-md'
+                    className='inline-flex items-center px-2.5 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-lg hover:bg-blue-100 transition-colors'
                   >
                     #{tag}
                   </span>
                 ))}
               </div>
             )}
-            {/* Meta */}
-            <div className='flex items-center justify-between text-sm text-gray-500'>
-              <div className='flex items-center gap-4'>
-                <span>
-                  <i className='ri-user-line mr-1'></i>
-                  {topic.users?.full_name || 'Anonim'}
-                </span>
-              </div>
-              <div className='flex items-center gap-4'>
-                <span className='flex items-center gap-1'>
-                  <i className='ri-message-3-line'></i>
-                  {topic.reply_count} yanıt
-                </span>
-                <span className='flex items-center gap-1'>
-                  <i className='ri-eye-line'></i>
-                  {topic.view_count} görüntülenme
-                </span>
-              </div>
-            </div>
-          </div>
-          {/* Topic Content */}
-          <div className='p-6'>
-            <div className='prose max-w-none'>
-              <p className='text-gray-700 leading-relaxed whitespace-pre-wrap'>
-                {topic.content}
-              </p>
-            </div>
           </div>
         </div>
-        {/* Replies */}
-        <div className='bg-white rounded-xl shadow-sm border border-gray-100 mb-6'>
-          <div className='p-6 border-b border-gray-100'>
+        {/* Compact Replies Section */}
+        <div className='bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden'>
+          {/* Replies Header */}
+          <div className='bg-gray-50 px-6 py-4 border-b border-gray-100'>
             <div className='flex items-center justify-between'>
-              <h2 className='text-lg font-semibold text-gray-900'>
-                Yanıtlar ({replies.length})
-              </h2>
+              <div className='flex items-center gap-3'>
+                <div className='w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center'>
+                  <i className='ri-message-3-line text-white text-lg'></i>
+                </div>
+                <div>
+                  <h2 className='text-lg font-bold text-gray-900'>
+                    Yanıtlar
+                  </h2>
+                  <p className='text-sm text-gray-500'>{replies.length} yanıt bulundu</p>
+                </div>
+              </div>
               <button
                 onClick={() => setShowReplyForm(!showReplyForm)}
-                className='bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2'
+                className='px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition-all duration-200 flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-105'
               >
-                <i className='ri-add-line'></i>
-                Yanıt Yaz
+                <i className={showReplyForm ? 'ri-close-line' : 'ri-add-line'}></i>
+                {showReplyForm ? 'Kapat' : 'Yanıt Yaz'}
               </button>
             </div>
           </div>
-          {/* Reply Form */}
+
+          {/* Compact Reply Form */}
           {showReplyForm && (
-            <div className='p-6 border-b border-gray-100'>
-              <div className='mb-4'>
-                <label className='block text-sm font-medium text-gray-700 mb-2'>
-                  Yanıtınız
+            <div className='p-6 bg-blue-50 border-b border-blue-100'>
+              <div className='bg-white rounded-xl p-4'>
+                <label className='flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3'>
+                  <i className='ri-edit-line text-blue-600'></i>
+                  Yanıtınızı yazın
                 </label>
                 <textarea
                   value={newReply}
                   onChange={e => setNewReply(e.target.value)}
-                  placeholder='Yanıtınızı buraya yazın...'
-                  className='w-full h-32 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none'
+                  placeholder='Düşüncelerinizi paylaşın...'
+                  className='w-full h-28 px-4 py-3 bg-gray-50 border-0 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all resize-none text-sm'
                 />
-              </div>
-              <div className='flex items-center gap-3'>
-                <button
-                  onClick={handleSubmitReply}
-                  disabled={submitting || !newReply.trim()}
-                  className='bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-6 py-2 rounded-lg font-medium transition-colors flex items-center gap-2'
-                >
-                  {submitting ? (
-                    <>
-                      <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-white'></div>
-                      Gönderiliyor...
-                    </>
-                  ) : (
-                    <>
-                      <i className='ri-send-plane-line'></i>
-                      Yanıt Gönder
-                    </>
-                  )}
-                </button>
-                <button
-                  onClick={() => {
-                    setShowReplyForm(false);
-                    setNewReply('');
-                  }}
-                  className='text-gray-600 hover:text-gray-800 font-medium'
-                >
-                  İptal
-                </button>
+                <div className='flex items-center justify-between mt-4'>
+                  <span className='text-xs text-gray-500'>
+                    <i className='ri-information-line mr-1'></i>
+                    Lütfen saygılı bir dil kullanın
+                  </span>
+                  <div className='flex items-center gap-2'>
+                    <button
+                      onClick={() => {
+                        setShowReplyForm(false);
+                        setNewReply('');
+                      }}
+                      className='px-4 py-2 text-gray-600 hover:text-gray-800 font-medium transition-colors rounded-lg hover:bg-gray-100'
+                    >
+                      İptal
+                    </button>
+                    <button
+                      onClick={handleSubmitReply}
+                      disabled={submitting || !newReply.trim()}
+                      className='px-5 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:from-gray-400 disabled:to-gray-400 text-white rounded-lg font-semibold transition-all flex items-center gap-2 shadow-lg disabled:shadow-none'
+                    >
+                      {submitting ? (
+                        <>
+                          <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-white'></div>
+                          Gönderiliyor...
+                        </>
+                      ) : (
+                        <>
+                          <i className='ri-send-plane-fill'></i>
+                          Gönder
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           )}
-          {/* Replies List */}
+          {/* Modern Replies List */}
           <div className='divide-y divide-gray-100'>
             {replies.length === 0 ? (
-              <div className='p-12 text-center'>
-                <div className='w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4'>
-                  <i className='ri-message-3-line text-gray-400 text-2xl'></i>
+              <div className='p-12 text-center bg-gradient-to-br from-gray-50 to-blue-50'>
+                <div className='w-20 h-20 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4'>
+                  <i className='ri-chat-quote-line text-blue-600 text-3xl'></i>
                 </div>
-                <h3 className='text-lg font-semibold text-gray-900 mb-2'>
+                <h3 className='text-xl font-bold text-gray-900 mb-2'>
                   Henüz Yanıt Yok
                 </h3>
-                <p className='text-gray-600 mb-4'>
-                  Bu konuya ilk yanıtı siz yazın!
+                <p className='text-gray-600 mb-6 max-w-sm mx-auto'>
+                  Tartışmayı başlatın ve toplulukla etkileşime geçin!
                 </p>
                 <button
                   onClick={() => setShowReplyForm(true)}
-                  className='bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors'
+                  className='inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl transform hover:scale-105'
                 >
+                  <i className='ri-chat-new-line'></i>
                   İlk Yanıtı Yaz
                 </button>
               </div>
             ) : (
-              replies.map(reply => (
-                <div key={reply.id} className='p-6'>
+              replies.map((reply, index) => (
+                <div key={reply.id} className='p-5 hover:bg-gray-50 transition-colors group'>
                   <div className='flex items-start gap-4'>
-                    {/* Avatar */}
-                    <div className='w-10 h-10 rounded-full overflow-hidden flex-shrink-0 bg-gradient-to-br from-green-500 to-green-700 flex items-center justify-center'>
-                      <span className='text-white text-sm font-medium'>
-                        {reply.users?.full_name?.charAt(0) || 'U'}
-                      </span>
+                    {/* Modern Avatar */}
+                    <div className='relative flex-shrink-0'>
+                      <div className='w-11 h-11 rounded-xl overflow-hidden bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform'>
+                        <span className='text-white text-base font-bold'>
+                          {reply.users?.full_name?.charAt(0) || 'U'}
+                        </span>
+                      </div>
+                      {reply.is_solution && (
+                        <div className='absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center border-2 border-white'>
+                          <i className='ri-check-line text-white text-xs'></i>
+                        </div>
+                      )}
                     </div>
+
                     {/* Content */}
                     <div className='flex-1 min-w-0'>
                       <div className='flex items-center justify-between mb-2'>
-                        <div className='flex items-center gap-2'>
-                          <span className='font-medium text-gray-900'>
+                        <div className='flex items-center gap-2 flex-wrap'>
+                          <span className='font-semibold text-gray-900'>
                             {reply.users?.full_name || 'Anonim'}
                           </span>
                           {reply.is_solution && (
-                            <span className='inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full'>
-                              <i className='ri-check-line text-xs'></i>Çözüm
+                            <span className='inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-700 text-xs font-semibold rounded-md'>
+                              <i className='ri-verified-badge-fill'></i>
+                              Çözüm
                             </span>
                           )}
+                          <span className='text-xs text-gray-500'>
+                            • {getTimeAgo(reply.created_at)}
+                          </span>
                         </div>
-                        <span className='text-sm text-gray-500'>
-                          {getTimeAgo(reply.created_at)}
-                        </span>
+                        <span className='text-xs text-gray-400'>#{index + 1}</span>
                       </div>
+                      
                       <div className='prose max-w-none mb-3'>
-                        <p className='text-gray-700 leading-relaxed whitespace-pre-wrap'>
+                        <p className='text-gray-700 leading-relaxed whitespace-pre-wrap text-sm'>
                           {reply.content}
                         </p>
                       </div>
-                      {/* Actions */}
-                      <div className='flex items-center gap-4 text-sm text-gray-500'>
+
+                      {/* Modern Actions */}
+                      <div className='flex items-center gap-3'>
                         <button
                           onClick={() => handleLike(reply.id)}
-                          className='flex items-center gap-1 hover:text-blue-600 transition-colors'
+                          className='inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-red-50 text-gray-600 hover:text-red-600 rounded-lg text-xs font-medium transition-all group/like'
                         >
-                          <i className='ri-heart-line'></i>
-                          {reply.like_count} beğeni
+                          <i className='ri-heart-line group-hover/like:ri-heart-fill'></i>
+                          <span>{reply.like_count}</span>
                         </button>
-                        <button className='flex items-center gap-1 hover:text-blue-600 transition-colors'>
+                        <button className='inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-blue-50 text-gray-600 hover:text-blue-600 rounded-lg text-xs font-medium transition-all'>
                           <i className='ri-reply-line'></i>
                           Yanıtla
+                        </button>
+                        <button className='inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-lg text-xs font-medium transition-all'>
+                          <i className='ri-share-line'></i>
+                          Paylaş
                         </button>
                       </div>
                     </div>
