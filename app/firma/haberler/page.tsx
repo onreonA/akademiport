@@ -349,7 +349,7 @@ export default function HaberlerPage() {
               Tekrar Dene
             </button>
           </div>
-            </div>
+        </div>
       </FirmaLayout>
     );
   }
