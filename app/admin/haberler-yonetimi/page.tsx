@@ -2,6 +2,9 @@
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 
+import Card from '@/components/ui/Card';
+import Modal, { ModalFooter } from '@/components/ui/Modal';
+import Button from '@/components/ui/Button';
 import FileUpload from '@/components/forms/FileUpload';
 import MarkdownEditor from '@/components/forms/MarkdownEditor';
 import { useAuthStore } from '@/lib/stores/auth-store';
@@ -1108,44 +1111,34 @@ export default function NewsManagement() {
         </div>
       </div>
       {/* Haber Oluşturma/Düzenleme Modal */}
-      {showCreateForm && (
-        <div className='fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4'>
-          <div className='bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto'>
-            <div className='p-6 border-b border-gray-200'>
-              <div className='flex justify-between items-center'>
-                <h3 className='text-xl font-semibold text-gray-900'>
-                  {editingArticle ? 'Haber Düzenle' : 'Yeni Haber Oluştur'}
-                </h3>
-                <button
-                  onClick={() => {
-                    setShowCreateForm(false);
-                    setEditingArticle(null);
-                    setCreateFormData({
-                      title: '',
-                      content: '',
-                      excerpt: '',
-                      summary: '',
-                      category: '',
-                      tags: [],
-                      image_url: '',
-                      video_url: '',
-                      podcast_url: '',
-                      reading_time: 5,
-                      difficulty_level: 'Başlangıç',
-                      expert_author_id: '',
-                      is_featured: false,
-                      seo_keywords: '',
-                      source_url: '',
-                      status: 'draft',
-                    });
-                  }}
-                  className='text-gray-400 hover:text-gray-600'
-                >
-                  <i className='ri-close-line text-xl'></i>
-                </button>
-              </div>
-            </div>
-            <div className='p-6'>
+      <Modal
+        isOpen={showCreateForm}
+        onClose={() => {
+          setShowCreateForm(false);
+          setEditingArticle(null);
+          setCreateFormData({
+            title: '',
+            content: '',
+            excerpt: '',
+            summary: '',
+            category: '',
+            tags: [],
+            image_url: '',
+            video_url: '',
+            podcast_url: '',
+            reading_time: 5,
+            difficulty_level: 'Başlangıç',
+            expert_author_id: '',
+            is_featured: false,
+            seo_keywords: '',
+            source_url: '',
+            status: 'draft',
+          });
+        }}
+        title={editingArticle ? 'Haber Düzenle' : 'Yeni Haber Oluştur'}
+        size='xl'
+      >
+        <div>
               <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
                 {/* Sol Kolon */}
                 <div className='space-y-4'>
@@ -1452,46 +1445,44 @@ export default function NewsManagement() {
                 />
               </div>
             </div>
-            <div className='p-6 border-t border-gray-200 flex justify-end space-x-3'>
-              <button
-                onClick={() => {
-                  setShowCreateForm(false);
-                  setEditingArticle(null);
-                  setCreateFormData({
-                    title: '',
-                    content: '',
-                    excerpt: '',
-                    summary: '',
-                    category: '',
-                    tags: [],
-                    image_url: '',
-                    video_url: '',
-                    podcast_url: '',
-                    reading_time: 5,
-                    difficulty_level: 'Başlangıç',
-                    expert_author_id: '',
-                    is_featured: false,
-                    seo_keywords: '',
-                    source_url: '',
-                    status: 'draft',
-                  });
-                }}
-                className='px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors'
-              >
-                İptal
-              </button>
-              <button
-                onClick={
-                  editingArticle ? handleUpdateArticle : handleCreateArticle
-                }
-                className='px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors'
-              >
-                {editingArticle ? 'Güncelle' : 'Oluştur'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+        <ModalFooter>
+          <Button
+            variant='secondary'
+            onClick={() => {
+              setShowCreateForm(false);
+              setEditingArticle(null);
+              setCreateFormData({
+                title: '',
+                content: '',
+                excerpt: '',
+                summary: '',
+                category: '',
+                tags: [],
+                image_url: '',
+                video_url: '',
+                podcast_url: '',
+                reading_time: 5,
+                difficulty_level: 'Başlangıç',
+                expert_author_id: '',
+                is_featured: false,
+                seo_keywords: '',
+                source_url: '',
+                status: 'draft',
+              });
+            }}
+          >
+            İptal
+          </Button>
+          <Button
+            variant='primary'
+            onClick={
+              editingArticle ? handleUpdateArticle : handleCreateArticle
+            }
+          >
+            {editingArticle ? 'Güncelle' : 'Oluştur'}
+          </Button>
+        </ModalFooter>
+      </Modal>
     </div>
   );
 }
