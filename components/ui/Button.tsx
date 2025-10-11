@@ -8,7 +8,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   size?: 'sm' | 'md' | 'lg';
   loading?: boolean;
   fullWidth?: boolean;
-  icon?: React.ReactNode;
+  icon?: string | React.ReactNode;
 }
 
 /**
@@ -82,7 +82,13 @@ export default function Button({
         </>
       ) : (
         <>
-          {icon && <span>{icon}</span>}
+          {icon && (
+            typeof icon === 'string' ? (
+              <i className={`${icon} mr-2`}></i>
+            ) : (
+              <span className="mr-2">{icon}</span>
+            )
+          )}
           {children}
         </>
       )}
