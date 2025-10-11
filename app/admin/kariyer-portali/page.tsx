@@ -150,17 +150,11 @@ const JobPostingCard = ({
   onChangeStatus: (id: string, status: string) => void;
 }) => {
   const [showActions, setShowActions] = useState(false);
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'Aktif':
-        return 'bg-green-100 text-green-800';
-      case 'Pasif':
-        return 'bg-gray-100 text-gray-800';
-      case 'Dolu':
-        return 'bg-blue-100 text-blue-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
+  
+  const mapJobStatus = (status: string) => {
+    if (status === 'Aktif') return 'active';
+    if (status === 'Dolu') return 'completed';
+    return 'inactive';
   };
   const getTypeColor = (type: string) => {
     switch (type) {
@@ -242,11 +236,7 @@ const JobPostingCard = ({
           <div className='flex items-start justify-between mb-2'>
             <h3 className='text-lg font-semibold text-gray-900'>{job.title}</h3>
             <div className='flex flex-col gap-1'>
-              <span
-                className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(job.status)}`}
-              >
-                {job.status}
-              </span>
+              <StatusBadge status={mapJobStatus(job.status)} />
               <span
                 className={`px-2 py-1 rounded-full text-xs font-medium ${getTypeColor(job.type)}`}
               >
@@ -319,23 +309,14 @@ const ApplicationCard = ({
   onDownloadCV: (fileName: string) => void;
 }) => {
   const [showActions, setShowActions] = useState(false);
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'Bekliyor':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'Admin Onayladı':
-        return 'bg-blue-100 text-blue-800';
-      case 'Danışman Onayladı':
-        return 'bg-purple-100 text-purple-800';
-      case 'Firma Görüyor':
-        return 'bg-orange-100 text-orange-800';
-      case 'İşe Alındı':
-        return 'bg-green-100 text-green-800';
-      case 'Reddedildi':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
+  
+  const mapApplicationStatus = (status: string) => {
+    if (status === 'Bekliyor') return 'pending';
+    if (status === 'Admin Onayladı' || status === 'Danışman Onayladı') return 'approved';
+    if (status === 'Firma Görüyor') return 'in-progress';
+    if (status === 'İşe Alındı') return 'completed';
+    if (status === 'Reddedildi') return 'rejected';
+    return 'pending';
   };
   const getTypeColor = (type: string) => {
     switch (type) {
@@ -412,11 +393,7 @@ const ApplicationCard = ({
               {application.name}
             </h3>
             <div className='flex flex-col gap-1'>
-              <span
-                className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(application.status)}`}
-              >
-                {application.status}
-              </span>
+              <StatusBadge status={mapApplicationStatus(application.status)} />
               <span
                 className={`px-2 py-1 rounded-full text-xs font-medium ${getTypeColor(application.type)}`}
               >
