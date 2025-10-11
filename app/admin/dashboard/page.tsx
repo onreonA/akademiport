@@ -7,7 +7,6 @@ import DashboardStatsCards from '@/components/charts/DashboardStatsCards';
 import ErrorBoundary from '@/components/ui/ErrorBoundary';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import RecentActivity from '@/components/ui/RecentActivity';
-import { ToastContainer, useToast } from '@/components/ui/Toast';
 import {
   RecentActivity as ActivityType,
   analyticsService,
@@ -21,7 +20,6 @@ export default function AdminDashboard() {
   const [activities, setActivities] = useState<ActivityType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { toasts, removeToast, showSuccess, showError } = useToast();
   useEffect(() => {
     fetchDashboardData();
   }, [fetchDashboardData]);
