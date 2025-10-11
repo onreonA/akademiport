@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { cn, tokens } from '@/lib/design-tokens';
+
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
   variant?: 'primary' | 'secondary' | 'success' | 'danger' | 'ghost';
@@ -10,7 +12,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 /**
- * Reusable Button Component
+ * Reusable Button Component with Design Tokens
  *
  * @example
  * <Button variant="primary" size="md" onClick={handleClick}>
@@ -28,16 +30,13 @@ export default function Button({
   disabled,
   ...props
 }: ButtonProps) {
+  // Use pre-composed tokens for variants
   const variantClasses = {
-    primary:
-      'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl',
-    secondary:
-      'bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 shadow-sm',
-    success:
-      'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl',
-    danger:
-      'bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl',
-    ghost: 'bg-transparent hover:bg-gray-100 text-gray-700',
+    primary: tokens.button.primary,
+    secondary: tokens.button.secondary,
+    success: tokens.button.success,
+    danger: tokens.button.danger,
+    ghost: tokens.button.ghost,
   };
 
   const sizeClasses = {
@@ -46,12 +45,14 @@ export default function Button({
     lg: 'px-6 py-3 text-lg',
   };
 
-  const baseClasses =
-    'font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none';
-
   return (
     <button
-      className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${fullWidth ? 'w-full' : ''} ${className}`}
+      className={cn(
+        variantClasses[variant],
+        sizeClasses[size],
+        fullWidth && 'w-full',
+        className
+      )}
       disabled={disabled || loading}
       {...props}
     >
