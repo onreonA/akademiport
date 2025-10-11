@@ -189,21 +189,12 @@ export async function GET(
           .eq('company_id', companyId);
 
         if (!statusError && companyTaskStatuses) {
-          console.log(
-            '🔍 Firma API - Company task statuses found:',
-            companyTaskStatuses
-          );
           // Task'ların status'unu firma bazlı olarak güncelle
           subProjectTasks.forEach(task => {
             const companyStatus = companyTaskStatuses.find(
               cts => cts.task_id === task.id
             );
             if (companyStatus) {
-              console.log('Company task status update:', {
-                taskId: task.id,
-                status: companyStatus.status,
-                approval_note: companyStatus.approval_note,
-              });
               // Company-specific status exists, use it
               task.status = companyStatus.status;
               task.completed_at = companyStatus.completed_at;
@@ -261,13 +252,6 @@ export async function GET(
         allTaskIds.length > 0
           ? Math.round((completedTasks / allTaskIds.length) * 100)
           : 0;
-
-      console.log('Project progress calculation:', {
-        totalTasks: allTaskIds.length,
-        completedTasks,
-        companyProgress,
-        taskIds: allTaskIds,
-      });
     }
 
     // Alt proje bazlı progress hesapla
@@ -299,14 +283,6 @@ export async function GET(
                 (completedSubProjectTasks / subProjectTaskIds.length) * 100
               )
             : 0;
-
-        console.log('Sub-project progress calculation:', {
-          subProjectId: subProject.id,
-          subProjectName: subProject.name,
-          totalTasks: subProjectTaskIds.length,
-          completedTasks: completedSubProjectTasks,
-          progress: subProjectProgress,
-        });
       }
 
       subProjectsWithProgress.push({
