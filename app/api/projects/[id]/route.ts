@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { createClient } from '@/lib/supabase/server';
-import { requireAuth, createAuthErrorResponse, ROLE_GROUPS } from '@/lib/jwt-utils';
+import { requireAuth, createAuthErrorResponse } from '@/lib/jwt-utils';
+import { ROLE_GROUPS } from '@/lib/rbac';
 // GET /api/projects/[id] - Get single project with full details
 export async function GET(
   request: NextRequest,
