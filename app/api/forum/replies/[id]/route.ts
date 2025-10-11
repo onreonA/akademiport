@@ -91,7 +91,6 @@ export async function PUT(
           { status: 404 }
         );
       }
-      console.log('Forum reply update error:', error);
       return NextResponse.json(
         { success: false, error: 'Yanıt güncellenemedi', details: error },
         { status: 500 }

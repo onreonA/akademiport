@@ -60,9 +60,6 @@ export default function VideoDetailClient({
   const fetchEducationSetDetails = useCallback(async () => {
     try {
       setLoading(true);
-      console.log('Fetching education set details for setId:', {
-        setId,
-      });
 
       // Fetch education set details
       const setResponse = await fetch(`/api/education-sets/${setId}`, {

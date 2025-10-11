@@ -222,7 +222,6 @@ export default function ProjectDetailPage() {
   ).length;
   const totalSubProjects = subProjects.length;
 
-  // Removed console.log to prevent infinite loop
   const overdueTasks = tasks.filter(
     task => new Date(task.due_date) < new Date() && task.status !== 'Tamamlandı'
   ).length;
