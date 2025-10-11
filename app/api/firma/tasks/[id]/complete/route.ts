@@ -120,19 +120,6 @@ export async function POST(
     }
 
     // Firma bazlı görev durumunu güncelle
-    console.log('Task completion request:', {
-      taskId,
-      companyUser,
-      completionNote,
-    });
-
-    // Re-enable company_task_statuses with detailed error logging
-    console.log('Company user info:', {
-      id: companyUser.id,
-      company_id: companyUser.company_id,
-      name: companyUser.name,
-    });
-
     const upsertData = {
       task_id: taskId,
       company_id: companyUser.company_id,
@@ -150,11 +137,6 @@ export async function POST(
         onConflict: 'task_id,company_id',
       })
       .select();
-
-    console.log('Company task status result:', {
-      companyTaskStatus,
-      statusError,
-    });
 
     if (statusError) {
       console.error('❌ Company task status error details:', {

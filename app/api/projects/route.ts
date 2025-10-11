@@ -29,11 +29,6 @@ export async function GET(request: NextRequest) {
 
     if (isCompanyUser && user.company_id) {
       // Firma kullanıcısı için: Sadece project_company_assignments'ta aktif olan projeler
-      console.log('Company user projects request:', {
-        companyId: user.company_id,
-        role: user.role,
-      });
-
       const { data: assignedProjects, error: assignedError } = await supabase
         .from('project_company_assignments')
         .select(
@@ -64,23 +59,6 @@ export async function GET(request: NextRequest) {
         projects = assignedProjects?.map(item => item.projects) || [];
         error = null;
       }
-
-      console.log('Projects fetched:', {
-        projects: projects?.length,
-        error,
-      });
-
-      // Debug: Her projenin raw verilerini kontrol et
-      projects?.forEach((project: any, index: number) => {
-        console.log(`Project ${index}:`, {
-          id: project.id,
-          name: project.name,
-          end_date: project.end_date,
-          start_date: project.start_date,
-          status: project.status,
-          progress: project.progress,
-        });
-      });
     } else {
       // Admin/consultant için normal query
 
