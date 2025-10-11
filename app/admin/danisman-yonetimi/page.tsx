@@ -3,6 +3,10 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 import AdminLayout from '@/components/admin/AdminLayout';
+import Badge from '@/components/ui/Badge';
+import Card from '@/components/ui/Card';
+import StatsCard from '@/components/ui/StatsCard';
+import StatusBadge from '@/components/ui/StatusBadge';
 import { useAuthStore } from '@/lib/stores/auth-store';
 
 interface Consultant {
@@ -128,15 +132,9 @@ const ConsultantCard = ({
           </div>
         </div>
         <div className='flex items-center space-x-2'>
-          <span
-            className={`px-2 py-1 rounded-full text-xs font-medium ${
-              consultant.status === 'active'
-                ? 'bg-green-100 text-green-800'
-                : 'bg-red-100 text-red-800'
-            }`}
-          >
-            {consultant.status === 'active' ? 'Aktif' : 'Pasif'}
-          </span>
+          <StatusBadge 
+            status={consultant.status === 'active' ? 'active' : 'inactive'} 
+          />
         </div>
       </div>
       <div className='grid grid-cols-2 gap-4 mb-4'>
@@ -515,64 +513,30 @@ export default function DanismanYonetimiPage() {
         </div>
         {/* Stats */}
         <div className='grid grid-cols-1 md:grid-cols-4 gap-6 mb-8'>
-          <div className='bg-white rounded-xl shadow-sm border border-gray-200 p-6'>
-            <div className='flex items-center'>
-              <div className='w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center'>
-                <i className='ri-user-line text-2xl text-blue-600'></i>
-              </div>
-              <div className='ml-4'>
-                <p className='text-sm font-medium text-gray-600'>
-                  Toplam Danışman
-                </p>
-                <p className='text-2xl font-bold text-gray-900'>
-                  {consultants.length}
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className='bg-white rounded-xl shadow-sm border border-gray-200 p-6'>
-            <div className='flex items-center'>
-              <div className='w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center'>
-                <i className='ri-check-line text-2xl text-green-600'></i>
-              </div>
-              <div className='ml-4'>
-                <p className='text-sm font-medium text-gray-600'>
-                  Aktif Danışman
-                </p>
-                <p className='text-2xl font-bold text-gray-900'>
-                  {consultants.filter(c => c.status === 'active').length}
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className='bg-white rounded-xl shadow-sm border border-gray-200 p-6'>
-            <div className='flex items-center'>
-              <div className='w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center'>
-                <i className='ri-building-line text-2xl text-purple-600'></i>
-              </div>
-              <div className='ml-4'>
-                <p className='text-sm font-medium text-gray-600'>
-                  Toplam Atama
-                </p>
-                <p className='text-2xl font-bold text-gray-900'>
-                  {consultants.reduce((sum, c) => sum + c.assignedCompanies, 0)}
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className='bg-white rounded-xl shadow-sm border border-gray-200 p-6'>
-            <div className='flex items-center'>
-              <div className='w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center'>
-                <i className='ri-file-list-line text-2xl text-orange-600'></i>
-              </div>
-              <div className='ml-4'>
-                <p className='text-sm font-medium text-gray-600'>Aktif Rapor</p>
-                <p className='text-2xl font-bold text-gray-900'>
-                  {consultants.reduce((sum, c) => sum + c.activeReports, 0)}
-                </p>
-              </div>
-            </div>
-          </div>
+          <StatsCard
+            icon='ri-user-line'
+            label='Toplam Danışman'
+            value={consultants.length.toString()}
+            variant='primary'
+          />
+          <StatsCard
+            icon='ri-check-line'
+            label='Aktif Danışman'
+            value={consultants.filter(c => c.status === 'active').length.toString()}
+            variant='success'
+          />
+          <StatsCard
+            icon='ri-building-line'
+            label='Toplam Atama'
+            value={consultants.reduce((sum, c) => sum + c.assignedCompanies, 0).toString()}
+            variant='accent'
+          />
+          <StatsCard
+            icon='ri-file-list-line'
+            label='Aktif Rapor'
+            value={consultants.reduce((sum, c) => sum + c.activeReports, 0).toString()}
+            variant='warning'
+          />
         </div>
         {/* Consultants Grid */}
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
