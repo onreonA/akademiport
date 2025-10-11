@@ -4,6 +4,9 @@
 // High-performance data table with virtualization
 'use client';
 import React, { memo, useCallback, useMemo, useState } from 'react';
+
+import EmptyState, { LoadingEmptyState } from '@/components/ui/EmptyState';
+import { tokens } from '@/lib/design-tokens';
 interface Column<T> {
   key: keyof T;
   title: string;
@@ -187,31 +190,29 @@ function OptimizedDataTable<T extends Record<string, any>>({
   }, [data.length]);
   if (loading) {
     return (
-      <div className={`bg-white rounded-lg shadow ${className}`}>
-        <div className='p-8 text-center'>
-          <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4'></div>
-          <p className='text-gray-600'>Veriler yükleniyor...</p>
-        </div>
+      <div className={tokens.card.base}>
+        <LoadingEmptyState message='Veriler yükleniyor...' />
       </div>
     );
   }
   if (error) {
     return (
-      <div className={`bg-white rounded-lg shadow ${className}`}>
-        <div className='p-8 text-center text-red-600'>
-          <i className='ri-error-warning-line text-4xl mb-4'></i>
-          <p>{error}</p>
-        </div>
+      <div className={tokens.card.base}>
+        <EmptyState
+          type='custom'
+          title='Hata Oluştu'
+          description={error}
+          color='error'
+          size='md'
+          variant='flat'
+        />
       </div>
     );
   }
   if (data.length === 0) {
     return (
-      <div className={`bg-white rounded-lg shadow ${className}`}>
-        <div className='p-8 text-center text-gray-600'>
-          <i className='ri-database-line text-4xl mb-4'></i>
-          <p>Veri bulunamadı</p>
-        </div>
+      <div className={tokens.card.base}>
+        <EmptyState type='no-data' size='md' variant='flat' />
       </div>
     );
   }
