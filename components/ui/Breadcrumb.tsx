@@ -1,115 +1,148 @@
 'use client';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 
-interface BreadcrumbItem {
+import React from 'react';
+import Link from 'next/link';
+import { ChevronRight, Home, type LucideIcon } from 'lucide-react';
+
+import { cn, typography } from '@/lib/design-tokens';
+
+export interface BreadcrumbItem {
   label: string;
   href?: string;
-  icon?: string;
+  icon?: LucideIcon;
+  current?: boolean;
 }
 
-interface BreadcrumbProps {
-  items?: BreadcrumbItem[];
+export interface BreadcrumbProps {
+  items: BreadcrumbItem[];
+  separator?: 'chevron' | 'slash' | 'dot';
+  size?: 'sm' | 'md' | 'lg';
+  showHome?: boolean;
+  homeHref?: string;
   className?: string;
 }
 
-export default function Breadcrumb({ items, className = '' }: BreadcrumbProps) {
-  const pathname = usePathname();
-
-  // Auto-generate breadcrumb from pathname if no items provided
-  const generateBreadcrumbs = (): BreadcrumbItem[] => {
-    if (items) return items;
-
-    const pathSegments = pathname.split('/').filter(Boolean);
-    const breadcrumbs: BreadcrumbItem[] = [];
-
-    // Admin Panel
-    if (pathSegments[0] === 'admin') {
-      breadcrumbs.push({
-        label: 'Admin Panel',
-        href: '/admin',
-        icon: 'ri-dashboard-line',
-      });
-    }
-
-    // Project Management
-    if (pathSegments[1] === 'proje-yonetimi') {
-      breadcrumbs.push({
-        label: 'Proje Yönetimi',
-        href: '/admin/proje-yonetimi',
-        icon: 'ri-folder-line',
-      });
-    }
-
-    // Dashboard
-    if (pathSegments[2] === 'dashboard') {
-      breadcrumbs.push({
-        label: 'Dashboard',
-        href: '/admin/proje-yonetimi/dashboard',
-        icon: 'ri-bar-chart-line',
-      });
-    }
-
-    // Project Detail
-    if (pathSegments[2] && pathSegments[2] !== 'dashboard') {
-      breadcrumbs.push({
-        label: 'Proje Detayı',
-        icon: 'ri-file-text-line',
-      });
-    }
-
-    // Sub-projects
-    if (pathSegments[3] === 'alt-projeler') {
-      breadcrumbs.push({
-        label: 'Alt Projeler',
-        href: `/admin/proje-yonetimi/${pathSegments[2]}/alt-projeler`,
-        icon: 'ri-folder-open-line',
-      });
-    }
-
-    // Sub-project Detail
-    if (pathSegments[4]) {
-      breadcrumbs.push({
-        label: 'Alt Proje Detayı',
-        icon: 'ri-file-list-line',
-      });
-    }
-
-    return breadcrumbs;
+/**
+ * Breadcrumb Component - Page navigation trail
+ *
+ * @example
+ * <Breadcrumb
+ *   items={[
+ *     { label: 'Projeler', href: '/firma/projeler' },
+ *     { label: 'Proje Detay', current: true }
+ *   ]}
+ * />
+ *
+ * @example
+ * <Breadcrumb
+ *   items={breadcrumbs}
+ *   separator="slash"
+ *   showHome
+ * />
+ */
+export default function Breadcrumb({
+  items,
+  separator = 'chevron',
+  size = 'md',
+  showHome = true,
+  homeHref = '/',
+  className,
+}: BreadcrumbProps) {
+  // Size configurations
+  const sizeConfig = {
+    sm: {
+      text: 'text-xs',
+      icon: 'w-3 h-3',
+      gap: 'gap-1',
+      padding: 'px-2 py-1',
+    },
+    md: {
+      text: 'text-sm',
+      icon: 'w-4 h-4',
+      gap: 'gap-1.5',
+      padding: 'px-2.5 py-1.5',
+    },
+    lg: {
+      text: 'text-base',
+      icon: 'w-5 h-5',
+      gap: 'gap-2',
+      padding: 'px-3 py-2',
+    },
   };
 
-  const breadcrumbs = generateBreadcrumbs();
+  const currentSize = sizeConfig[size];
 
-  if (breadcrumbs.length <= 1) return null;
+  // Separator component
+  const Separator = () => {
+    if (separator === 'chevron') {
+      return <ChevronRight className={cn(currentSize.icon, 'text-gray-400')} />;
+    }
+    if (separator === 'slash') {
+      return <span className='text-gray-400'>/</span>;
+    }
+    if (separator === 'dot') {
+      return <span className='text-gray-400'>•</span>;
+    }
+    return null;
+  };
+
+  // All items (home + provided items)
+  const allItems: BreadcrumbItem[] = showHome
+    ? [{ label: 'Ana Sayfa', href: homeHref, icon: Home }, ...items]
+    : items;
 
   return (
-    <nav
-      className={`flex items-center space-x-2 text-sm ${className}`}
-      aria-label='Breadcrumb'
-    >
-      <ol className='flex items-center space-x-2'>
-        {breadcrumbs.map((item, index) => (
-          <li key={index} className='flex items-center'>
-            {index > 0 && (
-              <i className='ri-arrow-right-s-line text-gray-400 mx-2'></i>
-            )}
+    <nav aria-label='Breadcrumb' className={cn('flex items-center flex-wrap', currentSize.gap, className)}>
+      <ol className={cn('flex items-center flex-wrap', currentSize.gap)}>
+        {allItems.map((item, index) => {
+          const isLast = index === allItems.length - 1;
+          const isCurrent = item.current || isLast;
+          const ItemIcon = item.icon;
 
-            {item.href ? (
-              <Link
-                href={item.href}
-                className='flex items-center text-gray-600 hover:text-blue-600 transition-colors'
-              >
-                {item.icon && <i className={`${item.icon} mr-1.5 text-sm`}></i>}
-                <span>{item.label}</span>
-              </Link>
-            ) : (
-              <span className='flex items-center text-gray-900 font-medium'>
-                {item.icon && <i className={`${item.icon} mr-1.5 text-sm`}></i>}
-                <span>{item.label}</span>
-              </span>
-            )}
-          </li>
-        ))}
+          return (
+            <li key={index} className={cn('flex items-center', currentSize.gap)}>
+              {/* Item */}
+              {item.href && !isCurrent ? (
+                <Link
+                  href={item.href}
+                  className={cn(
+                    'inline-flex items-center',
+                    currentSize.gap,
+                    currentSize.text,
+                    currentSize.padding,
+                    'text-gray-600',
+                    'hover:text-blue-600',
+                    'hover:bg-blue-50',
+                    'rounded-md',
+                    'transition-colors',
+                    'font-medium'
+                  )}
+                >
+                  {ItemIcon && <ItemIcon className={currentSize.icon} />}
+                  <span>{item.label}</span>
+                </Link>
+              ) : (
+                <span
+                  className={cn(
+                    'inline-flex items-center',
+                    currentSize.gap,
+                    currentSize.text,
+                    currentSize.padding,
+                    isCurrent ? 'text-gray-900 font-semibold' : 'text-gray-600',
+                    'rounded-md'
+                  )}
+                  aria-current={isCurrent ? 'page' : undefined}
+                >
+                  {ItemIcon && <ItemIcon className={currentSize.icon} />}
+                  <span>{item.label}</span>
+                </span>
+              )}
+
+              {/* Separator */}
+              {!isLast && <Separator />}
+            </li>
+          );
+        })}
       </ol>
     </nav>
   );
