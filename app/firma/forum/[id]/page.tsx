@@ -87,11 +87,8 @@ const createReply = async (
   parentReplyId?: string
 ): Promise<ForumReply | null> => {
   try {
-    console.log('createReply called with:', { topicId, content, authorId, parentReplyId });
-
     // Eğer authorId yoksa, mevcut yanıtlardan birini kullan
     const fallbackAuthorId = authorId || 'cd9bf9ec-f2ef-4672-87e4-428fb1b5241e';
-    console.log('Using authorId:', fallbackAuthorId);
 
     const requestBody = {
       topic_id: topicId,
@@ -99,7 +96,6 @@ const createReply = async (
       content: content,
       parent_reply_id: parentReplyId || null,
     };
-    console.log('Request body:', requestBody);
 
     const response = await fetch('/api/forum/replies', {
       method: 'POST',
@@ -110,9 +106,7 @@ const createReply = async (
       body: JSON.stringify(requestBody),
     });
 
-    console.log('Response status:', response.status);
     const result = await response.json();
-    console.log('Response result:', result);
 
     if (result.success) {
       return result.data;
@@ -151,12 +145,7 @@ const ForumTopicDetail = () => {
 
   // Debug: Auth durumunu kontrol et (sadece bir kez)
   useEffect(() => {
-    console.log('Auth user:', user);
-    console.log('Cookies:', document.cookie);
-    console.log(
-      'localStorage auth_session:',
-      localStorage.getItem('auth_session')
-    );
+    // Auth state tracking
   }, [user]);
   const [loading, setLoading] = useState(true);
   const [topic, setTopic] = useState<ForumTopic | null>(null);
@@ -181,7 +170,6 @@ const ForumTopicDetail = () => {
         });
         const result = await response.json();
         if (result.success) {
-          console.log('Current user from API:', result.data);
           setCurrentUserId(result.data.id);
         } else {
           console.error('Failed to get current user:', result.error);
@@ -249,13 +237,7 @@ const ForumTopicDetail = () => {
     };
   }, [topicId]);
   const handleSubmitReply = async () => {
-    console.log('handleSubmitReply çağrıldı');
-    console.log('newReply:', newReply);
-    console.log('topic:', topic);
-    console.log('user:', user);
-
     if (!newReply.trim() || !topic) {
-      console.log('Validation failed - newReply or topic missing');
       return;
     }
 
@@ -263,12 +245,8 @@ const ForumTopicDetail = () => {
     try {
       // Önce currentUserId'yi kullan, yoksa user?.id'yi kullan, son olarak fallback
       const authorId = currentUserId || user?.id;
-      console.log('currentUserId:', currentUserId);
-      console.log('user?.id:', user?.id);
-      console.log('final authorId:', authorId);
 
       const reply = await createReply(topic.id, newReply, authorId);
-      console.log('Reply created:', reply);
 
       if (reply) {
         setReplies([...replies, reply]);
@@ -295,9 +273,8 @@ const ForumTopicDetail = () => {
 
         setNewReply('');
         setShowReplyForm(false);
-        console.log('Reply added successfully');
       } else {
-        console.log('Reply creation failed - no reply returned');
+        // Reply creation failed
       }
     } catch (error) {
       console.error('Yanıt gönderme hatası:', error);
@@ -315,10 +292,7 @@ const ForumTopicDetail = () => {
   };
 
   const handleReplyToReply = async (parentReplyId: string) => {
-    console.log('handleReplyToReply called with:', { parentReplyId, replyToReply, topic, currentUserId });
-    
     if (!replyToReply.trim() || !topic || !currentUserId) {
-      console.log('Validation failed:', { replyToReply: replyToReply.trim(), topic, currentUserId });
       return;
     }
 
@@ -580,14 +554,6 @@ const ForumTopicDetail = () => {
                     </button>
                     <button
                       onClick={() => {
-                        console.log('Button clicked!');
-                        console.log('submitting:', submitting);
-                        console.log('newReply:', newReply);
-                        console.log('newReply.trim():', newReply.trim());
-                        console.log(
-                          'Button disabled:',
-                          submitting || !newReply.trim()
-                        );
                         handleSubmitReply();
                       }}
                       disabled={submitting || !newReply.trim()}
