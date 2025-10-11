@@ -97,7 +97,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
     ref
   ) => {
     // Normalize options to SelectOption[]
-    const normalizedOptions: SelectOption[] = options.map(opt => {
+    const normalizedOptions: SelectOption[] = (options || []).map(opt => {
       if (typeof opt === 'string') {
         return { value: opt, label: opt };
       }

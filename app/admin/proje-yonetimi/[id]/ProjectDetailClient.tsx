@@ -7,6 +7,7 @@ import Accordion from '@/components/ui/Accordion';
 import Breadcrumb from '@/components/ui/Breadcrumb';
 import Button from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';
+import StatusBadge from '@/components/ui/StatusBadge';
 
 import EnhancedAssignmentModal from './EnhancedAssignmentModal';
 
@@ -1112,35 +1113,36 @@ export default function ProjectDetailClient({
     }
   };
 
-  const getStatusColor = (status: string) => {
+  // Mapping functions for StatusBadge component
+  const mapProjectStatus = (status: string) => {
     switch (status) {
       case 'Aktif':
-        return 'bg-green-100 text-green-800';
+        return 'active';
       case 'Tamamlandı':
-        return 'bg-blue-100 text-blue-800';
+        return 'completed';
       case 'Planlandı':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'pending';
       case 'Devam Ediyor':
-        return 'bg-orange-100 text-orange-800';
+        return 'in-progress';
       case 'Beklemede':
-        return 'bg-gray-100 text-gray-800';
+        return 'on-hold';
       case 'Başlamadı':
-        return 'bg-red-100 text-red-800';
+        return 'cancelled';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'inactive';
     }
   };
 
-  const getPriorityColor = (priority: string) => {
+  const mapTaskPriority = (priority: string) => {
     switch (priority) {
       case 'Yüksek':
-        return 'bg-red-100 text-red-800';
+        return 'urgent';
       case 'Orta':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'medium';
       case 'Düşük':
-        return 'bg-green-100 text-green-800';
+        return 'low';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'low';
     }
   };
 
@@ -1262,11 +1264,9 @@ export default function ProjectDetailClient({
               </div>
             </div>
             <div className='flex items-center space-x-2'>
-              <span
-                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(subProject.status)}`}
-              >
+              <StatusBadge status={mapProjectStatus(subProject.status)} size='sm'>
                 {subProject.status}
-              </span>
+              </StatusBadge>
               <div className='flex items-center space-x-1'>
                 <Button
                   size='xs'
@@ -1381,16 +1381,12 @@ export default function ProjectDetailClient({
                       </p>
                     </div>
                     <div className='flex items-center space-x-2 ml-4'>
-                      <span
-                        className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(task.priority)}`}
-                      >
+                      <StatusBadge status={mapTaskPriority(task.priority)} size='xs'>
                         {task.priority}
-                      </span>
-                      <span
-                        className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(task.status)}`}
-                      >
+                      </StatusBadge>
+                      <StatusBadge status={mapProjectStatus(task.status)} size='xs'>
                         {task.status}
-                      </span>
+                      </StatusBadge>
                     </div>
                   </div>
 
@@ -1477,11 +1473,9 @@ export default function ProjectDetailClient({
         <div>
           <div className='flex items-center space-x-3 mb-2'>
             <h1 className='text-3xl font-bold text-gray-900'>{project.name}</h1>
-            <span
-              className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(project.status)}`}
-            >
+            <StatusBadge status={mapProjectStatus(project.status)} size='md'>
               {project.status}
-            </span>
+            </StatusBadge>
           </div>
           <p className='text-gray-600'>{project.description}</p>
           <div className='flex items-center space-x-4 text-sm text-gray-500 mt-2'>
@@ -1889,9 +1883,9 @@ export default function ProjectDetailClient({
                 <h4 className='font-medium text-gray-800'>
                   Ana Proje Tarihleri
                 </h4>
-                <span className='text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full'>
+                <StatusBadge status='info' size='sm'>
                   Üst Seviye
-                </span>
+                </StatusBadge>
               </div>
               <div className='grid grid-cols-2 gap-4'>
                 <div>
@@ -1963,9 +1957,9 @@ export default function ProjectDetailClient({
                 <h4 className='font-medium text-gray-800'>
                   Alt Proje Tarihleri
                 </h4>
-                <span className='text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full'>
+                <StatusBadge status='success' size='sm'>
                   Ana Proje Aralığında
-                </span>
+                </StatusBadge>
               </div>
               <div className='grid grid-cols-2 gap-4'>
                 <div>
@@ -2049,9 +2043,9 @@ export default function ProjectDetailClient({
             <div className='border border-gray-200 rounded-lg p-4'>
               <div className='flex items-center justify-between mb-3'>
                 <h4 className='font-medium text-gray-800'>Görev Tarihleri</h4>
-                <span className='text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full'>
+                <StatusBadge status='warning' size='sm'>
                   Alt Proje Aralığında
-                </span>
+                </StatusBadge>
               </div>
               <div className='grid grid-cols-2 gap-4'>
                 <div>

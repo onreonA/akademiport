@@ -4,8 +4,11 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 import Button from '@/components/ui/Button';
+import Input from '@/components/ui/Input';
 import Modal, { ModalFooter } from '@/components/ui/Modal';
+import Select from '@/components/ui/Select';
 import StatusBadge from '@/components/ui/StatusBadge';
+import Textarea from '@/components/ui/Textarea';
 interface Video {
   id: string;
   title: string;
@@ -294,10 +297,10 @@ export default function VideoManagement() {
                 <label className='block text-sm font-medium text-gray-700 mb-2'>
                   Eğitim Seti
                 </label>
-                <select
+                <Select
                   value={selectedSet}
                   onChange={e => setSelectedSet(e.target.value)}
-                  className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm'
+                  className='w-full'
                 >
                   <option value=''>Tüm Setler</option>
                   {educationSets.map(set => (
@@ -305,38 +308,34 @@ export default function VideoManagement() {
                       {set.name}
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
               <div>
                 <label className='block text-sm font-medium text-gray-700 mb-2'>
                   Durum
                 </label>
-                <select
+                <Select
                   value={selectedStatus}
                   onChange={e => setSelectedStatus(e.target.value)}
-                  className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm'
+                  className='w-full'
                 >
                   <option value=''>Tüm Durumlar</option>
                   <option value='Aktif'>Aktif</option>
                   <option value='Pasif'>Pasif</option>
-                </select>
+                </Select>
               </div>
               <div>
                 <label className='block text-sm font-medium text-gray-700 mb-2'>
                   Video Ara
                 </label>
-                <div className='relative'>
-                  <div className='absolute inset-y-0 left-0 pl-3 flex items-center'>
-                    <i className='ri-search-line text-gray-400 text-sm'></i>
-                  </div>
-                  <input
-                    type='text'
-                    value={searchQuery}
-                    onChange={e => setSearchQuery(e.target.value)}
-                    placeholder='Video adı ara...'
-                    className='w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm'
-                  />
-                </div>
+                <Input
+                  type='text'
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  placeholder='Video adı ara...'
+                  className='w-full'
+                  icon='ri-search-line'
+                />
               </div>
               <div className='flex items-end'>
                 <button
@@ -472,13 +471,13 @@ export default function VideoManagement() {
             <label className='block text-sm font-medium text-gray-700 mb-2'>
               Video Başlığı <span className='text-red-500'>*</span>
             </label>
-            <input
+            <Input
               type='text'
               value={formData.title}
               onChange={e =>
                 setFormData({ ...formData, title: e.target.value })
               }
-              className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+              className='w-full'
               required
             />
           </div>
@@ -486,13 +485,13 @@ export default function VideoManagement() {
             <label className='block text-sm font-medium text-gray-700 mb-2'>
               Açıklama
             </label>
-            <textarea
+            <Textarea
               value={formData.description}
               onChange={e =>
                 setFormData({ ...formData, description: e.target.value })
               }
               rows={3}
-              className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+              className='w-full'
               placeholder='Video hakkında kısa açıklama...'
             />
           </div>
