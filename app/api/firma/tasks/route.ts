@@ -1,27 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { createClient } from '@/lib/supabase/server';
+import { requireCompany, createAuthErrorResponse } from '@/lib/jwt-utils';
 
 // GET /api/firma/tasks - Get tasks assigned to the logged-in company
 export async function GET(request: NextRequest) {
   try {
+    // JWT Authentication - Company users only
+    const user = await requireCompany(request);
+    
     const supabase = createClient();
+    
+    // JWT'den company_id al
+    const userCompanyId = user.company_id;
 
-    // Get user info from cookies
-    const userEmail = request.cookies.get('auth-user-email')?.value;
-    const userRole = request.cookies.get('auth-user-role')?.value;
-    const userCompanyId = request.cookies.get('auth-user-company-id')?.value;
-
-    if (!userEmail || !userCompanyId) {
+    if (!userCompanyId) {
       return NextResponse.json(
-        { error: 'Kullanıcı kimlik doğrulaması gerekli' },
-        { status: 401 }
+        { error: 'Firma bilgisi bulunamadı' },
+        { status: 404 }
       );
-    }
-
-    // Only company users can access this endpoint
-    if (!['firma_admin', 'firma_kullanıcı'].includes(userRole || '')) {
-      return NextResponse.json({ error: 'Erişim reddedildi' }, { status: 403 });
     }
 
     // Get query parameters
@@ -119,7 +116,13 @@ export async function GET(request: NextRequest) {
       tasks: formattedTasks,
       total: formattedTasks.length,
     });
-  } catch (error) {
+  } catch (error: any) {
+    // Handle authentication errors specifically
+    if (error.message === 'Authentication required' || 
+        error.message === 'Company access required') {
+      return createAuthErrorResponse(error.message, 401);
+    }
+    
     return NextResponse.json({ error: 'Sunucu hatası' }, { status: 500 });
   }
 }

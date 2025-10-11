@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 /**
  * Temel veri doğrulama şemaları
- * 
+ *
  * Bu modül, API endpoint'lerinde kullanılan veri doğrulama şemalarını içerir.
  * Zod kütüphanesi kullanılarak tip güvenliği ve veri doğrulama sağlanır.
  */
@@ -156,7 +156,7 @@ export const videoSchema = z.object({
     message: 'Video açıklaması en az 10 karakter olmalıdır',
   }),
   url: z.string().url({
-    message: 'Geçerli bir video URL\'si girilmelidir',
+    message: "Geçerli bir video URL'si girilmelidir",
   }),
   thumbnail_url: urlSchema,
   duration: z.number().min(0).optional(),
@@ -174,7 +174,7 @@ export const documentSchema = z.object({
   }),
   category_id: uuidSchema,
   file_url: z.string().url({
-    message: 'Geçerli bir dosya URL\'si girilmelidir',
+    message: "Geçerli bir dosya URL'si girilmelidir",
   }),
   file_size: z.number().min(0).optional(),
   file_type: z.string().optional(),
@@ -264,7 +264,7 @@ export const appointmentSchema = z.object({
 export function validateData<T>(schema: z.ZodType<T>, data: unknown) {
   try {
     const result = schema.safeParse(data);
-    
+
     if (result.success) {
       return {
         success: true,

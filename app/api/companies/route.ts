@@ -2,9 +2,14 @@ import { createClient } from '@supabase/supabase-js';
 import bcrypt from 'bcryptjs';
 import { NextRequest, NextResponse } from 'next/server';
 
+import { requireAdmin, createAuthErrorResponse } from '@/lib/jwt-utils';
+
 // Firmaları getir
 export async function GET(request: NextRequest) {
   try {
+    // JWT Authentication - Admin users only
+    const user = await requireAdmin(request);
+    
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -13,16 +18,6 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status');
     const limit = parseInt(searchParams.get('limit') || '50');
     const offset = parseInt(searchParams.get('offset') || '0');
-
-    // TEMPORARY: Simplified authentication for testing
-    const userEmail = request.headers.get('X-User-Email');
-
-    if (!userEmail) {
-      return NextResponse.json(
-        { error: 'User email required' },
-        { status: 400 }
-      );
-    }
     // TEMPORARY: Disable cache for testing
     // const cacheKey = cacheKeys.companies({
     //   status,
@@ -77,7 +72,13 @@ export async function GET(request: NextRequest) {
     // TEMPORARY: Disable cache for testing
     // cacheUtils.set(cacheKey, response, 2 * 60 * 1000); // 2 minutes cache
     return NextResponse.json(response);
-  } catch (error) {
+  } catch (error: any) {
+    // Handle authentication errors specifically
+    if (error.message === 'Authentication required' || 
+        error.message === 'Admin access required') {
+      return createAuthErrorResponse(error.message, 401);
+    }
+    
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -97,6 +98,9 @@ function generateSecurePassword(): string {
 // Yeni firma oluştur
 export async function POST(request: NextRequest) {
   try {
+    // JWT Authentication - Only admin users can create companies
+    const user = await requireAdmin(request);
+    
     const {
       name,
       email,
@@ -112,27 +116,6 @@ export async function POST(request: NextRequest) {
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
-    const userEmail = request.cookies.get('auth-user-email')?.value;
-    const userRole = request.cookies.get('auth-user-role')?.value;
-    if (!userEmail) {
-      return NextResponse.json(
-        { error: 'User email required' },
-        { status: 400 }
-      );
-    }
-    // Kullanıcı yetkisini kontrol et
-    const { data: user, error: userError } = await supabase
-      .from('users')
-      .select('id, role')
-      .eq('email', userEmail)
-      .single();
-    if (userError || !user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
-    // Sadece adminler firma oluşturabilir
-    if (user.role !== 'admin' && user.role !== 'master_admin') {
-      return NextResponse.json({ error: 'Access denied' }, { status: 403 });
-    }
     // Gerekli alanları kontrol et
     if (!name || !email) {
       return NextResponse.json(
@@ -197,7 +180,13 @@ export async function POST(request: NextRequest) {
       password: plainPassword, // Şifreyi response'da döndür (sadece bu seferlik)
       message: 'Firma başarıyla oluşturuldu',
     });
-  } catch (error) {
+  } catch (error: any) {
+    // Handle authentication errors specifically
+    if (error.message === 'Authentication required' || 
+        error.message === 'Admin access required') {
+      return createAuthErrorResponse(error.message, 401);
+    }
+    
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

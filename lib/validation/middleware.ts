@@ -3,7 +3,7 @@ import { z } from 'zod';
 
 /**
  * API endpoint'leri için veri doğrulama middleware'i
- * 
+ *
  * Bu modül, API endpoint'lerinde kullanılan veri doğrulama middleware'lerini içerir.
  * Zod kütüphanesi kullanılarak tip güvenliği ve veri doğrulama sağlanır.
  */
@@ -18,27 +18,27 @@ export function validateBody<T>(schema: z.ZodType<T>) {
     try {
       const body = await request.json();
       const result = schema.safeParse(body);
-      
+
       if (!result.success) {
         return NextResponse.json(
-          { 
-            success: false, 
-            error: 'Validation error', 
-            details: result.error.format() 
+          {
+            success: false,
+            error: 'Validation error',
+            details: result.error.format(),
           },
           { status: 400 }
         );
       }
-      
+
       // Doğrulanmış veriyi request'e ekle
       (request as any).validatedBody = result.data;
-      
+
       return next();
     } catch (error) {
       return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Invalid JSON' 
+        {
+          success: false,
+          error: 'Invalid JSON',
         },
         { status: 400 }
       );
@@ -56,34 +56,34 @@ export function validateQuery<T>(schema: z.ZodType<T>) {
     try {
       const url = new URL(request.url);
       const query: Record<string, any> = {};
-      
+
       // URL'den query parametrelerini al
       url.searchParams.forEach((value, key) => {
         query[key] = value;
       });
-      
+
       const result = schema.safeParse(query);
-      
+
       if (!result.success) {
         return NextResponse.json(
-          { 
-            success: false, 
-            error: 'Validation error', 
-            details: result.error.format() 
+          {
+            success: false,
+            error: 'Validation error',
+            details: result.error.format(),
           },
           { status: 400 }
         );
       }
-      
+
       // Doğrulanmış veriyi request'e ekle
       (request as any).validatedQuery = result.data;
-      
+
       return next();
     } catch (error) {
       return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Invalid query parameters' 
+        {
+          success: false,
+          error: 'Invalid query parameters',
         },
         { status: 400 }
       );
@@ -97,30 +97,34 @@ export function validateQuery<T>(schema: z.ZodType<T>) {
  * @returns Middleware fonksiyonu
  */
 export function validateParams<T>(schema: z.ZodType<T>) {
-  return async (request: NextRequest, params: any, next: () => Promise<NextResponse>) => {
+  return async (
+    request: NextRequest,
+    params: any,
+    next: () => Promise<NextResponse>
+  ) => {
     try {
       const result = schema.safeParse(params);
-      
+
       if (!result.success) {
         return NextResponse.json(
-          { 
-            success: false, 
-            error: 'Validation error', 
-            details: result.error.format() 
+          {
+            success: false,
+            error: 'Validation error',
+            details: result.error.format(),
           },
           { status: 400 }
         );
       }
-      
+
       // Doğrulanmış veriyi request'e ekle
       (request as any).validatedParams = result.data;
-      
+
       return next();
     } catch (error) {
       return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Invalid path parameters' 
+        {
+          success: false,
+          error: 'Invalid path parameters',
         },
         { status: 400 }
       );
@@ -136,14 +140,14 @@ export function validateParams<T>(schema: z.ZodType<T>) {
  */
 export function validateRequest<T>(schema: z.ZodType<T>, data: unknown) {
   const result = schema.safeParse(data);
-  
+
   if (result.success) {
     return { success: true, data: result.data };
   } else {
-    return { 
-      success: false, 
+    return {
+      success: false,
       errors: result.error.format(),
-      errorMessage: formatZodErrors(result.error)
+      errorMessage: formatZodErrors(result.error),
     };
   }
 }
@@ -154,8 +158,10 @@ export function validateRequest<T>(schema: z.ZodType<T>, data: unknown) {
  * @returns Formatlanmış hata mesajı
  */
 function formatZodErrors(error: z.ZodError): string {
-  return error.errors.map(err => {
-    const path = err.path.join('.');
-    return `${path ? path + ': ' : ''}${err.message}`;
-  }).join(', ');
+  return error.errors
+    .map(err => {
+      const path = err.path.join('.');
+      return `${path ? path + ': ' : ''}${err.message}`;
+    })
+    .join(', ');
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { createClient } from '@/lib/supabase/server';
+import { requireAuth, createAuthErrorResponse, ROLE_GROUPS } from '@/lib/jwt-utils';
 
 /**
  * POST /api/consultant/tasks/[id]/approve
@@ -11,44 +12,32 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const supabase = createClient();
-    const { id: taskId } = await params;
-
-    // Kullanıcı kimlik doğrulama
-    const userEmail = request.cookies.get('auth-user-email')?.value;
-    const userRole = request.cookies.get('auth-user-role')?.value;
-
-    if (!userEmail) {
-      return NextResponse.json(
-        { error: 'Kullanıcı kimlik doğrulaması gerekli' },
-        { status: 401 }
-      );
-    }
-
-    // Danışman kontrolü
-    if (
-      userRole !== 'danışman' &&
-      userRole !== 'admin' &&
-      userRole !== 'master_admin'
-    ) {
+    // JWT Authentication - Admin and consultant only
+    const user = await requireAuth(request);
+    
+    // Danışman veya admin kontrolü
+    if (!ROLE_GROUPS.ADMIN_ROLES.includes(user.role)) {
       return NextResponse.json(
         { error: 'Bu işlem için danışman yetkisi gerekli' },
         { status: 403 }
       );
     }
+    
+    const supabase = createClient();
+    const { id: taskId } = await params;
 
     // Request body'den onay bilgilerini al
     const body = await request.json();
     const { approvalNote, qualityScore } = body;
 
     // Kullanıcı bilgilerini al (danışman veya admin)
-    const { data: user, error: userError } = await supabase
+    const { data: currentUser, error: userError } = await supabase
       .from('users')
       .select('id, full_name, email')
-      .eq('email', userEmail)
+      .eq('email', user.email)
       .single();
 
-    if (userError || !user) {
+    if (userError || !currentUser) {
       return NextResponse.json(
         { error: 'Kullanıcı bilgisi bulunamadı' },
         { status: 404 }
@@ -102,7 +91,7 @@ export async function POST(
         .from('task_completions')
         .update({
           status: 'approved',
-          approved_by: user.id,
+          approved_by: currentUser.id,
           approved_at: new Date().toISOString(),
           approval_note: approvalNote || 'Görev onaylandı',
           quality_score: qualityScore || null,
@@ -142,7 +131,7 @@ export async function POST(
       action: 'approved',
       old_value: 'pending_approval',
       new_value: 'approved',
-      user_id: user.id,
+      user_id: currentUser.id,
       notes: approvalNote || 'Görev danışman tarafından onaylandı',
     });
 
@@ -169,7 +158,7 @@ export async function POST(
           entity_id: taskId,
           metadata: {
             task_title: (completionRecord.tasks as any).title,
-            approved_by: user.full_name,
+            approved_by: currentUser.full_name,
             approval_note: approvalNote,
             quality_score: qualityScore,
           },
@@ -200,7 +189,7 @@ export async function POST(
         title: (completionRecord.tasks as any).title,
         status: 'completed',
         approvedAt: updatedCompletion.approved_at,
-        approvedBy: user.full_name,
+        approvedBy: currentUser.full_name,
       },
       completion: {
         id: updatedCompletion.id,
@@ -211,7 +200,12 @@ export async function POST(
     };
 
     return NextResponse.json(response);
-  } catch (error) {
+  } catch (error: any) {
+    // Handle authentication errors specifically
+    if (error.message === 'Authentication required') {
+      return createAuthErrorResponse(error.message, 401);
+    }
+    
     return NextResponse.json(
       {
         error: 'Sunucu hatası',
