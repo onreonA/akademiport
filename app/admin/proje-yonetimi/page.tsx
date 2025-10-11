@@ -498,7 +498,13 @@ export default function ProjectManagement() {
       description='Tüm projelerinizi buradan yönetebilir ve takip edebilirsiniz'
     >
       {/* Breadcrumb */}
-      <Breadcrumb className='mb-6' />
+      <Breadcrumb 
+        items={[
+          { label: 'Ana Sayfa', href: '/admin' },
+          { label: 'Proje Yönetimi', current: true }
+        ]}
+        className='mb-6' 
+      />
 
       {/* Header Actions */}
       <div className='flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4 mb-8'>

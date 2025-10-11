@@ -87,9 +87,10 @@ export default function Breadcrumb({
   };
 
   // All items (home + provided items)
+  const safeItems = items || [];
   const allItems: BreadcrumbItem[] = showHome
-    ? [{ label: 'Ana Sayfa', href: homeHref, icon: Home }, ...items]
-    : items;
+    ? [{ label: 'Ana Sayfa', href: homeHref, icon: Home }, ...safeItems]
+    : safeItems;
 
   return (
     <nav
