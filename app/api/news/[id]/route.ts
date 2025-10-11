@@ -39,7 +39,6 @@ export async function GET(
       .single();
 
     if (error) {
-      console.log('News fetch error:', error);
       return NextResponse.json(
         { success: false, error: 'Haber bulunamadı' },
         { status: 404 }
@@ -48,7 +47,6 @@ export async function GET(
 
     return NextResponse.json({ success: true, data: news });
   } catch (error) {
-    console.log('News API error:', error);
     return NextResponse.json(
       { success: false, error: 'Sunucu hatası' },
       { status: 500 }
@@ -148,7 +146,6 @@ export async function PUT(
       .single();
 
     if (error) {
-      console.log('News update error:', error);
       return NextResponse.json(
         { success: false, error: 'Haber güncellenemedi' },
         { status: 500 }
@@ -157,7 +154,6 @@ export async function PUT(
 
     return NextResponse.json({ success: true, data: updatedNews });
   } catch (error) {
-    console.log('News update API error:', error);
     return NextResponse.json(
       { success: false, error: 'Sunucu hatası' },
       { status: 500 }
@@ -202,7 +198,6 @@ export async function DELETE(
       .eq('id', id);
 
     if (deleteError) {
-      console.log('News delete error:', deleteError);
       return NextResponse.json(
         { success: false, error: 'Haber silinemedi' },
         { status: 500 }
@@ -214,7 +209,6 @@ export async function DELETE(
       message: `"${existingNews.title}" haberi başarıyla silindi`,
     });
   } catch (error) {
-    console.log('News delete API error:', error);
     return NextResponse.json(
       { success: false, error: 'Sunucu hatası' },
       { status: 500 }
