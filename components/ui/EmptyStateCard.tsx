@@ -1,3 +1,20 @@
+/**
+ * @deprecated This component is deprecated. Use EmptyState from '@/components/ui/EmptyState' instead.
+ * 
+ * Migration:
+ * ```tsx
+ * // OLD
+ * import EmptyStateCard from '@/components/ui/EmptyStateCard';
+ * <EmptyStateCard type="no-projects" />
+ * 
+ * // NEW
+ * import EmptyState from '@/components/ui/EmptyState';
+ * <EmptyState type="no-projects" />
+ * ```
+ * 
+ * This file will be removed in a future version.
+ */
+
 'use client';
 import {
   FolderOpenIcon,
@@ -7,6 +24,13 @@ import {
   InformationCircleIcon,
 } from '@heroicons/react/24/outline';
 
+// Re-export new EmptyState for backward compatibility
+export { default } from '@/components/ui/EmptyState';
+export { CompactEmptyState, LoadingEmptyState } from '@/components/ui/EmptyState';
+
+/**
+ * @deprecated Use EmptyState instead
+ */
 interface EmptyStateCardProps {
   type:
     | 'no-projects'
@@ -21,7 +45,10 @@ interface EmptyStateCardProps {
   className?: string;
 }
 
-export default function EmptyStateCard({
+/**
+ * @deprecated This component is deprecated. Use EmptyState from '@/components/ui/EmptyState' instead.
+ */
+export function OldEmptyStateCard({
   type,
   title,
   description,
@@ -170,50 +197,6 @@ export default function EmptyStateCard({
           </ul>
         </div>
       )}
-    </div>
-  );
-}
-
-// Compact Empty State Component
-interface CompactEmptyStateProps {
-  message: string;
-  icon?: React.ComponentType<{ className?: string }>;
-  className?: string;
-}
-
-export function CompactEmptyState({
-  message,
-  icon: Icon = InformationCircleIcon,
-  className = '',
-}: CompactEmptyStateProps) {
-  return (
-    <div
-      className={`flex items-center justify-center py-8 text-gray-500 ${className}`}
-    >
-      <div className='text-center'>
-        <Icon className='w-8 h-8 mx-auto mb-2 text-gray-300' />
-        <p className='text-sm'>{message}</p>
-      </div>
-    </div>
-  );
-}
-
-// Loading Empty State Component
-interface LoadingEmptyStateProps {
-  message?: string;
-  className?: string;
-}
-
-export function LoadingEmptyState({
-  message = 'Yükleniyor...',
-  className = '',
-}: LoadingEmptyStateProps) {
-  return (
-    <div className={`flex items-center justify-center py-8 ${className}`}>
-      <div className='text-center'>
-        <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2'></div>
-        <p className='text-sm text-gray-500'>{message}</p>
-      </div>
     </div>
   );
 }

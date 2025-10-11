@@ -1,3 +1,4 @@
+import jwt from 'jsonwebtoken';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { authService } from '@/lib/auth-service';
@@ -11,28 +12,27 @@ export async function POST(request: NextRequest) {
       user: result.user,
       session: result.session,
     });
-    // Authentication cookie'lerini set et (httpOnly: false - client-side okunabilir)
-    response.cookies.set('auth-user-email', result.user.email, {
-      httpOnly: false, // Client-side'da okunabilir
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7, // 7 gün
+    // Güvenli JWT token oluştur
+    const jwtToken = jwt.sign(
+      {
+        id: result.user.id,
+        email: result.user.email,
+        role: result.user.role,
+        company_id: result.user.company_id,
+      },
+      process.env.JWT_SECRET || 'your-secret-key-change-in-production',
+      { expiresIn: '2h' } // 2 saat
+    );
+
+    // Güvenli authentication cookie set et
+    response.cookies.set('auth-token', jwtToken, {
+      httpOnly: true, // XSS koruması
+      secure: false, // Development için false (production'da true olacak)
+      sameSite: 'lax', // CSRF koruması
+      maxAge: 60 * 60 * 2, // 2 saat
+      path: '/',
+      domain: undefined, // Explicit domain belirtme (localhost için)
     });
-    response.cookies.set('auth-user-role', result.user.role, {
-      httpOnly: false, // Client-side'da okunabilir
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7, // 7 gün
-    });
-    // Company ID varsa onu da set et
-    if (result.user.company_id) {
-      response.cookies.set('auth-user-company-id', result.user.company_id, {
-        httpOnly: false, // Client-side'da okunabilir
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 60 * 60 * 24 * 7, // 7 gün
-      });
-    }
     return response;
   } catch (error: any) {
     return NextResponse.json(

@@ -1,6 +1,9 @@
 'use client';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+
+import Button from '@/components/ui/Button';
+import Modal, { ModalFooter } from '@/components/ui/Modal';
 interface EducationSet {
   id: string;
   name: string;
@@ -207,6 +210,18 @@ export default function EducationSetsManagement() {
     setShowAssignModal(true);
   };
   // Handle create/update education set
+  // Close modal handler
+  const handleCloseCreateModal = () => {
+    setShowCreateForm(false);
+    setEditingSet(null);
+    setFormData({
+      name: '',
+      description: '',
+      category: 'B2B',
+      status: 'Aktif',
+    });
+  };
+
   const handleCreateSet = async () => {
     try {
       const response = await fetch('/api/education-sets', {
@@ -557,105 +572,93 @@ export default function EducationSetsManagement() {
         </div>
       </div>
       {/* Create/Edit Education Set Modal */}
-      {showCreateForm && (
-        <div className='fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4'>
-          <div className='bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto'>
-            <div className='p-6 border-b border-gray-200'>
-              <h3 className='text-xl font-semibold text-gray-900'>
-                {editingSet
-                  ? 'Eğitim Seti Düzenle'
-                  : 'Yeni Eğitim Seti Oluştur'}
-              </h3>
-            </div>
-            <form
-              onSubmit={e => {
-                e.preventDefault();
-                handleCreateSet();
-              }}
-              className='p-6 space-y-6'
-            >
-              <div>
-                <label className='block text-sm font-medium text-gray-700 mb-2'>
-                  Set Adı <span className='text-red-500'>*</span>
-                </label>
-                <input
-                  type='text'
-                  value={formData.name}
-                  onChange={e =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
-                  className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-                  required
-                />
-              </div>
-              <div>
-                <label className='block text-sm font-medium text-gray-700 mb-2'>
-                  Açıklama <span className='text-red-500'>*</span>
-                </label>
-                <textarea
-                  value={formData.description}
-                  onChange={e =>
-                    setFormData({ ...formData, description: e.target.value })
-                  }
-                  rows={3}
-                  className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-                  placeholder='Eğitim seti hakkında açıklama...'
-                  required
-                />
-              </div>
-              <div className='grid grid-cols-2 gap-4'>
-                <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-2'>
-                    Kategori <span className='text-red-500'>*</span>
-                  </label>
-                  <select
-                    value={formData.category}
-                    onChange={e =>
-                      setFormData({ ...formData, category: e.target.value })
-                    }
-                    className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-                    required
-                  >
-                    <option value='B2B'>B2B</option>
-                    <option value='B2C'>B2C</option>
-                    <option value='Destek'>Destek</option>
-                  </select>
-                </div>
-                <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-2'>
-                    Durum
-                  </label>
-                  <select
-                    value={formData.status}
-                    onChange={e =>
-                      setFormData({ ...formData, status: e.target.value })
-                    }
-                    className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-                  >
-                    <option value='Aktif'>Aktif</option>
-                    <option value='Pasif'>Pasif</option>
-                  </select>
-                </div>
-              </div>
-              <div className='flex justify-end gap-3 pt-4'>
-                <button
-                  type='button'
-                  onClick={() => setShowCreateForm(false)}
-                  className='px-4 py-2 text-gray-600 hover:text-gray-800 font-medium cursor-pointer'
-                >
-                  İptal
-                </button>
-                <button
-                  type='submit'
-                  className='bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium transition-colors cursor-pointer'
-                >
-                  {editingSet ? 'Güncelle' : 'Oluştur'}
-                </button>
-              </div>
-            </form>
+      <Modal
+        isOpen={showCreateForm}
+        onClose={handleCloseCreateModal}
+        title={editingSet ? 'Eğitim Seti Düzenle' : 'Yeni Eğitim Seti Oluştur'}
+        size="lg"
+      >
+        <form
+          onSubmit={e => {
+            e.preventDefault();
+            handleCreateSet();
+          }}
+          className='space-y-6'
+        >
+          <div>
+            <label className='block text-sm font-medium text-gray-700 mb-2'>
+              Set Adı <span className='text-red-500'>*</span>
+            </label>
+            <input
+              type='text'
+              value={formData.name}
+              onChange={e =>
+                setFormData({ ...formData, name: e.target.value })
+              }
+              className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+              required
+            />
           </div>
-        </div>
-      )}
+          <div>
+            <label className='block text-sm font-medium text-gray-700 mb-2'>
+              Açıklama <span className='text-red-500'>*</span>
+            </label>
+            <textarea
+              value={formData.description}
+              onChange={e =>
+                setFormData({ ...formData, description: e.target.value })
+              }
+              rows={3}
+              className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+              placeholder='Eğitim seti hakkında açıklama...'
+              required
+            />
+          </div>
+          <div className='grid grid-cols-2 gap-4'>
+            <div>
+              <label className='block text-sm font-medium text-gray-700 mb-2'>
+                Kategori <span className='text-red-500'>*</span>
+              </label>
+              <select
+                value={formData.category}
+                onChange={e =>
+                  setFormData({ ...formData, category: e.target.value })
+                }
+                className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                required
+              >
+                <option value='B2B'>B2B</option>
+                <option value='B2C'>B2C</option>
+                <option value='Destek'>Destek</option>
+              </select>
+            </div>
+            <div>
+              <label className='block text-sm font-medium text-gray-700 mb-2'>
+                Durum
+              </label>
+              <select
+                value={formData.status}
+                onChange={e =>
+                  setFormData({ ...formData, status: e.target.value })
+                }
+                className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+              >
+                <option value='Aktif'>Aktif</option>
+                <option value='Pasif'>Pasif</option>
+              </select>
+            </div>
+          </div>
+        </form>
+
+        <ModalFooter>
+          <Button variant="secondary" onClick={handleCloseCreateModal}>
+            İptal
+          </Button>
+          <Button variant="success" onClick={handleCreateSet}>
+            {editingSet ? 'Güncelle' : 'Oluştur'}
+          </Button>
+        </ModalFooter>
+      </Modal>
       {/* Company Assignment Modal */}
       {showAssignModal && selectedSetForAssignment && (
         <div className='fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4'>

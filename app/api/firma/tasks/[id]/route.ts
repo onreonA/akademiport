@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import { requireCompany, createAuthErrorResponse } from '@/lib/jwt-utils';
 import { createClient } from '@/lib/supabase/server';
 
 /**
@@ -11,43 +12,16 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // JWT Authentication - Company users only
+    const user = await requireCompany(request);
+
     const supabase = createClient();
     const { id } = await params;
 
-    // Kullanıcı kimlik doğrulama
-    const userEmail = request.cookies.get('auth-user-email')?.value;
-    const userRole = request.cookies.get('auth-user-role')?.value;
+    // Kullanıcının company_id'sini JWT'den al
+    const companyId = user.company_id;
 
-    if (!userEmail) {
-      return NextResponse.json(
-        { error: 'Kullanıcı kimlik doğrulaması gerekli' },
-        { status: 401 }
-      );
-    }
-
-    // Firma kullanıcısı kontrolü
-    const COMPANY_ROLES = [
-      'user',
-      'operator',
-      'manager',
-      'firma_admin',
-      'firma_kullanıcı',
-    ];
-    if (!COMPANY_ROLES.includes(userRole || '')) {
-      return NextResponse.json(
-        { error: 'Bu işlem için firma kullanıcısı yetkisi gerekli' },
-        { status: 403 }
-      );
-    }
-
-    // Kullanıcının company_id'sini al
-    const { data: companyUser, error: companyUserError } = await supabase
-      .from('company_users')
-      .select('company_id')
-      .eq('email', userEmail)
-      .single();
-
-    if (companyUserError || !companyUser) {
+    if (!companyId) {
       return NextResponse.json(
         { error: 'Firma bilgisi bulunamadı' },
         { status: 404 }
@@ -59,7 +33,7 @@ export async function GET(
       .from('task_company_assignments')
       .select('id, status, assigned_at')
       .eq('task_id', id)
-      .eq('company_id', companyUser.company_id)
+      .eq('company_id', companyId)
       .eq('status', 'active')
       .single();
 
@@ -367,7 +341,15 @@ export async function GET(
     };
 
     return NextResponse.json(response);
-  } catch (error) {
+  } catch (error: any) {
+    // Handle authentication errors specifically
+    if (
+      error.message === 'Authentication required' ||
+      error.message === 'Company access required'
+    ) {
+      return createAuthErrorResponse(error.message, 401);
+    }
+
     return NextResponse.json(
       {
         error: 'Sunucu hatası',

@@ -7,20 +7,19 @@ import DashboardStatsCards from '@/components/charts/DashboardStatsCards';
 import ErrorBoundary from '@/components/ui/ErrorBoundary';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import RecentActivity from '@/components/ui/RecentActivity';
-import { ToastContainer, useToast } from '@/components/ui/Toast';
 import {
   RecentActivity as ActivityType,
   analyticsService,
   ChartData,
   DashboardStats,
 } from '@/lib/analytics-service';
+import { cn, tokens, spacing, typography } from '@/lib/design-tokens';
 export default function AdminDashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [chartData, setChartData] = useState<ChartData | null>(null);
   const [activities, setActivities] = useState<ActivityType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { toasts, removeToast, showSuccess, showError } = useToast();
   useEffect(() => {
     fetchDashboardData();
   }, [fetchDashboardData]);
@@ -111,19 +110,22 @@ export default function AdminDashboard() {
       description='Randevu yönetimi sistemi genel bakış'
     >
       <ErrorBoundary>
-        <div className='p-6'>
+        <div className={spacing(6, 'p')}>
           {/* Header */}
-          <div className='flex items-center justify-between mb-8'>
+          <div className={cn('flex items-center justify-between', spacing(8, 'm', 'b'))}>
             <div>
-              <h1 className='text-3xl font-bold text-gray-900'>Dashboard</h1>
-              <p className='text-gray-600 mt-1'>
+              <h1 className={typography('heading1')}>Dashboard</h1>
+              <p className={cn(typography('body'), 'mt-1')}>
                 Randevu yönetimi sistemi genel bakış
               </p>
             </div>
             <button
               onClick={handleRefresh}
               disabled={isLoading}
-              className='bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center'
+              className={cn(
+                tokens.button.primary,
+                'flex items-center'
+              )}
             >
               <LoadingSpinner size='sm' color='white' className='mr-2' />
               Yenile
@@ -159,14 +161,14 @@ export default function AdminDashboard() {
             isLoading={isLoading}
           />
           {/* Recent Activity */}
-          <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
+          <div className={tokens.layout.grid.cols3}>
             <div className='lg:col-span-2'>
               {/* Additional stats or charts can go here */}
-              <div className='bg-white rounded-lg shadow-sm border border-gray-200 p-6'>
-                <h3 className='text-lg font-semibold text-gray-900 mb-4'>
+              <div className={tokens.card.base}>
+                <h3 className={cn(typography('heading3'), spacing(4, 'm', 'b'))}>
                   Hızlı İstatistikler
                 </h3>
-                <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
+                <div className={cn('grid grid-cols-2 md:grid-cols-4', spacing(4, 'gap'))}>
                   <div className='text-center'>
                     <div className='text-2xl font-bold text-blue-600'>
                       {stats?.completionRate || 0}%

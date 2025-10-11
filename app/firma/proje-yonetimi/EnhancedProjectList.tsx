@@ -378,19 +378,6 @@ export default function EnhancedProjectList() {
 
         const data = await response.json();
 
-        // Debug: Her projenin raw verilerini kontrol et
-        data.projects?.forEach((project: any, index: number) => {
-          console.log(`Project ${index}:`, {
-            id: project.id,
-            name: project.name,
-            end_date: project.end_date,
-            endDate: project.endDate,
-            deadline: project.deadline,
-            company_id: project.company_id,
-            companies: project.companies,
-          });
-        });
-
         // Type guard for API response
         const isValidProjectData = (
           project: unknown
@@ -645,21 +632,6 @@ export default function EnhancedProjectList() {
     const avgProgress = Math.round(
       projects.reduce((sum, p) => sum + (p.progress_percentage || 0), 0) / total
     );
-
-    console.log('Project Stats:', {
-      total,
-      active,
-      completed,
-      overdue,
-      avgProgress,
-      projects: projects.map(p => ({
-        id: p.id,
-        name: p.name,
-        status: p.status,
-        progress_percentage: p.progress_percentage,
-        deadline: p.deadline,
-      })),
-    });
 
     return { total, active, completed, overdue, avgProgress };
   }, [projects]);

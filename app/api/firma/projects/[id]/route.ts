@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import { createAuthErrorResponse, requireCompany } from '@/lib/jwt-utils';
 import { createAdminClient, createClient } from '@/lib/supabase/server';
 
 /**
@@ -11,59 +12,14 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // JWT Authentication - Company users only
+    const user = await requireCompany(request);
+
     const supabase = createClient();
     const { id } = await params;
 
-    // Kullanıcı kimlik doğrulama
-    const userEmail = request.cookies.get('auth-user-email')?.value;
-    const userRole = request.cookies.get('auth-user-role')?.value;
-
-    if (!userEmail) {
-      return NextResponse.json(
-        { error: 'Kullanıcı kimlik doğrulaması gerekli' },
-        { status: 401 }
-      );
-    }
-
-    // Firma kullanıcısı kontrolü
-    const COMPANY_ROLES = [
-      'user',
-      'operator',
-      'manager',
-      'firma_admin',
-      'firma_kullanıcı',
-    ];
-    if (!COMPANY_ROLES.includes(userRole || '')) {
-      return NextResponse.json(
-        { error: 'Bu işlem için firma kullanıcısı yetkisi gerekli' },
-        { status: 403 }
-      );
-    }
-
-    // Kullanıcının company_id'sini al - önce company_users, sonra companies tablosundan
-    let companyId = null;
-
-    // Önce company_users tablosundan ara
-    const { data: companyUserData, error: companyUserError } = await supabase
-      .from('company_users')
-      .select('company_id')
-      .eq('email', userEmail)
-      .single();
-
-    if (companyUserData) {
-      companyId = companyUserData.company_id;
-    } else {
-      // company_users'da yoksa companies tablosundan ara
-      const { data: companyData, error: companyError } = await supabase
-        .from('companies')
-        .select('id')
-        .eq('email', userEmail)
-        .single();
-
-      if (companyData) {
-        companyId = companyData.id;
-      }
-    }
+    // JWT'den company_id'yi al
+    const companyId = user.company_id;
 
     if (!companyId) {
       return NextResponse.json(
@@ -233,21 +189,12 @@ export async function GET(
           .eq('company_id', companyId);
 
         if (!statusError && companyTaskStatuses) {
-          console.log(
-            '🔍 Firma API - Company task statuses found:',
-            companyTaskStatuses
-          );
           // Task'ların status'unu firma bazlı olarak güncelle
           subProjectTasks.forEach(task => {
             const companyStatus = companyTaskStatuses.find(
               cts => cts.task_id === task.id
             );
             if (companyStatus) {
-              console.log('Company task status update:', {
-                taskId: task.id,
-                status: companyStatus.status,
-                approval_note: companyStatus.approval_note,
-              });
               // Company-specific status exists, use it
               task.status = companyStatus.status;
               task.completed_at = companyStatus.completed_at;
@@ -305,13 +252,6 @@ export async function GET(
         allTaskIds.length > 0
           ? Math.round((completedTasks / allTaskIds.length) * 100)
           : 0;
-
-      console.log('Project progress calculation:', {
-        totalTasks: allTaskIds.length,
-        completedTasks,
-        companyProgress,
-        taskIds: allTaskIds,
-      });
     }
 
     // Alt proje bazlı progress hesapla
@@ -343,14 +283,6 @@ export async function GET(
                 (completedSubProjectTasks / subProjectTaskIds.length) * 100
               )
             : 0;
-
-        console.log('Sub-project progress calculation:', {
-          subProjectId: subProject.id,
-          subProjectName: subProject.name,
-          totalTasks: subProjectTaskIds.length,
-          completedTasks: completedSubProjectTasks,
-          progress: subProjectProgress,
-        });
       }
 
       subProjectsWithProgress.push({
@@ -561,8 +493,6 @@ export async function GET(
           : null,
       })),
       companyId: companyId,
-      userEmail: userEmail,
-      userRole: userRole,
       assignmentStatus: assignment.status,
       isLocked: assignment.status === 'locked',
       debug: {
@@ -576,7 +506,15 @@ export async function GET(
     };
 
     return NextResponse.json(response);
-  } catch (error) {
+  } catch (error: any) {
+    // Handle authentication errors specifically
+    if (
+      error.message === 'Authentication required' ||
+      error.message === 'Company access required'
+    ) {
+      return createAuthErrorResponse(error.message, 401);
+    }
+
     return NextResponse.json(
       {
         error: 'Sunucu hatası',

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import { createAuthErrorResponse, requireAuth } from '@/lib/jwt-utils';
+import { ROLE_GROUPS } from '@/lib/rbac';
 import { createClient } from '@/lib/supabase/server';
 // GET /api/projects/[id] - Get single project with full details
 export async function GET(
@@ -7,15 +9,12 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // JWT Authentication
+    const user = await requireAuth(request);
+
     const { id } = await params;
     const supabase = createClient();
-    // Get user email from cookies (middleware sets this)
-    const userEmail = request.cookies.get('auth-user-email')?.value;
-    const userRole = request.cookies.get('auth-user-role')?.value;
-    if (!userEmail) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-    // Debug bilgisi kaldırıldı
+
     // Get project with basic data first
     const { data: project, error } = await supabase
       .from('projects')
@@ -23,33 +22,30 @@ export async function GET(
       .eq('id', id)
       .single();
     if (error) {
-      // Database error logged
       return NextResponse.json(
         { error: 'Proje bulunamadı', details: error.message },
         { status: 404 }
       );
     }
     // Check permissions - Admin users can access all projects, company users only their own
-    if (!['admin', 'consultant', 'master_admin'].includes(userRole || '')) {
+    const isAdmin = ROLE_GROUPS.ADMIN_ROLES.includes(user.role);
+
+    if (!isAdmin) {
       // For company users, check if they have access to this project
-      const userCompanyId = request.cookies.get('auth-user-company-id')?.value;
-      if (userRole === 'user') {
-        // Check both direct assignment and multi-company assignment
-        const isDirectlyAssigned = project.company_id === userCompanyId;
-        if (!isDirectlyAssigned) {
-          // Check multi-company assignment
-          const { data: assignment } = await supabase
-            .from('project_company_assignments')
-            .select('id')
-            .eq('project_id', id)
-            .eq('company_id', userCompanyId)
-            .single();
-          if (!assignment) {
-            return NextResponse.json(
-              { error: 'Access denied' },
-              { status: 403 }
-            );
-          }
+      const userCompanyId = user.company_id;
+
+      // Check both direct assignment and multi-company assignment
+      const isDirectlyAssigned = project.company_id === userCompanyId;
+      if (!isDirectlyAssigned) {
+        // Check multi-company assignment
+        const { data: assignment } = await supabase
+          .from('project_company_assignments')
+          .select('id')
+          .eq('project_id', id)
+          .eq('company_id', userCompanyId)
+          .single();
+        if (!assignment) {
+          return NextResponse.json({ error: 'Access denied' }, { status: 403 });
         }
       }
     }
@@ -191,7 +187,12 @@ export async function GET(
       assignedCompanies: assignedCompanies || [],
     };
     return NextResponse.json({ project: formattedProject });
-  } catch (error) {
+  } catch (error: any) {
+    // Handle authentication errors specifically
+    if (error.message === 'Authentication required') {
+      return createAuthErrorResponse(error.message, 401);
+    }
+
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -204,17 +205,14 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Debug
+    // JWT Authentication - Only admin users can update projects
+    const user = await requireAuth(request);
+
     const { id } = await params;
     const supabase = createClient();
-    // Get user email from cookies (middleware sets this)
-    const userEmail = request.cookies.get('auth-user-email')?.value;
-    const userRole = request.cookies.get('auth-user-role')?.value; // Debug
-    if (!userEmail) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+
     // Only admin and consultant can update projects
-    if (!['admin', 'consultant', 'master_admin'].includes(userRole || '')) {
+    if (!ROLE_GROUPS.ADMIN_ROLES.includes(user.role)) {
       return NextResponse.json({ error: 'Access denied' }, { status: 403 });
     }
     const body = await request.json(); // Debug
@@ -259,7 +257,12 @@ export async function PATCH(
       );
     } // Debug
     return NextResponse.json({ project: updatedProject });
-  } catch (error) {
+  } catch (error: any) {
+    // Handle authentication errors specifically
+    if (error.message === 'Authentication required') {
+      return createAuthErrorResponse(error.message, 401);
+    }
+
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -272,17 +275,16 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // JWT Authentication - Only admin users can update projects
+    const user = await requireAuth(request);
+
+    // Only admin and consultant can update projects
+    if (!ROLE_GROUPS.ADMIN_ROLES.includes(user.role)) {
+      return NextResponse.json({ error: 'Access denied' }, { status: 403 });
+    }
     const { id } = await params;
     const supabase = createClient();
-    // Get user email from cookies (middleware sets this)
-    const userEmail = request.cookies.get('auth-user-email')?.value;
-    const userRole = request.cookies.get('auth-user-role')?.value;
-    if (
-      !userEmail ||
-      !['admin', 'consultant', 'master_admin'].includes(userRole || '')
-    ) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+
     const body = await request.json();
     const {
       name,
@@ -325,7 +327,12 @@ export async function PUT(
       );
     }
     return NextResponse.json({ project: updatedProject });
-  } catch (error) {
+  } catch (error: any) {
+    // Handle authentication errors specifically
+    if (error.message === 'Authentication required') {
+      return createAuthErrorResponse(error.message, 401);
+    }
+
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -338,14 +345,16 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params;
-    const supabase = createClient();
-    // Get user email from cookies (middleware sets this)
-    const userEmail = request.cookies.get('auth-user-email')?.value;
-    const userRole = request.cookies.get('auth-user-role')?.value;
-    if (!userEmail || !['admin', 'master_admin'].includes(userRole || '')) {
+    // JWT Authentication - Only admin users can delete projects
+    const user = await requireAuth(request);
+
+    // Only admin and master_admin can delete projects
+    if (!['admin', 'master_admin'].includes(user.role)) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const { id } = await params;
+    const supabase = createClient();
 
     // Check if project exists
     const { data: project } = await supabase
@@ -459,7 +468,12 @@ export async function DELETE(
       );
     }
     return NextResponse.json({ message: 'Project deleted successfully' });
-  } catch (error) {
+  } catch (error: any) {
+    // Handle authentication errors specifically
+    if (error.message === 'Authentication required') {
+      return createAuthErrorResponse(error.message, 401);
+    }
+
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

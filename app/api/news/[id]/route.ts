@@ -39,7 +39,6 @@ export async function GET(
       .single();
 
     if (error) {
-      console.log('News fetch error:', error);
       return NextResponse.json(
         { success: false, error: 'Haber bulunamadı' },
         { status: 404 }
@@ -48,7 +47,6 @@ export async function GET(
 
     return NextResponse.json({ success: true, data: news });
   } catch (error) {
-    console.log('News API error:', error);
     return NextResponse.json(
       { success: false, error: 'Sunucu hatası' },
       { status: 500 }
@@ -117,8 +115,10 @@ export async function PUT(
     if (video_url !== undefined) updateData.video_url = video_url;
     if (podcast_url !== undefined) updateData.podcast_url = podcast_url;
     if (reading_time !== undefined) updateData.reading_time = reading_time;
-    if (difficulty_level !== undefined) updateData.difficulty_level = difficulty_level;
-    if (expert_author_id !== undefined) updateData.expert_author_id = expert_author_id;
+    if (difficulty_level !== undefined)
+      updateData.difficulty_level = difficulty_level;
+    if (expert_author_id !== undefined)
+      updateData.expert_author_id = expert_author_id;
     if (is_featured !== undefined) updateData.is_featured = is_featured;
     if (seo_keywords !== undefined) updateData.seo_keywords = seo_keywords;
     if (source_url !== undefined) updateData.source_url = source_url;
@@ -148,7 +148,6 @@ export async function PUT(
       .single();
 
     if (error) {
-      console.log('News update error:', error);
       return NextResponse.json(
         { success: false, error: 'Haber güncellenemedi' },
         { status: 500 }
@@ -157,7 +156,6 @@ export async function PUT(
 
     return NextResponse.json({ success: true, data: updatedNews });
   } catch (error) {
-    console.log('News update API error:', error);
     return NextResponse.json(
       { success: false, error: 'Sunucu hatası' },
       { status: 500 }
@@ -202,7 +200,6 @@ export async function DELETE(
       .eq('id', id);
 
     if (deleteError) {
-      console.log('News delete error:', deleteError);
       return NextResponse.json(
         { success: false, error: 'Haber silinemedi' },
         { status: 500 }
@@ -214,7 +211,6 @@ export async function DELETE(
       message: `"${existingNews.title}" haberi başarıyla silindi`,
     });
   } catch (error) {
-    console.log('News delete API error:', error);
     return NextResponse.json(
       { success: false, error: 'Sunucu hatası' },
       { status: 500 }

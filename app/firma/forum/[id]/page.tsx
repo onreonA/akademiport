@@ -87,11 +87,8 @@ const createReply = async (
   parentReplyId?: string
 ): Promise<ForumReply | null> => {
   try {
-    console.log('createReply called with:', { topicId, content, authorId, parentReplyId });
-
     // Eğer authorId yoksa, mevcut yanıtlardan birini kullan
     const fallbackAuthorId = authorId || 'cd9bf9ec-f2ef-4672-87e4-428fb1b5241e';
-    console.log('Using authorId:', fallbackAuthorId);
 
     const requestBody = {
       topic_id: topicId,
@@ -99,7 +96,6 @@ const createReply = async (
       content: content,
       parent_reply_id: parentReplyId || null,
     };
-    console.log('Request body:', requestBody);
 
     const response = await fetch('/api/forum/replies', {
       method: 'POST',
@@ -110,9 +106,7 @@ const createReply = async (
       body: JSON.stringify(requestBody),
     });
 
-    console.log('Response status:', response.status);
     const result = await response.json();
-    console.log('Response result:', result);
 
     if (result.success) {
       return result.data;
@@ -151,12 +145,7 @@ const ForumTopicDetail = () => {
 
   // Debug: Auth durumunu kontrol et (sadece bir kez)
   useEffect(() => {
-    console.log('Auth user:', user);
-    console.log('Cookies:', document.cookie);
-    console.log(
-      'localStorage auth_session:',
-      localStorage.getItem('auth_session')
-    );
+    // Auth state tracking
   }, [user]);
   const [loading, setLoading] = useState(true);
   const [topic, setTopic] = useState<ForumTopic | null>(null);
@@ -181,7 +170,6 @@ const ForumTopicDetail = () => {
         });
         const result = await response.json();
         if (result.success) {
-          console.log('Current user from API:', result.data);
           setCurrentUserId(result.data.id);
         } else {
           console.error('Failed to get current user:', result.error);
@@ -192,7 +180,7 @@ const ForumTopicDetail = () => {
     };
 
     fetchCurrentUser();
-    
+
     // Sayfa yüklendiğinde form state'lerini temizle
     setNewReply('');
     setReplyToReply('');
@@ -249,13 +237,7 @@ const ForumTopicDetail = () => {
     };
   }, [topicId]);
   const handleSubmitReply = async () => {
-    console.log('handleSubmitReply çağrıldı');
-    console.log('newReply:', newReply);
-    console.log('topic:', topic);
-    console.log('user:', user);
-
     if (!newReply.trim() || !topic) {
-      console.log('Validation failed - newReply or topic missing');
       return;
     }
 
@@ -263,12 +245,8 @@ const ForumTopicDetail = () => {
     try {
       // Önce currentUserId'yi kullan, yoksa user?.id'yi kullan, son olarak fallback
       const authorId = currentUserId || user?.id;
-      console.log('currentUserId:', currentUserId);
-      console.log('user?.id:', user?.id);
-      console.log('final authorId:', authorId);
 
       const reply = await createReply(topic.id, newReply, authorId);
-      console.log('Reply created:', reply);
 
       if (reply) {
         setReplies([...replies, reply]);
@@ -295,9 +273,8 @@ const ForumTopicDetail = () => {
 
         setNewReply('');
         setShowReplyForm(false);
-        console.log('Reply added successfully');
       } else {
-        console.log('Reply creation failed - no reply returned');
+        // Reply creation failed
       }
     } catch (error) {
       console.error('Yanıt gönderme hatası:', error);
@@ -315,16 +292,18 @@ const ForumTopicDetail = () => {
   };
 
   const handleReplyToReply = async (parentReplyId: string) => {
-    console.log('handleReplyToReply called with:', { parentReplyId, replyToReply, topic, currentUserId });
-    
     if (!replyToReply.trim() || !topic || !currentUserId) {
-      console.log('Validation failed:', { replyToReply: replyToReply.trim(), topic, currentUserId });
       return;
     }
 
     setSubmitting(true);
     try {
-      const reply = await createReply(topic.id, replyToReply, currentUserId, parentReplyId);
+      const reply = await createReply(
+        topic.id,
+        replyToReply,
+        currentUserId,
+        parentReplyId
+      );
       if (reply) {
         // Yanıtları yeniden yükle
         const updatedReplies = await fetchReplies(topicId);
@@ -580,14 +559,6 @@ const ForumTopicDetail = () => {
                     </button>
                     <button
                       onClick={() => {
-                        console.log('Button clicked!');
-                        console.log('submitting:', submitting);
-                        console.log('newReply:', newReply);
-                        console.log('newReply.trim():', newReply.trim());
-                        console.log(
-                          'Button disabled:',
-                          submitting || !newReply.trim()
-                        );
                         handleSubmitReply();
                       }}
                       disabled={submitting || !newReply.trim()}
@@ -635,172 +606,181 @@ const ForumTopicDetail = () => {
               replies
                 .filter(reply => !reply.parent_reply_id) // Sadece ana yanıtları göster
                 .map((reply, index) => {
-                  const childReplies = replies.filter(child => child.parent_reply_id === reply.id);
+                  const childReplies = replies.filter(
+                    child => child.parent_reply_id === reply.id
+                  );
                   return (
-                <div
-                  key={reply.id}
-                  className='p-5 hover:bg-gray-50 transition-colors group'
-                >
-                  <div className='flex items-start gap-4'>
-                    {/* Modern Avatar */}
-                    <div className='relative flex-shrink-0'>
-                      <div className='w-11 h-11 rounded-xl overflow-hidden bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform'>
-                        <span className='text-white text-base font-bold'>
-                          {reply.users?.full_name?.charAt(0) || 'U'}
-                        </span>
+                    <div
+                      key={reply.id}
+                      className='p-5 hover:bg-gray-50 transition-colors group'
+                    >
+                      <div className='flex items-start gap-4'>
+                        {/* Modern Avatar */}
+                        <div className='relative flex-shrink-0'>
+                          <div className='w-11 h-11 rounded-xl overflow-hidden bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform'>
+                            <span className='text-white text-base font-bold'>
+                              {reply.users?.full_name?.charAt(0) || 'U'}
+                            </span>
+                          </div>
+                          {reply.is_solution && (
+                            <div className='absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center border-2 border-white'>
+                              <i className='ri-check-line text-white text-xs'></i>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Content */}
+                        <div className='flex-1 min-w-0'>
+                          <div className='flex items-center justify-between mb-2'>
+                            <div className='flex items-center gap-2 flex-wrap'>
+                              <span className='font-semibold text-gray-900'>
+                                {userMap[reply.author_id]?.full_name ||
+                                  'Anonim'}
+                              </span>
+                              {reply.is_solution && (
+                                <span className='inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-700 text-xs font-semibold rounded-md'>
+                                  <i className='ri-verified-badge-fill'></i>
+                                  Çözüm
+                                </span>
+                              )}
+                              <span className='text-xs text-gray-500'>
+                                • {getTimeAgo(reply.created_at)}
+                              </span>
+                            </div>
+                            <span className='text-xs text-gray-400'>
+                              #{index + 1}
+                            </span>
+                          </div>
+
+                          <div className='prose max-w-none mb-3'>
+                            <p className='text-gray-700 leading-relaxed whitespace-pre-wrap text-sm'>
+                              {reply.content}
+                            </p>
+                          </div>
+
+                          {/* Modern Actions */}
+                          <div className='flex items-center gap-3'>
+                            <button
+                              onClick={() => handleLike(reply.id)}
+                              className='inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-red-50 text-gray-600 hover:text-red-600 rounded-lg text-xs font-medium transition-all group/like'
+                            >
+                              <i className='ri-heart-line group-hover/like:ri-heart-fill'></i>
+                              <span>{reply.like_count}</span>
+                            </button>
+                            <button
+                              onClick={() =>
+                                setReplyingTo(
+                                  replyingTo === reply.id ? null : reply.id
+                                )
+                              }
+                              className='inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-blue-50 text-gray-600 hover:text-blue-600 rounded-lg text-xs font-medium transition-all'
+                            >
+                              <i className='ri-reply-line'></i>
+                              Yanıtla
+                            </button>
+                            <button className='inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-lg text-xs font-medium transition-all'>
+                              <i className='ri-share-line'></i>
+                              Paylaş
+                            </button>
+                          </div>
+                        </div>
                       </div>
-                      {reply.is_solution && (
-                        <div className='absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center border-2 border-white'>
-                          <i className='ri-check-line text-white text-xs'></i>
+
+                      {/* Yanıt Yanıtlama Formu */}
+                      {replyingTo === reply.id && (
+                        <div className='ml-16 mt-4 p-4 bg-blue-50 rounded-xl border border-blue-100'>
+                          <div className='bg-white rounded-lg p-4'>
+                            <label className='flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3'>
+                              <i className='ri-edit-line text-blue-600'></i>
+                              {userMap[reply.author_id]?.full_name ||
+                                'Anonim'}{' '}
+                              kullanıcısına yanıt
+                            </label>
+                            <textarea
+                              value={replyToReply}
+                              onChange={e => setReplyToReply(e.target.value)}
+                              placeholder='Yanıtınızı yazın...'
+                              className='w-full h-20 px-3 py-2 bg-gray-50 border-0 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all resize-none text-sm'
+                            />
+                            <div className='flex items-center justify-between mt-3'>
+                              <span className='text-xs text-gray-500'>
+                                <i className='ri-information-line mr-1'></i>
+                                Lütfen saygılı bir dil kullanın
+                              </span>
+                              <div className='flex items-center gap-2'>
+                                <button
+                                  onClick={() => {
+                                    setReplyingTo(null);
+                                    setReplyToReply('');
+                                  }}
+                                  className='px-3 py-1.5 text-gray-600 hover:text-gray-800 font-medium transition-colors rounded-lg hover:bg-gray-100 text-sm'
+                                >
+                                  İptal
+                                </button>
+                                <button
+                                  onClick={() => handleReplyToReply(reply.id)}
+                                  disabled={submitting || !replyToReply.trim()}
+                                  className='px-4 py-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:from-gray-400 disabled:to-gray-400 text-white rounded-lg font-semibold transition-all flex items-center gap-2 shadow-lg disabled:shadow-none text-sm'
+                                >
+                                  {submitting ? (
+                                    <>
+                                      <div className='animate-spin rounded-full h-3 w-3 border-b-2 border-white'></div>
+                                      Gönderiliyor...
+                                    </>
+                                  ) : (
+                                    <>
+                                      <i className='ri-send-plane-fill'></i>
+                                      Gönder
+                                    </>
+                                  )}
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Child Yanıtları (Nested Replies) */}
+                      {childReplies.length > 0 && (
+                        <div className='ml-16 mt-4 space-y-3'>
+                          {childReplies.map(childReply => (
+                            <div
+                              key={childReply.id}
+                              className='p-4 bg-gray-50 rounded-xl border border-gray-200'
+                            >
+                              <div className='flex items-start gap-3'>
+                                {/* Child Avatar */}
+                                <div className='w-8 h-8 rounded-lg overflow-hidden bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-sm'>
+                                  <span className='text-white text-sm font-bold'>
+                                    {userMap[
+                                      childReply.author_id
+                                    ]?.full_name?.charAt(0) || 'U'}
+                                  </span>
+                                </div>
+
+                                {/* Child Content */}
+                                <div className='flex-1 min-w-0'>
+                                  <div className='flex items-center gap-2 mb-2'>
+                                    <span className='font-semibold text-gray-900 text-sm'>
+                                      {userMap[childReply.author_id]
+                                        ?.full_name || 'Anonim'}
+                                    </span>
+                                    <span className='text-xs text-gray-500'>
+                                      {getTimeAgo(childReply.created_at)}
+                                    </span>
+                                  </div>
+                                  <p className='text-sm text-gray-700 leading-relaxed'>
+                                    {childReply.content}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       )}
                     </div>
-
-                    {/* Content */}
-                    <div className='flex-1 min-w-0'>
-                      <div className='flex items-center justify-between mb-2'>
-                        <div className='flex items-center gap-2 flex-wrap'>
-                          <span className='font-semibold text-gray-900'>
-                            {userMap[reply.author_id]?.full_name || 'Anonim'}
-                          </span>
-                          {reply.is_solution && (
-                            <span className='inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-700 text-xs font-semibold rounded-md'>
-                              <i className='ri-verified-badge-fill'></i>
-                              Çözüm
-                            </span>
-                          )}
-                          <span className='text-xs text-gray-500'>
-                            • {getTimeAgo(reply.created_at)}
-                          </span>
-                        </div>
-                        <span className='text-xs text-gray-400'>
-                          #{index + 1}
-                        </span>
-                      </div>
-
-                      <div className='prose max-w-none mb-3'>
-                        <p className='text-gray-700 leading-relaxed whitespace-pre-wrap text-sm'>
-                          {reply.content}
-                        </p>
-                      </div>
-
-                      {/* Modern Actions */}
-                      <div className='flex items-center gap-3'>
-                        <button
-                          onClick={() => handleLike(reply.id)}
-                          className='inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-red-50 text-gray-600 hover:text-red-600 rounded-lg text-xs font-medium transition-all group/like'
-                        >
-                          <i className='ri-heart-line group-hover/like:ri-heart-fill'></i>
-                          <span>{reply.like_count}</span>
-                        </button>
-                        <button
-                          onClick={() =>
-                            setReplyingTo(
-                              replyingTo === reply.id ? null : reply.id
-                            )
-                          }
-                          className='inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-blue-50 text-gray-600 hover:text-blue-600 rounded-lg text-xs font-medium transition-all'
-                        >
-                          <i className='ri-reply-line'></i>
-                          Yanıtla
-                        </button>
-                        <button className='inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-lg text-xs font-medium transition-all'>
-                          <i className='ri-share-line'></i>
-                          Paylaş
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Yanıt Yanıtlama Formu */}
-                  {replyingTo === reply.id && (
-                    <div className='ml-16 mt-4 p-4 bg-blue-50 rounded-xl border border-blue-100'>
-                      <div className='bg-white rounded-lg p-4'>
-                        <label className='flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3'>
-                          <i className='ri-edit-line text-blue-600'></i>
-                          {userMap[reply.author_id]?.full_name || 'Anonim'}{' '}
-                          kullanıcısına yanıt
-                        </label>
-                        <textarea
-                          value={replyToReply}
-                          onChange={e => setReplyToReply(e.target.value)}
-                          placeholder='Yanıtınızı yazın...'
-                          className='w-full h-20 px-3 py-2 bg-gray-50 border-0 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all resize-none text-sm'
-                        />
-                        <div className='flex items-center justify-between mt-3'>
-                          <span className='text-xs text-gray-500'>
-                            <i className='ri-information-line mr-1'></i>
-                            Lütfen saygılı bir dil kullanın
-                          </span>
-                          <div className='flex items-center gap-2'>
-                            <button
-                              onClick={() => {
-                                setReplyingTo(null);
-                                setReplyToReply('');
-                              }}
-                              className='px-3 py-1.5 text-gray-600 hover:text-gray-800 font-medium transition-colors rounded-lg hover:bg-gray-100 text-sm'
-                            >
-                              İptal
-                            </button>
-                            <button
-                              onClick={() => handleReplyToReply(reply.id)}
-                              disabled={submitting || !replyToReply.trim()}
-                              className='px-4 py-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:from-gray-400 disabled:to-gray-400 text-white rounded-lg font-semibold transition-all flex items-center gap-2 shadow-lg disabled:shadow-none text-sm'
-                            >
-                              {submitting ? (
-                                <>
-                                  <div className='animate-spin rounded-full h-3 w-3 border-b-2 border-white'></div>
-                                  Gönderiliyor...
-                                </>
-                              ) : (
-                                <>
-                                  <i className='ri-send-plane-fill'></i>
-                                  Gönder
-                                </>
-                              )}
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  
-                  {/* Child Yanıtları (Nested Replies) */}
-                  {childReplies.length > 0 && (
-                    <div className='ml-16 mt-4 space-y-3'>
-                      {childReplies.map(childReply => (
-                        <div key={childReply.id} className='p-4 bg-gray-50 rounded-xl border border-gray-200'>
-                          <div className='flex items-start gap-3'>
-                            {/* Child Avatar */}
-                            <div className='w-8 h-8 rounded-lg overflow-hidden bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-sm'>
-                              <span className='text-white text-sm font-bold'>
-                                {userMap[childReply.author_id]?.full_name?.charAt(0) || 'U'}
-                              </span>
-                            </div>
-                            
-                            {/* Child Content */}
-                            <div className='flex-1 min-w-0'>
-                              <div className='flex items-center gap-2 mb-2'>
-                                <span className='font-semibold text-gray-900 text-sm'>
-                                  {userMap[childReply.author_id]?.full_name || 'Anonim'}
-                                </span>
-                                <span className='text-xs text-gray-500'>
-                                  {getTimeAgo(childReply.created_at)}
-                                </span>
-                              </div>
-                              <p className='text-sm text-gray-700 leading-relaxed'>
-                                {childReply.content}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                );
+                  );
                 })
-              )}
             )}
           </div>
         </div>

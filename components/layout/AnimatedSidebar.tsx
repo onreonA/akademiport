@@ -51,6 +51,7 @@ export default function AnimatedSidebar({
       href: '/firma',
       icon: Layout,
       color: 'red',
+      notifications: 0,
     },
     {
       id: 'egitimlerim',
@@ -58,6 +59,7 @@ export default function AnimatedSidebar({
       href: '/firma/egitimlerim',
       icon: BookOpen,
       color: 'green',
+      notifications: 3,
     },
     {
       id: 'proje-yonetimi',
@@ -65,6 +67,7 @@ export default function AnimatedSidebar({
       href: '/firma/proje-yonetimi',
       icon: BarChart3,
       color: 'purple',
+      notifications: 1,
     },
     {
       id: 'etkinlikler',
@@ -72,6 +75,7 @@ export default function AnimatedSidebar({
       href: '/firma/etkinlikler',
       icon: Calendar,
       color: 'yellow',
+      notifications: 0,
     },
     {
       id: 'randevularim',
@@ -79,6 +83,7 @@ export default function AnimatedSidebar({
       href: '/firma/randevularim',
       icon: ClipboardList,
       color: 'emerald',
+      notifications: 2,
     },
     {
       id: 'haberler',
@@ -86,6 +91,7 @@ export default function AnimatedSidebar({
       href: '/firma/haberler',
       icon: Newspaper,
       color: 'blue',
+      notifications: 0,
     },
     {
       id: 'forum',
@@ -93,6 +99,7 @@ export default function AnimatedSidebar({
       href: '/firma/forum',
       icon: MessageSquare,
       color: 'pink',
+      notifications: 5,
     },
     {
       id: 'ik-havuzu',
@@ -100,13 +107,15 @@ export default function AnimatedSidebar({
       href: '/firma/ik-havuzu',
       icon: UserCheck,
       color: 'cyan',
+      notifications: 0,
     },
     {
       id: 'raporlar',
-      title: 'Değerlendirme Raporları',
+      title: 'Değerlendirme',
       href: '/firma/raporlar',
       icon: BarChart3,
       color: 'violet',
+      notifications: 0,
     },
     {
       id: 'tarih-yonetimi',
@@ -114,6 +123,7 @@ export default function AnimatedSidebar({
       href: '/firma/tarih-yonetimi',
       icon: Calendar,
       color: 'indigo',
+      notifications: 0,
     },
   ];
 
@@ -149,65 +159,72 @@ export default function AnimatedSidebar({
   ];
 
   const getColorClasses = (color: string, isActive: boolean = false) => {
-    const baseClasses = 'transition-all duration-200 transform hover:scale-105';
+    const baseClasses =
+      'transition-all duration-300 transform hover:scale-[1.01] hover:shadow-md';
 
     if (isActive) {
-      // Aktif durum için sabit renkler
+      // Aktif durum için modern gradient renkler
       const activeColorMap: { [key: string]: string } = {
-        red: 'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg border-l-4 border-red-400',
+        red: 'bg-gradient-to-r from-red-500 via-red-600 to-pink-600 text-white shadow-lg border-l-4 border-red-400 rounded-lg',
         green:
-          'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-lg border-l-4 border-emerald-400',
+          'bg-gradient-to-r from-emerald-500 via-green-600 to-teal-600 text-white shadow-xl border-l-4 border-emerald-400 rounded-lg',
         purple:
-          'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-lg border-l-4 border-purple-400',
+          'bg-gradient-to-r from-purple-500 via-violet-600 to-purple-700 text-white shadow-xl border-l-4 border-purple-400 rounded-lg',
         yellow:
-          'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-lg border-l-4 border-amber-400',
+          'bg-gradient-to-r from-amber-500 via-yellow-600 to-orange-500 text-white shadow-xl border-l-4 border-amber-400 rounded-lg',
         emerald:
-          'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-lg border-l-4 border-emerald-400',
-        blue: 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg border-l-4 border-blue-400',
-        pink: 'bg-gradient-to-r from-pink-500 to-pink-600 text-white shadow-lg border-l-4 border-pink-400',
-        cyan: 'bg-gradient-to-r from-cyan-500 to-cyan-600 text-white shadow-lg border-l-4 border-cyan-400',
+          'bg-gradient-to-r from-emerald-500 via-green-600 to-teal-600 text-white shadow-xl border-l-4 border-emerald-400 rounded-lg',
+        blue: 'bg-gradient-to-r from-blue-500 via-blue-600 to-cyan-600 text-white shadow-xl border-l-4 border-blue-400 rounded-lg',
+        pink: 'bg-gradient-to-r from-pink-500 via-rose-600 to-pink-700 text-white shadow-xl border-l-4 border-pink-400 rounded-lg',
+        cyan: 'bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 text-white shadow-xl border-l-4 border-cyan-400 rounded-lg',
         violet:
-          'bg-gradient-to-r from-violet-500 to-violet-600 text-white shadow-lg border-l-4 border-violet-400',
+          'bg-gradient-to-r from-violet-500 via-purple-600 to-indigo-600 text-white shadow-xl border-l-4 border-violet-400 rounded-lg',
         orange:
-          'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg border-l-4 border-orange-400',
+          'bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 text-white shadow-xl border-l-4 border-orange-400 rounded-lg',
         indigo:
-          'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-lg border-l-4 border-indigo-400',
-        gray: 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-lg border-l-4 border-gray-400',
+          'bg-gradient-to-r from-indigo-500 via-blue-600 to-purple-600 text-white shadow-xl border-l-4 border-indigo-400 rounded-lg',
+        gray: 'bg-gradient-to-r from-gray-500 via-gray-600 to-slate-600 text-white shadow-xl border-l-4 border-gray-400 rounded-lg',
       };
       return `${baseClasses} ${activeColorMap[color] || activeColorMap['gray']}`;
     } else {
-      // Inactive durum için - gelişmiş hover effects
-      return `${baseClasses} text-gray-700 border-l-4 border-transparent hover:bg-gray-50 hover:shadow-md hover:border-gray-300`;
+      // Inactive durum için - modern glassmorphism hover effects
+      return `${baseClasses} text-gray-700 border-l-4 border-transparent hover:bg-white/40 hover:backdrop-blur-sm hover:shadow-md hover:border-gray-300 rounded-lg`;
     }
   };
 
-  const getIconColorClasses = (color: string, isActive: boolean = false) => {
+  const getIconClasses = (color: string, isActive: boolean = false) => {
     if (isActive) {
       return 'text-white';
     } else {
       const iconColorMap: { [key: string]: string } = {
-        red: 'text-gray-600 group-hover:text-red-600',
-        green: 'text-gray-600 group-hover:text-emerald-600',
-        purple: 'text-gray-600 group-hover:text-purple-600',
-        yellow: 'text-gray-600 group-hover:text-amber-600',
-        emerald: 'text-gray-600 group-hover:text-emerald-600',
-        blue: 'text-gray-600 group-hover:text-blue-600',
-        pink: 'text-gray-600 group-hover:text-pink-600',
-        cyan: 'text-gray-600 group-hover:text-cyan-600',
-        violet: 'text-gray-600 group-hover:text-violet-600',
-        orange: 'text-gray-600 group-hover:text-orange-600',
-        indigo: 'text-gray-600 group-hover:text-indigo-600',
-        gray: 'text-gray-600 group-hover:text-gray-600',
+        red: 'text-red-600 border border-red-200',
+        green: 'text-emerald-600 border border-emerald-200',
+        purple: 'text-purple-600 border border-purple-200',
+        yellow: 'text-amber-600 border border-amber-200',
+        emerald: 'text-emerald-600 border border-emerald-200',
+        blue: 'text-blue-600 border border-blue-200',
+        pink: 'text-pink-600 border border-pink-200',
+        cyan: 'text-cyan-600 border border-cyan-200',
+        violet: 'text-violet-600 border border-violet-200',
+        orange: 'text-orange-600 border border-orange-200',
+        indigo: 'text-indigo-600 border border-indigo-200',
+        gray: 'text-gray-600 border border-gray-200',
       };
-      return iconColorMap[color] || iconColorMap['gray'];
+
+      // Collapsed durumda tek tip gri renk
+      const collapsedStyle = collapsed
+        ? 'text-gray-600 border border-gray-200'
+        : iconColorMap[color] || iconColorMap['gray'];
+
+      return `w-7 h-7 rounded-lg flex items-center justify-start pl-1 transition-all duration-300 hover:scale-102 bg-white/40 hover:bg-white/60 ${collapsedStyle}`;
     }
   };
 
   return (
     <div
-      className={`transition-all duration-300 ease-in-out min-h-full ${collapsed ? 'w-16' : 'w-52'}`}
+      className={`transition-all duration-300 ease-in-out min-h-full ${collapsed ? 'w-16' : 'w-52'} bg-white/60 backdrop-blur-sm border-r border-white/30`}
     >
-      <nav className='p-2 space-y-1 pt-4'>
+      <nav className='p-2 space-y-0 pt-4'>
         {/* Ana Menü Öğeleri */}
         {menuItems.map(item => {
           const isActive = pathname === item.href;
@@ -218,22 +235,32 @@ export default function AnimatedSidebar({
               {item.hasSubmenu ? (
                 <div>
                   <div
-                    className={`group relative flex items-center px-3 py-2 text-sm font-medium rounded-md cursor-pointer ${getColorClasses(item.color, isActive)}`}
+                    className={`group relative flex items-center px-2 py-2 text-sm font-medium cursor-pointer ${getColorClasses(item.color, isActive)}`}
                     onClick={() => toggleExpanded(item.id)}
                   >
-                    <div className='flex items-center justify-center mr-3'>
-                      <div
-                        className={`transition-all duration-200 ${getIconColorClasses(item.color, isActive)}`}
-                      >
+                    <div className='flex items-center justify-start mr-2 relative'>
+                      <div className={getIconClasses(item.color, isActive)}>
                         <item.icon className='w-5 h-5' />
                       </div>
+                      {item.notifications > 0 && collapsed && (
+                        <span className='absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold'>
+                          {item.notifications > 9 ? '9+' : item.notifications}
+                        </span>
+                      )}
                     </div>
                     <div className='flex-1 flex items-center justify-between'>
-                      <span
-                        className={`truncate transition-all duration-200 ${collapsed ? 'opacity-0 w-0' : 'opacity-100'}`}
-                      >
-                        {item.title}
-                      </span>
+                      <div className='flex items-center gap-2'>
+                        <span
+                          className={`truncate transition-all duration-200 ${collapsed ? 'opacity-0 w-0' : 'opacity-100'}`}
+                        >
+                          {item.title}
+                        </span>
+                        {item.notifications > 0 && !collapsed && (
+                          <span className='w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold'>
+                            {item.notifications > 9 ? '9+' : item.notifications}
+                          </span>
+                        )}
+                      </div>
                       <div
                         className={`flex items-center space-x-2 transition-all duration-200 ${collapsed ? 'opacity-0 w-0' : 'opacity-100'}`}
                       >
@@ -251,7 +278,7 @@ export default function AnimatedSidebar({
                         <Link
                           key={index}
                           href={subItem.href}
-                          className='block px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors duration-200'
+                          className='block px-2 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors duration-200'
                         >
                           {subItem.title}
                         </Link>
@@ -262,21 +289,31 @@ export default function AnimatedSidebar({
               ) : (
                 <Link href={item.href}>
                   <div
-                    className={`group relative flex items-center px-3 py-2 text-sm font-medium rounded-md cursor-pointer ${getColorClasses(item.color, isActive)}`}
+                    className={`group relative flex items-center px-2 py-2 text-sm font-medium cursor-pointer ${getColorClasses(item.color, isActive)}`}
                   >
-                    <div className='flex items-center justify-center mr-3'>
-                      <div
-                        className={`transition-all duration-200 ${getIconColorClasses(item.color, isActive)}`}
-                      >
+                    <div className='flex items-center justify-start mr-2 relative'>
+                      <div className={getIconClasses(item.color, isActive)}>
                         <item.icon className='w-5 h-5' />
                       </div>
+                      {item.notifications > 0 && collapsed && (
+                        <span className='absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold'>
+                          {item.notifications > 9 ? '9+' : item.notifications}
+                        </span>
+                      )}
                     </div>
                     <div className='flex-1 flex items-center justify-between'>
-                      <span
-                        className={`truncate transition-all duration-200 ${collapsed ? 'opacity-0 w-0' : 'opacity-100'}`}
-                      >
-                        {item.title}
-                      </span>
+                      <div className='flex items-center gap-2'>
+                        <span
+                          className={`truncate transition-all duration-200 ${collapsed ? 'opacity-0 w-0' : 'opacity-100'}`}
+                        >
+                          {item.title}
+                        </span>
+                        {item.notifications > 0 && !collapsed && (
+                          <span className='w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold'>
+                            {item.notifications > 9 ? '9+' : item.notifications}
+                          </span>
+                        )}
+                      </div>
                       <div className='flex items-center space-x-2'></div>
                     </div>
                   </div>
@@ -288,9 +325,9 @@ export default function AnimatedSidebar({
 
         {/* Ayarlar Bölümü */}
         {!collapsed && (
-          <div className='my-4 border-t border-gray-200'>
-            <div className='px-3 py-2'>
-              <h3 className='text-xs font-semibold text-gray-500 uppercase tracking-wider'>
+          <div className='my-4 border-t border-white/20'>
+            <div className='px-2 py-2'>
+              <h3 className='text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gradient-to-r from-gray-600 to-gray-800 bg-clip-text text-transparent'>
                 AYARLAR
               </h3>
             </div>
@@ -304,12 +341,10 @@ export default function AnimatedSidebar({
           return (
             <Link key={item.id} href={item.href}>
               <div
-                className={`group relative flex items-center px-3 py-2 text-sm font-medium rounded-md cursor-pointer ${getColorClasses(item.color, isActive)}`}
+                className={`group relative flex items-center px-2 py-2 text-sm font-medium cursor-pointer ${getColorClasses(item.color, isActive)}`}
               >
-                <div className='flex items-center justify-center mr-3'>
-                  <div
-                    className={`transition-all duration-200 ${getIconColorClasses(item.color, isActive)}`}
-                  >
+                <div className='flex items-center justify-center mr-2'>
+                  <div className={getIconClasses(item.color, isActive)}>
                     <item.icon className='w-5 h-5' />
                   </div>
                 </div>

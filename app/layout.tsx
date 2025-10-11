@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import { Inter, Pacifico } from 'next/font/google';
 
+import ErrorBoundary from '@/components/ErrorBoundary';
 import { AuthProvider } from '@/contexts/AuthContext';
-import { ErrorBoundary } from '@/lib/components/error-boundary';
 import './globals.css';
 const pacifico = Pacifico({
   weight: '400',

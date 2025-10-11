@@ -1,68 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { cacheKeys, cacheUtils } from '@/lib/cache/redis-cache';
+import { requireCompany, createAuthErrorResponse } from '@/lib/jwt-utils';
 import { createClient } from '@/lib/supabase/server';
 // GET /api/firma/dashboard-stats - Get firm's dashboard statistics
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createClient();
-    // Get user email from cookies (middleware sets this) or headers for testing
-    const userEmail =
-      request.cookies.get('auth-user-email')?.value ||
-      request.headers.get('X-User-Email');
-    const userRole =
-      request.cookies.get('auth-user-role')?.value ||
-      request.headers.get('X-User-Role');
+    // JWT Authentication - Company users only
+    const user = await requireCompany(request);
 
-    // For testing, allow any role
-    if (!userEmail) {
-      return NextResponse.json(
-        { error: 'Unauthorized - No email provided' },
-        { status: 401 }
-      );
-    }
+    const supabase = createClient();
     // OPTIMIZED: Check cache first
-    const cacheKey = cacheKeys.firmaStats(userEmail);
+    const cacheKey = cacheKeys.firmaStats(user.email);
     const cachedData = cacheUtils.get(cacheKey);
     if (cachedData) {
       return NextResponse.json(cachedData);
     }
-    // Find company by email
-    const { data: company, error: companyError } = await supabase
-      .from('companies')
-      .select('id, name, email')
-      .eq('email', userEmail)
-      .single();
-    // If not found in companies table, check company_users table
-    if (companyError && companyError.code === 'PGRST116') {
-      const { data: userCompanyData, error: userCompanyError } = await supabase
-        .from('company_users')
-        .select(
-          `
-          company_id,
-          companies (id, name, email)
-        `
-        )
-        .eq('email', userEmail)
-        .single();
-      if (userCompanyError) {
-        return NextResponse.json(
-          { error: 'Company not found' },
-          { status: 404 }
-        );
-      }
-      if (userCompanyData && userCompanyData.companies) {
-        company = userCompanyData.companies[0];
-      }
+
+    // Use company_id from JWT token
+    const companyId = user.company_id;
+    if (!companyId) {
+      return NextResponse.json(
+        { error: 'Company ID not found in token' },
+        { status: 400 }
+      );
     }
-    if (!company) {
-      return NextResponse.json({ error: 'Company not found' }, { status: 404 });
-    }
-    // Get company basic info first
+
+    // Get company basic info
     const { data: companyData, error: companyDataError } = await supabase
       .from('companies')
       .select('id, name, email')
-      .eq('id', company.id)
+      .eq('id', companyId)
       .single();
 
     if (companyDataError) {
@@ -76,19 +44,19 @@ export async function GET(request: NextRequest) {
     const { data: projects } = await supabase
       .from('projects')
       .select('id, status, progress_percentage, created_at, updated_at')
-      .eq('company_id', company.id);
+      .eq('company_id', companyId);
 
     // Get education assignments separately
     const { data: educationAssignments } = await supabase
       .from('company_education_assignments')
       .select('id, status, created_at, updated_at')
-      .eq('company_id', company.id);
+      .eq('company_id', companyId);
 
     // Get tasks separately
     const { data: tasks } = await supabase
       .from('tasks')
       .select('id, status, created_at, updated_at')
-      .eq('company_id', company.id);
+      .eq('company_id', companyId);
 
     // Combine the data
     const combinedData = {
@@ -186,7 +154,15 @@ export async function GET(request: NextRequest) {
     // Cache the response
     cacheUtils.set(cacheKey, response, 3 * 60 * 1000); // 3 minutes cache
     return NextResponse.json(response);
-  } catch (error) {
+  } catch (error: any) {
+    // Handle authentication errors specifically
+    if (
+      error.message === 'Authentication required' ||
+      error.message === 'Company access required'
+    ) {
+      return createAuthErrorResponse(error.message, 401);
+    }
+
     return NextResponse.json(
       { error: 'Failed to fetch dashboard statistics' },
       { status: 500 }

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import { requireCompany, createAuthErrorResponse } from '@/lib/jwt-utils';
 import { createAdminClient, createClient } from '@/lib/supabase/server';
 
 /**
@@ -8,46 +9,15 @@ import { createAdminClient, createClient } from '@/lib/supabase/server';
  */
 export async function GET(request: NextRequest) {
   try {
+    // JWT Authentication - Company users only
+    const user = await requireCompany(request);
+
     const supabase = createClient();
 
-    // Kullanıcı kimlik doğrulama
-    const userEmail = request.cookies.get('auth-user-email')?.value;
-    const userRole = request.cookies.get('auth-user-role')?.value;
+    // Kullanıcının company_id'sini JWT'den al
+    const companyId = user.company_id;
 
-    if (!userEmail) {
-      return NextResponse.json(
-        { error: 'Kullanıcı kimlik doğrulaması gerekli' },
-        { status: 401 }
-      );
-    }
-
-    // Firma kullanıcısı kontrolü - Middleware COMPANY_ROLES ile uyumlu
-    const COMPANY_ROLES = [
-      'user',
-      'operator',
-      'manager',
-      'firma_admin',
-      'firma_kullanıcı',
-    ];
-    if (!COMPANY_ROLES.includes(userRole || '')) {
-      return NextResponse.json(
-        { error: 'Bu işlem için firma kullanıcısı yetkisi gerekli' },
-        { status: 403 }
-      );
-    }
-
-    // Kullanıcının company_id'sini al
-    const { data: companyUser, error: companyUserError } = await supabase
-      .from('company_users')
-      .select('company_id')
-      .eq('email', userEmail)
-      .single();
-
-    //   companyUser,
-    //   companyUserError,
-    // });
-
-    if (companyUserError || !companyUser) {
+    if (!companyId) {
       return NextResponse.json(
         { error: 'Firma bilgisi bulunamadı' },
         { status: 404 }
@@ -58,7 +28,7 @@ export async function GET(request: NextRequest) {
     const { data: assignedProjects, error: projectsError } = await supabase
       .from('project_company_assignments')
       .select('id, project_id, assigned_at, status')
-      .eq('company_id', companyUser.company_id)
+      .eq('company_id', companyId)
       .eq('status', 'active')
       .order('assigned_at', { ascending: false });
 
@@ -141,15 +111,6 @@ export async function GET(request: NextRequest) {
         project.progress = companyProgress;
         project.progress_percentage = companyProgress;
 
-        console.log('Company progress for project:', {
-          projectId,
-          projectName: project.name,
-          totalTasks: projectTasks?.length || 0,
-          completedTasks: completedTasks || 0,
-          companyProgress,
-          originalProgress: project.progress,
-        });
-
         projects.push(project);
       }
     }
@@ -160,7 +121,15 @@ export async function GET(request: NextRequest) {
       projects: projects,
       message: 'Atanmış projeler başarıyla getirildi',
     });
-  } catch (error) {
+  } catch (error: any) {
+    // Handle authentication errors specifically
+    if (
+      error.message === 'Authentication required' ||
+      error.message === 'Company access required'
+    ) {
+      return createAuthErrorResponse(error.message, 401);
+    }
+
     return NextResponse.json(
       { error: 'Sunucu hatası oluştu' },
       { status: 500 }

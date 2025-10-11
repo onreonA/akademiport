@@ -97,7 +97,6 @@ export async function POST(request: NextRequest) {
       )
       .single();
     if (error) {
-      console.log('Forum reply creation error:', error);
       return NextResponse.json(
         { success: false, error: 'Yanıt oluşturulamadı', details: error },
         { status: 500 }

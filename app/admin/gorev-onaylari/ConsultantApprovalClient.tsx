@@ -202,13 +202,6 @@ export default function ConsultantApprovalClient() {
     let retryCount = 0;
 
     const attemptApproval = async (): Promise<Response> => {
-      console.log('Approval payload:', {
-        taskId: completion.taskId,
-        company_id: completion.company_id,
-        approval_notes: approvalForm.approvalNote,
-        completion: completion,
-      });
-
       const response = await fetch(
         `/api/admin/task-approvals/${completion.taskId}`,
         {

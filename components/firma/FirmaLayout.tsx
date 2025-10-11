@@ -38,7 +38,6 @@ export default function FirmaLayout({
   const [mounted, setMounted] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -62,66 +61,14 @@ export default function FirmaLayout({
     }
   }, []);
 
-
-  // Authentication kontrolü
+  // Authentication kontrolü - Middleware tarafından yapılıyor
+  // FirmaLayout sadece UI render ediyor
   useEffect(() => {
-    const checkAuth = () => {
-      try {
-        // Authorization check started
-
-        const userEmail = document.cookie
-          .split('; ')
-          .find(row => row.startsWith('auth-user-email='))
-          ?.split('=')[1];
-        const userRole = document.cookie
-          .split('; ')
-          .find(row => row.startsWith('auth-user-role='))
-          ?.split('=')[1];
-        const userCompanyId = document.cookie
-          .split('; ')
-          .find(row => row.startsWith('auth-user-company-id='))
-          ?.split('=')[1];
-
-        // User data retrieved
-
-        if (!userEmail) {
-          // No user found, redirecting to login
-          setError('Kullanıcı oturumu bulunamadı');
-          router.push('/giris');
-          return;
-        }
-
-        // Firma kullanıcıları için role kontrolü - Middleware COMPANY_ROLES ile uyumlu
-        const COMPANY_ROLES = [
-          'user',
-          'operator',
-          'manager',
-          'firma_admin',
-          'firma_kullanıcı',
-        ];
-
-        if (!COMPANY_ROLES.includes(userRole || '')) {
-          // Unauthorized role
-          setError('Firma erişimi gerekli');
-          router.push('/giris');
-          return;
-        }
-
-        // Authorization successful
-        setError(null);
-      } catch (error) {
-        // Auth check error
-        setError('Kimlik doğrulama hatası');
-        router.push('/giris');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
+    // Mounted olduğunda loading'i false yap
     if (mounted) {
-      checkAuth();
+      setIsLoading(false);
     }
-  }, [mounted, router]);
+  }, [mounted]);
 
   // Auto-collapse timer logic - 10 saniye sonra daralt
   useEffect(() => {
@@ -184,32 +131,7 @@ export default function FirmaLayout({
     );
   }
 
-  if (error) {
-    return (
-      <div className='min-h-screen bg-gray-50'>
-        <div className='fixed top-0 left-0 w-full h-16 bg-white border-b border-gray-200 z-50' />
-        <div className='pt-16'>
-          <div className='p-4 sm:p-6 lg:p-8'>
-            <div className='mb-6'>
-              <h1 className='text-xl font-bold text-gray-900'>{title}</h1>
-              {description && (
-                <p className='mt-1 text-xs text-gray-600'>{description}</p>
-              )}
-            </div>
-            <div className='flex items-center justify-center h-64'>
-              <div className='text-center'>
-                <div className='text-red-600 text-lg mb-2'>⚠️</div>
-                <p className='text-sm text-gray-600'>{error}</p>
-                <p className='text-xs text-gray-500 mt-1'>
-                  Giriş sayfasına yönlendiriliyorsunuz...
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // Error state kaldırıldı - Middleware tarafından yönetiliyor
 
   return (
     <div className='min-h-screen bg-gray-50'>
@@ -229,10 +151,9 @@ export default function FirmaLayout({
         className={`
                 fixed top-16 left-0 h-[calc(100vh-4rem)] z-60 transition-all duration-300 ease-in-out
                 ${sidebarCollapsed ? 'w-16' : 'w-52'}
-                bg-white shadow-xl border-r border-gray-200
+                bg-white/60 backdrop-blur-sm shadow-xl border-r border-white/30
                 hidden md:block sidebar-fix
               `}
-        style={{ backgroundColor: 'white' }}
         onMouseEnter={handleSidebarMouseEnter}
         onMouseLeave={handleSidebarMouseLeave}
       >
@@ -247,11 +168,10 @@ export default function FirmaLayout({
         className={`
           fixed top-16 left-0 h-[calc(100vh-4rem)] z-50 transition-all duration-300 ease-in-out
           w-52
-          bg-white shadow-xl rounded-tr-2xl border-r border-gray-200
+          bg-white/60 backdrop-blur-sm shadow-xl rounded-tr-lg border-r border-white/30
           md:hidden
           ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
         `}
-        style={{ backgroundColor: 'white' }}
       >
         <AnimatedSidebar
           collapsed={false}

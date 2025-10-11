@@ -1,6 +1,10 @@
 'use client';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+
+import Button from '@/components/ui/Button';
+import EmptyState from '@/components/ui/EmptyState';
+import Modal, { ModalFooter } from '@/components/ui/Modal';
 interface JobPosting {
   id: string;
   title: string;
@@ -528,114 +532,97 @@ const JobApplicationModal = ({
     }
   };
   return (
-    <div className='fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4'>
-      <div className='bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-screen overflow-y-auto'>
-        <div className='p-6 border-b border-gray-200'>
-          <div className='flex justify-between items-center'>
-            <div>
-              <h3 className='text-xl font-semibold text-gray-900'>
-                {job.title} - Başvurular
-              </h3>
-              <p className='text-gray-600 text-sm mt-1'>
-                {applications.length} başvuru
-              </p>
-            </div>
-            <button
-              onClick={onClose}
-              className='w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center cursor-pointer'
+    <Modal
+      isOpen={true}
+      onClose={onClose}
+      title={`${job.title} - Başvurular`}
+      subtitle={`${applications.length} başvuru`}
+      size="xl"
+    >
+      {applications.length > 0 ? (
+        <div className='space-y-4'>
+          {applications.map(application => (
+            <div
+              key={application.id}
+              className='border border-gray-200 rounded-lg p-4 hover:bg-gray-50'
             >
-              <i className='ri-close-line text-gray-600'></i>
-            </button>
-          </div>
-        </div>
-        <div className='p-6'>
-          {applications.length > 0 ? (
-            <div className='space-y-4'>
-              {applications.map(application => (
-                <div
-                  key={application.id}
-                  className='border border-gray-200 rounded-lg p-4 hover:bg-gray-50'
-                >
-                  <div className='flex items-start justify-between'>
-                    <div className='flex-1'>
-                      <div className='flex items-center gap-3 mb-2'>
-                        <h4 className='font-medium text-gray-900'>
-                          {application.applicantName}
-                        </h4>
-                        <span
-                          className={`px-2 py-1 rounded-full text-xs font-medium ${getApplicationStatusColor(application.status)}`}
-                        >
-                          {application.status}
-                        </span>
-                      </div>
-                      <div className='space-y-1 text-sm text-gray-600 mb-3'>
-                        <div className='flex items-center gap-2'>
-                          <i className='ri-mail-line'></i>
-                          <span>{application.applicantEmail}</span>
-                        </div>
-                        <div className='flex items-center gap-2'>
-                          <i className='ri-phone-line'></i>
-                          <span>{application.applicantPhone}</span>
-                        </div>
-                        <div className='flex items-center gap-2'>
-                          <i className='ri-calendar-line'></i>
-                          <span suppressHydrationWarning={true}>
-                            Başvuru:{' '}
-                            {new Date(
-                              application.appliedDate
-                            ).toLocaleDateString('tr-TR')}
-                          </span>
-                        </div>
-                      </div>
-                      {application.coverLetter && (
-                        <div className='mb-3'>
-                          <p className='text-sm font-medium text-gray-700 mb-1'>
-                            Ön Yazı:
-                          </p>
-                          <p className='text-sm text-gray-600 line-clamp-2'>
-                            {application.coverLetter}
-                          </p>
-                        </div>
-                      )}
+              <div className='flex items-start justify-between'>
+                <div className='flex-1'>
+                  <div className='flex items-center gap-3 mb-2'>
+                    <h4 className='font-medium text-gray-900'>
+                      {application.applicantName}
+                    </h4>
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${getApplicationStatusColor(application.status)}`}
+                    >
+                      {application.status}
+                    </span>
+                  </div>
+                  <div className='space-y-1 text-sm text-gray-600 mb-3'>
+                    <div className='flex items-center gap-2'>
+                      <i className='ri-mail-line'></i>
+                      <span>{application.applicantEmail}</span>
                     </div>
-                    <div className='flex flex-col gap-2 ml-4'>
-                      <select
-                        value={application.status}
-                        onChange={e =>
-                          onUpdateApplicationStatus(
-                            application.id,
-                            e.target.value
-                          )
-                        }
-                        className='px-2 py-1 text-xs border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-                      >
-                        <option value='Yeni'>Yeni</option>
-                        <option value='İnceleniyor'>İnceleniyor</option>
-                        <option value='Mülakat'>Mülakat</option>
-                        <option value='Kabul'>Kabul</option>
-                        <option value='Red'>Red</option>
-                      </select>
-                      {application.resumeUrl && (
-                        <button className='text-xs text-blue-600 hover:text-blue-800 cursor-pointer'>
-                          CV İndir
-                        </button>
-                      )}
+                    <div className='flex items-center gap-2'>
+                      <i className='ri-phone-line'></i>
+                      <span>{application.applicantPhone}</span>
+                    </div>
+                    <div className='flex items-center gap-2'>
+                      <i className='ri-calendar-line'></i>
+                      <span suppressHydrationWarning={true}>
+                        Başvuru:{' '}
+                        {new Date(
+                          application.appliedDate
+                        ).toLocaleDateString('tr-TR')}
+                      </span>
                     </div>
                   </div>
+                  {application.coverLetter && (
+                    <div className='mb-3'>
+                      <p className='text-sm font-medium text-gray-700 mb-1'>
+                        Ön Yazı:
+                      </p>
+                      <p className='text-sm text-gray-600 line-clamp-2'>
+                        {application.coverLetter}
+                      </p>
+                    </div>
+                  )}
                 </div>
-              ))}
+                <div className='flex flex-col gap-2 ml-4'>
+                  <select
+                    value={application.status}
+                    onChange={e =>
+                      onUpdateApplicationStatus(
+                        application.id,
+                        e.target.value
+                      )
+                    }
+                    className='px-2 py-1 text-xs border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                  >
+                    <option value='Yeni'>Yeni</option>
+                    <option value='İnceleniyor'>İnceleniyor</option>
+                    <option value='Mülakat'>Mülakat</option>
+                    <option value='Kabul'>Kabul</option>
+                    <option value='Red'>Red</option>
+                  </select>
+                  {application.resumeUrl && (
+                    <button className='text-xs text-blue-600 hover:text-blue-800 cursor-pointer'>
+                      CV İndir
+                    </button>
+                  )}
+                </div>
+              </div>
             </div>
-          ) : (
-            <div className='text-center py-12'>
-              <i className='ri-user-line text-4xl text-gray-400 mb-4'></i>
-              <p className='text-gray-500'>
-                Bu pozisyon için henüz başvuru bulunmuyor
-              </p>
-            </div>
-          )}
+          ))}
         </div>
-      </div>
-    </div>
+      ) : (
+        <EmptyState
+          type='no-applications'
+          size='md'
+          description='Bu pozisyon için henüz başvuru bulunmuyor'
+        />
+      )}
+    </Modal>
   );
 };
 const ApplicationDetailModal = ({
@@ -666,27 +653,14 @@ const ApplicationDetailModal = ({
     onClose();
   };
   return (
-    <div className='fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4'>
-      <div className='bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-screen overflow-y-auto'>
-        <div className='p-6 border-b border-gray-200'>
-          <div className='flex justify-between items-center'>
-            <div>
-              <h3 className='text-xl font-semibold text-gray-900'>
-                {application.name} - Başvuru Detayları
-              </h3>
-              <p className='text-gray-600 text-sm mt-1'>
-                {application.type} Başvurusu
-              </p>
-            </div>
-            <button
-              onClick={onClose}
-              className='w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center cursor-pointer'
-            >
-              <i className='ri-close-line text-gray-600'></i>
-            </button>
-          </div>
-        </div>
-        <div className='p-6 grid grid-cols-1 lg:grid-cols-3 gap-6'>
+    <Modal
+      isOpen={true}
+      onClose={onClose}
+      title={`${application.name} - Başvuru Detayları`}
+      subtitle={`${application.type} Başvurusu`}
+      size="xl"
+    >
+      <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
           {/* Sol Sütun - Kişisel Bilgiler */}
           <div className='lg:col-span-2 space-y-6'>
             <div>
@@ -873,12 +847,13 @@ const ApplicationDetailModal = ({
                     placeholder='Durum değişikliği hakkında not...'
                   />
                 </div>
-                <button
+                <Button
                   onClick={handleStatusUpdate}
-                  className='w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium transition-colors cursor-pointer whitespace-nowrap'
+                  variant="primary"
+                  className="w-full"
                 >
                   Durumu Güncelle
-                </button>
+                </Button>
               </div>
             </div>
             <div>
@@ -894,9 +869,9 @@ const ApplicationDetailModal = ({
                     </p>
                     <p className='text-xs text-gray-500'>PDF Dosyası</p>
                   </div>
-                  <button className='bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm transition-colors cursor-pointer whitespace-nowrap'>
+                  <Button variant="primary" size="sm">
                     İndir
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>
@@ -911,14 +886,13 @@ const ApplicationDetailModal = ({
                 className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm'
                 placeholder='Bu başvuru hakkında notlarınız...'
               />
-              <button className='mt-2 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm transition-colors cursor-pointer whitespace-nowrap'>
+              <Button variant="secondary" size="sm" className="mt-2">
                 Notu Kaydet
-              </button>
+              </Button>
             </div>
           </div>
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 };
 export default function CareerPortal() {

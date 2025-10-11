@@ -2,6 +2,9 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+
+import Button from '@/components/ui/Button';
+import Modal, { ModalFooter } from '@/components/ui/Modal';
 interface Video {
   id: string;
   title: string;
@@ -457,157 +460,147 @@ export default function VideoManagement() {
         </div>
       </div>
       {/* Create/Edit Video Modal */}
-      {showCreateForm && (
-        <div className='fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4'>
-          <div className='bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto'>
-            <div className='p-6 border-b border-gray-200'>
-              <h3 className='text-xl font-semibold text-gray-900'>
-                {editingVideo ? 'Video Düzenle' : 'Yeni Video Ekle'}
-              </h3>
-            </div>
-            <form
-              onSubmit={e => {
-                e.preventDefault();
-                handleCreateVideo();
-              }}
-              className='p-6 space-y-6'
-            >
-              <div>
-                <label className='block text-sm font-medium text-gray-700 mb-2'>
-                  Video Başlığı <span className='text-red-500'>*</span>
-                </label>
-                <input
-                  type='text'
-                  value={formData.title}
-                  onChange={e =>
-                    setFormData({ ...formData, title: e.target.value })
-                  }
-                  className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-                  required
-                />
-              </div>
-              <div>
-                <label className='block text-sm font-medium text-gray-700 mb-2'>
-                  Açıklama
-                </label>
-                <textarea
-                  value={formData.description}
-                  onChange={e =>
-                    setFormData({ ...formData, description: e.target.value })
-                  }
-                  rows={3}
-                  className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-                  placeholder='Video hakkında kısa açıklama...'
-                />
-              </div>
-              <div>
-                <label className='block text-sm font-medium text-gray-700 mb-2'>
-                  YouTube Linki <span className='text-red-500'>*</span>
-                </label>
-                <input
-                  type='url'
-                  value={formData.youtube_url}
-                  onChange={e =>
-                    setFormData({ ...formData, youtube_url: e.target.value })
-                  }
-                  className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-                  placeholder='https://www.youtube.com/watch?v=...'
-                  required
-                />
-              </div>
-              <div className='grid grid-cols-3 gap-4'>
-                <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-2'>
-                    Süre (saniye)
-                  </label>
-                  <input
-                    type='number'
-                    value={formData.duration}
-                    onChange={e =>
-                      setFormData({
-                        ...formData,
-                        duration: parseInt(e.target.value) || 0,
-                      })
-                    }
-                    className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-                    min='0'
-                  />
-                </div>
-                <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-2'>
-                    Sıra
-                  </label>
-                  <input
-                    type='number'
-                    value={formData.order_index}
-                    onChange={e =>
-                      setFormData({
-                        ...formData,
-                        order_index: parseInt(e.target.value) || 0,
-                      })
-                    }
-                    className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-                    min='0'
-                  />
-                </div>
-                <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-2'>
-                    Durum
-                  </label>
-                  <select
-                    value={formData.status}
-                    onChange={e =>
-                      setFormData({
-                        ...formData,
-                        status: e.target.value as 'Aktif' | 'Pasif',
-                      })
-                    }
-                    className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-                  >
-                    <option value='Aktif'>Aktif</option>
-                    <option value='Pasif'>Pasif</option>
-                  </select>
-                </div>
-              </div>
-              <div>
-                <label className='block text-sm font-medium text-gray-700 mb-2'>
-                  Eğitim Seti <span className='text-red-500'>*</span>
-                </label>
-                <select
-                  value={formData.set_id}
-                  onChange={e =>
-                    setFormData({ ...formData, set_id: e.target.value })
-                  }
-                  className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-                  required
-                >
-                  <option value=''>Eğitim Seti Seçin</option>
-                  {educationSets.map(set => (
-                    <option key={set.id} value={set.id}>
-                      {set.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className='flex justify-end gap-3 pt-4'>
-                <button
-                  type='button'
-                  onClick={() => setShowCreateForm(false)}
-                  className='px-4 py-2 text-gray-600 hover:text-gray-800 font-medium cursor-pointer'
-                >
-                  İptal
-                </button>
-                <button
-                  type='submit'
-                  className='bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium transition-colors cursor-pointer'
-                >
-                  {editingVideo ? 'Güncelle' : 'Ekle'}
-                </button>
-              </div>
-            </form>
+      <Modal
+        isOpen={showCreateForm}
+        onClose={() => setShowCreateForm(false)}
+        title={editingVideo ? 'Video Düzenle' : 'Yeni Video Ekle'}
+        size="lg"
+      >
+        <form
+          onSubmit={e => {
+            e.preventDefault();
+            handleCreateVideo();
+          }}
+          className='space-y-6'
+        >
+          <div>
+            <label className='block text-sm font-medium text-gray-700 mb-2'>
+              Video Başlığı <span className='text-red-500'>*</span>
+            </label>
+            <input
+              type='text'
+              value={formData.title}
+              onChange={e =>
+                setFormData({ ...formData, title: e.target.value })
+              }
+              className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+              required
+            />
           </div>
-        </div>
-      )}
+          <div>
+            <label className='block text-sm font-medium text-gray-700 mb-2'>
+              Açıklama
+            </label>
+            <textarea
+              value={formData.description}
+              onChange={e =>
+                setFormData({ ...formData, description: e.target.value })
+              }
+              rows={3}
+              className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+              placeholder='Video hakkında kısa açıklama...'
+            />
+          </div>
+          <div>
+            <label className='block text-sm font-medium text-gray-700 mb-2'>
+              YouTube Linki <span className='text-red-500'>*</span>
+            </label>
+            <input
+              type='url'
+              value={formData.youtube_url}
+              onChange={e =>
+                setFormData({ ...formData, youtube_url: e.target.value })
+              }
+              className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+              placeholder='https://www.youtube.com/watch?v=...'
+              required
+            />
+          </div>
+          <div className='grid grid-cols-3 gap-4'>
+            <div>
+              <label className='block text-sm font-medium text-gray-700 mb-2'>
+                Süre (saniye)
+              </label>
+              <input
+                type='number'
+                value={formData.duration}
+                onChange={e =>
+                  setFormData({
+                    ...formData,
+                    duration: parseInt(e.target.value) || 0,
+                  })
+                }
+                className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                min='0'
+              />
+            </div>
+            <div>
+              <label className='block text-sm font-medium text-gray-700 mb-2'>
+                Sıra
+              </label>
+              <input
+                type='number'
+                value={formData.order_index}
+                onChange={e =>
+                  setFormData({
+                    ...formData,
+                    order_index: parseInt(e.target.value) || 0,
+                  })
+                }
+                className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                min='0'
+              />
+            </div>
+            <div>
+              <label className='block text-sm font-medium text-gray-700 mb-2'>
+                Durum
+              </label>
+              <select
+                value={formData.status}
+                onChange={e =>
+                  setFormData({
+                    ...formData,
+                    status: e.target.value as 'Aktif' | 'Pasif',
+                  })
+                }
+                className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+              >
+                <option value='Aktif'>Aktif</option>
+                <option value='Pasif'>Pasif</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label className='block text-sm font-medium text-gray-700 mb-2'>
+              Eğitim Seti <span className='text-red-500'>*</span>
+            </label>
+            <select
+              value={formData.set_id}
+              onChange={e =>
+                setFormData({ ...formData, set_id: e.target.value })
+              }
+              className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+              required
+            >
+              <option value=''>Eğitim Seti Seçin</option>
+              {educationSets.map(set => (
+                <option key={set.id} value={set.id}>
+                  {set.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </form>
+
+        <ModalFooter>
+          <Button variant="secondary" onClick={() => setShowCreateForm(false)}>
+            İptal
+          </Button>
+          <Button variant="success" onClick={handleCreateVideo}>
+            {editingVideo ? 'Güncelle' : 'Ekle'}
+          </Button>
+        </ModalFooter>
+      </Modal>
     </div>
   );
 }

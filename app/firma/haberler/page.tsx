@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
 import FirmaLayout from '@/components/firma/FirmaLayout';
+import EmptyState, { LoadingEmptyState } from '@/components/ui/EmptyState';
 import { useAuthStore } from '@/lib/stores/auth-store';
 
 interface News {
@@ -65,7 +66,9 @@ export default function HaberlerPage() {
   const [error, setError] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState<'latest' | 'popular' | 'trending'>('latest');
+  const [sortBy, setSortBy] = useState<'latest' | 'popular' | 'trending'>(
+    'latest'
+  );
   const [showComments, setShowComments] = useState<string | null>(null);
   const [comments, setComments] = useState<{ [key: string]: Comment[] }>({});
   const [newComment, setNewComment] = useState('');
@@ -79,7 +82,8 @@ export default function HaberlerPage() {
       id: '1',
       title: 'E-ihracat Sektöründe Yeni Dönem: Dijital Dönüşüm',
       content: 'E-ihracat sektöründe yaşanan dijital dönüşüm...',
-      excerpt: 'E-ihracat sektöründe yaşanan dijital dönüşüm hakkında detaylı analiz.',
+      excerpt:
+        'E-ihracat sektöründe yaşanan dijital dönüşüm hakkında detaylı analiz.',
       summary: 'Dijital dönüşüm e-ihracat sektörünü nasıl etkiliyor?',
       published_at: '2024-01-15T10:00:00Z',
       category: 'E-ihracat',
@@ -194,15 +198,16 @@ export default function HaberlerPage() {
         const userEmail = user?.email || '';
 
         // Fetch real data from API with authentication
-        const [newsResponse, categoriesResponse, expertsResponse] = await Promise.all([
-          fetch('/api/news', {
-        headers: {
-              'X-User-Email': userEmail,
-            },
-          }),
-          fetch('/api/news/categories'),
-          fetch('/api/news/experts'),
-        ]);
+        const [newsResponse, categoriesResponse, expertsResponse] =
+          await Promise.all([
+            fetch('/api/news', {
+              headers: {
+                'X-User-Email': userEmail,
+              },
+            }),
+            fetch('/api/news/categories'),
+            fetch('/api/news/experts'),
+          ]);
 
         const newsData = await newsResponse.json();
         const categoriesData = await categoriesResponse.json();
@@ -226,7 +231,6 @@ export default function HaberlerPage() {
           setExperts(mockExperts); // Fallback to mock data
         }
       } catch (err) {
-        console.log('API Error, using mock data:', err);
         // Fallback to mock data
         setNews(mockNews);
         setCategories(mockCategories);
@@ -240,8 +244,10 @@ export default function HaberlerPage() {
 
   // Filter news based on category and search
   const filteredNews = news.filter(item => {
-    const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory;
-    const matchesSearch = searchQuery === '' || 
+    const matchesCategory =
+      selectedCategory === 'all' || item.category === selectedCategory;
+    const matchesSearch =
+      searchQuery === '' ||
       item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
@@ -251,7 +257,10 @@ export default function HaberlerPage() {
   const sortedNews = [...filteredNews].sort((a, b) => {
     switch (sortBy) {
       case 'latest':
-        return new Date(b.published_at).getTime() - new Date(a.published_at).getTime();
+        return (
+          new Date(b.published_at).getTime() -
+          new Date(a.published_at).getTime()
+        );
       case 'popular':
         return b.view_count - a.view_count;
       case 'trending':
@@ -316,26 +325,14 @@ export default function HaberlerPage() {
   };
 
   if (loading) {
-  return (
+    return (
       <FirmaLayout
         title='Haberler'
         description='Sektör haberlerini ve güncel gelişmeleri takip edin'
       >
-        <div className='max-w-7xl mx-auto'>
-          <div className='animate-pulse'>
-            <div className='h-8 bg-gray-200 rounded w-1/4 mb-6'></div>
-            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-              {[...Array(6)].map((_, i) => (
-                <div key={i} className='bg-white rounded-xl shadow-sm border border-gray-100 p-6'>
-                  <div className='h-4 bg-gray-200 rounded w-3/4 mb-4'></div>
-                  <div className='h-6 bg-gray-200 rounded w-full mb-2'></div>
-                  <div className='h-4 bg-gray-200 rounded w-2/3 mb-4'></div>
-                  <div className='h-4 bg-gray-200 rounded w-1/2'></div>
-              </div>
-              ))}
-                  </div>
-                  </div>
-                </div>
+        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
+          <LoadingEmptyState message='Haberler yükleniyor...' />
+        </div>
       </FirmaLayout>
     );
   }
@@ -346,23 +343,21 @@ export default function HaberlerPage() {
         title='Haberler'
         description='Sektör haberlerini ve güncel gelişmeleri takip edin'
       >
-        <div className='max-w-7xl mx-auto'>
-          <div className='text-center py-12'>
-            <div className='w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4'>
-              <i className='ri-error-warning-line text-red-600 text-2xl'></i>
-            </div>
-            <h3 className='text-lg font-medium text-gray-900 mb-2'>
-              Hata Oluştu
-            </h3>
-            <p className='text-gray-500 mb-6'>{error}</p>
-            <button
-              onClick={() => window.location.reload()}
-              className='bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors'
-            >
-              Tekrar Dene
-            </button>
-          </div>
-            </div>
+        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
+          <EmptyState
+            type='custom'
+            title='Hata Oluştu'
+            description={error}
+            color='error'
+            size='lg'
+            variant='elevated'
+            action={{
+              label: 'Tekrar Dene',
+              onClick: () => window.location.reload(),
+              variant: 'primary',
+            }}
+          />
+        </div>
       </FirmaLayout>
     );
   }
@@ -380,8 +375,8 @@ export default function HaberlerPage() {
             <div className='absolute top-10 left-10 w-32 h-32 bg-white/5 rounded-full blur-xl'></div>
             <div className='absolute top-32 right-20 w-24 h-24 bg-white/5 rounded-full blur-lg'></div>
             <div className='absolute bottom-20 left-1/3 w-40 h-40 bg-white/5 rounded-full blur-2xl'></div>
-              </div>
-            </div>
+          </div>
+        </div>
 
         <div className='relative px-3 sm:px-4 lg:px-6 py-8'>
           <div className='max-w-7xl mx-auto'>
@@ -390,29 +385,30 @@ export default function HaberlerPage() {
                 <div className='flex items-center gap-3 mb-4'>
                   <div className='w-12 h-12 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center border border-white/20'>
                     <i className='ri-newspaper-line text-white text-2xl'></i>
-                    </div>
-                    <div>
+                  </div>
+                  <div>
                     <h1 className='text-2xl sm:text-3xl font-bold text-white mb-1'>
                       Haberler 📰
                     </h1>
                     <p className='text-blue-100 text-sm sm:text-base'>
                       {sortedNews.length} haber • En güncel gelişmeler
-                      </p>
-                    </div>
+                    </p>
                   </div>
+                </div>
                 <p className='text-white/90 text-sm sm:text-base max-w-2xl leading-relaxed'>
-                  E-ihracat ve e-ticaret dünyasından en güncel haberler, trendler ve uzman görüşleri
+                  E-ihracat ve e-ticaret dünyasından en güncel haberler,
+                  trendler ve uzman görüşleri
                 </p>
-                    </div>
+              </div>
               <div className='hidden lg:flex flex-shrink-0'>
                 <div className='w-20 h-20 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center border border-white/20'>
                   <i className='ri-global-line text-white text-3xl'></i>
-                  </div>
+                </div>
               </div>
             </div>
+          </div>
         </div>
       </div>
-    </div>
 
       <div className='px-3 sm:px-4 lg:px-6 py-6'>
         <div className='max-w-7xl mx-auto'>
@@ -422,16 +418,16 @@ export default function HaberlerPage() {
               <div className='flex items-center gap-3'>
                 <div className='w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-200'>
                   <i className='ri-filter-line text-white text-lg'></i>
-                      </div>
-                  <div>
+                </div>
+                <div>
                   <h3 className='text-lg font-semibold text-gray-900'>
                     Filtreler
                   </h3>
                   <p className='text-sm text-gray-500'>
                     {sortedNews.length} haber bulundu
-                    </p>
-                  </div>
+                  </p>
                 </div>
+              </div>
               <button
                 onClick={() => {
                   setSelectedCategory('all');
@@ -443,16 +439,16 @@ export default function HaberlerPage() {
                 <i className='ri-refresh-line text-sm'></i>
                 Sıfırla
               </button>
-              </div>
+            </div>
 
             <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
-                  {/* Search */}
-                  <div>
+              {/* Search */}
+              <div>
                 <label className='block text-sm font-medium text-gray-700 mb-2'>
                   <i className='ri-search-line mr-2'></i>Arama
-                    </label>
+                </label>
                 <div className='relative'>
-                    <input
+                  <input
                     type='text'
                     value={searchQuery}
                     onChange={e => setSearchQuery(e.target.value)}
@@ -461,44 +457,48 @@ export default function HaberlerPage() {
                   />
                   <i className='ri-search-line absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400'></i>
                 </div>
-                  </div>
+              </div>
 
-                  {/* Category Filter */}
-                  <div>
+              {/* Category Filter */}
+              <div>
                 <label className='block text-sm font-medium text-gray-700 mb-2'>
                   <i className='ri-folder-line mr-2'></i>Kategori
-                    </label>
-                    <select
-                      value={selectedCategory}
-                      onChange={e => setSelectedCategory(e.target.value)}
+                </label>
+                <select
+                  value={selectedCategory}
+                  onChange={e => setSelectedCategory(e.target.value)}
                   className='w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white appearance-none cursor-pointer'
-                    >
+                >
                   <option value='all'>Tüm Kategoriler</option>
-                      {categories.map(category => (
-                        <option key={category.id} value={category.name}>
-                          {category.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  {categories.map(category => (
+                    <option key={category.id} value={category.name}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
               {/* Sort */}
-                  <div>
+              <div>
                 <label className='block text-sm font-medium text-gray-700 mb-2'>
                   <i className='ri-sort-desc mr-2'></i>Sıralama
-                    </label>
-                    <select
+                </label>
+                <select
                   value={sortBy}
-                  onChange={e => setSortBy(e.target.value as 'latest' | 'popular' | 'trending')}
+                  onChange={e =>
+                    setSortBy(
+                      e.target.value as 'latest' | 'popular' | 'trending'
+                    )
+                  }
                   className='w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white appearance-none cursor-pointer'
                 >
                   <option value='latest'>En Yeni</option>
                   <option value='popular'>En Popüler</option>
                   <option value='trending'>Trend</option>
-                    </select>
-                  </div>
-                  </div>
-                </div>
+                </select>
+              </div>
+            </div>
+          </div>
 
           {/* Modern News Grid */}
           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
@@ -522,10 +522,10 @@ export default function HaberlerPage() {
                       <div className='absolute top-4 right-4'>
                         <span className='px-3 py-1 bg-yellow-400 text-yellow-900 rounded-full text-xs font-semibold shadow-lg'>
                           ⭐ Öne Çıkan
-                    </span>
-                </div>
+                        </span>
+                      </div>
                     )}
-              </div>
+                  </div>
                 ) : (
                   <div className='aspect-video bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center'>
                     <i className='ri-newspaper-line text-blue-400 text-4xl'></i>
@@ -536,31 +536,32 @@ export default function HaberlerPage() {
                 <div className='p-6'>
                   {/* Category & Meta */}
                   <div className='flex items-center justify-between mb-4'>
-                      <span
+                    <span
                       className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                        categories.find(c => c.name === item.category)?.color || 'bg-gray-100 text-gray-800'
+                        categories.find(c => c.name === item.category)?.color ||
+                        'bg-gray-100 text-gray-800'
                       }`}
                     >
                       {item.category}
-                      </span>
+                    </span>
                     <div className='flex items-center gap-3 text-xs text-gray-500'>
                       <span className='flex items-center gap-1'>
                         <i className='ri-eye-line'></i>
                         {item.view_count}
-                        </span>
+                      </span>
                       <span className='flex items-center gap-1'>
                         <i className='ri-time-line'></i>
                         {item.reading_time}d
                       </span>
                     </div>
-                    </div>
+                  </div>
 
-                    {/* Title */}
+                  {/* Title */}
                   <h3 className='text-lg font-bold text-gray-900 mb-3 line-clamp-2 group-hover:text-blue-600 transition-colors'>
                     {item.title}
-                    </h3>
+                  </h3>
 
-                    {/* Excerpt */}
+                  {/* Excerpt */}
                   <p className='text-gray-600 text-sm mb-4 line-clamp-3 leading-relaxed'>
                     {item.excerpt}
                   </p>
@@ -570,17 +571,17 @@ export default function HaberlerPage() {
                     <div className='flex items-center gap-3 mb-4 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100'>
                       <div className='w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-200'>
                         <i className='ri-user-line text-white text-sm'></i>
-                        </div>
-                        <div>
+                      </div>
+                      <div>
                         <div className='text-sm font-semibold text-gray-900'>
                           {item.news_experts.name}
                         </div>
                         <div className='text-xs text-gray-500'>
                           {item.news_experts.title}
                         </div>
-                        </div>
                       </div>
-                    )}
+                    </div>
+                  )}
 
                   {/* Date & Difficulty */}
                   <div className='flex items-center justify-between mb-4'>
@@ -588,7 +589,7 @@ export default function HaberlerPage() {
                       <i className='ri-calendar-line'></i>
                       {formatDate(item.published_at)}
                     </span>
-                          <span
+                    <span
                       className={`px-2 py-1 rounded-lg text-xs font-medium ${
                         item.difficulty_level === 'Başlangıç'
                           ? 'bg-green-100 text-green-700'
@@ -598,8 +599,8 @@ export default function HaberlerPage() {
                       }`}
                     >
                       {item.difficulty_level}
-                          </span>
-                      </div>
+                    </span>
+                  </div>
 
                   {/* Actions */}
                   <div className='flex items-center justify-between'>
@@ -612,17 +613,23 @@ export default function HaberlerPage() {
                             : 'bg-gray-50 text-gray-600 border border-gray-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200'
                         }`}
                       >
-                        <i className={`ri-heart-${likedNews.has(item.id) ? 'fill' : 'line'} text-base`}></i>
+                        <i
+                          className={`ri-heart-${likedNews.has(item.id) ? 'fill' : 'line'} text-base`}
+                        ></i>
                         {item.like_count + (likedNews.has(item.id) ? 1 : 0)}
                       </button>
                       <button
-                        onClick={() => setShowComments(showComments === item.id ? null : item.id)}
+                        onClick={() =>
+                          setShowComments(
+                            showComments === item.id ? null : item.id
+                          )
+                        }
                         className='flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-gray-50 text-gray-600 border border-gray-200 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all duration-200'
                       >
                         <i className='ri-chat-3-line text-base'></i>
                         {item.comment_count + (comments[item.id]?.length || 0)}
                       </button>
-                      </div>
+                    </div>
                     <button
                       onClick={() => handleBookmark(item.id)}
                       className={`p-3 rounded-xl transition-all duration-200 ${
@@ -631,13 +638,15 @@ export default function HaberlerPage() {
                           : 'bg-gray-50 text-gray-600 border border-gray-200 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200'
                       }`}
                     >
-                      <i className={`ri-bookmark-${bookmarkedNews.has(item.id) ? 'fill' : 'line'} text-base`}></i>
+                      <i
+                        className={`ri-bookmark-${bookmarkedNews.has(item.id) ? 'fill' : 'line'} text-base`}
+                      ></i>
                     </button>
-                      </div>
-                    </div>
                   </div>
-                ))}
+                </div>
               </div>
+            ))}
+          </div>
 
           {/* Modern No Results */}
           {sortedNews.length === 0 && (
@@ -649,9 +658,10 @@ export default function HaberlerPage() {
                 Haber Bulunamadı
               </h3>
               <p className='text-gray-500 mb-6 max-w-md mx-auto'>
-                Arama kriterlerinize uygun haber bulunamadı. Filtreleri değiştirmeyi deneyin.
+                Arama kriterlerinize uygun haber bulunamadı. Filtreleri
+                değiştirmeyi deneyin.
               </p>
-                    <button
+              <button
                 onClick={() => {
                   setSelectedCategory('all');
                   setSearchQuery('');
@@ -661,11 +671,11 @@ export default function HaberlerPage() {
               >
                 <i className='ri-refresh-line text-base'></i>
                 Filtreleri Sıfırla
-                    </button>
-                </div>
-              )}
+              </button>
             </div>
+          )}
         </div>
+      </div>
     </FirmaLayout>
   );
 }

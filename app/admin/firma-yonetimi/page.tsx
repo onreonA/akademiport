@@ -4,6 +4,9 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import AdminLayout from '@/components/admin/AdminLayout';
+import Button from '@/components/ui/Button';
+import { LoadingEmptyState } from '@/components/ui/EmptyState';
+import Modal from '@/components/ui/Modal';
 import { LazyExportImport } from '@/lib/utils/lazy-imports';
 interface Company {
   id: string;
@@ -1387,10 +1390,7 @@ export default function CompanyManagement() {
       </div>
       {/* Loading State */}
       {companiesLoading && (
-        <div className='text-center py-12'>
-          <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4'></div>
-          <p className='text-gray-600'>Firma verileri yükleniyor...</p>
-        </div>
+        <LoadingEmptyState message='Firma verileri yükleniyor...' />
       )}
       {/* Error State */}
       {companiesError && (
@@ -1515,124 +1515,95 @@ export default function CompanyManagement() {
         </div>
       )}
       {/* Assign Consultant Modal */}
-      {showAssignModal && (
-        <div className='fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4'>
-          <div className='bg-white rounded-xl shadow-2xl w-full max-w-md'>
-            <div className='p-6 border-b border-gray-200'>
-              <h3 className='text-xl font-semibold text-gray-900'>
-                Danışman Ata / Değiştir
-              </h3>
-            </div>
-            <div className='p-6'>
-              <div className='mb-4'>
-                <label className='block text-sm font-medium text-gray-700 mb-2'>
-                  Yeni Danışman Seçin
-                </label>
-                <select
-                  defaultValue={
-                    companies.find(c => c.id === selectedCompanyId)
-                      ?.consultant || ''
-                  }
-                  onChange={e => updateConsultant(e.target.value)}
-                  className='w-full px-3 py-2 pr-8 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-                >
-                  <option value=''>Danışman Seçiniz</option>
-                  {consultants.map((consultant, index) => (
-                    <option key={`${consultant}-${index}`} value={consultant}>
-                      {consultant}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className='flex justify-end gap-3'>
-                <button
-                  onClick={() => setShowAssignModal(false)}
-                  className='px-4 py-2 text-gray-600 hover:text-gray-800 font-medium cursor-pointer whitespace-nowrap'
-                >
-                  İptal
-                </button>
-              </div>
-            </div>
-          </div>
+      <Modal
+        isOpen={showAssignModal}
+        onClose={() => setShowAssignModal(false)}
+        title="Danışman Ata / Değiştir"
+        size="md"
+      >
+        <div className='mb-4'>
+          <label className='block text-sm font-medium text-gray-700 mb-2'>
+            Yeni Danışman Seçin
+          </label>
+          <select
+            defaultValue={
+              companies.find(c => c.id === selectedCompanyId)
+                ?.consultant || ''
+            }
+            onChange={e => updateConsultant(e.target.value)}
+            className='w-full px-3 py-2 pr-8 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+          >
+            <option value=''>Danışman Seçiniz</option>
+            {consultants.map((consultant, index) => (
+              <option key={`${consultant}-${index}`} value={consultant}>
+                {consultant}
+              </option>
+            ))}
+          </select>
         </div>
-      )}
+      </Modal>
       {/* Notes Modal */}
-      {showNotesModal && (
-        <div className='fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4'>
-          <div className='bg-white rounded-xl shadow-2xl w-full max-w-2xl'>
-            <div className='p-6 border-b border-gray-200'>
-              <h3 className='text-xl font-semibold text-gray-900'>
-                Firma Notları
-              </h3>
-            </div>
-            <div className='p-6'>
-              <div className='mb-4'>
-                <label className='block text-sm font-medium text-gray-700 mb-2'>
-                  Notlar
-                </label>
-                <textarea
-                  rows={6}
-                  defaultValue={
-                    companies.find(c => c.id === selectedCompanyId)?.notes || ''
-                  }
-                  className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-                  placeholder='Firma hakkında özel notlarınızı buraya yazabilirsiniz...'
-                />
-              </div>
-              <div className='flex justify-end gap-3'>
-                <button
-                  onClick={() => setShowNotesModal(false)}
-                  className='px-4 py-2 text-gray-600 hover:text-gray-800 font-medium cursor-pointer whitespace-nowrap'
-                >
-                  İptal
-                </button>
-                <button
-                  onClick={() => {
-                    setShowNotesModal(false);
-                    // Notlar güncellendi - Firma: ${selectedCompanyId} - ${new Date().toISOString()}
-                  }}
-                  className='bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors cursor-pointer whitespace-nowrap'
-                >
-                  Kaydet
-                </button>
-              </div>
-            </div>
-          </div>
+      <Modal
+        isOpen={showNotesModal}
+        onClose={() => setShowNotesModal(false)}
+        title="Firma Notları"
+        size="lg"
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setShowNotesModal(false)}>
+              İptal
+            </Button>
+            <Button
+              variant="primary"
+              onClick={() => {
+                setShowNotesModal(false);
+                // Notlar güncellendi - Firma: ${selectedCompanyId} - ${new Date().toISOString()}
+              }}
+            >
+              Kaydet
+            </Button>
+          </>
+        }
+      >
+        <div className='mb-4'>
+          <label className='block text-sm font-medium text-gray-700 mb-2'>
+            Notlar
+          </label>
+          <textarea
+            rows={6}
+            defaultValue={
+              companies.find(c => c.id === selectedCompanyId)?.notes || ''
+            }
+            className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+            placeholder='Firma hakkında özel notlarınızı buraya yazabilirsiniz...'
+          />
         </div>
-      )}
+      </Modal>
       {/* Add Company Modal */}
-      {showAddModal && (
-        <div className='fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4'>
-          <div className='bg-white rounded-xl shadow-2xl w-full max-w-2xl'>
-            <div className='p-6 border-b border-gray-200'>
-              <h3 className='text-xl font-semibold text-gray-900'>
-                Yeni Firma Ekle
-              </h3>
-            </div>
-            <AddCompanyForm
-              onSave={handleSaveCompany}
-              onCancel={() => setShowAddModal(false)}
-            />
-          </div>
-        </div>
-      )}
+      <Modal
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        title="Yeni Firma Ekle"
+        size="lg"
+      >
+        <AddCompanyForm
+          onSave={handleSaveCompany}
+          onCancel={() => setShowAddModal(false)}
+        />
+      </Modal>
       {/* Edit Company Modal */}
-      {showEditModal && (
-        <div className='fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4'>
-          <div className='bg-white rounded-xl shadow-2xl w-full max-w-2xl'>
-            <div className='p-6 border-b border-gray-200'>
-              <h3 className='text-xl font-semibold text-gray-900'>
-                Firma Düzenle
-              </h3>
-            </div>
-            <EditCompanyForm
-              company={companies.find(c => c.id === selectedCompanyId)}
-              onSave={handleUpdateCompany}
-              onCancel={() => setShowEditModal(false)}
-            />
-          </div>
-        </div>
-      )}
+      <Modal
+        isOpen={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        title="Firma Düzenle"
+        size="lg"
+      >
+        <EditCompanyForm
+          company={companies.find(c => c.id === selectedCompanyId)}
+          onSave={handleUpdateCompany}
+          onCancel={() => setShowEditModal(false)}
+        />
+      </Modal>
       {/* Password Management Modal */}
       {showPasswordModal && (
         <PasswordManagementModal

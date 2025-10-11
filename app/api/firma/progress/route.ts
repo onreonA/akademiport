@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import { requireCompany, createAuthErrorResponse } from '@/lib/jwt-utils';
 import { createClient } from '@/lib/supabase/server';
 
 /**
@@ -8,33 +9,10 @@ import { createClient } from '@/lib/supabase/server';
  */
 export async function GET(request: NextRequest) {
   try {
+    // JWT Authentication - Company users only
+    const user = await requireCompany(request);
+
     const supabase = createClient();
-
-    // Kullanıcı kimlik doğrulama
-    const userEmail = request.cookies.get('auth-user-email')?.value;
-    const userRole = request.cookies.get('auth-user-role')?.value;
-
-    if (!userEmail) {
-      return NextResponse.json(
-        { error: 'Kullanıcı kimlik doğrulaması gerekli' },
-        { status: 401 }
-      );
-    }
-
-    // Firma kullanıcısı kontrolü
-    const COMPANY_ROLES = [
-      'user',
-      'operator',
-      'manager',
-      'firma_admin',
-      'firma_kullanıcı',
-    ];
-    if (!COMPANY_ROLES.includes(userRole || '')) {
-      return NextResponse.json(
-        { error: 'Bu işlem için firma kullanıcısı yetkisi gerekli' },
-        { status: 403 }
-      );
-    }
 
     // Query parameters
     const { searchParams } = new URL(request.url);
@@ -45,7 +23,7 @@ export async function GET(request: NextRequest) {
     const { data: companyUser, error: companyUserError } = await supabase
       .from('company_users')
       .select('company_id, name')
-      .eq('email', userEmail)
+      .eq('email', user.email)
       .single();
 
     if (companyUserError || !companyUser) {
@@ -366,7 +344,15 @@ export async function GET(request: NextRequest) {
     };
 
     return NextResponse.json(response);
-  } catch (error) {
+  } catch (error: any) {
+    // Handle authentication errors specifically
+    if (
+      error.message === 'Authentication required' ||
+      error.message === 'Company access required'
+    ) {
+      return createAuthErrorResponse(error.message, 401);
+    }
+
     return NextResponse.json(
       {
         error: 'Sunucu hatası',
