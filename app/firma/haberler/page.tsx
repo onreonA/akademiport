@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
 import FirmaLayout from '@/components/firma/FirmaLayout';
+import EmptyState, { LoadingEmptyState } from '@/components/ui/EmptyState';
 import { useAuthStore } from '@/lib/stores/auth-store';
 
 interface News {
@@ -329,23 +330,8 @@ export default function HaberlerPage() {
         title='Haberler'
         description='Sektör haberlerini ve güncel gelişmeleri takip edin'
       >
-        <div className='max-w-7xl mx-auto'>
-          <div className='animate-pulse'>
-            <div className='h-8 bg-gray-200 rounded w-1/4 mb-6'></div>
-            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-              {[...Array(6)].map((_, i) => (
-                <div
-                  key={i}
-                  className='bg-white rounded-xl shadow-sm border border-gray-100 p-6'
-                >
-                  <div className='h-4 bg-gray-200 rounded w-3/4 mb-4'></div>
-                  <div className='h-6 bg-gray-200 rounded w-full mb-2'></div>
-                  <div className='h-4 bg-gray-200 rounded w-2/3 mb-4'></div>
-                  <div className='h-4 bg-gray-200 rounded w-1/2'></div>
-                </div>
-              ))}
-            </div>
-          </div>
+        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
+          <LoadingEmptyState message='Haberler yükleniyor...' />
         </div>
       </FirmaLayout>
     );
@@ -357,22 +343,20 @@ export default function HaberlerPage() {
         title='Haberler'
         description='Sektör haberlerini ve güncel gelişmeleri takip edin'
       >
-        <div className='max-w-7xl mx-auto'>
-          <div className='text-center py-12'>
-            <div className='w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4'>
-              <i className='ri-error-warning-line text-red-600 text-2xl'></i>
-            </div>
-            <h3 className='text-lg font-medium text-gray-900 mb-2'>
-              Hata Oluştu
-            </h3>
-            <p className='text-gray-500 mb-6'>{error}</p>
-            <button
-              onClick={() => window.location.reload()}
-              className='bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors'
-            >
-              Tekrar Dene
-            </button>
-          </div>
+        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
+          <EmptyState
+            type='custom'
+            title='Hata Oluştu'
+            description={error}
+            color='error'
+            size='lg'
+            variant='elevated'
+            action={{
+              label: 'Tekrar Dene',
+              onClick: () => window.location.reload(),
+              variant: 'primary',
+            }}
+          />
         </div>
       </FirmaLayout>
     );
