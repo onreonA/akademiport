@@ -46,6 +46,51 @@ export default function VideoManagement() {
     status: 'Aktif' as 'Aktif' | 'Pasif',
     set_id: '',
   });
+  
+  // Form validation states
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [isFormValid, setIsFormValid] = useState(false);
+
+  // Form validation functions
+  const validateForm = () => {
+    const errors: Record<string, string> = {};
+    
+    if (!formData.title.trim()) {
+      errors.title = 'Video başlığı gereklidir';
+    }
+    
+    if (!formData.youtube_url.trim()) {
+      errors.youtube_url = 'YouTube linki gereklidir';
+    } else if (!formData.youtube_url.includes('youtube.com') && !formData.youtube_url.includes('youtu.be')) {
+      errors.youtube_url = 'Geçerli bir YouTube linki giriniz';
+    }
+    
+    if (!formData.set_id) {
+      errors.set_id = 'Eğitim seti seçimi gereklidir';
+    }
+    
+    if (formData.duration <= 0) {
+      errors.duration = 'Süre 0\'dan büyük olmalıdır';
+    }
+    
+    if (formData.order_index < 0) {
+      errors.order_index = 'Sıra numarası 0\'dan küçük olamaz';
+    }
+    
+    setFormErrors(errors);
+    setIsFormValid(Object.keys(errors).length === 0);
+    return Object.keys(errors).length === 0;
+  };
+
+  // Update form data with validation
+  const updateFormData = (field: string, value: any) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    // Clear error for this field when user starts typing
+    if (formErrors[field]) {
+      setFormErrors(prev => ({ ...prev, [field]: '' }));
+    }
+  };
+
   // Fetch videos from API
   const fetchVideos = async () => {
     try {
@@ -463,9 +508,11 @@ export default function VideoManagement() {
         <form
           onSubmit={e => {
             e.preventDefault();
-            handleCreateVideo();
+            if (validateForm()) {
+              handleCreateVideo();
+            }
           }}
-          className='space-y-6'
+          className='space-y-6 max-w-4xl mx-auto'
         >
           <div>
             <label className='block text-sm font-medium text-gray-700 mb-2'>
@@ -474,10 +521,9 @@ export default function VideoManagement() {
             <Input
               type='text'
               value={formData.title}
-              onChange={e =>
-                setFormData({ ...formData, title: e.target.value })
-              }
+              onChange={e => updateFormData('title', e.target.value)}
               className='w-full'
+              error={formErrors.title}
               required
             />
           </div>
@@ -487,93 +533,78 @@ export default function VideoManagement() {
             </label>
             <Textarea
               value={formData.description}
-              onChange={e =>
-                setFormData({ ...formData, description: e.target.value })
-              }
+              onChange={e => updateFormData('description', e.target.value)}
               rows={3}
               className='w-full'
               placeholder='Video hakkında kısa açıklama...'
+              error={formErrors.description}
             />
           </div>
           <div>
             <label className='block text-sm font-medium text-gray-700 mb-2'>
               YouTube Linki <span className='text-red-500'>*</span>
             </label>
-            <input
+            <Input
               type='url'
               value={formData.youtube_url}
-              onChange={e =>
-                setFormData({ ...formData, youtube_url: e.target.value })
-              }
-              className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+              onChange={e => updateFormData('youtube_url', e.target.value)}
+              className='w-full'
               placeholder='https://www.youtube.com/watch?v=...'
+              error={formErrors.youtube_url}
               required
             />
           </div>
-          <div className='grid grid-cols-3 gap-4'>
+          <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
             <div>
               <label className='block text-sm font-medium text-gray-700 mb-2'>
                 Süre (saniye)
               </label>
-              <input
+              <Input
                 type='number'
                 value={formData.duration}
-                onChange={e =>
-                  setFormData({
-                    ...formData,
-                    duration: parseInt(e.target.value) || 0,
-                  })
-                }
-                className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                onChange={e => updateFormData('duration', parseInt(e.target.value) || 0)}
+                className='w-full'
                 min='0'
+                error={formErrors.duration}
               />
             </div>
             <div>
               <label className='block text-sm font-medium text-gray-700 mb-2'>
                 Sıra
               </label>
-              <input
+              <Input
                 type='number'
                 value={formData.order_index}
-                onChange={e =>
-                  setFormData({
-                    ...formData,
-                    order_index: parseInt(e.target.value) || 0,
-                  })
-                }
-                className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                onChange={e => updateFormData('order_index', parseInt(e.target.value) || 0)}
+                className='w-full'
                 min='0'
+                error={formErrors.order_index}
               />
             </div>
             <div>
               <label className='block text-sm font-medium text-gray-700 mb-2'>
                 Durum
               </label>
-              <select
+              <Select
                 value={formData.status}
-                onChange={e =>
-                  setFormData({
-                    ...formData,
-                    status: e.target.value as 'Aktif' | 'Pasif',
-                  })
-                }
-                className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                onChange={e => updateFormData('status', e.target.value as 'Aktif' | 'Pasif')}
+                className='w-full'
+                error={formErrors.status}
               >
                 <option value='Aktif'>Aktif</option>
                 <option value='Pasif'>Pasif</option>
-              </select>
+              </Select>
             </div>
           </div>
           <div>
             <label className='block text-sm font-medium text-gray-700 mb-2'>
               Eğitim Seti <span className='text-red-500'>*</span>
             </label>
-            <select
+            <Select
               value={formData.set_id}
-              onChange={e =>
-                setFormData({ ...formData, set_id: e.target.value })
-              }
-              className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+              onChange={e => updateFormData('set_id', e.target.value)}
+              className='w-full'
+              error={formErrors.set_id}
               required
             >
               <option value=''>Eğitim Seti Seçin</option>
@@ -582,7 +613,7 @@ export default function VideoManagement() {
                   {set.name}
                 </option>
               ))}
-            </select>
+            </Select>
           </div>
         </form>
 
