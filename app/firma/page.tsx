@@ -38,10 +38,6 @@ export default function FirmaDashboard() {
 
   // Handle auto-login from admin panel
   const handleAutoLogin = async (token: string, companyName: string) => {
-    console.log('Auto-login attempt:', {
-      token: token.substring(0, 20) + '...',
-      companyName,
-    });
     try {
       // Verify token (client-side verification - in production, this should be server-side)
       const decoded = jwt.decode(token) as any;

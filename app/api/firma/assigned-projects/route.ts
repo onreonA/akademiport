@@ -111,15 +111,6 @@ export async function GET(request: NextRequest) {
         project.progress = companyProgress;
         project.progress_percentage = companyProgress;
 
-        console.log('Company progress for project:', {
-          projectId,
-          projectName: project.name,
-          totalTasks: projectTasks?.length || 0,
-          completedTasks: completedTasks || 0,
-          companyProgress,
-          originalProgress: project.progress,
-        });
-
         projects.push(project);
       }
     }

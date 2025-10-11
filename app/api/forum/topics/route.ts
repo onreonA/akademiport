@@ -120,7 +120,6 @@ export async function POST(request: NextRequest) {
       )
       .single();
     if (error) {
-      console.log('Forum topic creation error:', error);
       return NextResponse.json(
         { success: false, error: 'Konu oluşturulamadı', details: error },
         { status: 500 }

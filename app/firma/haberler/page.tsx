@@ -226,7 +226,6 @@ export default function HaberlerPage() {
           setExperts(mockExperts); // Fallback to mock data
         }
       } catch (err) {
-        console.log('API Error, using mock data:', err);
         // Fallback to mock data
         setNews(mockNews);
         setCategories(mockCategories);
