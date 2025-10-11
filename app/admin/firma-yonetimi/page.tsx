@@ -1518,8 +1518,8 @@ export default function CompanyManagement() {
       <Modal
         isOpen={showAssignModal}
         onClose={() => setShowAssignModal(false)}
-        title="Danışman Ata / Değiştir"
-        size="md"
+        title='Danışman Ata / Değiştir'
+        size='md'
       >
         <div className='mb-4'>
           <label className='block text-sm font-medium text-gray-700 mb-2'>
@@ -1527,8 +1527,7 @@ export default function CompanyManagement() {
           </label>
           <select
             defaultValue={
-              companies.find(c => c.id === selectedCompanyId)
-                ?.consultant || ''
+              companies.find(c => c.id === selectedCompanyId)?.consultant || ''
             }
             onChange={e => updateConsultant(e.target.value)}
             className='w-full px-3 py-2 pr-8 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
@@ -1546,15 +1545,18 @@ export default function CompanyManagement() {
       <Modal
         isOpen={showNotesModal}
         onClose={() => setShowNotesModal(false)}
-        title="Firma Notları"
-        size="lg"
+        title='Firma Notları'
+        size='lg'
         footer={
           <>
-            <Button variant="secondary" onClick={() => setShowNotesModal(false)}>
+            <Button
+              variant='secondary'
+              onClick={() => setShowNotesModal(false)}
+            >
               İptal
             </Button>
             <Button
-              variant="primary"
+              variant='primary'
               onClick={() => {
                 setShowNotesModal(false);
                 // Notlar güncellendi - Firma: ${selectedCompanyId} - ${new Date().toISOString()}
@@ -1583,8 +1585,8 @@ export default function CompanyManagement() {
       <Modal
         isOpen={showAddModal}
         onClose={() => setShowAddModal(false)}
-        title="Yeni Firma Ekle"
-        size="lg"
+        title='Yeni Firma Ekle'
+        size='lg'
       >
         <AddCompanyForm
           onSave={handleSaveCompany}
@@ -1595,8 +1597,8 @@ export default function CompanyManagement() {
       <Modal
         isOpen={showEditModal}
         onClose={() => setShowEditModal(false)}
-        title="Firma Düzenle"
-        size="lg"
+        title='Firma Düzenle'
+        size='lg'
       >
         <EditCompanyForm
           company={companies.find(c => c.id === selectedCompanyId)}

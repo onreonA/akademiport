@@ -7,27 +7,34 @@ import { cn, tokens, spacing, typography, radius } from '@/lib/design-tokens';
 
 export interface BadgeProps {
   children: React.ReactNode;
-  
+
   // Variant
-  variant?: 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info';
-  
+  variant?:
+    | 'default'
+    | 'primary'
+    | 'secondary'
+    | 'success'
+    | 'warning'
+    | 'error'
+    | 'info';
+
   // Size
   size?: 'xs' | 'sm' | 'md' | 'lg';
-  
+
   // Style
   style?: 'solid' | 'soft' | 'outline' | 'ghost';
-  
+
   // Icon
   icon?: LucideIcon;
   iconPosition?: 'left' | 'right';
-  
+
   // Removable
   removable?: boolean;
   onRemove?: () => void;
-  
+
   // Dot indicator
   dot?: boolean;
-  
+
   // Additional
   className?: string;
   onClick?: () => void;
@@ -35,7 +42,7 @@ export interface BadgeProps {
 
 /**
  * Badge Component with Design Tokens
- * 
+ *
  * @example
  * <Badge variant="success">Aktif</Badge>
  * <Badge variant="primary" icon={User}>Admin</Badge>
@@ -144,18 +151,18 @@ export default function Badge({
         'font-medium',
         'rounded-full',
         'transition-all duration-200',
-        
+
         // Size
         currentSize.padding,
         currentSize.text,
         currentSize.gap,
-        
+
         // Variant + Style
         currentStyle,
-        
+
         // Interactive
         onClick && 'cursor-pointer hover:scale-105',
-        
+
         // Custom
         className
       )}
@@ -195,7 +202,7 @@ export default function Badge({
       {removable && (
         <button
           type='button'
-          onClick={(e) => {
+          onClick={e => {
             e.stopPropagation();
             onRemove?.();
           }}
@@ -217,4 +224,3 @@ export default function Badge({
     </span>
   );
 }
-

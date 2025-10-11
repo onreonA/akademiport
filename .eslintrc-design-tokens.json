@@ -14,11 +14,14 @@
   },
   "overrides": [
     {
-      "files": ["components/ui/**/*.tsx", "app/admin/**/*.tsx", "app/firma/**/*.tsx"],
+      "files": [
+        "components/ui/**/*.tsx",
+        "app/admin/**/*.tsx",
+        "app/firma/**/*.tsx"
+      ],
       "rules": {
         "no-restricted-syntax": "error"
       }
     }
   ]
 }
-

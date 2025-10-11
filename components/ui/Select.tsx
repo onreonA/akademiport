@@ -3,7 +3,14 @@
 import React, { forwardRef } from 'react';
 import { AlertCircle, Check, ChevronDown, type LucideIcon } from 'lucide-react';
 
-import { cn, tokens, spacing, typography, color, radius } from '@/lib/design-tokens';
+import {
+  cn,
+  tokens,
+  spacing,
+  typography,
+  color,
+  radius,
+} from '@/lib/design-tokens';
 
 export interface SelectOption {
   value: string;
@@ -12,28 +19,29 @@ export interface SelectOption {
   icon?: LucideIcon;
 }
 
-export interface SelectProps extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'size'> {
+export interface SelectProps
+  extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'size'> {
   // Label & Description
   label?: string;
   description?: string;
-  
+
   // Options
   options: SelectOption[] | string[];
   placeholder?: string;
-  
+
   // Validation
   error?: string;
   success?: string;
-  
+
   // Icons
   leftIcon?: LucideIcon;
-  
+
   // Size
   size?: 'sm' | 'md' | 'lg';
-  
+
   // Variants
   variant?: 'default' | 'filled' | 'outlined';
-  
+
   // Additional
   helperText?: string;
   containerClassName?: string;
@@ -41,27 +49,27 @@ export interface SelectProps extends Omit<React.SelectHTMLAttributes<HTMLSelectE
 
 /**
  * Select Component with Design Tokens
- * 
+ *
  * @example
  * // Basic
- * <Select 
- *   label="Kategori" 
+ * <Select
+ *   label="Kategori"
  *   options={['Option 1', 'Option 2']}
  * />
- * 
+ *
  * @example
  * // With objects
- * <Select 
+ * <Select
  *   label="Şehir"
  *   options={[
  *     { value: 'ist', label: 'İstanbul' },
  *     { value: 'ank', label: 'Ankara' }
  *   ]}
  * />
- * 
+ *
  * @example
  * // With validation
- * <Select 
+ * <Select
  *   label="Durum"
  *   options={statuses}
  *   error={errors.status}
@@ -89,7 +97,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
     ref
   ) => {
     // Normalize options to SelectOption[]
-    const normalizedOptions: SelectOption[] = options.map((opt) => {
+    const normalizedOptions: SelectOption[] = options.map(opt => {
       if (typeof opt === 'string') {
         return { value: opt, label: opt };
       }
@@ -134,7 +142,8 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
     // State classes
     const stateClasses = cn(
       error && 'border-red-500 focus:border-red-500 focus:ring-red-500/20',
-      success && 'border-green-500 focus:border-green-500 focus:ring-green-500/20',
+      success &&
+        'border-green-500 focus:border-green-500 focus:ring-green-500/20',
       disabled && 'bg-gray-100 cursor-not-allowed opacity-60'
     );
 
@@ -144,7 +153,12 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
       <div className={cn('w-full', containerClassName)}>
         {/* Label */}
         {label && (
-          <label className={cn(currentSize.label, 'block font-medium text-gray-700 mb-1.5')}>
+          <label
+            className={cn(
+              currentSize.label,
+              'block font-medium text-gray-700 mb-1.5'
+            )}
+          >
             {label}
             {required && <span className='text-red-500 ml-1'>*</span>}
           </label>
@@ -178,23 +192,23 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
               'outline-none',
               'appearance-none',
               'cursor-pointer',
-              
+
               // Size
               currentSize.select,
-              
+
               // Variant
               variantConfig[variant],
-              
+
               // States
               stateClasses,
-              
+
               // Icon padding
               LeftIcon && 'pl-10',
               'pr-10', // Always add right padding for chevron
-              
+
               // Disabled state
               disabled && 'cursor-not-allowed',
-              
+
               // Custom className
               className
             )}
@@ -206,7 +220,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
             </option>
 
             {/* Options */}
-            {normalizedOptions.map((option) => (
+            {normalizedOptions.map(option => (
               <option
                 key={option.value}
                 value={option.value}
@@ -256,4 +270,3 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
 Select.displayName = 'Select';
 
 export default Select;
-

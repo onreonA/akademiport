@@ -576,7 +576,7 @@ export default function EducationSetsManagement() {
         isOpen={showCreateForm}
         onClose={handleCloseCreateModal}
         title={editingSet ? 'Eğitim Seti Düzenle' : 'Yeni Eğitim Seti Oluştur'}
-        size="lg"
+        size='lg'
       >
         <form
           onSubmit={e => {
@@ -592,9 +592,7 @@ export default function EducationSetsManagement() {
             <input
               type='text'
               value={formData.name}
-              onChange={e =>
-                setFormData({ ...formData, name: e.target.value })
-              }
+              onChange={e => setFormData({ ...formData, name: e.target.value })}
               className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
               required
             />
@@ -651,10 +649,10 @@ export default function EducationSetsManagement() {
         </form>
 
         <ModalFooter>
-          <Button variant="secondary" onClick={handleCloseCreateModal}>
+          <Button variant='secondary' onClick={handleCloseCreateModal}>
             İptal
           </Button>
-          <Button variant="success" onClick={handleCreateSet}>
+          <Button variant='success' onClick={handleCreateSet}>
             {editingSet ? 'Güncelle' : 'Oluştur'}
           </Button>
         </ModalFooter>

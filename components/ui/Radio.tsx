@@ -2,7 +2,14 @@
 
 import React, { forwardRef } from 'react';
 
-import { cn, tokens, spacing, typography, color, radius } from '@/lib/design-tokens';
+import {
+  cn,
+  tokens,
+  spacing,
+  typography,
+  color,
+  radius,
+} from '@/lib/design-tokens';
 
 export interface RadioOption {
   value: string;
@@ -11,7 +18,8 @@ export interface RadioOption {
   disabled?: boolean;
 }
 
-export interface RadioProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
+export interface RadioProps
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
   // Label
   label?: string;
   description?: string;
@@ -86,7 +94,9 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>(
     const currentSize = sizeConfig[size];
 
     return (
-      <div className={cn('flex items-start', currentSize.gap, containerClassName)}>
+      <div
+        className={cn('flex items-start', currentSize.gap, containerClassName)}
+      >
         {/* Radio Container */}
         <div className='relative flex-shrink-0 mt-0.5'>
           {/* Hidden Input */}
@@ -121,7 +131,8 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>(
               'peer-checked:border-blue-600',
 
               // Disabled state
-              disabled && 'opacity-50 cursor-not-allowed peer-hover:border-gray-300',
+              disabled &&
+                'opacity-50 cursor-not-allowed peer-hover:border-gray-300',
 
               // Error state
               error && 'border-red-500 peer-focus:ring-red-500/20'
@@ -174,7 +185,9 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>(
 
             {/* Error Message */}
             {error && (
-              <p className={cn(typography('bodySmall'), 'text-red-600 mt-1')}>{error}</p>
+              <p className={cn(typography('bodySmall'), 'text-red-600 mt-1')}>
+                {error}
+              </p>
             )}
           </div>
         )}
@@ -186,4 +199,3 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>(
 Radio.displayName = 'Radio';
 
 export default Radio;
-

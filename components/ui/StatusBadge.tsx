@@ -158,11 +158,7 @@ export default function StatusBadge({
     return (
       <span className={cn('relative inline-flex', className)}>
         <span
-          className={cn(
-            'rounded-full',
-            currentSize.dot,
-            config.dotColor
-          )}
+          className={cn('rounded-full', currentSize.dot, config.dotColor)}
         />
         {pulse && (
           <span
@@ -224,4 +220,3 @@ export default function StatusBadge({
     </span>
   );
 }
-

@@ -1,6 +1,14 @@
 import React from 'react';
 
-import { cn, tokens, color, spacing, radius, shadow as shadowHelper, typography } from '@/lib/design-tokens';
+import {
+  cn,
+  tokens,
+  color,
+  spacing,
+  radius,
+  shadow as shadowHelper,
+  typography,
+} from '@/lib/design-tokens';
 
 interface CardProps {
   children: React.ReactNode;
@@ -75,13 +83,15 @@ export function CardHeader({
   className?: string;
 }) {
   return (
-    <div className={cn(
-      spacing(4, 'm', 'b'),
-      spacing(4, 'p', 'b'),
-      color('secondary', 200, 'border'),
-      'border-b',
-      className
-    )}>
+    <div
+      className={cn(
+        spacing(4, 'm', 'b'),
+        spacing(4, 'p', 'b'),
+        color('secondary', 200, 'border'),
+        'border-b',
+        className
+      )}
+    >
       {children}
     </div>
   );
@@ -97,14 +107,7 @@ export function CardTitle({
   children: React.ReactNode;
   className?: string;
 }) {
-  return (
-    <h3 className={cn(
-      typography('heading4'),
-      className
-    )}>
-      {children}
-    </h3>
-  );
+  return <h3 className={cn(typography('heading4'), className)}>{children}</h3>;
 }
 
 /**
@@ -117,14 +120,7 @@ export function CardContent({
   children: React.ReactNode;
   className?: string;
 }) {
-  return (
-    <div className={cn(
-      typography('body'),
-      className
-    )}>
-      {children}
-    </div>
-  );
+  return <div className={cn(typography('body'), className)}>{children}</div>;
 }
 
 /**
@@ -138,13 +134,15 @@ export function CardFooter({
   className?: string;
 }) {
   return (
-    <div className={cn(
-      spacing(4, 'm', 't'),
-      spacing(4, 'p', 't'),
-      color('secondary', 200, 'border'),
-      'border-t',
-      className
-    )}>
+    <div
+      className={cn(
+        spacing(4, 'm', 't'),
+        spacing(4, 'p', 't'),
+        color('secondary', 200, 'border'),
+        'border-t',
+        className
+      )}
+    >
       {children}
     </div>
   );

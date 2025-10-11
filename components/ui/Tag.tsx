@@ -9,7 +9,17 @@ export interface TagProps {
   children: React.ReactNode;
 
   // Variant
-  variant?: 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info' | 'purple' | 'pink' | 'orange';
+  variant?:
+    | 'default'
+    | 'primary'
+    | 'secondary'
+    | 'success'
+    | 'warning'
+    | 'error'
+    | 'info'
+    | 'purple'
+    | 'pink'
+    | 'orange';
 
   // Size
   size?: 'sm' | 'md' | 'lg';
@@ -167,7 +177,7 @@ export default function Tag({
       {removable && (
         <button
           type='button'
-          onClick={(e) => {
+          onClick={e => {
             e.stopPropagation();
             onRemove?.();
           }}
@@ -188,4 +198,3 @@ export default function Tag({
     </span>
   );
 }
-

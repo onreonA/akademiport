@@ -75,7 +75,8 @@ export default function Tabs({
   );
 
   // Use controlled or uncontrolled state
-  const activeTab = controlledActiveTab !== undefined ? controlledActiveTab : internalActiveTab;
+  const activeTab =
+    controlledActiveTab !== undefined ? controlledActiveTab : internalActiveTab;
 
   const handleTabChange = (tabId: string) => {
     if (controlledActiveTab === undefined) {
@@ -122,7 +123,11 @@ export default function Tabs({
     },
     enclosed: {
       container: 'border-b border-gray-200 gap-1',
-      tab: cn(radius('lg'), 'border border-transparent hover:border-gray-300', 'rounded-b-none'),
+      tab: cn(
+        radius('lg'),
+        'border border-transparent hover:border-gray-300',
+        'rounded-b-none'
+      ),
       active: 'bg-white border-gray-200 border-b-white text-blue-600 -mb-px',
       inactive: 'text-gray-600 hover:text-gray-900',
     },
@@ -138,20 +143,16 @@ export default function Tabs({
   const currentVariant = variantConfig[variant];
 
   // Get active tab content
-  const activeTabData = tabs.find((tab) => tab.id === activeTab);
+  const activeTabData = tabs.find(tab => tab.id === activeTab);
 
   return (
     <div className={className}>
       {/* Tab List */}
       <div
         role='tablist'
-        className={cn(
-          'flex',
-          currentVariant.container,
-          fullWidth && 'w-full'
-        )}
+        className={cn('flex', currentVariant.container, fullWidth && 'w-full')}
       >
-        {tabs.map((tab) => {
+        {tabs.map(tab => {
           const isActive = tab.id === activeTab;
           const TabIcon = tab.icon;
 

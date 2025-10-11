@@ -3,9 +3,17 @@
 import React, { forwardRef, useState, useEffect } from 'react';
 import { AlertCircle, CheckCircle, type LucideIcon } from 'lucide-react';
 
-import { cn, tokens, spacing, typography, color, radius } from '@/lib/design-tokens';
+import {
+  cn,
+  tokens,
+  spacing,
+  typography,
+  color,
+  radius,
+} from '@/lib/design-tokens';
 
-export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+export interface TextareaProps
+  extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   // Label & Description
   label?: string;
   description?: string;
@@ -96,7 +104,9 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     },
     ref
   ) => {
-    const [internalValue, setInternalValue] = useState<string>((value as string) || '');
+    const [internalValue, setInternalValue] = useState<string>(
+      (value as string) || ''
+    );
     const [textareaHeight, setTextareaHeight] = useState<number | undefined>();
 
     // Sync internal value with external value
@@ -116,7 +126,10 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
         const minHeight = lineHeight * minRows;
         const maxHeight = lineHeight * maxRows;
 
-        const newHeight = Math.min(Math.max(scrollHeight, minHeight), maxHeight);
+        const newHeight = Math.min(
+          Math.max(scrollHeight, minHeight),
+          maxHeight
+        );
         setTextareaHeight(newHeight);
       }
     }, [internalValue, autoResize, minRows, maxRows, ref]);
@@ -172,7 +185,8 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     // State classes
     const stateClasses = cn(
       error && 'border-red-500 focus:border-red-500 focus:ring-red-500/20',
-      success && 'border-green-500 focus:border-green-500 focus:ring-green-500/20',
+      success &&
+        'border-green-500 focus:border-green-500 focus:ring-green-500/20',
       disabled && 'bg-gray-100 cursor-not-allowed opacity-60'
     );
 
@@ -199,7 +213,9 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
 
         {/* Description */}
         {description && (
-          <p className={cn(typography('bodySmall'), 'text-gray-500 mb-2')}>{description}</p>
+          <p className={cn(typography('bodySmall'), 'text-gray-500 mb-2')}>
+            {description}
+          </p>
         )}
 
         {/* Textarea Container */}
@@ -276,7 +292,9 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
 
             {/* Helper Text */}
             {helperText && !error && !success && (
-              <p className={cn(typography('bodySmall'), 'text-gray-500')}>{helperText}</p>
+              <p className={cn(typography('bodySmall'), 'text-gray-500')}>
+                {helperText}
+              </p>
             )}
           </div>
 
@@ -287,7 +305,8 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
                 typography('bodySmall'),
                 'text-gray-500 flex-shrink-0',
                 internalValue.length >= maxLength * 0.9 && 'text-orange-500',
-                internalValue.length === maxLength && 'text-red-500 font-semibold'
+                internalValue.length === maxLength &&
+                  'text-red-500 font-semibold'
               )}
             >
               {internalValue.length}/{maxLength}
@@ -302,4 +321,3 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
 Textarea.displayName = 'Textarea';
 
 export default Textarea;
-

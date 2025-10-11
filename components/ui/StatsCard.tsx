@@ -3,7 +3,14 @@
 import React from 'react';
 import { TrendingUp, TrendingDown, Minus, type LucideIcon } from 'lucide-react';
 
-import { cn, tokens, spacing, typography, radius, shadow } from '@/lib/design-tokens';
+import {
+  cn,
+  tokens,
+  spacing,
+  typography,
+  radius,
+  shadow,
+} from '@/lib/design-tokens';
 
 export interface StatsCardProps {
   // Content
@@ -13,7 +20,13 @@ export interface StatsCardProps {
 
   // Icon
   icon?: LucideIcon;
-  iconColor?: 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info';
+  iconColor?:
+    | 'primary'
+    | 'secondary'
+    | 'success'
+    | 'warning'
+    | 'error'
+    | 'info';
 
   // Trend
   trend?: 'up' | 'down' | 'neutral';
@@ -169,16 +182,16 @@ export default function StatsCard({
         // Base
         'transition-all duration-200',
         radius('xl'),
-        
+
         // Size
         currentSize.padding,
-        
+
         // Variant
         variantConfig[variant],
-        
+
         // Interactive
         onClick && 'cursor-pointer hover:scale-[1.02]',
-        
+
         // Custom
         className
       )}
@@ -252,4 +265,3 @@ export default function StatsCard({
     </div>
   );
 }
-

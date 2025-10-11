@@ -101,7 +101,9 @@ export default function RadioGroup({
 
       {/* Description */}
       {description && (
-        <p className={cn(typography('bodySmall'), 'text-gray-500 mb-3')}>{description}</p>
+        <p className={cn(typography('bodySmall'), 'text-gray-500 mb-3')}>
+          {description}
+        </p>
       )}
 
       {/* Radio Options */}
@@ -111,7 +113,7 @@ export default function RadioGroup({
           layout === 'horizontal' && 'flex flex-wrap gap-4'
         )}
       >
-        {options.map((option) => (
+        {options.map(option => (
           <Radio
             key={option.value}
             name={name}
@@ -128,9 +130,10 @@ export default function RadioGroup({
 
       {/* Error Message */}
       {error && (
-        <p className={cn(typography('bodySmall'), 'text-red-600 mt-2')}>{error}</p>
+        <p className={cn(typography('bodySmall'), 'text-red-600 mt-2')}>
+          {error}
+        </p>
       )}
     </div>
   );
 }
-

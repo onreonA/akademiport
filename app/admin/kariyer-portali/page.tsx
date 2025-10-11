@@ -540,7 +540,7 @@ const JobApplicationModal = ({
       onClose={onClose}
       title={`${job.title} - Başvurular`}
       subtitle={`${applications.length} başvuru`}
-      size="xl"
+      size='xl'
     >
       {applications.length > 0 ? (
         <div className='space-y-4'>
@@ -574,9 +574,9 @@ const JobApplicationModal = ({
                       <i className='ri-calendar-line'></i>
                       <span suppressHydrationWarning={true}>
                         Başvuru:{' '}
-                        {new Date(
-                          application.appliedDate
-                        ).toLocaleDateString('tr-TR')}
+                        {new Date(application.appliedDate).toLocaleDateString(
+                          'tr-TR'
+                        )}
                       </span>
                     </div>
                   </div>
@@ -595,10 +595,7 @@ const JobApplicationModal = ({
                   <select
                     value={application.status}
                     onChange={e =>
-                      onUpdateApplicationStatus(
-                        application.id,
-                        e.target.value
-                      )
+                      onUpdateApplicationStatus(application.id, e.target.value)
                     }
                     className='px-2 py-1 text-xs border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
                   >
@@ -661,240 +658,236 @@ const ApplicationDetailModal = ({
       onClose={onClose}
       title={`${application.name} - Başvuru Detayları`}
       subtitle={`${application.type} Başvurusu`}
-      size="xl"
+      size='xl'
     >
       <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
-          {/* Sol Sütun - Kişisel Bilgiler */}
-          <div className='lg:col-span-2 space-y-6'>
-            <div>
-              <h4 className='text-lg font-medium text-gray-900 mb-4'>
-                Kişisel Bilgiler
-              </h4>
-              <div className='grid grid-cols-2 gap-4'>
-                <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-1'>
-                    Ad Soyad
-                  </label>
-                  <p className='text-sm text-gray-900'>{application.name}</p>
-                </div>
-                <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-1'>
-                    E-posta
-                  </label>
-                  <p className='text-sm text-gray-900'>{application.email}</p>
-                </div>
-                <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-1'>
-                    Telefon
-                  </label>
-                  <p className='text-sm text-gray-900'>{application.phone}</p>
-                </div>
-                <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-1'>
-                    Şehir
-                  </label>
-                  <p className='text-sm text-gray-900'>{application.city}</p>
-                </div>
-                <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-1'>
-                    Eğitim Durumu
-                  </label>
-                  <p className='text-sm text-gray-900'>
-                    {application.education}
-                  </p>
-                </div>
-                <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-1'>
-                    Başvuru Tarihi
-                  </label>
-                  <p
-                    className='text-sm text-gray-900'
-                    suppressHydrationWarning={true}
-                  >
-                    {new Date(application.appliedDate).toLocaleDateString(
-                      'tr-TR'
-                    )}
-                  </p>
-                </div>
+        {/* Sol Sütun - Kişisel Bilgiler */}
+        <div className='lg:col-span-2 space-y-6'>
+          <div>
+            <h4 className='text-lg font-medium text-gray-900 mb-4'>
+              Kişisel Bilgiler
+            </h4>
+            <div className='grid grid-cols-2 gap-4'>
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-1'>
+                  Ad Soyad
+                </label>
+                <p className='text-sm text-gray-900'>{application.name}</p>
+              </div>
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-1'>
+                  E-posta
+                </label>
+                <p className='text-sm text-gray-900'>{application.email}</p>
+              </div>
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-1'>
+                  Telefon
+                </label>
+                <p className='text-sm text-gray-900'>{application.phone}</p>
+              </div>
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-1'>
+                  Şehir
+                </label>
+                <p className='text-sm text-gray-900'>{application.city}</p>
+              </div>
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-1'>
+                  Eğitim Durumu
+                </label>
+                <p className='text-sm text-gray-900'>{application.education}</p>
+              </div>
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-1'>
+                  Başvuru Tarihi
+                </label>
+                <p
+                  className='text-sm text-gray-900'
+                  suppressHydrationWarning={true}
+                >
+                  {new Date(application.appliedDate).toLocaleDateString(
+                    'tr-TR'
+                  )}
+                </p>
               </div>
             </div>
-            {/* Pozisyon/Deneyim/İlgi Alanı */}
-            {application.experience && (
-              <div>
-                <h4 className='text-lg font-medium text-gray-900 mb-2'>
-                  Deneyim Açıklaması
-                </h4>
-                <div className='bg-gray-50 rounded-lg p-4'>
-                  <p className='text-sm text-gray-700'>
-                    {application.experience}
-                  </p>
-                </div>
-              </div>
-            )}
-            {application.interests && (
-              <div>
-                <h4 className='text-lg font-medium text-gray-900 mb-2'>
-                  İlgi Alanı
-                </h4>
-                <p className='text-sm text-gray-700'>{application.interests}</p>
-              </div>
-            )}
-            {application.position && (
-              <div>
-                <h4 className='text-lg font-medium text-gray-900 mb-2'>
-                  Hedeflenen Pozisyon
-                </h4>
-                <p className='text-sm text-gray-700'>{application.position}</p>
-              </div>
-            )}
-            {/* Uzmanlık Alanları */}
-            {application.expertise && application.expertise.length > 0 && (
-              <div>
-                <h4 className='text-lg font-medium text-gray-900 mb-2'>
-                  Uzmanlık Alanları
-                </h4>
-                <div className='flex flex-wrap gap-2'>
-                  {application.expertise.map((skill, index) => (
-                    <span
-                      key={index}
-                      className='px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm'
-                    >
-                      {skill}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-            {/* Durum Geçmişi */}
+          </div>
+          {/* Pozisyon/Deneyim/İlgi Alanı */}
+          {application.experience && (
             <div>
-              <h4 className='text-lg font-medium text-gray-900 mb-4'>
-                Durum Geçmişi
+              <h4 className='text-lg font-medium text-gray-900 mb-2'>
+                Deneyim Açıklaması
               </h4>
-              <div className='space-y-3'>
-                {application.statusHistory.map(update => (
-                  <div
-                    key={update.id}
-                    className='flex items-start gap-3 p-3 bg-gray-50 rounded-lg'
+              <div className='bg-gray-50 rounded-lg p-4'>
+                <p className='text-sm text-gray-700'>
+                  {application.experience}
+                </p>
+              </div>
+            </div>
+          )}
+          {application.interests && (
+            <div>
+              <h4 className='text-lg font-medium text-gray-900 mb-2'>
+                İlgi Alanı
+              </h4>
+              <p className='text-sm text-gray-700'>{application.interests}</p>
+            </div>
+          )}
+          {application.position && (
+            <div>
+              <h4 className='text-lg font-medium text-gray-900 mb-2'>
+                Hedeflenen Pozisyon
+              </h4>
+              <p className='text-sm text-gray-700'>{application.position}</p>
+            </div>
+          )}
+          {/* Uzmanlık Alanları */}
+          {application.expertise && application.expertise.length > 0 && (
+            <div>
+              <h4 className='text-lg font-medium text-gray-900 mb-2'>
+                Uzmanlık Alanları
+              </h4>
+              <div className='flex flex-wrap gap-2'>
+                {application.expertise.map((skill, index) => (
+                  <span
+                    key={index}
+                    className='px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm'
                   >
-                    <div className='w-2 h-2 bg-blue-500 rounded-full mt-2'></div>
-                    <div className='flex-1'>
-                      <div className='flex items-center gap-2 mb-1'>
-                        <span className='font-medium text-sm text-gray-900'>
-                          {update.status}
-                        </span>
-                        <span className='text-xs text-gray-500'>•</span>
-                        <span className='text-xs text-gray-500'>
-                          {update.updatedBy}
-                        </span>
-                        <span className='text-xs text-gray-500'>•</span>
-                        <span
-                          className='text-xs text-gray-500'
-                          suppressHydrationWarning={true}
-                        >
-                          {new Date(update.updatedAt).toLocaleDateString(
-                            'tr-TR'
-                          )}
-                        </span>
-                      </div>
-                      {update.notes && (
-                        <p className='text-sm text-gray-600'>{update.notes}</p>
-                      )}
-                    </div>
-                  </div>
+                    {skill}
+                  </span>
                 ))}
               </div>
             </div>
-          </div>
-          {/* Sağ Sütun - Durum Yönetimi */}
-          <div className='space-y-6'>
-            <div>
-              <h4 className='text-lg font-medium text-gray-900 mb-4'>
-                Durum Yönetimi
-              </h4>
-              <div className='space-y-4'>
-                <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-2'>
-                    Mevcut Durum
-                  </label>
-                  <span
-                    className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${application.status === 'Bekliyor' ? 'bg-yellow-100 text-yellow-800' : application.status === 'Admin Onayladı' ? 'bg-blue-100 text-blue-800' : application.status === 'Danışman Onayladı' ? 'bg-purple-100 text-purple-800' : application.status === 'Firma Görüyor' ? 'bg-orange-100 text-orange-800' : application.status === 'İşe Alındı' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}
-                  >
-                    {application.status}
-                  </span>
-                </div>
-                <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-2'>
-                    Yeni Durum
-                  </label>
-                  <select
-                    value={selectedStatus}
-                    onChange={e => setSelectedStatus(e.target.value)}
-                    className='w-full px-3 py-2 pr-8 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-                  >
-                    {statuses.map(status => (
-                      <option key={status} value={status}>
-                        {status}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-2'>
-                    Durum Notu (İsteğe Bağlı)
-                  </label>
-                  <textarea
-                    rows={3}
-                    value={statusNotes}
-                    onChange={e => setStatusNotes(e.target.value)}
-                    className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm'
-                    placeholder='Durum değişikliği hakkında not...'
-                  />
-                </div>
-                <Button
-                  onClick={handleStatusUpdate}
-                  variant="primary"
-                  className="w-full"
+          )}
+          {/* Durum Geçmişi */}
+          <div>
+            <h4 className='text-lg font-medium text-gray-900 mb-4'>
+              Durum Geçmişi
+            </h4>
+            <div className='space-y-3'>
+              {application.statusHistory.map(update => (
+                <div
+                  key={update.id}
+                  className='flex items-start gap-3 p-3 bg-gray-50 rounded-lg'
                 >
-                  Durumu Güncelle
-                </Button>
-              </div>
-            </div>
-            <div>
-              <h4 className='text-lg font-medium text-gray-900 mb-4'>
-                CV Dosyası
-              </h4>
-              <div className='bg-gray-50 border border-gray-200 rounded-lg p-4'>
-                <div className='flex items-center gap-3'>
-                  <i className='ri-file-pdf-line text-red-500 text-xl'></i>
+                  <div className='w-2 h-2 bg-blue-500 rounded-full mt-2'></div>
                   <div className='flex-1'>
-                    <p className='text-sm font-medium text-gray-900'>
-                      {application.cvFileName}
-                    </p>
-                    <p className='text-xs text-gray-500'>PDF Dosyası</p>
+                    <div className='flex items-center gap-2 mb-1'>
+                      <span className='font-medium text-sm text-gray-900'>
+                        {update.status}
+                      </span>
+                      <span className='text-xs text-gray-500'>•</span>
+                      <span className='text-xs text-gray-500'>
+                        {update.updatedBy}
+                      </span>
+                      <span className='text-xs text-gray-500'>•</span>
+                      <span
+                        className='text-xs text-gray-500'
+                        suppressHydrationWarning={true}
+                      >
+                        {new Date(update.updatedAt).toLocaleDateString('tr-TR')}
+                      </span>
+                    </div>
+                    {update.notes && (
+                      <p className='text-sm text-gray-600'>{update.notes}</p>
+                    )}
                   </div>
-                  <Button variant="primary" size="sm">
-                    İndir
-                  </Button>
                 </div>
-              </div>
-            </div>
-            {/* Admin Notları */}
-            <div>
-              <h4 className='text-lg font-medium text-gray-900 mb-4'>
-                Admin Notları
-              </h4>
-              <textarea
-                rows={4}
-                defaultValue={application.notes}
-                className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm'
-                placeholder='Bu başvuru hakkında notlarınız...'
-              />
-              <Button variant="secondary" size="sm" className="mt-2">
-                Notu Kaydet
-              </Button>
+              ))}
             </div>
           </div>
         </div>
+        {/* Sağ Sütun - Durum Yönetimi */}
+        <div className='space-y-6'>
+          <div>
+            <h4 className='text-lg font-medium text-gray-900 mb-4'>
+              Durum Yönetimi
+            </h4>
+            <div className='space-y-4'>
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-2'>
+                  Mevcut Durum
+                </label>
+                <span
+                  className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${application.status === 'Bekliyor' ? 'bg-yellow-100 text-yellow-800' : application.status === 'Admin Onayladı' ? 'bg-blue-100 text-blue-800' : application.status === 'Danışman Onayladı' ? 'bg-purple-100 text-purple-800' : application.status === 'Firma Görüyor' ? 'bg-orange-100 text-orange-800' : application.status === 'İşe Alındı' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}
+                >
+                  {application.status}
+                </span>
+              </div>
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-2'>
+                  Yeni Durum
+                </label>
+                <select
+                  value={selectedStatus}
+                  onChange={e => setSelectedStatus(e.target.value)}
+                  className='w-full px-3 py-2 pr-8 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                >
+                  {statuses.map(status => (
+                    <option key={status} value={status}>
+                      {status}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-2'>
+                  Durum Notu (İsteğe Bağlı)
+                </label>
+                <textarea
+                  rows={3}
+                  value={statusNotes}
+                  onChange={e => setStatusNotes(e.target.value)}
+                  className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm'
+                  placeholder='Durum değişikliği hakkında not...'
+                />
+              </div>
+              <Button
+                onClick={handleStatusUpdate}
+                variant='primary'
+                className='w-full'
+              >
+                Durumu Güncelle
+              </Button>
+            </div>
+          </div>
+          <div>
+            <h4 className='text-lg font-medium text-gray-900 mb-4'>
+              CV Dosyası
+            </h4>
+            <div className='bg-gray-50 border border-gray-200 rounded-lg p-4'>
+              <div className='flex items-center gap-3'>
+                <i className='ri-file-pdf-line text-red-500 text-xl'></i>
+                <div className='flex-1'>
+                  <p className='text-sm font-medium text-gray-900'>
+                    {application.cvFileName}
+                  </p>
+                  <p className='text-xs text-gray-500'>PDF Dosyası</p>
+                </div>
+                <Button variant='primary' size='sm'>
+                  İndir
+                </Button>
+              </div>
+            </div>
+          </div>
+          {/* Admin Notları */}
+          <div>
+            <h4 className='text-lg font-medium text-gray-900 mb-4'>
+              Admin Notları
+            </h4>
+            <textarea
+              rows={4}
+              defaultValue={application.notes}
+              className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm'
+              placeholder='Bu başvuru hakkında notlarınız...'
+            />
+            <Button variant='secondary' size='sm' className='mt-2'>
+              Notu Kaydet
+            </Button>
+          </div>
+        </div>
+      </div>
     </Modal>
   );
 };
@@ -1816,19 +1809,25 @@ export default function CareerPortal() {
                 <StatsCard
                   icon='ri-check-line'
                   label='Aktif İlanlar'
-                  value={jobPostings.filter(job => job.status === 'Aktif').length.toString()}
+                  value={jobPostings
+                    .filter(job => job.status === 'Aktif')
+                    .length.toString()}
                   variant='success'
                 />
                 <StatsCard
                   icon='ri-user-line'
                   label='Toplam Başvuru'
-                  value={jobPostings.reduce((total, job) => total + job.applicationsCount, 0).toString()}
+                  value={jobPostings
+                    .reduce((total, job) => total + job.applicationsCount, 0)
+                    .toString()}
                   variant='accent'
                 />
                 <StatsCard
                   icon='ri-eye-line'
                   label='Bu Ay Görüntüleme'
-                  value={jobPostings.reduce((total, job) => total + job.viewsCount, 0).toString()}
+                  value={jobPostings
+                    .reduce((total, job) => total + job.viewsCount, 0)
+                    .toString()}
                   variant='warning'
                 />
               </div>

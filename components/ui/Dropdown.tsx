@@ -49,7 +49,10 @@ export default function Dropdown({
   // Close on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     };
@@ -106,10 +109,10 @@ export default function Dropdown({
             'border border-gray-200',
             radius('lg'),
             shadow('lg'),
-            
+
             // Animation
             'animate-fade-in',
-            
+
             // Position
             'top-full',
             positionConfig[position]
@@ -136,14 +139,14 @@ export default function Dropdown({
                       'px-4 py-2',
                       'text-sm text-left',
                       'transition-colors',
-                      
+
                       // States
                       item.disabled
                         ? 'opacity-50 cursor-not-allowed'
                         : item.danger
-                        ? 'text-red-600 hover:bg-red-50'
-                        : 'text-gray-700 hover:bg-gray-50',
-                      
+                          ? 'text-red-600 hover:bg-red-50'
+                          : 'text-gray-700 hover:bg-gray-50',
+
                       // Submenu indicator
                       item.submenu && 'justify-between'
                     )}
@@ -200,7 +203,10 @@ export function DropdownCheckbox({
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     };
@@ -240,7 +246,7 @@ export function DropdownCheckbox({
           )}
         >
           <div className='py-1'>
-            {items.map((item) => (
+            {items.map(item => (
               <label
                 key={item.id}
                 className={cn(
@@ -255,7 +261,7 @@ export function DropdownCheckbox({
                 <input
                   type='checkbox'
                   checked={item.checked}
-                  onChange={(e) => onChange?.(item.id, e.target.checked)}
+                  onChange={e => onChange?.(item.id, e.target.checked)}
                   className='w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500'
                 />
                 <span className='text-gray-700'>{item.label}</span>
@@ -270,4 +276,3 @@ export function DropdownCheckbox({
     </div>
   );
 }
-

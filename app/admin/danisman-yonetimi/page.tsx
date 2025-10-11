@@ -132,8 +132,8 @@ const ConsultantCard = ({
           </div>
         </div>
         <div className='flex items-center space-x-2'>
-          <StatusBadge 
-            status={consultant.status === 'active' ? 'active' : 'inactive'} 
+          <StatusBadge
+            status={consultant.status === 'active' ? 'active' : 'inactive'}
           />
         </div>
       </div>
@@ -522,19 +522,25 @@ export default function DanismanYonetimiPage() {
           <StatsCard
             icon='ri-check-line'
             label='Aktif Danışman'
-            value={consultants.filter(c => c.status === 'active').length.toString()}
+            value={consultants
+              .filter(c => c.status === 'active')
+              .length.toString()}
             variant='success'
           />
           <StatsCard
             icon='ri-building-line'
             label='Toplam Atama'
-            value={consultants.reduce((sum, c) => sum + c.assignedCompanies, 0).toString()}
+            value={consultants
+              .reduce((sum, c) => sum + c.assignedCompanies, 0)
+              .toString()}
             variant='accent'
           />
           <StatsCard
             icon='ri-file-list-line'
             label='Aktif Rapor'
-            value={consultants.reduce((sum, c) => sum + c.activeReports, 0).toString()}
+            value={consultants
+              .reduce((sum, c) => sum + c.activeReports, 0)
+              .toString()}
             variant='warning'
           />
         </div>

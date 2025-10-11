@@ -2,7 +2,14 @@
 
 import React, { useEffect } from 'react';
 
-import { cn, color, spacing, radius, shadow, typography } from '@/lib/design-tokens';
+import {
+  cn,
+  color,
+  spacing,
+  radius,
+  shadow,
+  typography,
+} from '@/lib/design-tokens';
 
 interface ModalProps {
   isOpen: boolean;
@@ -69,7 +76,12 @@ export default function Modal({
   };
 
   return (
-    <div className={cn('fixed inset-0 z-50 flex items-center justify-center', spacing(4, 'p'))}>
+    <div
+      className={cn(
+        'fixed inset-0 z-50 flex items-center justify-center',
+        spacing(4, 'p')
+      )}
+    >
       {/* Overlay */}
       <div
         className='fixed inset-0 bg-black bg-opacity-50 transition-opacity'
@@ -90,22 +102,24 @@ export default function Modal({
       >
         {/* Header */}
         {(title || subtitle) && (
-          <div className={cn(
-            'sticky top-0 z-10',
-            color('secondary', 50, 'bg'),
-            color('secondary', 200, 'border'),
-            'border-b',
-            spacing(6, 'p', 'x'),
-            spacing(4, 'p', 'y'),
-            'flex items-center justify-between',
-            'rounded-t-xl'
-          )}>
+          <div
+            className={cn(
+              'sticky top-0 z-10',
+              color('secondary', 50, 'bg'),
+              color('secondary', 200, 'border'),
+              'border-b',
+              spacing(6, 'p', 'x'),
+              spacing(4, 'p', 'y'),
+              'flex items-center justify-between',
+              'rounded-t-xl'
+            )}
+          >
             <div>
-              {title && (
-                <h2 className={typography('heading4')}>{title}</h2>
-              )}
+              {title && <h2 className={typography('heading4')}>{title}</h2>}
               {subtitle && (
-                <p className={cn(typography('bodySmall'), 'mt-1')}>{subtitle}</p>
+                <p className={cn(typography('bodySmall'), 'mt-1')}>
+                  {subtitle}
+                </p>
               )}
             </div>
             <button
@@ -144,17 +158,19 @@ export default function Modal({
 
         {/* Footer */}
         {footer && (
-          <div className={cn(
-            'sticky bottom-0',
-            color('secondary', 50, 'bg'),
-            color('secondary', 200, 'border'),
-            'border-t',
-            spacing(6, 'p', 'x'),
-            spacing(4, 'p', 'y'),
-            'flex items-center justify-end',
-            spacing(3, 'gap'),
-            'rounded-b-xl'
-          )}>
+          <div
+            className={cn(
+              'sticky bottom-0',
+              color('secondary', 50, 'bg'),
+              color('secondary', 200, 'border'),
+              'border-t',
+              spacing(6, 'p', 'x'),
+              spacing(4, 'p', 'y'),
+              'flex items-center justify-end',
+              spacing(3, 'gap'),
+              'rounded-b-xl'
+            )}
+          >
             {footer}
           </div>
         )}

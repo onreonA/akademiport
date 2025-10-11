@@ -92,7 +92,10 @@ export default function Breadcrumb({
     : items;
 
   return (
-    <nav aria-label='Breadcrumb' className={cn('flex items-center flex-wrap', currentSize.gap, className)}>
+    <nav
+      aria-label='Breadcrumb'
+      className={cn('flex items-center flex-wrap', currentSize.gap, className)}
+    >
       <ol className={cn('flex items-center flex-wrap', currentSize.gap)}>
         {allItems.map((item, index) => {
           const isLast = index === allItems.length - 1;
@@ -100,7 +103,10 @@ export default function Breadcrumb({
           const ItemIcon = item.icon;
 
           return (
-            <li key={index} className={cn('flex items-center', currentSize.gap)}>
+            <li
+              key={index}
+              className={cn('flex items-center', currentSize.gap)}
+            >
               {/* Item */}
               {item.href && !isCurrent ? (
                 <Link

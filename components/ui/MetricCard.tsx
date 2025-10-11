@@ -13,11 +13,23 @@ export interface MetricCardProps {
 
   // Icon
   icon?: LucideIcon;
-  iconColor?: 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info';
+  iconColor?:
+    | 'primary'
+    | 'secondary'
+    | 'success'
+    | 'warning'
+    | 'error'
+    | 'info';
 
   // Progress
   progress?: number; // 0-100
-  progressColor?: 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info';
+  progressColor?:
+    | 'primary'
+    | 'secondary'
+    | 'success'
+    | 'warning'
+    | 'error'
+    | 'info';
 
   // Footer items
   footerItems?: Array<{
@@ -98,7 +110,12 @@ export default function MetricCard({
 
   // Variant configurations
   const variantConfig = {
-    default: cn('bg-white', 'border border-gray-200', shadow('md'), 'hover:shadow-lg'),
+    default: cn(
+      'bg-white',
+      'border border-gray-200',
+      shadow('md'),
+      'hover:shadow-lg'
+    ),
     gradient: cn(
       'bg-gradient-to-br from-white via-blue-50/30 to-purple-50/30',
       'border border-blue-100',
@@ -160,16 +177,25 @@ export default function MetricCard({
       <div className='flex items-start justify-between mb-4'>
         <div className='flex-1 min-w-0'>
           {/* Title */}
-          <p className={cn(currentSize.titleSize, 'text-gray-600 font-medium mb-2')}>
+          <p
+            className={cn(
+              currentSize.titleSize,
+              'text-gray-600 font-medium mb-2'
+            )}
+          >
             {title}
           </p>
 
           {/* Value */}
-          <p className={cn(currentSize.valueSize, 'font-bold text-gray-900')}>{value}</p>
+          <p className={cn(currentSize.valueSize, 'font-bold text-gray-900')}>
+            {value}
+          </p>
 
           {/* Subtitle */}
           {subtitle && (
-            <p className={cn(currentSize.subtitleSize, 'text-gray-500 mt-1')}>{subtitle}</p>
+            <p className={cn(currentSize.subtitleSize, 'text-gray-500 mt-1')}>
+              {subtitle}
+            </p>
           )}
         </div>
 
@@ -193,7 +219,9 @@ export default function MetricCard({
         <div className='mb-4'>
           <div className='flex items-center justify-between mb-2'>
             <span className='text-xs text-gray-600 font-medium'>İlerleme</span>
-            <span className='text-xs text-gray-900 font-semibold'>{progress}%</span>
+            <span className='text-xs text-gray-900 font-semibold'>
+              {progress}%
+            </span>
           </div>
           <div className='w-full h-2 bg-gray-200 rounded-full overflow-hidden'>
             <div
@@ -229,4 +257,3 @@ export default function MetricCard({
     </div>
   );
 }
-

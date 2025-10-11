@@ -1,12 +1,12 @@
 /**
  * Design Tokens - Utility Functions
- * 
+ *
  * Bu dosya, design-system.ts'i Tailwind CSS class'ları olarak kullanmayı kolaylaştırır.
  * Hardcoded class'lar yerine, bu helper fonksiyonları kullanarak tutarlı tasarım sağlayın.
- * 
+ *
  * @example
  * import { tokens, color, spacing } from '@/lib/design-tokens';
- * 
+ *
  * <button className={tokens.button.primary}>Kaydet</button>
  * <div className={color('primary', 600, 'bg')}>Mavi arkaplan</div>
  */
@@ -29,7 +29,7 @@ export function cn(...inputs: ClassValue[]) {
  * @param shade - Color shade (50-900)
  * @param type - Type of color class (bg, text, border)
  * @returns Tailwind color class string
- * 
+ *
  * @example
  * color('primary', 600, 'bg') // 'bg-blue-600'
  * color('success', 500, 'text') // 'text-green-500'
@@ -46,7 +46,7 @@ export function color(
     warning: 'yellow',
     error: 'red',
   };
-  
+
   return `${type}-${colorMap[palette]}-${shade}`;
 }
 
@@ -56,21 +56,39 @@ export function color(
  * @param type - Type of spacing (p, m, gap, space-x, space-y)
  * @param side - Side for padding/margin (t, r, b, l, x, y, or empty for all sides)
  * @returns Tailwind spacing class string
- * 
+ *
  * @example
  * spacing(4, 'p') // 'p-4'
  * spacing(6, 'm', 'x') // 'mx-6'
  * spacing(8, 'gap') // 'gap-8'
  */
 export function spacing(
-  size: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16 | 20 | 24 | 32 | 40 | 48 | 56 | 64,
+  size:
+    | 0
+    | 1
+    | 2
+    | 3
+    | 4
+    | 5
+    | 6
+    | 8
+    | 10
+    | 12
+    | 16
+    | 20
+    | 24
+    | 32
+    | 40
+    | 48
+    | 56
+    | 64,
   type: 'p' | 'm' | 'gap' | 'space-x' | 'space-y' = 'p',
   side?: 't' | 'r' | 'b' | 'l' | 'x' | 'y'
 ): string {
   if (type === 'gap' || type === 'space-x' || type === 'space-y') {
     return `${type}-${size}`;
   }
-  
+
   return side ? `${type}${side}-${size}` : `${type}-${size}`;
 }
 
@@ -78,7 +96,7 @@ export function spacing(
  * Typography Helper - Generate Tailwind typography classes
  * @param variant - Typography variant
  * @returns Tailwind typography class string
- * 
+ *
  * @example
  * typography('heading1') // 'text-4xl font-bold text-gray-900'
  * typography('body') // 'text-base text-gray-600'
@@ -104,7 +122,7 @@ export function typography(
     bodySmall: 'text-sm text-gray-600',
     caption: 'text-xs text-gray-500',
   };
-  
+
   return variants[variant];
 }
 
@@ -112,7 +130,7 @@ export function typography(
  * Shadow Helper - Generate Tailwind shadow classes
  * @param size - Shadow size
  * @returns Tailwind shadow class string
- * 
+ *
  * @example
  * shadow('lg') // 'shadow-lg'
  */
@@ -126,7 +144,7 @@ export function shadow(
  * Border Radius Helper - Generate Tailwind border radius classes
  * @param size - Border radius size
  * @returns Tailwind border radius class string
- * 
+ *
  * @example
  * radius('lg') // 'rounded-lg'
  */
@@ -198,11 +216,7 @@ export const tokens = {
       'transition-shadow duration-200',
       'p-6'
     ),
-    flat: cn(
-      'bg-gray-50 rounded-lg',
-      'border border-gray-200',
-      'p-4'
-    ),
+    flat: cn('bg-gray-50 rounded-lg', 'border border-gray-200', 'p-4'),
     glass: cn(
       'bg-white/80 backdrop-blur-sm rounded-xl',
       'border border-white/20',
@@ -242,11 +256,26 @@ export const tokens = {
 
   // Badge variants
   badge: {
-    primary: cn('px-3 py-1 rounded-full text-sm font-medium', 'bg-blue-100 text-blue-800'),
-    success: cn('px-3 py-1 rounded-full text-sm font-medium', 'bg-green-100 text-green-800'),
-    warning: cn('px-3 py-1 rounded-full text-sm font-medium', 'bg-yellow-100 text-yellow-800'),
-    danger: cn('px-3 py-1 rounded-full text-sm font-medium', 'bg-red-100 text-red-800'),
-    neutral: cn('px-3 py-1 rounded-full text-sm font-medium', 'bg-gray-100 text-gray-800'),
+    primary: cn(
+      'px-3 py-1 rounded-full text-sm font-medium',
+      'bg-blue-100 text-blue-800'
+    ),
+    success: cn(
+      'px-3 py-1 rounded-full text-sm font-medium',
+      'bg-green-100 text-green-800'
+    ),
+    warning: cn(
+      'px-3 py-1 rounded-full text-sm font-medium',
+      'bg-yellow-100 text-yellow-800'
+    ),
+    danger: cn(
+      'px-3 py-1 rounded-full text-sm font-medium',
+      'bg-red-100 text-red-800'
+    ),
+    neutral: cn(
+      'px-3 py-1 rounded-full text-sm font-medium',
+      'bg-gray-100 text-gray-800'
+    ),
   },
 
   // Layout helpers
@@ -279,7 +308,7 @@ export const tokens = {
  * @param md - Medium screen class
  * @param lg - Large screen class
  * @returns Combined responsive class string
- * 
+ *
  * @example
  * responsive('text-sm', 'text-base', 'text-lg', 'text-xl')
  * // 'text-sm sm:text-base md:text-lg lg:text-xl'
@@ -299,4 +328,3 @@ export function responsive(
 
 // Export design system for direct access if needed
 export { designSystem };
-

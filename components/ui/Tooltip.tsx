@@ -54,19 +54,23 @@ export default function Tooltip({
   const positionConfig = {
     top: {
       tooltip: 'bottom-full left-1/2 -translate-x-1/2 mb-2',
-      arrow: 'top-full left-1/2 -translate-x-1/2 border-t-gray-900 border-x-transparent border-b-transparent',
+      arrow:
+        'top-full left-1/2 -translate-x-1/2 border-t-gray-900 border-x-transparent border-b-transparent',
     },
     bottom: {
       tooltip: 'top-full left-1/2 -translate-x-1/2 mt-2',
-      arrow: 'bottom-full left-1/2 -translate-x-1/2 border-b-gray-900 border-x-transparent border-t-transparent',
+      arrow:
+        'bottom-full left-1/2 -translate-x-1/2 border-b-gray-900 border-x-transparent border-t-transparent',
     },
     left: {
       tooltip: 'right-full top-1/2 -translate-y-1/2 mr-2',
-      arrow: 'left-full top-1/2 -translate-y-1/2 border-l-gray-900 border-y-transparent border-r-transparent',
+      arrow:
+        'left-full top-1/2 -translate-y-1/2 border-l-gray-900 border-y-transparent border-r-transparent',
     },
     right: {
       tooltip: 'left-full top-1/2 -translate-y-1/2 ml-2',
-      arrow: 'right-full top-1/2 -translate-y-1/2 border-r-gray-900 border-y-transparent border-l-transparent',
+      arrow:
+        'right-full top-1/2 -translate-y-1/2 border-r-gray-900 border-y-transparent border-l-transparent',
     },
   };
 
@@ -94,13 +98,13 @@ export default function Tooltip({
             'whitespace-nowrap',
             radius('md'),
             shadow('lg'),
-            
+
             // Animation
             'animate-fade-in',
-            
+
             // Position
             config.tooltip,
-            
+
             // Custom
             className
           )}
@@ -110,12 +114,7 @@ export default function Tooltip({
           {/* Arrow */}
           {arrow && (
             <div
-              className={cn(
-                'absolute',
-                'w-0 h-0',
-                'border-4',
-                config.arrow
-              )}
+              className={cn('absolute', 'w-0 h-0', 'border-4', config.arrow)}
             />
           )}
         </div>
@@ -123,4 +122,3 @@ export default function Tooltip({
     </div>
   );
 }
-

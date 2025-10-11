@@ -3,9 +3,17 @@
 import React, { forwardRef } from 'react';
 import { Check, Minus } from 'lucide-react';
 
-import { cn, tokens, spacing, typography, color, radius } from '@/lib/design-tokens';
+import {
+  cn,
+  tokens,
+  spacing,
+  typography,
+  color,
+  radius,
+} from '@/lib/design-tokens';
 
-export interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
+export interface CheckboxProps
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
   // Label
   label?: string;
   description?: string;
@@ -95,7 +103,9 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
     const currentSize = sizeConfig[size];
 
     return (
-      <div className={cn('flex items-start', currentSize.gap, containerClassName)}>
+      <div
+        className={cn('flex items-start', currentSize.gap, containerClassName)}
+      >
         {/* Checkbox Container */}
         <div className='relative flex-shrink-0 mt-0.5'>
           {/* Hidden Input */}
@@ -135,7 +145,8 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
               indeterminate && 'bg-blue-600 border-blue-600',
 
               // Disabled state
-              disabled && 'opacity-50 cursor-not-allowed peer-hover:border-gray-300',
+              disabled &&
+                'opacity-50 cursor-not-allowed peer-hover:border-gray-300',
 
               // Error state
               error && 'border-red-500 peer-focus:ring-red-500/20'
@@ -143,12 +154,18 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
           >
             {/* Check Icon */}
             {checked && !indeterminate && (
-              <Check className={cn(currentSize.icon, 'text-white')} strokeWidth={3} />
+              <Check
+                className={cn(currentSize.icon, 'text-white')}
+                strokeWidth={3}
+              />
             )}
 
             {/* Indeterminate Icon */}
             {indeterminate && (
-              <Minus className={cn(currentSize.icon, 'text-white')} strokeWidth={3} />
+              <Minus
+                className={cn(currentSize.icon, 'text-white')}
+                strokeWidth={3}
+              />
             )}
           </div>
         </div>
@@ -183,7 +200,9 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
 
             {/* Error Message */}
             {error && (
-              <p className={cn(typography('bodySmall'), 'text-red-600 mt-1')}>{error}</p>
+              <p className={cn(typography('bodySmall'), 'text-red-600 mt-1')}>
+                {error}
+              </p>
             )}
           </div>
         )}
@@ -195,4 +214,3 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
 Checkbox.displayName = 'Checkbox';
 
 export default Checkbox;
-

@@ -20,7 +20,13 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 
-export type ColorTheme = 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info';
+export type ColorTheme =
+  | 'primary'
+  | 'secondary'
+  | 'success'
+  | 'warning'
+  | 'error'
+  | 'info';
 
 export interface EmptyStateConfig {
   icon: LucideIcon;
@@ -32,7 +38,7 @@ export interface EmptyStateConfig {
   helpText?: string[];
 }
 
-export type EmptyStateType = 
+export type EmptyStateType =
   // Data States
   | 'no-data'
   | 'no-results'
@@ -75,7 +81,8 @@ export const emptyStateConfigs: Record<EmptyStateType, EmptyStateConfig> = {
     icon: SearchX,
     color: 'warning',
     title: 'Sonuç Bulunamadı',
-    description: 'Arama kriterlerinize uygun sonuç yok. Farklı anahtar kelimeler deneyin.',
+    description:
+      'Arama kriterlerinize uygun sonuç yok. Farklı anahtar kelimeler deneyin.',
     defaultActionText: 'Filtreleri Temizle',
     showAction: true,
   },
@@ -92,7 +99,8 @@ export const emptyStateConfigs: Record<EmptyStateType, EmptyStateConfig> = {
     icon: FolderX,
     color: 'primary',
     title: 'Proje Atanmamış',
-    description: 'Tarafınıza hiç proje atanmamıştır. Danışmanınızla iletişime geçiniz.',
+    description:
+      'Tarafınıza hiç proje atanmamıştır. Danışmanınızla iletişime geçiniz.',
     defaultActionText: 'Danışmanla İletişim',
     showAction: true,
     helpText: [
@@ -188,7 +196,7 @@ export const emptyStateConfigs: Record<EmptyStateType, EmptyStateConfig> = {
   },
 
   // State States
-  'locked': {
+  locked: {
     icon: Lock,
     color: 'warning',
     title: 'Kilitli İçerik',
@@ -199,7 +207,8 @@ export const emptyStateConfigs: Record<EmptyStateType, EmptyStateConfig> = {
     icon: Lock,
     color: 'warning',
     title: 'Kilitli Projeler',
-    description: 'Size atanmış projeler kilitli durumda. Geçmiş işlemlerinizi görüntüleyebilirsiniz.',
+    description:
+      'Size atanmış projeler kilitli durumda. Geçmiş işlemlerinizi görüntüleyebilirsiniz.',
     defaultActionText: 'Geçmiş Görüntüle',
     showAction: true,
     helpText: [
@@ -208,7 +217,7 @@ export const emptyStateConfigs: Record<EmptyStateType, EmptyStateConfig> = {
       'Yeni işlem yapamazsınız',
     ],
   },
-  'unauthorized': {
+  unauthorized: {
     icon: ShieldAlert,
     color: 'error',
     title: 'Yetkisiz Erişim',
@@ -220,14 +229,16 @@ export const emptyStateConfigs: Record<EmptyStateType, EmptyStateConfig> = {
     icon: Clock,
     color: 'info',
     title: 'Yakında',
-    description: 'Bu özellik yakında eklenecek. Sabırlı olduğunuz için teşekkürler!',
+    description:
+      'Bu özellik yakında eklenecek. Sabırlı olduğunuz için teşekkürler!',
     showAction: false,
   },
-  'maintenance': {
+  maintenance: {
     icon: Settings,
     color: 'warning',
     title: 'Bakım Modunda',
-    description: 'Bu bölüm şu anda bakımdadır. Lütfen daha sonra tekrar deneyin.',
+    description:
+      'Bu bölüm şu anda bakımdadır. Lütfen daha sonra tekrar deneyin.',
     showAction: false,
   },
 
@@ -244,7 +255,8 @@ export const emptyStateConfigs: Record<EmptyStateType, EmptyStateConfig> = {
     icon: Upload,
     color: 'primary',
     title: 'Veri İçe Aktarın',
-    description: 'CSV veya Excel dosyası yükleyerek toplu veri ekleyebilirsiniz.',
+    description:
+      'CSV veya Excel dosyası yükleyerek toplu veri ekleyebilirsiniz.',
     defaultActionText: 'Dosya Yükle',
     showAction: true,
   },
@@ -252,7 +264,8 @@ export const emptyStateConfigs: Record<EmptyStateType, EmptyStateConfig> = {
     icon: Settings,
     color: 'warning',
     title: 'Kurulum Gerekli',
-    description: 'Bu özelliği kullanabilmek için önce kurulum yapmanız gerekmektedir.',
+    description:
+      'Bu özelliği kullanabilmek için önce kurulum yapmanız gerekmektedir.',
     defaultActionText: 'Kuruluma Başla',
     showAction: true,
   },
@@ -264,4 +277,3 @@ export const emptyStateConfigs: Record<EmptyStateType, EmptyStateConfig> = {
     showAction: false,
   },
 };
-

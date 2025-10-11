@@ -1,7 +1,14 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { X, CheckCircle, AlertCircle, Info, AlertTriangle, type LucideIcon } from 'lucide-react';
+import {
+  X,
+  CheckCircle,
+  AlertCircle,
+  Info,
+  AlertTriangle,
+  type LucideIcon,
+} from 'lucide-react';
 
 import { cn, radius, shadow } from '@/lib/design-tokens';
 
@@ -21,7 +28,13 @@ export interface ToastProps {
   onClose?: () => void;
 
   // Position (for styling reference)
-  position?: 'top-right' | 'top-center' | 'top-left' | 'bottom-right' | 'bottom-center' | 'bottom-left';
+  position?:
+    | 'top-right'
+    | 'top-center'
+    | 'top-left'
+    | 'bottom-right'
+    | 'bottom-center'
+    | 'bottom-left';
 
   // Additional
   className?: string;
@@ -29,8 +42,8 @@ export interface ToastProps {
 
 /**
  * Toast Component - Notification popup
- * 
- * Note: This is a presentational component. 
+ *
+ * Note: This is a presentational component.
  * For a complete toast system, use with a toast context/provider.
  *
  * @example
@@ -112,14 +125,14 @@ export default function Toast({
         radius('lg'),
         shadow('lg'),
         'border',
-        
+
         // Animation
         'animate-fade-in',
-        
+
         // Type
         config.bg,
         config.border,
-        
+
         // Custom
         className
       )}
@@ -139,9 +152,7 @@ export default function Toast({
         )}
 
         {/* Message */}
-        <p className={cn('text-sm', config.messageColor)}>
-          {message}
-        </p>
+        <p className={cn('text-sm', config.messageColor)}>{message}</p>
       </div>
 
       {/* Close Button */}
@@ -165,7 +176,7 @@ export default function Toast({
 
 /**
  * ToastContainer - Container for positioning toasts
- * 
+ *
  * @example
  * <ToastContainer position="top-right">
  *   {toasts.map(toast => <Toast key={toast.id} {...toast} />)}

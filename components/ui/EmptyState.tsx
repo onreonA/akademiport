@@ -4,7 +4,14 @@ import React from 'react';
 import { type LucideIcon } from 'lucide-react';
 
 import Button from '@/components/ui/Button';
-import { cn, tokens, spacing, typography, color, radius } from '@/lib/design-tokens';
+import {
+  cn,
+  tokens,
+  spacing,
+  typography,
+  color,
+  radius,
+} from '@/lib/design-tokens';
 import {
   emptyStateConfigs,
   type EmptyStateType,
@@ -44,11 +51,11 @@ export interface EmptyStateProps {
 
 /**
  * EmptyState Component with Design Tokens
- * 
+ *
  * @example
  * // Preset kullanımı
  * <EmptyState type="no-projects" />
- * 
+ *
  * @example
  * // Custom kullanımı
  * <EmptyState
@@ -79,14 +86,19 @@ export default function EmptyState({
   // Merge with custom props
   const Icon = CustomIcon || config?.icon;
   const finalTitle = title || config?.title || 'Veri Bulunamadı';
-  const finalDescription = description || config?.description || 'Gösterilecek veri bulunmamaktadır.';
+  const finalDescription =
+    description || config?.description || 'Gösterilecek veri bulunmamaktadır.';
   const finalColor = customColor || config?.color || 'secondary';
   const finalHelpText = helpText || config?.helpText;
-  const finalAction = action || (config?.showAction && config?.defaultActionText ? {
-    label: config.defaultActionText,
-    onClick: () => {},
-    variant: 'primary' as const,
-  } : undefined);
+  const finalAction =
+    action ||
+    (config?.showAction && config?.defaultActionText
+      ? {
+          label: config.defaultActionText,
+          onClick: () => {},
+          variant: 'primary' as const,
+        }
+      : undefined);
 
   // Size config
   const sizeConfig = {
@@ -159,7 +171,12 @@ export default function EmptyState({
   // Variant config
   const variantClasses = {
     base: cn(currentColor.bgColor, 'border-2', currentColor.borderColor),
-    elevated: cn(tokens.card.elevated, currentColor.bgColor, 'border', currentColor.borderColor),
+    elevated: cn(
+      tokens.card.elevated,
+      currentColor.bgColor,
+      'border',
+      currentColor.borderColor
+    ),
     flat: cn(currentColor.bgColor, 'border', currentColor.borderColor),
     glass: cn('bg-white/60 backdrop-blur-sm border', currentColor.borderColor),
   };
@@ -186,18 +203,30 @@ export default function EmptyState({
               animated && 'animate-scale-in'
             )}
           >
-            <Icon className={cn(currentSize.iconInnerSize, currentColor.iconColor)} />
+            <Icon
+              className={cn(currentSize.iconInnerSize, currentColor.iconColor)}
+            />
           </div>
         </div>
       )}
 
       {/* Title */}
-      <h3 className={cn(currentSize.titleClass, 'text-gray-800 mb-3 font-semibold')}>
+      <h3
+        className={cn(
+          currentSize.titleClass,
+          'text-gray-800 mb-3 font-semibold'
+        )}
+      >
         {finalTitle}
       </h3>
 
       {/* Description */}
-      <p className={cn(currentSize.descClass, 'text-gray-600 mb-6 max-w-md mx-auto')}>
+      <p
+        className={cn(
+          currentSize.descClass,
+          'text-gray-600 mb-6 max-w-md mx-auto'
+        )}
+      >
         {finalDescription}
       </p>
 
@@ -254,9 +283,7 @@ export function CompactEmptyState({
       )}
     >
       <div className='text-center'>
-        {Icon && (
-          <Icon className={cn('w-8 h-8 mx-auto mb-2 text-gray-300')} />
-        )}
+        {Icon && <Icon className={cn('w-8 h-8 mx-auto mb-2 text-gray-300')} />}
         <p className={typography('bodySmall')}>{message}</p>
       </div>
     </div>
@@ -275,12 +302,19 @@ export function LoadingEmptyState({
   className?: string;
 }) {
   return (
-    <div className={cn('flex items-center justify-center', spacing(8, 'p', 'y'), className)}>
+    <div
+      className={cn(
+        'flex items-center justify-center',
+        spacing(8, 'p', 'y'),
+        className
+      )}
+    >
       <div className='text-center'>
         <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2'></div>
-        <p className={cn(typography('bodySmall'), 'text-gray-500')}>{message}</p>
+        <p className={cn(typography('bodySmall'), 'text-gray-500')}>
+          {message}
+        </p>
       </div>
     </div>
   );
 }
-

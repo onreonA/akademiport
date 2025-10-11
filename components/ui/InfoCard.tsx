@@ -1,7 +1,14 @@
 'use client';
 
 import React from 'react';
-import { X, AlertCircle, CheckCircle, Info, AlertTriangle, type LucideIcon } from 'lucide-react';
+import {
+  X,
+  AlertCircle,
+  CheckCircle,
+  Info,
+  AlertTriangle,
+  type LucideIcon,
+} from 'lucide-react';
 
 import { cn, radius, shadow } from '@/lib/design-tokens';
 
@@ -73,7 +80,8 @@ export default function InfoCard({
       solid: 'bg-blue-600 text-white',
       soft: 'bg-blue-50 text-blue-900 border-blue-200',
       outline: 'bg-white text-blue-900 border-blue-400',
-      borderedLeft: 'bg-blue-50 text-blue-900 border-l-4 border-l-blue-500 border border-blue-200',
+      borderedLeft:
+        'bg-blue-50 text-blue-900 border-l-4 border-l-blue-500 border border-blue-200',
       iconColor: 'text-blue-600',
       buttonColor: 'text-blue-700 hover:bg-blue-200',
     },
@@ -82,7 +90,8 @@ export default function InfoCard({
       solid: 'bg-green-600 text-white',
       soft: 'bg-green-50 text-green-900 border-green-200',
       outline: 'bg-white text-green-900 border-green-400',
-      borderedLeft: 'bg-green-50 text-green-900 border-l-4 border-l-green-500 border border-green-200',
+      borderedLeft:
+        'bg-green-50 text-green-900 border-l-4 border-l-green-500 border border-green-200',
       iconColor: 'text-green-600',
       buttonColor: 'text-green-700 hover:bg-green-200',
     },
@@ -91,7 +100,8 @@ export default function InfoCard({
       solid: 'bg-yellow-600 text-white',
       soft: 'bg-yellow-50 text-yellow-900 border-yellow-200',
       outline: 'bg-white text-yellow-900 border-yellow-400',
-      borderedLeft: 'bg-yellow-50 text-yellow-900 border-l-4 border-l-yellow-500 border border-yellow-200',
+      borderedLeft:
+        'bg-yellow-50 text-yellow-900 border-l-4 border-l-yellow-500 border border-yellow-200',
       iconColor: 'text-yellow-600',
       buttonColor: 'text-yellow-700 hover:bg-yellow-200',
     },
@@ -100,7 +110,8 @@ export default function InfoCard({
       solid: 'bg-red-600 text-white',
       soft: 'bg-red-50 text-red-900 border-red-200',
       outline: 'bg-white text-red-900 border-red-400',
-      borderedLeft: 'bg-red-50 text-red-900 border-l-4 border-l-red-500 border border-red-200',
+      borderedLeft:
+        'bg-red-50 text-red-900 border-l-4 border-l-red-500 border border-red-200',
       iconColor: 'text-red-600',
       buttonColor: 'text-red-700 hover:bg-red-200',
     },
@@ -150,15 +161,15 @@ export default function InfoCard({
         'relative',
         radius('lg'),
         shadow('sm'),
-        
+
         // Size
         currentSize.padding,
-        
+
         // Variant
         variantStyle[variant],
         variant === 'outline' && 'border-2',
         (variant === 'soft' || variant === 'bordered-left') && 'border',
-        
+
         // Custom
         className
       )}
@@ -210,7 +221,9 @@ export default function InfoCard({
                 'text-sm font-medium',
                 'underline',
                 'transition-colors',
-                variant === 'solid' ? 'text-white hover:text-white/80' : config.buttonColor
+                variant === 'solid'
+                  ? 'text-white hover:text-white/80'
+                  : config.buttonColor
               )}
             >
               {action.label}
@@ -240,4 +253,3 @@ export default function InfoCard({
     </div>
   );
 }
-

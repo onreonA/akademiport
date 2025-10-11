@@ -464,7 +464,7 @@ export default function VideoManagement() {
         isOpen={showCreateForm}
         onClose={() => setShowCreateForm(false)}
         title={editingVideo ? 'Video Düzenle' : 'Yeni Video Ekle'}
-        size="lg"
+        size='lg'
       >
         <form
           onSubmit={e => {
@@ -593,10 +593,10 @@ export default function VideoManagement() {
         </form>
 
         <ModalFooter>
-          <Button variant="secondary" onClick={() => setShowCreateForm(false)}>
+          <Button variant='secondary' onClick={() => setShowCreateForm(false)}>
             İptal
           </Button>
-          <Button variant="success" onClick={handleCreateVideo}>
+          <Button variant='success' onClick={handleCreateVideo}>
             {editingVideo ? 'Güncelle' : 'Ekle'}
           </Button>
         </ModalFooter>

@@ -602,8 +602,8 @@ export default function DocumentManagement() {
       <Modal
         isOpen={!!showDeleteConfirm}
         onClose={() => setShowDeleteConfirm(null)}
-        title="Dökümanı Sil"
-        size="md"
+        title='Dökümanı Sil'
+        size='md'
       >
         <div className='text-center'>
           <div className='w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4'>
@@ -616,10 +616,16 @@ export default function DocumentManagement() {
         </div>
 
         <ModalFooter>
-          <Button variant="secondary" onClick={() => setShowDeleteConfirm(null)}>
+          <Button
+            variant='secondary'
+            onClick={() => setShowDeleteConfirm(null)}
+          >
             İptal
           </Button>
-          <Button variant="danger" onClick={() => handleDelete(showDeleteConfirm!)}>
+          <Button
+            variant='danger'
+            onClick={() => handleDelete(showDeleteConfirm!)}
+          >
             Sil
           </Button>
         </ModalFooter>
@@ -630,7 +636,7 @@ export default function DocumentManagement() {
         isOpen={showCreateForm}
         onClose={() => setShowCreateForm(false)}
         title={editingDocument ? 'Döküman Düzenle' : 'Yeni Döküman Ekle'}
-        size="lg"
+        size='lg'
       >
         <form onSubmit={handleCreateOrUpdate} className='space-y-6'>
           <div>
@@ -741,11 +747,11 @@ export default function DocumentManagement() {
         </form>
 
         <ModalFooter>
-          <Button variant="secondary" onClick={() => setShowCreateForm(false)}>
+          <Button variant='secondary' onClick={() => setShowCreateForm(false)}>
             İptal
           </Button>
           <Button
-            variant="primary"
+            variant='primary'
             onClick={handleCreateOrUpdate}
             disabled={isSubmitting}
           >

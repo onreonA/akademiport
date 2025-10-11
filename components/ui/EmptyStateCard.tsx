@@ -1,17 +1,17 @@
 /**
  * @deprecated This component is deprecated. Use EmptyState from '@/components/ui/EmptyState' instead.
- * 
+ *
  * Migration:
  * ```tsx
  * // OLD
  * import EmptyStateCard from '@/components/ui/EmptyStateCard';
  * <EmptyStateCard type="no-projects" />
- * 
+ *
  * // NEW
  * import EmptyState from '@/components/ui/EmptyState';
  * <EmptyState type="no-projects" />
  * ```
- * 
+ *
  * This file will be removed in a future version.
  */
 
@@ -26,7 +26,10 @@ import {
 
 // Re-export new EmptyState for backward compatibility
 export { default } from '@/components/ui/EmptyState';
-export { CompactEmptyState, LoadingEmptyState } from '@/components/ui/EmptyState';
+export {
+  CompactEmptyState,
+  LoadingEmptyState,
+} from '@/components/ui/EmptyState';
 
 /**
  * @deprecated Use EmptyState instead

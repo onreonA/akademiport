@@ -1,35 +1,49 @@
 'use client';
 
 import React, { forwardRef } from 'react';
-import { AlertCircle, Eye, EyeOff, Loader2, type LucideIcon } from 'lucide-react';
+import {
+  AlertCircle,
+  Eye,
+  EyeOff,
+  Loader2,
+  type LucideIcon,
+} from 'lucide-react';
 
-import { cn, tokens, spacing, typography, color, radius } from '@/lib/design-tokens';
+import {
+  cn,
+  tokens,
+  spacing,
+  typography,
+  color,
+  radius,
+} from '@/lib/design-tokens';
 
-export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
+export interface InputProps
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
   // Label & Description
   label?: string;
   description?: string;
-  
+
   // Validation
   error?: string;
   success?: string;
-  
+
   // Icons
   leftIcon?: LucideIcon;
   rightIcon?: LucideIcon;
-  
+
   // States
   loading?: boolean;
-  
+
   // Size
   size?: 'sm' | 'md' | 'lg';
-  
+
   // Variants
   variant?: 'default' | 'filled' | 'outlined' | 'ghost';
-  
+
   // Password toggle
   showPasswordToggle?: boolean;
-  
+
   // Additional
   helperText?: string;
   maxLength?: number;
@@ -39,22 +53,22 @@ export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElem
 
 /**
  * Input Component with Design Tokens
- * 
+ *
  * @example
  * // Basic
  * <Input label="Email" placeholder="email@example.com" />
- * 
+ *
  * @example
  * // With validation
- * <Input 
- *   label="Email" 
+ * <Input
+ *   label="Email"
  *   error={errors.email}
  *   leftIcon={Mail}
  * />
- * 
+ *
  * @example
  * // Password with toggle
- * <Input 
+ * <Input
  *   type="password"
  *   label="Şifre"
  *   showPasswordToggle
@@ -138,7 +152,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     // State classes
     const stateClasses = cn(
       error && 'border-red-500 focus:border-red-500 focus:ring-red-500/20',
-      success && 'border-green-500 focus:border-green-500 focus:ring-green-500/20',
+      success &&
+        'border-green-500 focus:border-green-500 focus:ring-green-500/20',
       disabled && 'bg-gray-100 cursor-not-allowed opacity-60'
     );
 
@@ -149,7 +164,12 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
       <div className={cn('w-full', containerClassName)}>
         {/* Label */}
         {label && (
-          <label className={cn(currentSize.label, 'block font-medium text-gray-700 mb-1.5')}>
+          <label
+            className={cn(
+              currentSize.label,
+              'block font-medium text-gray-700 mb-1.5'
+            )}
+          >
             {label}
             {required && <span className='text-red-500 ml-1'>*</span>}
           </label>
@@ -184,20 +204,20 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
               radius('lg'),
               'transition-all duration-200',
               'outline-none',
-              
+
               // Size
               currentSize.input,
-              
+
               // Variant
               variantConfig[variant],
-              
+
               // States
               stateClasses,
-              
+
               // Icon padding
               LeftIcon && 'pl-10',
               (RightIcon || loading || showPasswordToggle) && 'pr-10',
-              
+
               // Custom className
               className
             )}
@@ -208,7 +228,9 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           <div className='absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2'>
             {/* Loading Spinner */}
             {loading && (
-              <Loader2 className={cn(currentSize.icon, 'text-gray-400 animate-spin')} />
+              <Loader2
+                className={cn(currentSize.icon, 'text-gray-400 animate-spin')}
+              />
             )}
 
             {/* Password Toggle */}
@@ -263,10 +285,12 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 
           {/* Character Count */}
           {showCount && maxLength && (
-            <p className={cn(
-              typography('bodySmall'),
-              charCount > maxLength ? 'text-red-600' : 'text-gray-500'
-            )}>
+            <p
+              className={cn(
+                typography('bodySmall'),
+                charCount > maxLength ? 'text-red-600' : 'text-gray-500'
+              )}
+            >
               {charCount}/{maxLength}
             </p>
           )}
@@ -279,4 +303,3 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 Input.displayName = 'Input';
 
 export default Input;
-

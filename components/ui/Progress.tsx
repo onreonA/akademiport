@@ -141,7 +141,12 @@ export function ProgressCircle({
   };
 
   return (
-    <div className={cn('relative inline-flex items-center justify-center', className)}>
+    <div
+      className={cn(
+        'relative inline-flex items-center justify-center',
+        className
+      )}
+    >
       <svg width={size} height={size} className='transform -rotate-90'>
         {/* Background circle */}
         <circle
@@ -159,7 +164,10 @@ export function ProgressCircle({
           cy={size / 2}
           r={radius}
           strokeWidth={strokeWidth}
-          className={cn('transition-all duration-500 ease-out', colorConfig[color])}
+          className={cn(
+            'transition-all duration-500 ease-out',
+            colorConfig[color]
+          )}
           fill='none'
           strokeDasharray={circumference}
           strokeDashoffset={offset}
@@ -215,8 +223,14 @@ export function ProgressSteps({
   const colorConfig = {
     primary: { active: 'bg-blue-600 border-blue-600', text: 'text-blue-600' },
     secondary: { active: 'bg-gray-600 border-gray-600', text: 'text-gray-600' },
-    success: { active: 'bg-green-600 border-green-600', text: 'text-green-600' },
-    warning: { active: 'bg-yellow-600 border-yellow-600', text: 'text-yellow-600' },
+    success: {
+      active: 'bg-green-600 border-green-600',
+      text: 'text-green-600',
+    },
+    warning: {
+      active: 'bg-yellow-600 border-yellow-600',
+      text: 'text-yellow-600',
+    },
     error: { active: 'bg-red-600 border-red-600', text: 'text-red-600' },
     info: { active: 'bg-cyan-600 border-cyan-600', text: 'text-cyan-600' },
   };
@@ -255,7 +269,13 @@ export function ProgressSteps({
                   'font-semibold text-sm',
                   'transition-all duration-200',
                   isCompleted && cn(config.active, 'text-white'),
-                  isCurrent && cn('border-2', config.active.split(' ')[1], 'bg-white', config.text),
+                  isCurrent &&
+                    cn(
+                      'border-2',
+                      config.active.split(' ')[1],
+                      'bg-white',
+                      config.text
+                    ),
                   isPending && 'border-gray-300 bg-white text-gray-400'
                 )}
               >
@@ -275,7 +295,9 @@ export function ProgressSteps({
                   {step.label}
                 </p>
                 {step.description && (
-                  <p className='text-xs text-gray-500 mt-0.5'>{step.description}</p>
+                  <p className='text-xs text-gray-500 mt-0.5'>
+                    {step.description}
+                  </p>
                 )}
               </div>
             </div>
@@ -288,7 +310,9 @@ export function ProgressSteps({
                     ? 'h-0.5 flex-1 mx-4'
                     : 'w-0.5 h-12 ml-5',
                   'transition-colors duration-200',
-                  index < currentStep ? config.active.split(' ')[0] : 'bg-gray-300'
+                  index < currentStep
+                    ? config.active.split(' ')[0]
+                    : 'bg-gray-300'
                 )}
               />
             )}
@@ -307,4 +331,3 @@ const Progress = {
 };
 
 export default Progress;
-

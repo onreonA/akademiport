@@ -99,7 +99,6 @@ export default function AdminDashboard() {
               </button>
             </div>
           </div>
-          <ToastContainer toasts={toasts} onRemove={removeToast} />
         </ErrorBoundary>
       </AdminLayout>
     );
@@ -112,7 +111,12 @@ export default function AdminDashboard() {
       <ErrorBoundary>
         <div className={spacing(6, 'p')}>
           {/* Header */}
-          <div className={cn('flex items-center justify-between', spacing(8, 'm', 'b'))}>
+          <div
+            className={cn(
+              'flex items-center justify-between',
+              spacing(8, 'm', 'b')
+            )}
+          >
             <div>
               <h1 className={typography('heading1')}>Dashboard</h1>
               <p className={cn(typography('body'), 'mt-1')}>
@@ -122,10 +126,7 @@ export default function AdminDashboard() {
             <button
               onClick={handleRefresh}
               disabled={isLoading}
-              className={cn(
-                tokens.button.primary,
-                'flex items-center'
-              )}
+              className={cn(tokens.button.primary, 'flex items-center')}
             >
               <LoadingSpinner size='sm' color='white' className='mr-2' />
               Yenile
@@ -165,10 +166,17 @@ export default function AdminDashboard() {
             <div className='lg:col-span-2'>
               {/* Additional stats or charts can go here */}
               <div className={tokens.card.base}>
-                <h3 className={cn(typography('heading3'), spacing(4, 'm', 'b'))}>
+                <h3
+                  className={cn(typography('heading3'), spacing(4, 'm', 'b'))}
+                >
                   Hızlı İstatistikler
                 </h3>
-                <div className={cn('grid grid-cols-2 md:grid-cols-4', spacing(4, 'gap'))}>
+                <div
+                  className={cn(
+                    'grid grid-cols-2 md:grid-cols-4',
+                    spacing(4, 'gap')
+                  )}
+                >
                   <div className='text-center'>
                     <div className='text-2xl font-bold text-blue-600'>
                       {stats?.completionRate || 0}%
@@ -203,8 +211,6 @@ export default function AdminDashboard() {
             </div>
           </div>
         </div>
-        {/* Toast Notifications */}
-        <ToastContainer toasts={toasts} onRemove={removeToast} />
       </ErrorBoundary>
     </AdminLayout>
   );

@@ -125,17 +125,17 @@ export default function Avatar({
           'text-gray-600',
           'font-semibold',
           'select-none',
-          
+
           // Size
           currentSize.container,
           currentSize.text,
-          
+
           // Shape
           shapeConfig[shape],
-          
+
           // Border
           border && cn('ring-2', borderColor),
-          
+
           // Interactive
           onClick && 'cursor-pointer hover:opacity-80 transition-opacity'
         )}
@@ -169,13 +169,13 @@ export default function Avatar({
             'absolute',
             'rounded-full',
             'ring-2 ring-white',
-            
+
             // Size
             currentSize.status,
-            
+
             // Position (bottom-right)
             'bottom-0 right-0',
-            
+
             // Status color
             statusConfig[status]
           )}
@@ -244,4 +244,3 @@ export function AvatarGroup({
     </div>
   );
 }
-

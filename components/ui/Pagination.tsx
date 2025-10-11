@@ -1,7 +1,13 @@
 'use client';
 
 import React from 'react';
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, MoreHorizontal } from 'lucide-react';
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+  MoreHorizontal,
+} from 'lucide-react';
 
 import { cn, radius } from '@/lib/design-tokens';
 
@@ -169,17 +175,17 @@ export default function Pagination({
         'inline-flex items-center justify-center',
         'font-medium',
         'transition-all duration-200',
-        
+
         // Size
         currentSize.button,
-        
+
         // Variant
         currentVariant.base,
         isActive ? currentVariant.active : currentVariant.inactive,
-        
+
         // Disabled
         (isDisabled || disabled) && 'opacity-50 cursor-not-allowed',
-        
+
         // Active
         isActive && 'cursor-default'
       )}
@@ -193,7 +199,10 @@ export default function Pagination({
   }
 
   return (
-    <nav aria-label='Pagination' className={cn('flex items-center gap-1', className)}>
+    <nav
+      aria-label='Pagination'
+      className={cn('flex items-center gap-1', className)}
+    >
       {/* First Page */}
       {showFirstLast && (
         <PageButton
@@ -270,4 +279,3 @@ export default function Pagination({
     </nav>
   );
 }
-
