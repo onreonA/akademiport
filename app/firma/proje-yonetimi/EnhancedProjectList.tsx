@@ -633,21 +633,6 @@ export default function EnhancedProjectList() {
       projects.reduce((sum, p) => sum + (p.progress_percentage || 0), 0) / total
     );
 
-    console.log('Project Stats:', {
-      total,
-      active,
-      completed,
-      overdue,
-      avgProgress,
-      projects: projects.map(p => ({
-        id: p.id,
-        name: p.name,
-        status: p.status,
-        progress_percentage: p.progress_percentage,
-        deadline: p.deadline,
-      })),
-    });
-
     return { total, active, completed, overdue, avgProgress };
   }, [projects]);
 
