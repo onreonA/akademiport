@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import AdminLayout from '@/components/admin/AdminLayout';
 import Button from '@/components/ui/Button';
+import { LoadingEmptyState } from '@/components/ui/EmptyState';
 import Modal from '@/components/ui/Modal';
 import { LazyExportImport } from '@/lib/utils/lazy-imports';
 interface Company {
@@ -1389,10 +1390,7 @@ export default function CompanyManagement() {
       </div>
       {/* Loading State */}
       {companiesLoading && (
-        <div className='text-center py-12'>
-          <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4'></div>
-          <p className='text-gray-600'>Firma verileri yükleniyor...</p>
-        </div>
+        <LoadingEmptyState message='Firma verileri yükleniyor...' />
       )}
       {/* Error State */}
       {companiesError && (
