@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 import Button from '@/components/ui/Button';
+import EmptyState from '@/components/ui/EmptyState';
 import Modal, { ModalFooter } from '@/components/ui/Modal';
 interface JobPosting {
   id: string;
@@ -615,12 +616,11 @@ const JobApplicationModal = ({
           ))}
         </div>
       ) : (
-        <div className='text-center py-12'>
-          <i className='ri-user-line text-4xl text-gray-400 mb-4'></i>
-          <p className='text-gray-500'>
-            Bu pozisyon için henüz başvuru bulunmuyor
-          </p>
-        </div>
+        <EmptyState
+          type='no-applications'
+          size='md'
+          description='Bu pozisyon için henüz başvuru bulunmuyor'
+        />
       )}
     </Modal>
   );
