@@ -517,7 +517,8 @@ export default function DanismanYonetimiPage() {
             icon='ri-user-line'
             label='Toplam Danışman'
             value={consultants.length.toString()}
-            variant='primary'
+            variant='gradient'
+            iconColor='primary'
           />
           <StatsCard
             icon='ri-check-line'
@@ -525,7 +526,8 @@ export default function DanismanYonetimiPage() {
             value={consultants
               .filter(c => c.status === 'active')
               .length.toString()}
-            variant='success'
+            variant='default'
+            iconColor='success'
           />
           <StatsCard
             icon='ri-building-line'
@@ -533,7 +535,8 @@ export default function DanismanYonetimiPage() {
             value={consultants
               .reduce((sum, c) => sum + c.assignedCompanies, 0)
               .toString()}
-            variant='accent'
+            variant='default'
+            iconColor='info'
           />
           <StatsCard
             icon='ri-file-list-line'
@@ -541,7 +544,8 @@ export default function DanismanYonetimiPage() {
             value={consultants
               .reduce((sum, c) => sum + c.activeReports, 0)
               .toString()}
-            variant='warning'
+            variant='default'
+            iconColor='warning'
           />
         </div>
         {/* Consultants Grid */}

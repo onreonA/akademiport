@@ -1781,7 +1781,8 @@ export default function CareerPortal() {
                   icon='ri-briefcase-line'
                   label='Toplam İlan'
                   value={jobPostings.length.toString()}
-                  variant='primary'
+                  variant='gradient'
+                  iconColor='primary'
                 />
                 <StatsCard
                   icon='ri-check-line'
@@ -1789,7 +1790,8 @@ export default function CareerPortal() {
                   value={jobPostings
                     .filter(job => job.status === 'Aktif')
                     .length.toString()}
-                  variant='success'
+                  variant='default'
+                  iconColor='success'
                 />
                 <StatsCard
                   icon='ri-user-line'
@@ -1797,7 +1799,8 @@ export default function CareerPortal() {
                   value={jobPostings
                     .reduce((total, job) => total + job.applicationsCount, 0)
                     .toString()}
-                  variant='accent'
+                  variant='default'
+                  iconColor='info'
                 />
                 <StatsCard
                   icon='ri-eye-line'
@@ -1805,7 +1808,8 @@ export default function CareerPortal() {
                   value={jobPostings
                     .reduce((total, job) => total + job.viewsCount, 0)
                     .toString()}
-                  variant='warning'
+                  variant='default'
+                  iconColor='warning'
                 />
               </div>
               {/* Filters */}

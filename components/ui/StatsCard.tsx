@@ -14,12 +14,13 @@ import {
 
 export interface StatsCardProps {
   // Content
-  title: string;
+  title?: string;
+  label?: string; // Alias for title for backward compatibility
   value: string | number;
   description?: string;
 
   // Icon
-  icon?: LucideIcon;
+  icon?: LucideIcon | string;
   iconColor?:
     | 'primary'
     | 'secondary'
@@ -61,6 +62,7 @@ export interface StatsCardProps {
  */
 export default function StatsCard({
   title,
+  label,
   value,
   description,
   icon: Icon,
@@ -74,6 +76,8 @@ export default function StatsCard({
   loading = false,
   className,
 }: StatsCardProps) {
+  // Use label as fallback for title
+  const displayTitle = title || label || '';
   // Size configurations
   const sizeConfig = {
     sm: {
@@ -207,7 +211,7 @@ export default function StatsCard({
               'text-gray-600 font-medium mb-2'
             )}
           >
-            {title}
+            {displayTitle}
           </p>
 
           {/* Value */}
@@ -258,7 +262,11 @@ export default function StatsCard({
               iconColorConfig[iconColor]
             )}
           >
-            <Icon className='w-full h-full' />
+            {typeof Icon === 'string' ? (
+              <i className={`${Icon} w-full h-full`}></i>
+            ) : (
+              <Icon className='w-full h-full' />
+            )}
           </div>
         )}
       </div>
