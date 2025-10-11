@@ -11,6 +11,8 @@ import {
   RiSearchLine,
 } from 'react-icons/ri';
 
+import Badge from '@/components/ui/Badge';
+import StatusBadge from '@/components/ui/StatusBadge';
 import { useAuthStore } from '@/lib/stores/auth-store';
 
 type ProjectStatus =

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 
 import FirmaLayout from '@/components/firma/FirmaLayout';
 import EmptyState from '@/components/ui/EmptyState';
+import StatusBadge from '@/components/ui/StatusBadge';
 import { useAuthStore } from '@/lib/stores/auth-store';
 interface CareerApplication {
   id: string;
