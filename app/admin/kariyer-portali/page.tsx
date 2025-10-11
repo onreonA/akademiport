@@ -3,8 +3,11 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 import Button from '@/components/ui/Button';
+import Card from '@/components/ui/Card';
 import EmptyState from '@/components/ui/EmptyState';
 import Modal, { ModalFooter } from '@/components/ui/Modal';
+import StatsCard from '@/components/ui/StatsCard';
+import StatusBadge from '@/components/ui/StatusBadge';
 interface JobPosting {
   id: string;
   title: string;
@@ -1804,75 +1807,30 @@ export default function CareerPortal() {
             <>
               {/* Stats Cards */}
               <div className='grid grid-cols-1 md:grid-cols-4 gap-6 mb-8'>
-                <div className='bg-white rounded-xl shadow-sm border border-gray-100 p-6'>
-                  <div className='flex items-center justify-between'>
-                    <div>
-                      <p className='text-gray-600 text-sm font-medium'>
-                        Toplam İlan
-                      </p>
-                      <p className='text-2xl font-bold text-gray-900'>
-                        {jobPostings.length}
-                      </p>
-                    </div>
-                    <div className='bg-blue-500 w-12 h-12 rounded-lg flex items-center justify-center'>
-                      <i className='ri-briefcase-line text-white text-xl'></i>
-                    </div>
-                  </div>
-                </div>
-                <div className='bg-white rounded-xl shadow-sm border border-gray-100 p-6'>
-                  <div className='flex items-center justify-between'>
-                    <div>
-                      <p className='text-gray-600 text-sm font-medium'>
-                        Aktif İlanlar
-                      </p>
-                      <p className='text-2xl font-bold text-green-600'>
-                        {
-                          jobPostings.filter(job => job.status === 'Aktif')
-                            .length
-                        }
-                      </p>
-                    </div>
-                    <div className='bg-green-500 w-12 h-12 rounded-lg flex items-center justify-center'>
-                      <i className='ri-check-line text-white text-xl'></i>
-                    </div>
-                  </div>
-                </div>
-                <div className='bg-white rounded-xl shadow-sm border border-gray-100 p-6'>
-                  <div className='flex items-center justify-between'>
-                    <div>
-                      <p className='text-gray-600 text-sm font-medium'>
-                        Toplam Başvuru
-                      </p>
-                      <p className='text-2xl font-bold text-purple-600'>
-                        {jobPostings.reduce(
-                          (total, job) => total + job.applicationsCount,
-                          0
-                        )}
-                      </p>
-                    </div>
-                    <div className='bg-purple-500 w-12 h-12 rounded-lg flex items-center justify-center'>
-                      <i className='ri-user-line text-white text-xl'></i>
-                    </div>
-                  </div>
-                </div>
-                <div className='bg-white rounded-xl shadow-sm border border-gray-100 p-6'>
-                  <div className='flex items-center justify-between'>
-                    <div>
-                      <p className='text-gray-600 text-sm font-medium'>
-                        Bu Ay Görüntüleme
-                      </p>
-                      <p className='text-2xl font-bold text-orange-600'>
-                        {jobPostings.reduce(
-                          (total, job) => total + job.viewsCount,
-                          0
-                        )}
-                      </p>
-                    </div>
-                    <div className='bg-orange-500 w-12 h-12 rounded-lg flex items-center justify-center'>
-                      <i className='ri-eye-line text-white text-xl'></i>
-                    </div>
-                  </div>
-                </div>
+                <StatsCard
+                  icon='ri-briefcase-line'
+                  label='Toplam İlan'
+                  value={jobPostings.length.toString()}
+                  variant='primary'
+                />
+                <StatsCard
+                  icon='ri-check-line'
+                  label='Aktif İlanlar'
+                  value={jobPostings.filter(job => job.status === 'Aktif').length.toString()}
+                  variant='success'
+                />
+                <StatsCard
+                  icon='ri-user-line'
+                  label='Toplam Başvuru'
+                  value={jobPostings.reduce((total, job) => total + job.applicationsCount, 0).toString()}
+                  variant='accent'
+                />
+                <StatsCard
+                  icon='ri-eye-line'
+                  label='Bu Ay Görüntüleme'
+                  value={jobPostings.reduce((total, job) => total + job.viewsCount, 0).toString()}
+                  variant='warning'
+                />
               </div>
               {/* Filters */}
               <div className='bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8'>
