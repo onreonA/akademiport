@@ -1,116 +1,128 @@
 'use client';
-import { useEffect, useRef } from 'react';
+
+import React, { useEffect } from 'react';
 
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
-  title?: string;
   children: React.ReactNode;
+  title?: string;
   size?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
-  className?: string;
   closeOnOverlayClick?: boolean;
-  showCloseButton?: boolean;
 }
 
+/**
+ * Reusable Modal Component
+ * 
+ * @example
+ * <Modal isOpen={isOpen} onClose={handleClose} title="Modal Title" size="md">
+ *   <p>Modal content</p>
+ * </Modal>
+ */
 export default function Modal({
   isOpen,
   onClose,
-  title,
   children,
+  title,
   size = 'md',
-  className = '',
   closeOnOverlayClick = true,
-  showCloseButton = true,
 }: ModalProps) {
-  const modalRef = useRef<HTMLDivElement>(null);
-
-  // Handle escape key
+  // Close on Escape key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
+      if (e.key === 'Escape' && isOpen) {
         onClose();
       }
     };
 
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [isOpen, onClose]);
+
+  // Prevent body scroll when modal is open
+  useEffect(() => {
     if (isOpen) {
-      document.addEventListener('keydown', handleEscape);
       document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
     }
 
     return () => {
-      document.removeEventListener('keydown', handleEscape);
       document.body.style.overflow = 'unset';
     };
-  }, [isOpen, onClose]);
-
-  // Handle overlay click
-  const handleOverlayClick = (e: React.MouseEvent) => {
-    if (closeOnOverlayClick && e.target === e.currentTarget) {
-      onClose();
-    }
-  };
-
-  const getSizeClasses = () => {
-    switch (size) {
-      case 'sm':
-        return 'max-w-md';
-      case 'md':
-        return 'max-w-lg';
-      case 'lg':
-        return 'max-w-2xl';
-      case 'xl':
-        return 'max-w-4xl';
-      case 'full':
-        return 'max-w-7xl';
-      default:
-        return 'max-w-lg';
-    }
-  };
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
+  const sizeClasses = {
+    sm: 'max-w-md',
+    md: 'max-w-lg',
+    lg: 'max-w-2xl',
+    xl: 'max-w-4xl',
+    full: 'max-w-7xl',
+  };
+
   return (
-    <div className='fixed inset-0 z-50 overflow-y-auto'>
-      <div className='flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0'>
-        {/* Overlay */}
-        <div
-          className='fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75'
-          onClick={handleOverlayClick}
-        />
+    <div className='fixed inset-0 z-50 flex items-center justify-center p-4'>
+      {/* Overlay */}
+      <div
+        className='fixed inset-0 bg-black bg-opacity-50 transition-opacity'
+        onClick={closeOnOverlayClick ? onClose : undefined}
+        aria-hidden='true'
+      />
 
-        {/* Modal */}
-        <div
-          ref={modalRef}
-          className={`inline-block w-full ${getSizeClasses()} px-6 pt-6 pb-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white rounded-xl shadow-xl ${className}`}
-          role='dialog'
-          aria-modal='true'
-          aria-labelledby={title ? 'modal-title' : undefined}
-        >
-          {/* Header */}
-          {title && (
-            <div className='flex items-center justify-between mb-6'>
-              <h3
-                id='modal-title'
-                className='text-lg font-semibold text-gray-900'
+      {/* Modal */}
+      <div
+        className={`relative bg-white rounded-xl shadow-xl w-full ${sizeClasses[size]} max-h-[90vh] overflow-auto`}
+      >
+        {/* Header */}
+        {title && (
+          <div className='sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between rounded-t-xl z-10'>
+            <h2 className='text-xl font-semibold text-gray-900'>{title}</h2>
+            <button
+              onClick={onClose}
+              className='text-gray-400 hover:text-gray-600 transition-colors p-1 hover:bg-gray-100 rounded-lg'
+              aria-label='Close modal'
+            >
+              <svg
+                className='w-6 h-6'
+                fill='none'
+                stroke='currentColor'
+                viewBox='0 0 24 24'
               >
-                {title}
-              </h3>
-              {showCloseButton && (
-                <button
-                  onClick={onClose}
-                  className='w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors'
-                  aria-label="Modal'ı kapat"
-                >
-                  <i className='ri-close-line text-gray-500'></i>
-                </button>
-              )}
-            </div>
-          )}
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth={2}
+                  d='M6 18L18 6M6 6l12 12'
+                />
+              </svg>
+            </button>
+          </div>
+        )}
 
-          {/* Content */}
-          <div className='modal-content'>{children}</div>
-        </div>
+        {/* Content */}
+        <div className='px-6 py-4'>{children}</div>
       </div>
+    </div>
+  );
+}
+
+/**
+ * Modal Footer Component
+ */
+export function ModalFooter({
+  children,
+  className = '',
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <div
+      className={`sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4 flex items-center justify-end gap-3 rounded-b-xl ${className}`}
+    >
+      {children}
     </div>
   );
 }
