@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 
 import FirmaLayout from '@/components/firma/FirmaLayout';
+import EmptyState from '@/components/ui/EmptyState';
 import { useAuthStore } from '@/lib/stores/auth-store';
 interface CareerApplication {
   id: string;
@@ -275,20 +276,20 @@ const HRPoolPage = () => {
         title='İK Havuzu'
         description='İnsan kaynakları adaylarını yönetin ve değerlendirin'
       >
-        <div className='text-center py-12'>
-          <div className='w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4'>
-            <i className='ri-error-warning-line text-red-600 text-2xl'></i>
-          </div>
-          <h3 className='text-lg font-medium text-gray-900 mb-2'>
-            Hata Oluştu
-          </h3>
-          <p className='text-gray-500 mb-6'>{error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className='bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors'
-          >
-            Tekrar Dene
-          </button>
+        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
+          <EmptyState
+            type='custom'
+            title='Hata Oluştu'
+            description={error}
+            color='error'
+            size='lg'
+            variant='elevated'
+            action={{
+              label: 'Tekrar Dene',
+              onClick: () => window.location.reload(),
+              variant: 'primary',
+            }}
+          />
         </div>
       </FirmaLayout>
     );
