@@ -2,17 +2,21 @@
 
 import React, { useEffect } from 'react';
 
+import { cn, color, spacing, radius, shadow, typography } from '@/lib/design-tokens';
+
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   children: React.ReactNode;
   title?: string;
+  subtitle?: string;
   size?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
   closeOnOverlayClick?: boolean;
+  footer?: React.ReactNode;
 }
 
 /**
- * Reusable Modal Component
+ * Reusable Modal Component with Design Tokens
  *
  * @example
  * <Modal isOpen={isOpen} onClose={handleClose} title="Modal Title" size="md">
@@ -24,8 +28,10 @@ export default function Modal({
   onClose,
   children,
   title,
+  subtitle,
   size = 'md',
   closeOnOverlayClick = true,
+  footer,
 }: ModalProps) {
   // Close on Escape key
   useEffect(() => {
@@ -63,7 +69,7 @@ export default function Modal({
   };
 
   return (
-    <div className='fixed inset-0 z-50 flex items-center justify-center p-4'>
+    <div className={cn('fixed inset-0 z-50 flex items-center justify-center', spacing(4, 'p'))}>
       {/* Overlay */}
       <div
         className='fixed inset-0 bg-black bg-opacity-50 transition-opacity'
@@ -73,15 +79,45 @@ export default function Modal({
 
       {/* Modal */}
       <div
-        className={`relative bg-white rounded-xl shadow-xl w-full ${sizeClasses[size]} max-h-[90vh] overflow-auto`}
+        className={cn(
+          'relative',
+          color('secondary', 50, 'bg'),
+          radius('xl'),
+          shadow('xl'),
+          'w-full max-h-[90vh] overflow-auto',
+          sizeClasses[size]
+        )}
       >
         {/* Header */}
-        {title && (
-          <div className='sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between rounded-t-xl z-10'>
-            <h2 className='text-xl font-semibold text-gray-900'>{title}</h2>
+        {(title || subtitle) && (
+          <div className={cn(
+            'sticky top-0 z-10',
+            color('secondary', 50, 'bg'),
+            color('secondary', 200, 'border'),
+            'border-b',
+            spacing(6, 'p', 'x'),
+            spacing(4, 'p', 'y'),
+            'flex items-center justify-between',
+            'rounded-t-xl'
+          )}>
+            <div>
+              {title && (
+                <h2 className={typography('heading4')}>{title}</h2>
+              )}
+              {subtitle && (
+                <p className={cn(typography('bodySmall'), 'mt-1')}>{subtitle}</p>
+              )}
+            </div>
             <button
               onClick={onClose}
-              className='text-gray-400 hover:text-gray-600 transition-colors p-1 hover:bg-gray-100 rounded-lg'
+              className={cn(
+                color('secondary', 400, 'text'),
+                'hover:text-gray-600',
+                'transition-colors',
+                spacing(1, 'p'),
+                'hover:bg-gray-100',
+                radius('lg')
+              )}
               aria-label='Close modal'
             >
               <svg
@@ -102,14 +138,33 @@ export default function Modal({
         )}
 
         {/* Content */}
-        <div className='px-6 py-4'>{children}</div>
+        <div className={cn(spacing(6, 'p', 'x'), spacing(4, 'p', 'y'))}>
+          {children}
+        </div>
+
+        {/* Footer */}
+        {footer && (
+          <div className={cn(
+            'sticky bottom-0',
+            color('secondary', 50, 'bg'),
+            color('secondary', 200, 'border'),
+            'border-t',
+            spacing(6, 'p', 'x'),
+            spacing(4, 'p', 'y'),
+            'flex items-center justify-end',
+            spacing(3, 'gap'),
+            'rounded-b-xl'
+          )}>
+            {footer}
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
 /**
- * Modal Footer Component
+ * Modal Footer Component with Design Tokens
  */
 export function ModalFooter({
   children,
@@ -120,7 +175,18 @@ export function ModalFooter({
 }) {
   return (
     <div
-      className={`sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4 flex items-center justify-end gap-3 rounded-b-xl ${className}`}
+      className={cn(
+        'sticky bottom-0',
+        color('secondary', 50, 'bg'),
+        color('secondary', 200, 'border'),
+        'border-t',
+        spacing(6, 'p', 'x'),
+        spacing(4, 'p', 'y'),
+        'flex items-center justify-end',
+        spacing(3, 'gap'),
+        'rounded-b-xl',
+        className
+      )}
     >
       {children}
     </div>

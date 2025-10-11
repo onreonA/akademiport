@@ -1,8 +1,11 @@
 import React from 'react';
 
+import { cn, tokens, color, spacing, radius, shadow as shadowHelper, typography } from '@/lib/design-tokens';
+
 interface CardProps {
   children: React.ReactNode;
   className?: string;
+  variant?: 'base' | 'elevated' | 'flat' | 'glass';
   hover?: boolean;
   shadow?: 'sm' | 'md' | 'lg' | 'xl';
   padding?: 'sm' | 'md' | 'lg';
@@ -10,10 +13,10 @@ interface CardProps {
 }
 
 /**
- * Reusable Card Component
+ * Reusable Card Component with Design Tokens
  *
  * @example
- * <Card shadow="md" hover padding="lg">
+ * <Card variant="elevated" hover padding="lg">
  *   <h3>Card Title</h3>
  *   <p>Card content</p>
  * </Card>
@@ -21,32 +24,39 @@ interface CardProps {
 export default function Card({
   children,
   className = '',
+  variant = 'base',
   hover = false,
   shadow = 'sm',
   padding = 'md',
   onClick,
 }: CardProps) {
-  const shadowClasses = {
-    sm: 'shadow-sm',
-    md: 'shadow-md',
-    lg: 'shadow-lg',
-    xl: 'shadow-xl',
+  // Use pre-composed tokens for variants
+  const variantClasses = {
+    base: tokens.card.base,
+    elevated: tokens.card.elevated,
+    flat: tokens.card.flat,
+    glass: tokens.card.glass,
   };
 
   const paddingClasses = {
-    sm: 'p-4',
-    md: 'p-6',
-    lg: 'p-8',
+    sm: spacing(4, 'p'),
+    md: spacing(6, 'p'),
+    lg: spacing(8, 'p'),
   };
 
-  const baseClasses = 'bg-white rounded-xl border border-gray-200';
   const hoverClasses = hover
     ? 'hover:shadow-lg hover:scale-[1.02] transition-all duration-200 cursor-pointer'
     : '';
 
   return (
     <div
-      className={`${baseClasses} ${shadowClasses[shadow]} ${paddingClasses[padding]} ${hoverClasses} ${className}`}
+      className={cn(
+        variantClasses[variant],
+        paddingClasses[padding],
+        shadowHelper(shadow),
+        hover && hoverClasses,
+        className
+      )}
       onClick={onClick}
     >
       {children}
@@ -55,7 +65,7 @@ export default function Card({
 }
 
 /**
- * Card Header Component
+ * Card Header Component with Design Tokens
  */
 export function CardHeader({
   children,
@@ -65,14 +75,20 @@ export function CardHeader({
   className?: string;
 }) {
   return (
-    <div className={`mb-4 pb-4 border-b border-gray-200 ${className}`}>
+    <div className={cn(
+      spacing(4, 'm', 'b'),
+      spacing(4, 'p', 'b'),
+      color('secondary', 200, 'border'),
+      'border-b',
+      className
+    )}>
       {children}
     </div>
   );
 }
 
 /**
- * Card Title Component
+ * Card Title Component with Design Tokens
  */
 export function CardTitle({
   children,
@@ -82,14 +98,17 @@ export function CardTitle({
   className?: string;
 }) {
   return (
-    <h3 className={`text-lg font-semibold text-gray-900 ${className}`}>
+    <h3 className={cn(
+      typography('heading4'),
+      className
+    )}>
       {children}
     </h3>
   );
 }
 
 /**
- * Card Content Component
+ * Card Content Component with Design Tokens
  */
 export function CardContent({
   children,
@@ -98,11 +117,18 @@ export function CardContent({
   children: React.ReactNode;
   className?: string;
 }) {
-  return <div className={`text-gray-600 ${className}`}>{children}</div>;
+  return (
+    <div className={cn(
+      typography('body'),
+      className
+    )}>
+      {children}
+    </div>
+  );
 }
 
 /**
- * Card Footer Component
+ * Card Footer Component with Design Tokens
  */
 export function CardFooter({
   children,
@@ -112,7 +138,13 @@ export function CardFooter({
   className?: string;
 }) {
   return (
-    <div className={`mt-4 pt-4 border-t border-gray-200 ${className}`}>
+    <div className={cn(
+      spacing(4, 'm', 't'),
+      spacing(4, 'p', 't'),
+      color('secondary', 200, 'border'),
+      'border-t',
+      className
+    )}>
       {children}
     </div>
   );
