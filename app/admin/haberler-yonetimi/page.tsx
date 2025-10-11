@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 import FileUpload from '@/components/forms/FileUpload';
 import MarkdownEditor from '@/components/forms/MarkdownEditor';
 import Button from '@/components/ui/Button';
+import EmptyState from '@/components/ui/EmptyState';
 import Modal, { ModalFooter } from '@/components/ui/Modal';
 import { useAuthStore } from '@/lib/stores/auth-store';
 const MenuItem = ({
@@ -1086,26 +1087,20 @@ export default function NewsManagement() {
               ))}
             </div>
           ) : (
-            <div className='text-center py-12'>
-              <div className='w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4'>
-                <i className='ri-newspaper-line text-2xl text-gray-400'></i>
-              </div>
-              <h3 className='text-lg font-medium text-gray-900 mb-2'>
-                Haber bulunamadı
-              </h3>
-              <p className='text-gray-500 mb-4'>
-                İlk haberinizi oluşturmak için başlayın
-              </p>
-              <button
-                onClick={() => {
+            <EmptyState
+              type='no-news'
+              size='lg'
+              variant='elevated'
+              description='İlk haberinizi oluşturmak için başlayın'
+              action={{
+                label: 'Haber Ekle',
+                onClick: () => {
                   setEditingArticle(null);
                   setShowCreateForm(true);
-                }}
-                className='bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors cursor-pointer whitespace-nowrap'
-              >
-                Haber Ekle
-              </button>
-            </div>
+                },
+                variant: 'primary',
+              }}
+            />
           )}
         </div>
       </div>
