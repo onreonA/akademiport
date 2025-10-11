@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { createClient } from '@/lib/supabase/server';
-import { requireAuth, createAuthErrorResponse } from '@/lib/jwt-utils';
+import { createAuthErrorResponse, requireAuth } from '@/lib/jwt-utils';
 import { ROLE_GROUPS } from '@/lib/rbac';
+import { createClient } from '@/lib/supabase/server';
 // GET /api/projects/[id] - Get single project with full details
 export async function GET(
   request: NextRequest,
@@ -11,10 +11,10 @@ export async function GET(
   try {
     // JWT Authentication
     const user = await requireAuth(request);
-    
+
     const { id } = await params;
     const supabase = createClient();
-    
+
     // Get project with basic data first
     const { data: project, error } = await supabase
       .from('projects')
@@ -29,11 +29,11 @@ export async function GET(
     }
     // Check permissions - Admin users can access all projects, company users only their own
     const isAdmin = ROLE_GROUPS.ADMIN_ROLES.includes(user.role);
-    
+
     if (!isAdmin) {
       // For company users, check if they have access to this project
       const userCompanyId = user.company_id;
-      
+
       // Check both direct assignment and multi-company assignment
       const isDirectlyAssigned = project.company_id === userCompanyId;
       if (!isDirectlyAssigned) {
@@ -45,10 +45,7 @@ export async function GET(
           .eq('company_id', userCompanyId)
           .single();
         if (!assignment) {
-          return NextResponse.json(
-            { error: 'Access denied' },
-            { status: 403 }
-          );
+          return NextResponse.json({ error: 'Access denied' }, { status: 403 });
         }
       }
     }
@@ -195,7 +192,7 @@ export async function GET(
     if (error.message === 'Authentication required') {
       return createAuthErrorResponse(error.message, 401);
     }
-    
+
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -210,10 +207,10 @@ export async function PATCH(
   try {
     // JWT Authentication - Only admin users can update projects
     const user = await requireAuth(request);
-    
+
     const { id } = await params;
     const supabase = createClient();
-    
+
     // Only admin and consultant can update projects
     if (!ROLE_GROUPS.ADMIN_ROLES.includes(user.role)) {
       return NextResponse.json({ error: 'Access denied' }, { status: 403 });
@@ -265,7 +262,7 @@ export async function PATCH(
     if (error.message === 'Authentication required') {
       return createAuthErrorResponse(error.message, 401);
     }
-    
+
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -280,14 +277,14 @@ export async function PUT(
   try {
     // JWT Authentication - Only admin users can update projects
     const user = await requireAuth(request);
-    
+
     // Only admin and consultant can update projects
     if (!ROLE_GROUPS.ADMIN_ROLES.includes(user.role)) {
       return NextResponse.json({ error: 'Access denied' }, { status: 403 });
     }
     const { id } = await params;
     const supabase = createClient();
-    
+
     const body = await request.json();
     const {
       name,
@@ -335,7 +332,7 @@ export async function PUT(
     if (error.message === 'Authentication required') {
       return createAuthErrorResponse(error.message, 401);
     }
-    
+
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -350,12 +347,12 @@ export async function DELETE(
   try {
     // JWT Authentication - Only admin users can delete projects
     const user = await requireAuth(request);
-    
+
     // Only admin and master_admin can delete projects
     if (!['admin', 'master_admin'].includes(user.role)) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-    
+
     const { id } = await params;
     const supabase = createClient();
 
@@ -476,7 +473,7 @@ export async function DELETE(
     if (error.message === 'Authentication required') {
       return createAuthErrorResponse(error.message, 401);
     }
-    
+
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

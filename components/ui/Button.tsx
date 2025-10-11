@@ -11,7 +11,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 
 /**
  * Reusable Button Component
- * 
+ *
  * @example
  * <Button variant="primary" size="md" onClick={handleClick}>
  *   Click me

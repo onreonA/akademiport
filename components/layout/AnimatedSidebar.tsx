@@ -210,10 +210,12 @@ export default function AnimatedSidebar({
         indigo: 'text-indigo-600 border border-indigo-200',
         gray: 'text-gray-600 border border-gray-200',
       };
-      
+
       // Collapsed durumda tek tip gri renk
-      const collapsedStyle = collapsed ? 'text-gray-600 border border-gray-200' : iconColorMap[color] || iconColorMap['gray'];
-      
+      const collapsedStyle = collapsed
+        ? 'text-gray-600 border border-gray-200'
+        : iconColorMap[color] || iconColorMap['gray'];
+
       return `w-7 h-7 rounded-lg flex items-center justify-start pl-1 transition-all duration-300 hover:scale-102 bg-white/40 hover:bg-white/60 ${collapsedStyle}`;
     }
   };

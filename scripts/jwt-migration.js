@@ -2,10 +2,10 @@
 
 /**
  * JWT Kimlik Doğrulama Sistemi Geçiş Script'i
- * 
+ *
  * Bu script, API endpoint'lerini eski cookie/header tabanlı kimlik doğrulama sisteminden
  * yeni JWT token tabanlı kimlik doğrulama sistemine geçirmek için kullanılır.
- * 
+ *
  * Kullanım: node jwt-migration.js [dosya_yolu]
  * Örnek: node jwt-migration.js app/api/firma/tasks/route.ts
  */
@@ -39,45 +39,57 @@ const isAdminEndpoint = targetFile.includes('/admin/');
 const isFirmaEndpoint = targetFile.includes('/firma/');
 
 // İmport ekle
-if (!fileContent.includes('import { requireAuth') && 
-    !fileContent.includes('import { requireAdmin') && 
-    !fileContent.includes('import { requireCompany')) {
-  
+if (
+  !fileContent.includes('import { requireAuth') &&
+  !fileContent.includes('import { requireAdmin') &&
+  !fileContent.includes('import { requireCompany')
+) {
   // Mevcut import satırlarını bul
   const importLines = fileContent.match(/import.*from.*[\r\n]/g) || [];
   const lastImportLine = importLines[importLines.length - 1];
-  
+
   let importStatement = '';
   if (isAdminEndpoint) {
-    importStatement = "import { requireAdmin, createAuthErrorResponse } from '@/lib/jwt-utils';\n";
+    importStatement =
+      "import { requireAdmin, createAuthErrorResponse } from '@/lib/jwt-utils';\n";
   } else if (isFirmaEndpoint) {
-    importStatement = "import { requireCompany, createAuthErrorResponse } from '@/lib/jwt-utils';\n";
+    importStatement =
+      "import { requireCompany, createAuthErrorResponse } from '@/lib/jwt-utils';\n";
   } else {
-    importStatement = "import { requireAuth, createAuthErrorResponse } from '@/lib/jwt-utils';\n";
+    importStatement =
+      "import { requireAuth, createAuthErrorResponse } from '@/lib/jwt-utils';\n";
   }
-  
+
   // İmport satırını ekle
   if (lastImportLine) {
-    fileContent = fileContent.replace(lastImportLine, lastImportLine + importStatement);
+    fileContent = fileContent.replace(
+      lastImportLine,
+      lastImportLine + importStatement
+    );
   } else {
     fileContent = importStatement + fileContent;
   }
 }
 
 // Cookie tabanlı kimlik doğrulama kodunu değiştir
-const cookieAuthPattern = /const userEmail = request\.cookies\.get\('auth-user-email'\)\?\.value;[\s\S]*?const userRole = request\.cookies\.get\('auth-user-role'\)\?\.value;[\s\S]*?if \(!userEmail \|\| !userRole\) \{[\s\S]*?return NextResponse\.json\([\s\S]*?\{ status: 401 \}[\s\S]*?\);[\s\S]*?\}/g;
+const cookieAuthPattern =
+  /const userEmail = request\.cookies\.get\('auth-user-email'\)\?\.value;[\s\S]*?const userRole = request\.cookies\.get\('auth-user-role'\)\?\.value;[\s\S]*?if \(!userEmail \|\| !userRole\) \{[\s\S]*?return NextResponse\.json\([\s\S]*?\{ status: 401 \}[\s\S]*?\);[\s\S]*?\}/g;
 
 // Header tabanlı kimlik doğrulama kodunu değiştir
-const headerAuthPattern = /const userEmail = request\.headers\.get\('X-User-Email'\);[\s\S]*?if \(!userEmail\) \{[\s\S]*?return NextResponse\.json\([\s\S]*?\{ status: 40[01] \}[\s\S]*?\);[\s\S]*?\}/g;
+const headerAuthPattern =
+  /const userEmail = request\.headers\.get\('X-User-Email'\);[\s\S]*?if \(!userEmail\) \{[\s\S]*?return NextResponse\.json\([\s\S]*?\{ status: 40[01] \}[\s\S]*?\);[\s\S]*?\}/g;
 
 // Yeni kimlik doğrulama kodu
 let newAuthCode = '';
 if (isAdminEndpoint) {
-  newAuthCode = '    // JWT Authentication - Admin users only\n    const user = await requireAdmin(request);\n    \n    const supabase = createClient();';
+  newAuthCode =
+    '    // JWT Authentication - Admin users only\n    const user = await requireAdmin(request);\n    \n    const supabase = createClient();';
 } else if (isFirmaEndpoint) {
-  newAuthCode = '    // JWT Authentication - Company users only\n    const user = await requireCompany(request);\n    \n    const supabase = createClient();';
+  newAuthCode =
+    '    // JWT Authentication - Company users only\n    const user = await requireCompany(request);\n    \n    const supabase = createClient();';
 } else {
-  newAuthCode = '    // JWT Authentication\n    const user = await requireAuth(request);\n    \n    const supabase = createClient();';
+  newAuthCode =
+    '    // JWT Authentication\n    const user = await requireAuth(request);\n    \n    const supabase = createClient();';
 }
 
 // Cookie tabanlı kimlik doğrulama kodunu değiştir
@@ -87,7 +99,10 @@ fileContent = fileContent.replace(cookieAuthPattern, newAuthCode);
 fileContent = fileContent.replace(headerAuthPattern, newAuthCode);
 
 // userEmail -> user.email değişikliği
-fileContent = fileContent.replace(/\.eq\('email', userEmail\)/g, ".eq('email', user.email)");
+fileContent = fileContent.replace(
+  /\.eq\('email', userEmail\)/g,
+  ".eq('email', user.email)"
+);
 
 // userRole -> user.role değişikliği
 fileContent = fileContent.replace(/userRole/g, 'user.role');
@@ -96,10 +111,11 @@ fileContent = fileContent.replace(/userRole/g, 'user.role');
 fileContent = fileContent.replace(/userCompanyId/g, 'user.company_id');
 
 // Hata yakalama bloğunu güncelle
-const catchPattern = /catch \(error\) \{[\s\S]*?return NextResponse\.json\([\s\S]*?\{ status: 500 \}[\s\S]*?\);[\s\S]*?\}/g;
+const catchPattern =
+  /catch \(error\) \{[\s\S]*?return NextResponse\.json\([\s\S]*?\{ status: 500 \}[\s\S]*?\);[\s\S]*?\}/g;
 const newCatchBlock = `catch (error: any) {
     // Handle authentication errors specifically
-    if (error.message === 'Authentication required'${isAdminEndpoint ? " || \n        error.message === 'Admin access required'" : ""}${isFirmaEndpoint ? " || \n        error.message === 'Company access required'" : ""}) {
+    if (error.message === 'Authentication required'${isAdminEndpoint ? " || \n        error.message === 'Admin access required'" : ''}${isFirmaEndpoint ? " || \n        error.message === 'Company access required'" : ''}) {
       return createAuthErrorResponse(error.message, 401);
     }
     
@@ -114,7 +130,9 @@ fileContent = fileContent.replace(catchPattern, newCatchBlock);
 // Dosyayı kaydet
 fs.writeFileSync(targetFile, fileContent);
 
-console.log(`✅ ${targetFile} dosyası JWT kimlik doğrulama sistemine geçirildi.`);
+console.log(
+  `✅ ${targetFile} dosyası JWT kimlik doğrulama sistemine geçirildi.`
+);
 
 // Linting kontrolü yap
 try {

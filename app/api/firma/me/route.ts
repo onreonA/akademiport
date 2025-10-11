@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { createClient } from '@/lib/supabase/server';
 import { requireCompany, createAuthErrorResponse } from '@/lib/jwt-utils';
+import { createClient } from '@/lib/supabase/server';
 // GET /api/firma/me - Get current firm's data
 export async function GET(request: NextRequest) {
   try {
     // JWT Authentication - Company users only
     const user = await requireCompany(request);
-    
+
     const supabase = createClient();
     // Find company by email
     let { data: company, error: companyError } = await supabase
@@ -48,11 +48,13 @@ export async function GET(request: NextRequest) {
     });
   } catch (error: any) {
     // Handle authentication errors specifically
-    if (error.message === 'Authentication required' || 
-        error.message === 'Company access required') {
+    if (
+      error.message === 'Authentication required' ||
+      error.message === 'Company access required'
+    ) {
       return createAuthErrorResponse(error.message, 401);
     }
-    
+
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -64,7 +66,7 @@ export async function PUT(request: NextRequest) {
   try {
     // JWT Authentication - Company users only
     const user = await requireCompany(request);
-    
+
     const supabase = createClient();
     // Get request body
     const body = await request.json();
@@ -97,11 +99,13 @@ export async function PUT(request: NextRequest) {
     });
   } catch (error: any) {
     // Handle authentication errors specifically
-    if (error.message === 'Authentication required' || 
-        error.message === 'Company access required') {
+    if (
+      error.message === 'Authentication required' ||
+      error.message === 'Company access required'
+    ) {
       return createAuthErrorResponse(error.message, 401);
     }
-    
+
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

@@ -9,12 +9,14 @@ Bu doküman, IA-6 projesinde yapılan güvenlik iyileştirmelerini detaylandırm
 Eski cookie ve header tabanlı kimlik doğrulama sisteminden, daha güvenli olan JWT (JSON Web Token) tabanlı kimlik doğrulama sistemine geçiş yapıldı.
 
 **Eski Sistem:**
+
 - `auth-user-email`, `auth-user-role`, `auth-user-company-id` gibi çoklu cookie'ler
 - `X-User-Email` gibi header'lar
 - `httpOnly: false` güvenlik açığı
 - Cookie manipülasyonu riski
 
 **Yeni Sistem:**
+
 - Tek bir `auth-token` cookie'si
 - `httpOnly: true` ile XSS koruması
 - `sameSite: 'lax'` ile CSRF koruması
@@ -129,21 +131,21 @@ RBAC sistemi için test araçları oluşturuldu:
 
 ## 6. Güvenlik Açıkları ve Çözümleri
 
-| ID | Açıklama | Risk Seviyesi | Çözüm |
-|----|----------|---------------|-------|
-| AUTH-01 | Middleware'de otomatik giriş token bypass mekanizması | Kritik | Kaldırıldı |
-| AUTH-02 | Güvensiz cookie kullanımı (`httpOnly: false`) | Yüksek | `httpOnly: true` olarak değiştirildi |
-| AUTH-03 | Çoklu kimlik doğrulama yöntemleri | Orta | JWT tabanlı kimlik doğrulamaya geçildi |
-| AUTH-04 | JWT token'da eksik güvenlik ayarları | Yüksek | `sameSite: 'lax'`, `maxAge: 2h` eklendi |
-| AUTH-05 | Tutarsız rol tanımları | Düşük | Rol tanımları standardize edildi |
-| AUTHZ-01 | API endpoint'lerinde tutarsız rol kontrolü | Yüksek | RBAC sistemi uygulandı |
-| AUTHZ-02 | Firma kullanıcılarının diğer firma verilerine erişebilmesi | Kritik | `requireCompanyAccess` fonksiyonu eklendi |
-| AUTHZ-03 | Admin paneline firma kullanıcılarının erişebilmesi | Kritik | `requireAdmin` fonksiyonu eklendi |
-| AUTHZ-04 | Yetkilendirme kontrollerinin atlanması | Yüksek | Middleware ile zorunlu kontrol |
-| DATA-01 | API endpoint'lerinde eksik input validasyonu | Yüksek | Zod şemaları eklendi |
-| DATA-02 | SQL injection riski | Düşük | Supabase RLS koruması ve parametre doğrulama |
-| DATA-03 | Hassas verilerin loglanması | Orta | Log sanitizasyonu |
-| DATA-04 | Dosya yükleme güvenlik kontrolleri eksik | Orta | Dosya tipi ve boyut kontrolü eklendi |
+| ID       | Açıklama                                                   | Risk Seviyesi | Çözüm                                        |
+| -------- | ---------------------------------------------------------- | ------------- | -------------------------------------------- |
+| AUTH-01  | Middleware'de otomatik giriş token bypass mekanizması      | Kritik        | Kaldırıldı                                   |
+| AUTH-02  | Güvensiz cookie kullanımı (`httpOnly: false`)              | Yüksek        | `httpOnly: true` olarak değiştirildi         |
+| AUTH-03  | Çoklu kimlik doğrulama yöntemleri                          | Orta          | JWT tabanlı kimlik doğrulamaya geçildi       |
+| AUTH-04  | JWT token'da eksik güvenlik ayarları                       | Yüksek        | `sameSite: 'lax'`, `maxAge: 2h` eklendi      |
+| AUTH-05  | Tutarsız rol tanımları                                     | Düşük         | Rol tanımları standardize edildi             |
+| AUTHZ-01 | API endpoint'lerinde tutarsız rol kontrolü                 | Yüksek        | RBAC sistemi uygulandı                       |
+| AUTHZ-02 | Firma kullanıcılarının diğer firma verilerine erişebilmesi | Kritik        | `requireCompanyAccess` fonksiyonu eklendi    |
+| AUTHZ-03 | Admin paneline firma kullanıcılarının erişebilmesi         | Kritik        | `requireAdmin` fonksiyonu eklendi            |
+| AUTHZ-04 | Yetkilendirme kontrollerinin atlanması                     | Yüksek        | Middleware ile zorunlu kontrol               |
+| DATA-01  | API endpoint'lerinde eksik input validasyonu               | Yüksek        | Zod şemaları eklendi                         |
+| DATA-02  | SQL injection riski                                        | Düşük         | Supabase RLS koruması ve parametre doğrulama |
+| DATA-03  | Hassas verilerin loglanması                                | Orta          | Log sanitizasyonu                            |
+| DATA-04  | Dosya yükleme güvenlik kontrolleri eksik                   | Orta          | Dosya tipi ve boyut kontrolü eklendi         |
 
 ## 7. Güvenlik İyileştirme Araçları
 

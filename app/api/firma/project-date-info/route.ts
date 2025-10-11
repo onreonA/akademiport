@@ -1,5 +1,6 @@
-import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
+
+import { createClient } from '@/lib/supabase/server';
 
 /**
  * GET /api/firma/project-date-info
@@ -20,7 +21,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Kullanıcı bilgilerini al ve rol kontrolü yap
-    let { data: user, error: userError } = await supabase
+    const { data: user, error: userError } = await supabase
       .from('users')
       .select('id, role, company_id')
       .eq('email', userEmail)

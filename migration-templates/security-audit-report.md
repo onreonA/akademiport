@@ -8,31 +8,31 @@ Bu rapor, IA-6 projesinin güvenlik denetimi sonuçlarını içermektedir. Denet
 
 ### 2.1. Kimlik Doğrulama Sorunları
 
-| ID | Açıklama | Risk Seviyesi | Durum |
-|----|----------|---------------|-------|
-| AUTH-01 | Middleware'de otomatik giriş token bypass mekanizması | Kritik | Çözüldü |
-| AUTH-02 | Güvensiz cookie kullanımı (`httpOnly: false`) | Yüksek | Çözüldü |
-| AUTH-03 | Çoklu kimlik doğrulama yöntemleri (cookie, header, JWT) | Orta | Devam Ediyor |
-| AUTH-04 | JWT token'da eksik güvenlik ayarları | Yüksek | Çözüldü |
-| AUTH-05 | Tutarsız rol tanımları (Türkçe/İngilizce karakterler) | Düşük | Çözüldü |
+| ID      | Açıklama                                                | Risk Seviyesi | Durum        |
+| ------- | ------------------------------------------------------- | ------------- | ------------ |
+| AUTH-01 | Middleware'de otomatik giriş token bypass mekanizması   | Kritik        | Çözüldü      |
+| AUTH-02 | Güvensiz cookie kullanımı (`httpOnly: false`)           | Yüksek        | Çözüldü      |
+| AUTH-03 | Çoklu kimlik doğrulama yöntemleri (cookie, header, JWT) | Orta          | Devam Ediyor |
+| AUTH-04 | JWT token'da eksik güvenlik ayarları                    | Yüksek        | Çözüldü      |
+| AUTH-05 | Tutarsız rol tanımları (Türkçe/İngilizce karakterler)   | Düşük         | Çözüldü      |
 
 ### 2.2. Yetkilendirme Sorunları
 
-| ID | Açıklama | Risk Seviyesi | Durum |
-|----|----------|---------------|-------|
-| AUTHZ-01 | API endpoint'lerinde tutarsız rol kontrolü | Yüksek | Devam Ediyor |
-| AUTHZ-02 | Firma kullanıcılarının diğer firma verilerine erişebilmesi | Kritik | Devam Ediyor |
-| AUTHZ-03 | Admin paneline firma kullanıcılarının erişebilmesi | Kritik | Çözüldü |
-| AUTHZ-04 | Yetkilendirme kontrollerinin atlanması | Yüksek | Devam Ediyor |
+| ID       | Açıklama                                                   | Risk Seviyesi | Durum        |
+| -------- | ---------------------------------------------------------- | ------------- | ------------ |
+| AUTHZ-01 | API endpoint'lerinde tutarsız rol kontrolü                 | Yüksek        | Devam Ediyor |
+| AUTHZ-02 | Firma kullanıcılarının diğer firma verilerine erişebilmesi | Kritik        | Devam Ediyor |
+| AUTHZ-03 | Admin paneline firma kullanıcılarının erişebilmesi         | Kritik        | Çözüldü      |
+| AUTHZ-04 | Yetkilendirme kontrollerinin atlanması                     | Yüksek        | Devam Ediyor |
 
 ### 2.3. Veri Güvenliği Sorunları
 
-| ID | Açıklama | Risk Seviyesi | Durum |
-|----|----------|---------------|-------|
-| DATA-01 | API endpoint'lerinde eksik input validasyonu | Yüksek | Devam Ediyor |
-| DATA-02 | SQL injection riski (Supabase RLS koruması var) | Düşük | İzleniyor |
-| DATA-03 | Hassas verilerin loglanması | Orta | Devam Ediyor |
-| DATA-04 | Dosya yükleme güvenlik kontrolleri eksik | Orta | Devam Ediyor |
+| ID      | Açıklama                                        | Risk Seviyesi | Durum        |
+| ------- | ----------------------------------------------- | ------------- | ------------ |
+| DATA-01 | API endpoint'lerinde eksik input validasyonu    | Yüksek        | Devam Ediyor |
+| DATA-02 | SQL injection riski (Supabase RLS koruması var) | Düşük         | İzleniyor    |
+| DATA-03 | Hassas verilerin loglanması                     | Orta          | Devam Ediyor |
+| DATA-04 | Dosya yükleme güvenlik kontrolleri eksik        | Orta          | Devam Ediyor |
 
 ## 3. Kimlik Doğrulama Sistemleri Analizi
 

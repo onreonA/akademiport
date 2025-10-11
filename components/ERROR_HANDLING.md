@@ -9,11 +9,13 @@ Bu dokümantasyon projede hata yönetimi için kullanılan component'leri açık
 React component tree'sinde oluşan JavaScript hatalarını yakalar ve kullanıcıya user-friendly bir mesaj gösterir.
 
 **Import:**
+
 ```tsx
 import ErrorBoundary from '@/components/ErrorBoundary';
 ```
 
 **Kullanım:**
+
 ```tsx
 <ErrorBoundary>
   <YourComponent />
@@ -21,6 +23,7 @@ import ErrorBoundary from '@/components/ErrorBoundary';
 ```
 
 **Props:**
+
 - `children`: Korunacak component'ler (required)
 - `fallback`: Custom hata UI (optional)
 - `onError`: Hata yakalandığında çağrılacak callback (optional)
@@ -53,11 +56,13 @@ import ErrorBoundary from '@/components/ErrorBoundary';
 Küçük component'ler için inline hata göstergesi.
 
 **Import:**
+
 ```tsx
 import { InlineErrorBoundary } from '@/components/ErrorBoundary';
 ```
 
 **Kullanım:**
+
 ```tsx
 <InlineErrorBoundary>
   <SmallComponent />
@@ -65,24 +70,26 @@ import { InlineErrorBoundary } from '@/components/ErrorBoundary';
 ```
 
 **Ne Zaman Kullanılır?**
+
 - Card içindeki küçük component'ler
 - Liste item'ları
 - Widget'lar
 - Dashboard kartları
 
 **Örnek:**
+
 ```tsx
-<div className="grid grid-cols-3 gap-4">
+<div className='grid grid-cols-3 gap-4'>
   <InlineErrorBoundary>
-    <StatsCard title="Toplam" value={stats.total} />
+    <StatsCard title='Toplam' value={stats.total} />
   </InlineErrorBoundary>
-  
+
   <InlineErrorBoundary>
-    <StatsCard title="Aktif" value={stats.active} />
+    <StatsCard title='Aktif' value={stats.active} />
   </InlineErrorBoundary>
-  
+
   <InlineErrorBoundary>
-    <StatsCard title="Tamamlanan" value={stats.completed} />
+    <StatsCard title='Tamamlanan' value={stats.completed} />
   </InlineErrorBoundary>
 </div>
 ```
@@ -94,22 +101,28 @@ import { InlineErrorBoundary } from '@/components/ErrorBoundary';
 API call'larından dönen hataları user-friendly şekilde gösterir.
 
 **Import:**
+
 ```tsx
 import ApiErrorHandler from '@/components/ApiErrorHandler';
 ```
 
 **Kullanım:**
+
 ```tsx
-{error && <ApiErrorHandler error={error} onRetry={fetchData} />}
+{
+  error && <ApiErrorHandler error={error} onRetry={fetchData} />;
+}
 ```
 
 **Props:**
+
 - `error`: Error object veya string (required)
 - `onRetry`: Tekrar deneme callback (optional)
 - `className`: Ek CSS class'ları (optional)
 - `compact`: Kompakt görünüm (optional)
 
 **Özellikler:**
+
 - ✅ Otomatik error message parsing
 - ✅ User-friendly mesajlar (401, 403, 404, 500, network errors)
 - ✅ Tekrar deneme butonu
@@ -143,16 +156,16 @@ return (
 );
 
 // Compact mode (inline error)
-{error && <ApiErrorHandler error={error} onRetry={fetchData} compact />}
+{
+  error && <ApiErrorHandler error={error} onRetry={fetchData} compact />;
+}
 
 // Custom className
-{error && (
-  <ApiErrorHandler 
-    error={error} 
-    onRetry={fetchData} 
-    className="mb-4"
-  />
-)}
+{
+  error && (
+    <ApiErrorHandler error={error} onRetry={fetchData} className='mb-4' />
+  );
+}
 ```
 
 ---
@@ -162,21 +175,27 @@ return (
 Özellikle network/bağlantı hataları için.
 
 **Import:**
+
 ```tsx
 import { NetworkError } from '@/components/ApiErrorHandler';
 ```
 
 **Kullanım:**
+
 ```tsx
-{isNetworkError && <NetworkError onRetry={fetchData} />}
+{
+  isNetworkError && <NetworkError onRetry={fetchData} />;
+}
 ```
 
 **Ne Zaman Kullanılır?**
+
 - Internet connection kaybı
 - Timeout errors
 - DNS resolution failures
 
 **Örnek:**
+
 ```tsx
 const [isNetworkError, setIsNetworkError] = useState(false);
 
@@ -186,7 +205,10 @@ const fetchData = async () => {
     const response = await fetch('/api/data');
     setData(await response.json());
   } catch (err) {
-    if (err.message.includes('fetch failed') || err.message.includes('Network')) {
+    if (
+      err.message.includes('fetch failed') ||
+      err.message.includes('Network')
+    ) {
       setIsNetworkError(true);
     }
   }
@@ -207,35 +229,45 @@ return (
 404 hataları için özel component.
 
 **Import:**
+
 ```tsx
 import { NotFoundError } from '@/components/ApiErrorHandler';
 ```
 
 **Kullanım:**
+
 ```tsx
-{!data && !loading && <NotFoundError message="Proje bulunamadı" onBack={goBack} />}
+{
+  !data && !loading && (
+    <NotFoundError message='Proje bulunamadı' onBack={goBack} />
+  );
+}
 ```
 
 **Props:**
+
 - `message`: Custom mesaj (optional)
 - `onBack`: Geri dönme callback (optional)
 
 **Örnek:**
+
 ```tsx
 const [project, setProject] = useState(null);
 const [loading, setLoading] = useState(true);
 const router = useRouter();
 
 useEffect(() => {
-  fetchProject().then(setProject).finally(() => setLoading(false));
+  fetchProject()
+    .then(setProject)
+    .finally(() => setLoading(false));
 }, []);
 
 if (loading) return <LoadingSpinner />;
 
 if (!project) {
   return (
-    <NotFoundError 
-      message="İstediğiniz proje bulunamadı." 
+    <NotFoundError
+      message='İstediğiniz proje bulunamadı.'
       onBack={() => router.push('/projects')}
     />
   );
@@ -332,14 +364,14 @@ catch (error) {
 // Eski hata yönetimi
 function MyPage() {
   const [data, setData] = useState(null);
-  
+
   useEffect(() => {
     fetch('/api/data')
       .then(res => res.json())
       .then(setData)
-      .catch(console.error);  // ❌ Kötü UX
+      .catch(console.error); // ❌ Kötü UX
   }, []);
-  
+
   return <div>{data ? <Content data={data} /> : 'Loading...'}</div>;
 }
 ```
@@ -355,7 +387,7 @@ function MyPage() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
   const fetchData = async () => {
     try {
       setLoading(true);
@@ -370,11 +402,11 @@ function MyPage() {
       setLoading(false);
     }
   };
-  
+
   useEffect(() => {
     fetchData();
   }, []);
-  
+
   return (
     <ErrorBoundary>
       {loading && <LoadingSpinner />}
@@ -386,6 +418,7 @@ function MyPage() {
 ```
 
 **Kazanç:**
+
 - ✅ User-friendly error messages
 - ✅ Retry mechanism
 - ✅ Component crash protection
@@ -409,7 +442,7 @@ function logErrorToService(error, errorInfo) {
 
 <ErrorBoundary onError={logErrorToService}>
   <App />
-</ErrorBoundary>
+</ErrorBoundary>;
 ```
 
 ### **Route-Specific Error Handling**
@@ -420,10 +453,10 @@ export default function AdminLayout({ children }) {
   return (
     <ErrorBoundary
       fallback={
-        <div className="p-8">
+        <div className='p-8'>
           <h1>Admin Paneli Hatası</h1>
           <p>Lütfen sistem yöneticisine bildirin.</p>
-          <Button onClick={() => window.location.href = '/'}>
+          <Button onClick={() => (window.location.href = '/')}>
             Ana Sayfaya Dön
           </Button>
         </div>
@@ -438,23 +471,29 @@ export default function AdminLayout({ children }) {
 ### **Multiple Error Boundaries**
 
 ```tsx
-<ErrorBoundary>  {/* Page level */}
+<ErrorBoundary>
+  {' '}
+  {/* Page level */}
   <Header />
-  
   <main>
-    <ErrorBoundary>  {/* Section level */}
+    <ErrorBoundary>
+      {' '}
+      {/* Section level */}
       <Sidebar />
     </ErrorBoundary>
-    
-    <ErrorBoundary>  {/* Section level */}
+
+    <ErrorBoundary>
+      {' '}
+      {/* Section level */}
       <Content>
-        <InlineErrorBoundary>  {/* Widget level */}
+        <InlineErrorBoundary>
+          {' '}
+          {/* Widget level */}
           <StatsWidget />
         </InlineErrorBoundary>
       </Content>
     </ErrorBoundary>
   </main>
-  
   <Footer />
 </ErrorBoundary>
 ```
@@ -487,6 +526,7 @@ export function logError(error, context) {
 ## 📝 **Changelog**
 
 ### **v1.0.0 (2025-01-11)**
+
 - ✅ ErrorBoundary component eklendi
 - ✅ InlineErrorBoundary eklendi
 - ✅ ApiErrorHandler eklendi
@@ -497,4 +537,3 @@ export function logError(error, context) {
 ---
 
 **Happy Error Handling! 🛡️**
-

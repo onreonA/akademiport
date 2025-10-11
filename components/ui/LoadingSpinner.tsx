@@ -221,7 +221,9 @@ export function SectionLoading({
   height?: string;
 }) {
   return (
-    <div className={`${height} flex items-center justify-center bg-gray-50 rounded-xl border border-gray-200`}>
+    <div
+      className={`${height} flex items-center justify-center bg-gray-50 rounded-xl border border-gray-200`}
+    >
       <LoadingSpinner size='md' text={text} />
     </div>
   );

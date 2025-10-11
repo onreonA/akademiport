@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { cacheKeys, cacheUtils } from '@/lib/cache/redis-cache';
-import { createClient } from '@/lib/supabase/server';
 import { requireCompany, createAuthErrorResponse } from '@/lib/jwt-utils';
+import { createClient } from '@/lib/supabase/server';
 // GET /api/firma/dashboard-stats - Get firm's dashboard statistics
 export async function GET(request: NextRequest) {
   try {
     // JWT Authentication - Company users only
     const user = await requireCompany(request);
-    
+
     const supabase = createClient();
     // OPTIMIZED: Check cache first
     const cacheKey = cacheKeys.firmaStats(user.email);
@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     if (cachedData) {
       return NextResponse.json(cachedData);
     }
-    
+
     // Use company_id from JWT token
     const companyId = user.company_id;
     if (!companyId) {
@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
         { status: 400 }
       );
     }
-    
+
     // Get company basic info
     const { data: companyData, error: companyDataError } = await supabase
       .from('companies')
@@ -156,11 +156,13 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(response);
   } catch (error: any) {
     // Handle authentication errors specifically
-    if (error.message === 'Authentication required' || 
-        error.message === 'Company access required') {
+    if (
+      error.message === 'Authentication required' ||
+      error.message === 'Company access required'
+    ) {
       return createAuthErrorResponse(error.message, 401);
     }
-    
+
     return NextResponse.json(
       { error: 'Failed to fetch dashboard statistics' },
       { status: 500 }

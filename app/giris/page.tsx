@@ -19,27 +19,29 @@ export default function LoginPage() {
     try {
       setLoading(true);
       setError('');
-      
+
       // AuthStore signIn - hem cookie hem state'i güncelliyor
       await signIn(email, password);
-      
+
       // signIn başarılı olduysa, user state'i artık dolu
       // Direkt olarak user state'inden role'ü oku
       const currentUser = useAuthStore.getState().user;
-      
+
       if (!currentUser) {
         throw new Error('Kullanıcı bilgisi alınamadı');
       }
-      
+
       // Role'e göre yönlendirme
-      if (currentUser.role === 'firma_admin' || currentUser.role === 'firma_kullanici') {
+      if (
+        currentUser.role === 'firma_admin' ||
+        currentUser.role === 'firma_kullanici'
+      ) {
         router.push('/firma');
       } else {
         router.push('/admin');
       }
-      
+
       setLoading(false);
-      
     } catch (error: any) {
       setError(error.message || 'Giriş yapılırken bir hata oluştu');
       setLoading(false);
@@ -49,7 +51,7 @@ export default function LoginPage() {
     <div className='min-h-screen bg-gradient-to-br from-slate-50 to-blue-50'>
       {/* Modern Navigation */}
       <ModernNavigation />
-      
+
       {/* Hero Section with Single Login Form */}
       <section className='relative py-20 min-h-screen flex items-center'>
         <div className='container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl'>
@@ -69,12 +71,15 @@ export default function LoginPage() {
                     E-posta adresiniz ve şifrenizle sisteme giriş yapın
                   </p>
                 </div>
-                
+
                 {/* Form */}
                 <form onSubmit={handleLogin} className='space-y-6'>
                   <div className='space-y-4'>
                     <div>
-                      <label htmlFor='email' className='block text-sm font-semibold text-gray-700 mb-2'>
+                      <label
+                        htmlFor='email'
+                        className='block text-sm font-semibold text-gray-700 mb-2'
+                      >
                         E-posta Adresi
                       </label>
                       <div className='relative'>
@@ -95,7 +100,10 @@ export default function LoginPage() {
                       </div>
                     </div>
                     <div>
-                      <label htmlFor='password' className='block text-sm font-semibold text-gray-700 mb-2'>
+                      <label
+                        htmlFor='password'
+                        className='block text-sm font-semibold text-gray-700 mb-2'
+                      >
                         Şifre
                       </label>
                       <div className='relative'>
@@ -116,14 +124,14 @@ export default function LoginPage() {
                       </div>
                     </div>
                   </div>
-                  
+
                   {error && (
                     <div className='bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl flex items-center'>
                       <i className='ri-error-warning-line text-red-500 mr-3 w-5 h-5 flex items-center justify-center'></i>
                       {error}
                     </div>
                   )}
-                  
+
                   <button
                     type='submit'
                     disabled={loading}
@@ -141,7 +149,7 @@ export default function LoginPage() {
                       </span>
                     )}
                   </button>
-                  
+
                   <div className='text-center'>
                     <Link
                       href='/sifremi-unuttum'
@@ -151,7 +159,7 @@ export default function LoginPage() {
                     </Link>
                   </div>
                 </form>
-                
+
                 {/* Features */}
                 <div className='mt-8 pt-6 border-t border-gray-100'>
                   <h3 className='text-lg font-bold text-gray-900 mb-6 text-center'>
@@ -200,7 +208,7 @@ export default function LoginPage() {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className='mt-6 text-center'>
                   <span className='text-gray-600 text-sm'>
                     Henüz kaydınız yok mu?{' '}
@@ -213,7 +221,7 @@ export default function LoginPage() {
                   </span>
                 </div>
               </div>
-              
+
               {/* Decorative Elements */}
               <div className='absolute -top-4 -right-4 w-8 h-8 bg-blue-200 rounded-full opacity-60'></div>
               <div className='absolute -bottom-4 -left-4 w-6 h-6 bg-indigo-200 rounded-full opacity-60'></div>

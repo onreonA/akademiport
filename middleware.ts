@@ -2,8 +2,8 @@
 // OPTIMIZED ROUTE PROTECTION MIDDLEWARE
 // =====================================================
 // Next.js middleware for route protection - PERFORMANCE OPTIMIZED
-import { NextResponse, type NextRequest } from 'next/server';
 import { jwtVerify } from 'jose';
+import { NextResponse, type NextRequest } from 'next/server';
 // Pre-compiled route patterns for better performance
 const PROTECTED_ROUTE_PATTERN = /^\/(admin|firma|api\/(projects|companies|v2))/;
 const ADMIN_ROUTE_PATTERN = /^\/(admin|api\/admin)/;
@@ -35,7 +35,7 @@ export async function middleware(request: NextRequest) {
 
   // JWT token authentication
   const authToken = request.cookies.get('auth-token')?.value;
-  
+
   // Fast path: No authentication
   if (!authToken) {
     return handleUnauthenticated(request, pathname);
@@ -44,7 +44,7 @@ export async function middleware(request: NextRequest) {
   // JWT token doğrula (jose kullanarak - Edge Runtime uyumlu)
   let userEmail: string | null = null;
   let userRole: string | null = null;
-  
+
   try {
     const secret = new TextEncoder().encode(
       process.env.JWT_SECRET || 'your-secret-key-change-in-production'
@@ -52,7 +52,10 @@ export async function middleware(request: NextRequest) {
     const { payload } = await jwtVerify(authToken, secret);
     userEmail = payload.email as string;
     userRole = payload.role as string;
-    console.log('✅ Middleware: JWT verified', { email: userEmail, role: userRole });
+    console.log('✅ Middleware: JWT verified', {
+      email: userEmail,
+      role: userRole,
+    });
   } catch (error) {
     // Token geçersiz - çıkış yap
     console.error('❌ Middleware: JWT verification failed', error);

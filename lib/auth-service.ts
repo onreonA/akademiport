@@ -62,7 +62,8 @@ export class AuthService {
           id: companyUser.id,
           email: companyUser.email,
           full_name: companyUser.name,
-          role: companyUser.role === 'admin' ? 'firma_admin' : 'firma_kullanici',
+          role:
+            companyUser.role === 'admin' ? 'firma_admin' : 'firma_kullanici',
           company_id: companyUser.company_id,
           created_at: companyUser.created_at,
           updated_at: companyUser.updated_at,
@@ -163,7 +164,10 @@ export class AuthService {
           id: companyUserData.id,
           email: companyUserData.email,
           full_name: companyUserData.name,
-          role: companyUserData.role === 'admin' ? 'firma_admin' : 'firma_kullanici',
+          role:
+            companyUserData.role === 'admin'
+              ? 'firma_admin'
+              : 'firma_kullanici',
           company_id: companyUserData.company_id,
           created_at: companyUserData.created_at,
           updated_at: companyUserData.updated_at,

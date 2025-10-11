@@ -402,7 +402,9 @@ const HRPoolPage = () => {
                     <h3 className='text-base font-semibold text-gray-900 group-hover:text-purple-600 transition-colors'>
                       {candidate.name}
                     </h3>
-                    <p className='text-xs text-gray-500'>{candidate.position}</p>
+                    <p className='text-xs text-gray-500'>
+                      {candidate.position}
+                    </p>
                   </div>
                 </div>
                 <span
@@ -427,11 +429,13 @@ const HRPoolPage = () => {
                     <i className='ri-map-pin-line mr-2 text-green-500'></i>
                     {candidate.city || 'Belirtilmemiş'}
                   </div>
-                  <span className={`px-2 py-1 rounded-lg font-medium ${
-                    candidate.application_type === 'intern' 
-                      ? 'bg-orange-100 text-orange-700' 
-                      : 'bg-blue-100 text-blue-700'
-                  }`}>
+                  <span
+                    className={`px-2 py-1 rounded-lg font-medium ${
+                      candidate.application_type === 'intern'
+                        ? 'bg-orange-100 text-orange-700'
+                        : 'bg-blue-100 text-blue-700'
+                    }`}
+                  >
                     {getTypeText(candidate.application_type)}
                   </span>
                 </div>
@@ -498,7 +502,8 @@ const HRPoolPage = () => {
               Aday Bulunamadı
             </h3>
             <p className='text-gray-600'>
-              Arama kriterlerinize uygun aday bulunamadı. Filtreleri değiştirmeyi deneyin.
+              Arama kriterlerinize uygun aday bulunamadı. Filtreleri
+              değiştirmeyi deneyin.
             </p>
           </div>
         )}
@@ -543,25 +548,33 @@ const HRPoolPage = () => {
                   </h4>
                   <div className='grid grid-cols-2 gap-4'>
                     <div className='bg-white rounded-lg p-3'>
-                      <span className='text-xs text-gray-500 block mb-1'>İsim</span>
+                      <span className='text-xs text-gray-500 block mb-1'>
+                        İsim
+                      </span>
                       <span className='text-sm font-medium text-gray-900'>
                         {selectedCandidate.name}
                       </span>
                     </div>
                     <div className='bg-white rounded-lg p-3'>
-                      <span className='text-xs text-gray-500 block mb-1'>Email</span>
+                      <span className='text-xs text-gray-500 block mb-1'>
+                        Email
+                      </span>
                       <span className='text-sm font-medium text-gray-900 truncate block'>
                         {selectedCandidate.email}
                       </span>
                     </div>
                     <div className='bg-white rounded-lg p-3'>
-                      <span className='text-xs text-gray-500 block mb-1'>Telefon</span>
+                      <span className='text-xs text-gray-500 block mb-1'>
+                        Telefon
+                      </span>
                       <span className='text-sm font-medium text-gray-900'>
                         {selectedCandidate.phone}
                       </span>
                     </div>
                     <div className='bg-white rounded-lg p-3'>
-                      <span className='text-xs text-gray-500 block mb-1'>Şehir</span>
+                      <span className='text-xs text-gray-500 block mb-1'>
+                        Şehir
+                      </span>
                       <span className='text-sm font-medium text-gray-900'>
                         {selectedCandidate.city || 'Belirtilmemiş'}
                       </span>
@@ -577,29 +590,39 @@ const HRPoolPage = () => {
                   </h4>
                   <div className='grid grid-cols-2 gap-4'>
                     <div className='bg-white rounded-lg p-3'>
-                      <span className='text-xs text-gray-500 block mb-1'>Pozisyon</span>
+                      <span className='text-xs text-gray-500 block mb-1'>
+                        Pozisyon
+                      </span>
                       <span className='text-sm font-medium text-gray-900'>
                         {selectedCandidate.position}
                       </span>
                     </div>
                     <div className='bg-white rounded-lg p-3'>
-                      <span className='text-xs text-gray-500 block mb-1'>Tip</span>
-                      <span className={`text-sm font-medium inline-block px-2 py-1 rounded ${
-                        selectedCandidate.application_type === 'intern' 
-                          ? 'bg-orange-100 text-orange-700' 
-                          : 'bg-blue-100 text-blue-700'
-                      }`}>
+                      <span className='text-xs text-gray-500 block mb-1'>
+                        Tip
+                      </span>
+                      <span
+                        className={`text-sm font-medium inline-block px-2 py-1 rounded ${
+                          selectedCandidate.application_type === 'intern'
+                            ? 'bg-orange-100 text-orange-700'
+                            : 'bg-blue-100 text-blue-700'
+                        }`}
+                      >
                         {getTypeText(selectedCandidate.application_type)}
                       </span>
                     </div>
                     <div className='bg-white rounded-lg p-3'>
-                      <span className='text-xs text-gray-500 block mb-1'>Eğitim</span>
+                      <span className='text-xs text-gray-500 block mb-1'>
+                        Eğitim
+                      </span>
                       <span className='text-sm font-medium text-gray-900'>
                         {selectedCandidate.education || 'Belirtilmemiş'}
                       </span>
                     </div>
                     <div className='bg-white rounded-lg p-3'>
-                      <span className='text-xs text-gray-500 block mb-1'>Deneyim</span>
+                      <span className='text-xs text-gray-500 block mb-1'>
+                        Deneyim
+                      </span>
                       <span className='text-sm font-medium text-gray-900'>
                         {selectedCandidate.experience || 'Belirtilmemiş'}
                       </span>

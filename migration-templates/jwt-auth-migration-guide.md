@@ -26,7 +26,12 @@ Her API endpoint için aşağıdaki değişiklikleri yapmanız gerekiyor:
 ### 3.1. Import Ekle
 
 ```typescript
-import { requireAuth, requireAdmin, requireCompany, createAuthErrorResponse } from '@/lib/jwt-utils';
+import {
+  requireAuth,
+  requireAdmin,
+  requireCompany,
+  createAuthErrorResponse,
+} from '@/lib/jwt-utils';
 ```
 
 ### 3.2. Kimlik Doğrulama Kodunu Değiştir
@@ -109,12 +114,12 @@ catch (error) {
 ```typescript
 catch (error: any) {
   // Handle authentication errors specifically
-  if (error.message === 'Authentication required' || 
+  if (error.message === 'Authentication required' ||
       error.message === 'Admin access required' ||
       error.message === 'Company access required') {
     return createAuthErrorResponse(error.message, 401);
   }
-  
+
   return NextResponse.json(
     { error: 'Internal server error' },
     { status: 500 }

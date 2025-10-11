@@ -63,7 +63,7 @@ export default function MinimalHeader({ onSidebarToggle }: MinimalHeaderProps) {
           {/* Modern Search Bar */}
           <div className='relative hidden md:block'>
             <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400' />
-            <input 
+            <input
               className='w-64 pl-10 pr-4 py-2 bg-white/90 backdrop-blur-sm rounded-xl border border-gray-200/50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm placeholder-gray-500 shadow-sm'
               placeholder='Hızlı arama...'
             />

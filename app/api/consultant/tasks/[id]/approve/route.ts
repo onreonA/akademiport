@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { createClient } from '@/lib/supabase/server';
-import { requireAuth, createAuthErrorResponse } from '@/lib/jwt-utils';
+import { createAuthErrorResponse, requireAuth } from '@/lib/jwt-utils';
 import { ROLE_GROUPS } from '@/lib/rbac';
+import { createClient } from '@/lib/supabase/server';
 
 /**
  * POST /api/consultant/tasks/[id]/approve
@@ -15,7 +15,7 @@ export async function POST(
   try {
     // JWT Authentication - Admin and consultant only
     const user = await requireAuth(request);
-    
+
     // Danışman veya admin kontrolü
     if (!ROLE_GROUPS.ADMIN_ROLES.includes(user.role)) {
       return NextResponse.json(
@@ -23,7 +23,7 @@ export async function POST(
         { status: 403 }
       );
     }
-    
+
     const supabase = createClient();
     const { id: taskId } = await params;
 
@@ -206,7 +206,7 @@ export async function POST(
     if (error.message === 'Authentication required') {
       return createAuthErrorResponse(error.message, 401);
     }
-    
+
     return NextResponse.json(
       {
         error: 'Sunucu hatası',

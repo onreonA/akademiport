@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
   try {
     // JWT Authentication - Admin users only
     const user = await requireAdmin(request);
-    
+
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -74,11 +74,13 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(response);
   } catch (error: any) {
     // Handle authentication errors specifically
-    if (error.message === 'Authentication required' || 
-        error.message === 'Admin access required') {
+    if (
+      error.message === 'Authentication required' ||
+      error.message === 'Admin access required'
+    ) {
       return createAuthErrorResponse(error.message, 401);
     }
-    
+
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -100,7 +102,7 @@ export async function POST(request: NextRequest) {
   try {
     // JWT Authentication - Only admin users can create companies
     const user = await requireAdmin(request);
-    
+
     const {
       name,
       email,
@@ -182,11 +184,13 @@ export async function POST(request: NextRequest) {
     });
   } catch (error: any) {
     // Handle authentication errors specifically
-    if (error.message === 'Authentication required' || 
-        error.message === 'Admin access required') {
+    if (
+      error.message === 'Authentication required' ||
+      error.message === 'Admin access required'
+    ) {
       return createAuthErrorResponse(error.message, 401);
     }
-    
+
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

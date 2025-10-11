@@ -1,16 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { createClient } from '@/lib/supabase/server';
 import { requireCompany, createAuthErrorResponse } from '@/lib/jwt-utils';
+import { createClient } from '@/lib/supabase/server';
 
 // GET /api/firma/tasks - Get tasks assigned to the logged-in company
 export async function GET(request: NextRequest) {
   try {
     // JWT Authentication - Company users only
     const user = await requireCompany(request);
-    
+
     const supabase = createClient();
-    
+
     // JWT'den company_id al
     const userCompanyId = user.company_id;
 
@@ -118,11 +118,13 @@ export async function GET(request: NextRequest) {
     });
   } catch (error: any) {
     // Handle authentication errors specifically
-    if (error.message === 'Authentication required' || 
-        error.message === 'Company access required') {
+    if (
+      error.message === 'Authentication required' ||
+      error.message === 'Company access required'
+    ) {
       return createAuthErrorResponse(error.message, 401);
     }
-    
+
     return NextResponse.json({ error: 'Sunucu hatası' }, { status: 500 });
   }
 }

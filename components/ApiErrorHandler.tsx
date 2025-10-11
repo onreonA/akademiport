@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import Button from './ui/Button';
 
 interface ApiErrorHandlerProps {
@@ -12,9 +11,9 @@ interface ApiErrorHandlerProps {
 
 /**
  * API Error Handler Component
- * 
+ *
  * Displays user-friendly error messages for API failures
- * 
+ *
  * @example
  * {error && <ApiErrorHandler error={error} onRetry={fetchData} />}
  */
@@ -27,7 +26,9 @@ export default function ApiErrorHandler({
   if (!error) return null;
 
   const errorMessage =
-    typeof error === 'string' ? error : error.message || 'Bilinmeyen bir hata oluştu';
+    typeof error === 'string'
+      ? error
+      : error.message || 'Bilinmeyen bir hata oluştu';
 
   // Parse common API errors
   const getFriendlyMessage = (msg: string): string => {
@@ -224,9 +225,7 @@ export function NotFoundError({
           />
         </svg>
       </div>
-      <h3 className='text-lg font-semibold text-gray-900 mb-2'>
-        Bulunamadı
-      </h3>
+      <h3 className='text-lg font-semibold text-gray-900 mb-2'>Bulunamadı</h3>
       <p className='text-gray-600 mb-4'>{message}</p>
       {onBack && (
         <Button variant='secondary' onClick={onBack}>
@@ -236,4 +235,3 @@ export function NotFoundError({
     </div>
   );
 }
-

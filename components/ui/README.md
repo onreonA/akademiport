@@ -9,24 +9,32 @@ Bu klasörde projenin tamamında kullanılabilecek reusable (tekrar kullanılabi
 Tutarlı card tasarımı için kullanılır.
 
 **Import:**
+
 ```tsx
-import Card, { CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/Card';
+import Card, {
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardFooter,
+} from '@/components/ui/Card';
 ```
 
 **Kullanım:**
+
 ```tsx
-<Card shadow="md" hover padding="lg">
+<Card shadow='md' hover padding='lg'>
   <CardTitle>Card Başlığı</CardTitle>
   <CardContent>
     <p>Card içeriği burada...</p>
   </CardContent>
   <CardFooter>
-    <Button variant="primary">Aksiyon</Button>
+    <Button variant='primary'>Aksiyon</Button>
   </CardFooter>
 </Card>
 ```
 
 **Props:**
+
 - `shadow`: `'sm' | 'md' | 'lg' | 'xl'` - Card gölgesi (default: `'sm'`)
 - `hover`: `boolean` - Hover efekti (default: `false`)
 - `padding`: `'sm' | 'md' | 'lg'` - İç boşluk (default: `'md'`)
@@ -70,27 +78,29 @@ import Card, { CardHeader, CardTitle, CardContent, CardFooter } from '@/componen
 Overlay ile modal dialog için kullanılır.
 
 **Import:**
+
 ```tsx
 import Modal, { ModalFooter } from '@/components/ui/Modal';
 ```
 
 **Kullanım:**
+
 ```tsx
-<Modal 
-  isOpen={isOpen} 
-  onClose={handleClose} 
-  title="Modal Başlığı" 
-  size="lg"
->
+<Modal isOpen={isOpen} onClose={handleClose} title='Modal Başlığı' size='lg'>
   <p>Modal içeriği...</p>
   <ModalFooter>
-    <Button variant="secondary" onClick={handleClose}>İptal</Button>
-    <Button variant="primary" onClick={handleSave}>Kaydet</Button>
+    <Button variant='secondary' onClick={handleClose}>
+      İptal
+    </Button>
+    <Button variant='primary' onClick={handleSave}>
+      Kaydet
+    </Button>
   </ModalFooter>
 </Modal>
 ```
 
 **Props:**
+
 - `isOpen`: `boolean` - Modal açık mı? (required)
 - `onClose`: `() => void` - Kapanma handler (required)
 - `title`: `string` - Modal başlığı (optional)
@@ -98,6 +108,7 @@ import Modal, { ModalFooter } from '@/components/ui/Modal';
 - `closeOnOverlayClick`: `boolean` - Overlay'e tıklayınca kapansın mı? (default: `true`)
 
 **Özellikler:**
+
 - ✅ ESC tuşu ile kapanma
 - ✅ Body scroll engelleme
 - ✅ Overlay ile backdrop
@@ -132,10 +143,10 @@ import Modal, { ModalFooter } from '@/components/ui/Modal';
 </Modal>
 
 // Overlay'e tıklamayı devre dışı bırak
-<Modal 
-  isOpen={showCritical} 
-  onClose={handleClose} 
-  title="Kritik İşlem" 
+<Modal
+  isOpen={showCritical}
+  onClose={handleClose}
+  title="Kritik İşlem"
   closeOnOverlayClick={false}
 >
   <p>Bu modal sadece butonlarla kapatılabilir.</p>
@@ -152,18 +163,21 @@ import Modal, { ModalFooter } from '@/components/ui/Modal';
 Tutarlı button tasarımı ve loading state ile.
 
 **Import:**
+
 ```tsx
 import Button from '@/components/ui/Button';
 ```
 
 **Kullanım:**
+
 ```tsx
-<Button variant="primary" size="md" onClick={handleClick}>
+<Button variant='primary' size='md' onClick={handleClick}>
   Tıkla
 </Button>
 ```
 
 **Props:**
+
 - `variant`: `'primary' | 'secondary' | 'success' | 'danger' | 'ghost'` - Button tipi (default: `'primary'`)
 - `size`: `'sm' | 'md' | 'lg'` - Button boyutu (default: `'md'`)
 - `loading`: `boolean` - Yükleniyor durumu (default: `false`)
@@ -229,14 +243,14 @@ import Button from '@/components/ui/Button';
 
 function ProjectList() {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
       {projects.map(project => (
         <Card key={project.id} hover onClick={() => handleView(project.id)}>
           <CardTitle>{project.name}</CardTitle>
           <CardContent>
-            <p className="text-sm text-gray-600">{project.description}</p>
-            <div className="mt-4">
-              <Button variant="primary" size="sm" fullWidth>
+            <p className='text-sm text-gray-600'>{project.description}</p>
+            <div className='mt-4'>
+              <Button variant='primary' size='sm' fullWidth>
                 Detayları Gör
               </Button>
             </div>
@@ -267,26 +281,26 @@ function UserManagement() {
 
   return (
     <>
-      <Button variant="primary" onClick={() => setShowModal(true)}>
+      <Button variant='primary' onClick={() => setShowModal(true)}>
         Yeni Kullanıcı
       </Button>
 
-      <Modal 
-        isOpen={showModal} 
-        onClose={() => setShowModal(false)} 
-        title="Yeni Kullanıcı Ekle"
-        size="lg"
+      <Modal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        title='Yeni Kullanıcı Ekle'
+        size='lg'
       >
         <form>
-          <input type="text" placeholder="Ad" className="w-full mb-4" />
-          <input type="email" placeholder="Email" className="w-full mb-4" />
+          <input type='text' placeholder='Ad' className='w-full mb-4' />
+          <input type='email' placeholder='Email' className='w-full mb-4' />
         </form>
-        
+
         <ModalFooter>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>
+          <Button variant='secondary' onClick={() => setShowModal(false)}>
             İptal
           </Button>
-          <Button variant="primary" loading={saving} onClick={handleSave}>
+          <Button variant='primary' loading={saving} onClick={handleSave}>
             Kaydet
           </Button>
         </ModalFooter>
@@ -313,16 +327,16 @@ function DeleteConfirmation({ item, onConfirm, onCancel }) {
   };
 
   return (
-    <Modal isOpen={true} onClose={onCancel} title="Silme Onayı" size="sm">
-      <p className="text-gray-700">
+    <Modal isOpen={true} onClose={onCancel} title='Silme Onayı' size='sm'>
+      <p className='text-gray-700'>
         <strong>{item.name}</strong> silinecek. Bu işlem geri alınamaz!
       </p>
-      
+
       <ModalFooter>
-        <Button variant="secondary" onClick={onCancel}>
+        <Button variant='secondary' onClick={onCancel}>
           İptal
         </Button>
-        <Button variant="danger" loading={deleting} onClick={handleDelete}>
+        <Button variant='danger' loading={deleting} onClick={handleDelete}>
           Sil
         </Button>
       </ModalFooter>
@@ -414,11 +428,13 @@ Component'leri özelleştirmek için `className` prop'unu kullanın:
 ## 📊 **Performans İpuçları**
 
 1. **Lazy Loading:** Büyük modal'ları lazy load edin:
+
 ```tsx
 const LazyModal = dynamic(() => import('@/components/ui/Modal'));
 ```
 
 2. **Memoization:** Liste render'larında React.memo kullanın:
+
 ```tsx
 const MemoizedCard = React.memo(({ data }) => (
   <Card>
@@ -428,12 +444,13 @@ const MemoizedCard = React.memo(({ data }) => (
 ```
 
 3. **Callback Optimization:** useCallback ile optimize edin:
+
 ```tsx
 const handleClick = useCallback(() => {
   // Handler logic
 }, [deps]);
 
-<Button onClick={handleClick}>Click</Button>
+<Button onClick={handleClick}>Click</Button>;
 ```
 
 ---
@@ -443,14 +460,16 @@ const handleClick = useCallback(() => {
 Eski koddan yeni component'lere geçiş:
 
 ### **Eski Card:**
+
 ```tsx
-<div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-  <h3 className="text-lg font-semibold">Başlık</h3>
+<div className='bg-white rounded-xl shadow-sm border border-gray-200 p-6'>
+  <h3 className='text-lg font-semibold'>Başlık</h3>
   <p>İçerik</p>
 </div>
 ```
 
 ### **Yeni Card:**
+
 ```tsx
 <Card>
   <CardTitle>Başlık</CardTitle>
@@ -465,6 +484,7 @@ Eski koddan yeni component'lere geçiş:
 ## 📝 **Changelog**
 
 ### **v1.0.0 (2025-01-11)**
+
 - ✅ Card component eklendi
 - ✅ Modal component eklendi
 - ✅ Button component eklendi
@@ -490,4 +510,3 @@ Yeni component eklemek veya mevcut component'leri geliştirmek için:
 Sorularınız için proje ekibiyle iletişime geçin.
 
 **Happy Coding! 🚀**
-

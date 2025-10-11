@@ -2,9 +2,9 @@
 
 /**
  * JWT Kimlik Doğrulama Sistemi Test Script'i
- * 
+ *
  * Bu script, JWT kimlik doğrulama sistemine geçirilen API endpoint'lerini test etmek için kullanılır.
- * 
+ *
  * Kullanım: node jwt-migration-test.js [endpoint_yolu]
  * Örnek: node jwt-migration-test.js /api/firma/tasks
  */
@@ -25,9 +25,10 @@ if (!endpoint) {
 }
 
 // Test token'larını oluştur
-console.log('🔑 Test token\'ları oluşturuluyor...');
+console.log("🔑 Test token'ları oluşturuluyor...");
 
-const jwtSecret = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+const jwtSecret =
+  process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 const jwt = require('jsonwebtoken');
 
 const adminToken = jwt.sign(
@@ -55,7 +56,7 @@ const companyToken = jwt.sign(
 fs.writeFileSync('admin-token.txt', adminToken);
 fs.writeFileSync('company-token.txt', companyToken);
 
-console.log('✅ Test token\'ları oluşturuldu.');
+console.log("✅ Test token'ları oluşturuldu.");
 
 // Endpoint'i test et
 console.log(`\n🧪 ${endpoint} endpoint'i test ediliyor...`);
@@ -63,7 +64,10 @@ console.log(`\n🧪 ${endpoint} endpoint'i test ediliyor...`);
 // 1. Anonim erişim testi
 console.log('\n1️⃣ Anonim erişim testi:');
 try {
-  execSync(`curl -s -o /dev/null -w "%{http_code}" http://localhost:3000${endpoint}`, { stdio: 'inherit' });
+  execSync(
+    `curl -s -o /dev/null -w "%{http_code}" http://localhost:3000${endpoint}`,
+    { stdio: 'inherit' }
+  );
 } catch (error) {
   console.log('✅ Anonim erişim reddedildi (beklenen davranış).');
 }
@@ -71,7 +75,10 @@ try {
 // 2. Admin token ile erişim testi
 console.log('\n2️⃣ Admin token ile erişim testi:');
 try {
-  execSync(`curl -s -H "Cookie: auth-token=${adminToken}" http://localhost:3000${endpoint}`, { stdio: 'inherit' });
+  execSync(
+    `curl -s -H "Cookie: auth-token=${adminToken}" http://localhost:3000${endpoint}`,
+    { stdio: 'inherit' }
+  );
 } catch (error) {
   console.error(`❌ Admin token ile erişim hatası: ${error.message}`);
 }
@@ -79,7 +86,10 @@ try {
 // 3. Firma token ile erişim testi
 console.log('\n3️⃣ Firma token ile erişim testi:');
 try {
-  execSync(`curl -s -H "Cookie: auth-token=${companyToken}" http://localhost:3000${endpoint}`, { stdio: 'inherit' });
+  execSync(
+    `curl -s -H "Cookie: auth-token=${companyToken}" http://localhost:3000${endpoint}`,
+    { stdio: 'inherit' }
+  );
 } catch (error) {
   console.error(`❌ Firma token ile erişim hatası: ${error.message}`);
 }

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { createClient } from '@/lib/supabase/server';
 import { requireAuth, createAuthErrorResponse } from '@/lib/jwt-utils';
+import { createClient } from '@/lib/supabase/server';
 
 export async function POST(
   request: NextRequest,
@@ -10,7 +10,7 @@ export async function POST(
   try {
     // JWT Authentication
     const user = await requireAuth(request);
-    
+
     const supabase = createClient();
     const { id: taskId } = await params;
     const body = await request.json();
@@ -108,7 +108,7 @@ export async function POST(
     if (error.message === 'Authentication required') {
       return createAuthErrorResponse(error.message, 401);
     }
-    
+
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

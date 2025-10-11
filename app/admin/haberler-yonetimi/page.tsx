@@ -2,11 +2,10 @@
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 
-import Card from '@/components/ui/Card';
-import Modal, { ModalFooter } from '@/components/ui/Modal';
-import Button from '@/components/ui/Button';
 import FileUpload from '@/components/forms/FileUpload';
 import MarkdownEditor from '@/components/forms/MarkdownEditor';
+import Button from '@/components/ui/Button';
+import Modal, { ModalFooter } from '@/components/ui/Modal';
 import { useAuthStore } from '@/lib/stores/auth-store';
 const MenuItem = ({
   icon,
@@ -1139,312 +1138,312 @@ export default function NewsManagement() {
         size='xl'
       >
         <div>
-              <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
-                {/* Sol Kolon */}
-                <div className='space-y-4'>
-                  <div>
-                    <label className='block text-sm font-medium text-gray-700 mb-2'>
-                      Başlık *
-                    </label>
-                    <input
-                      type='text'
-                      value={createFormData.title}
-                      onChange={e =>
-                        setCreateFormData({
-                          ...createFormData,
-                          title: e.target.value,
-                        })
-                      }
-                      className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-                      placeholder='Haber başlığı...'
-                    />
-                  </div>
-                  <div>
-                    <label className='block text-sm font-medium text-gray-700 mb-2'>
-                      Özet
-                    </label>
-                    <textarea
-                      value={createFormData.excerpt}
-                      onChange={e =>
-                        setCreateFormData({
-                          ...createFormData,
-                          excerpt: e.target.value,
-                        })
-                      }
-                      rows={3}
-                      className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-                      placeholder='Haber özeti...'
-                    />
-                  </div>
-                  <div>
-                    <label className='block text-sm font-medium text-gray-700 mb-2'>
-                      Kategori
-                    </label>
-                    <select
-                      value={createFormData.category}
-                      onChange={e =>
-                        setCreateFormData({
-                          ...createFormData,
-                          category: e.target.value,
-                        })
-                      }
-                      className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-                    >
-                      <option value=''>Kategori Seçin</option>
-                      {categories.map(category => (
-                        <option key={category.id} value={category.name}>
-                          {category.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className='block text-sm font-medium text-gray-700 mb-2'>
-                      Uzman Yazar
-                    </label>
-                    <select
-                      value={createFormData.expert_author_id}
-                      onChange={e =>
-                        setCreateFormData({
-                          ...createFormData,
-                          expert_author_id: e.target.value,
-                        })
-                      }
-                      className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-                    >
-                      <option value=''>Uzman Seçin</option>
-                      {experts.map(expert => (
-                        <option key={expert.id} value={expert.id}>
-                          {expert.name} - {expert.title}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className='block text-sm font-medium text-gray-700 mb-2'>
-                      Zorluk Seviyesi
-                    </label>
-                    <select
-                      value={createFormData.difficulty_level}
-                      onChange={e =>
-                        setCreateFormData({
-                          ...createFormData,
-                          difficulty_level: e.target.value,
-                        })
-                      }
-                      className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-                    >
-                      <option value='Başlangıç'>Başlangıç</option>
-                      <option value='Orta'>Orta</option>
-                      <option value='İleri'>İleri</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className='block text-sm font-medium text-gray-700 mb-2'>
-                      Okuma Süresi (dakika)
-                    </label>
-                    <input
-                      type='number'
-                      value={createFormData.reading_time}
-                      onChange={e =>
-                        setCreateFormData({
-                          ...createFormData,
-                          reading_time: parseInt(e.target.value),
-                        })
-                      }
-                      className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-                      min='1'
-                      max='60'
-                    />
-                  </div>
-                </div>
-                {/* Sağ Kolon */}
-                <div className='space-y-4'>
-                  <div>
-                    <label className='block text-sm font-medium text-gray-700 mb-2'>
-                      Durum
-                    </label>
-                    <select
-                      value={createFormData.status}
-                      onChange={e =>
-                        setCreateFormData({
-                          ...createFormData,
-                          status: e.target.value,
-                        })
-                      }
-                      className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-                    >
-                      <option value='draft'>Taslak</option>
-                      <option value='pending'>İnceleme Bekliyor</option>
-                      <option value='published'>Yayınlandı</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className='block text-sm font-medium text-gray-700 mb-2'>
-                      Resim
-                    </label>
-                    <FileUpload
-                      type='image'
-                      onUploadSuccess={(file: any) =>
-                        setCreateFormData({
-                          ...createFormData,
-                          image_url: file.file_url,
-                        })
-                      }
-                      onUploadError={(error: any) => alert(error)}
-                      className='mb-2'
-                    />
-                    <input
-                      type='url'
-                      value={createFormData.image_url}
-                      onChange={e =>
-                        setCreateFormData({
-                          ...createFormData,
-                          image_url: e.target.value,
-                        })
-                      }
-                      className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-                      placeholder="Veya resim URL'si girin..."
-                    />
-                  </div>
-                  <div>
-                    <label className='block text-sm font-medium text-gray-700 mb-2'>
-                      Video
-                    </label>
-                    <FileUpload
-                      type='document'
-                      onUploadSuccess={(file: any) =>
-                        setCreateFormData({
-                          ...createFormData,
-                          video_url: file.file_url,
-                        })
-                      }
-                      onUploadError={(error: any) => alert(error)}
-                      className='mb-2'
-                    />
-                    <input
-                      type='url'
-                      value={createFormData.video_url}
-                      onChange={e =>
-                        setCreateFormData({
-                          ...createFormData,
-                          video_url: e.target.value,
-                        })
-                      }
-                      className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-                      placeholder="Veya video URL'si girin..."
-                    />
-                  </div>
-                  <div>
-                    <label className='block text-sm font-medium text-gray-700 mb-2'>
-                      Podcast URL
-                    </label>
-                    <input
-                      type='url'
-                      value={createFormData.podcast_url}
-                      onChange={e =>
-                        setCreateFormData({
-                          ...createFormData,
-                          podcast_url: e.target.value,
-                        })
-                      }
-                      className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-                      placeholder='https://spotify.com/episode/...'
-                    />
-                  </div>
-                  <div>
-                    <label className='block text-sm font-medium text-gray-700 mb-2'>
-                      Kaynak URL
-                    </label>
-                    <input
-                      type='url'
-                      value={createFormData.source_url}
-                      onChange={e =>
-                        setCreateFormData({
-                          ...createFormData,
-                          source_url: e.target.value,
-                        })
-                      }
-                      className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-                      placeholder='https://example.com/source'
-                    />
-                  </div>
-                  <div className='flex items-center'>
-                    <input
-                      type='checkbox'
-                      id='is_featured'
-                      checked={createFormData.is_featured}
-                      onChange={e =>
-                        setCreateFormData({
-                          ...createFormData,
-                          is_featured: e.target.checked,
-                        })
-                      }
-                      className='h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded'
-                    />
-                    <label
-                      htmlFor='is_featured'
-                      className='ml-2 block text-sm text-gray-900'
-                    >
-                      Öne Çıkan Haber
-                    </label>
-                  </div>
-                </div>
-              </div>
-              {/* İçerik Alanı */}
-              <div className='mt-6'>
+          <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
+            {/* Sol Kolon */}
+            <div className='space-y-4'>
+              <div>
                 <label className='block text-sm font-medium text-gray-700 mb-2'>
-                  İçerik *
-                </label>
-                <MarkdownEditor
-                  value={createFormData.content}
-                  onChange={value =>
-                    setCreateFormData({ ...createFormData, content: value })
-                  }
-                  placeholder='Haber içeriği... (Markdown formatında yazabilirsiniz)'
-                  rows={10}
-                />
-              </div>
-              {/* Etiketler */}
-              <div className='mt-6'>
-                <label className='block text-sm font-medium text-gray-700 mb-2'>
-                  Etiketler (virgülle ayırın)
+                  Başlık *
                 </label>
                 <input
                   type='text'
-                  value={createFormData.tags.join(', ')}
+                  value={createFormData.title}
                   onChange={e =>
                     setCreateFormData({
                       ...createFormData,
-                      tags: e.target.value
-                        .split(',')
-                        .map(tag => tag.trim())
-                        .filter(tag => tag),
+                      title: e.target.value,
                     })
                   }
                   className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-                  placeholder='e-ticaret, ihracat, pazaryeri'
+                  placeholder='Haber başlığı...'
                 />
               </div>
-              {/* SEO Anahtar Kelimeler */}
-              <div className='mt-6'>
+              <div>
                 <label className='block text-sm font-medium text-gray-700 mb-2'>
-                  SEO Anahtar Kelimeler (virgülle ayırın)
+                  Özet
                 </label>
-                <input
-                  type='text'
-                  value={createFormData.seo_keywords}
+                <textarea
+                  value={createFormData.excerpt}
                   onChange={e =>
                     setCreateFormData({
                       ...createFormData,
-                      seo_keywords: e.target.value,
+                      excerpt: e.target.value,
+                    })
+                  }
+                  rows={3}
+                  className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                  placeholder='Haber özeti...'
+                />
+              </div>
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-2'>
+                  Kategori
+                </label>
+                <select
+                  value={createFormData.category}
+                  onChange={e =>
+                    setCreateFormData({
+                      ...createFormData,
+                      category: e.target.value,
                     })
                   }
                   className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-                  placeholder='e-ticaret, ihracat, pazaryeri, amazon'
+                >
+                  <option value=''>Kategori Seçin</option>
+                  {categories.map(category => (
+                    <option key={category.id} value={category.name}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-2'>
+                  Uzman Yazar
+                </label>
+                <select
+                  value={createFormData.expert_author_id}
+                  onChange={e =>
+                    setCreateFormData({
+                      ...createFormData,
+                      expert_author_id: e.target.value,
+                    })
+                  }
+                  className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                >
+                  <option value=''>Uzman Seçin</option>
+                  {experts.map(expert => (
+                    <option key={expert.id} value={expert.id}>
+                      {expert.name} - {expert.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-2'>
+                  Zorluk Seviyesi
+                </label>
+                <select
+                  value={createFormData.difficulty_level}
+                  onChange={e =>
+                    setCreateFormData({
+                      ...createFormData,
+                      difficulty_level: e.target.value,
+                    })
+                  }
+                  className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                >
+                  <option value='Başlangıç'>Başlangıç</option>
+                  <option value='Orta'>Orta</option>
+                  <option value='İleri'>İleri</option>
+                </select>
+              </div>
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-2'>
+                  Okuma Süresi (dakika)
+                </label>
+                <input
+                  type='number'
+                  value={createFormData.reading_time}
+                  onChange={e =>
+                    setCreateFormData({
+                      ...createFormData,
+                      reading_time: parseInt(e.target.value),
+                    })
+                  }
+                  className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                  min='1'
+                  max='60'
                 />
               </div>
             </div>
+            {/* Sağ Kolon */}
+            <div className='space-y-4'>
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-2'>
+                  Durum
+                </label>
+                <select
+                  value={createFormData.status}
+                  onChange={e =>
+                    setCreateFormData({
+                      ...createFormData,
+                      status: e.target.value,
+                    })
+                  }
+                  className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                >
+                  <option value='draft'>Taslak</option>
+                  <option value='pending'>İnceleme Bekliyor</option>
+                  <option value='published'>Yayınlandı</option>
+                </select>
+              </div>
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-2'>
+                  Resim
+                </label>
+                <FileUpload
+                  type='image'
+                  onUploadSuccess={(file: any) =>
+                    setCreateFormData({
+                      ...createFormData,
+                      image_url: file.file_url,
+                    })
+                  }
+                  onUploadError={(error: any) => alert(error)}
+                  className='mb-2'
+                />
+                <input
+                  type='url'
+                  value={createFormData.image_url}
+                  onChange={e =>
+                    setCreateFormData({
+                      ...createFormData,
+                      image_url: e.target.value,
+                    })
+                  }
+                  className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                  placeholder="Veya resim URL'si girin..."
+                />
+              </div>
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-2'>
+                  Video
+                </label>
+                <FileUpload
+                  type='document'
+                  onUploadSuccess={(file: any) =>
+                    setCreateFormData({
+                      ...createFormData,
+                      video_url: file.file_url,
+                    })
+                  }
+                  onUploadError={(error: any) => alert(error)}
+                  className='mb-2'
+                />
+                <input
+                  type='url'
+                  value={createFormData.video_url}
+                  onChange={e =>
+                    setCreateFormData({
+                      ...createFormData,
+                      video_url: e.target.value,
+                    })
+                  }
+                  className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                  placeholder="Veya video URL'si girin..."
+                />
+              </div>
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-2'>
+                  Podcast URL
+                </label>
+                <input
+                  type='url'
+                  value={createFormData.podcast_url}
+                  onChange={e =>
+                    setCreateFormData({
+                      ...createFormData,
+                      podcast_url: e.target.value,
+                    })
+                  }
+                  className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                  placeholder='https://spotify.com/episode/...'
+                />
+              </div>
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-2'>
+                  Kaynak URL
+                </label>
+                <input
+                  type='url'
+                  value={createFormData.source_url}
+                  onChange={e =>
+                    setCreateFormData({
+                      ...createFormData,
+                      source_url: e.target.value,
+                    })
+                  }
+                  className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                  placeholder='https://example.com/source'
+                />
+              </div>
+              <div className='flex items-center'>
+                <input
+                  type='checkbox'
+                  id='is_featured'
+                  checked={createFormData.is_featured}
+                  onChange={e =>
+                    setCreateFormData({
+                      ...createFormData,
+                      is_featured: e.target.checked,
+                    })
+                  }
+                  className='h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded'
+                />
+                <label
+                  htmlFor='is_featured'
+                  className='ml-2 block text-sm text-gray-900'
+                >
+                  Öne Çıkan Haber
+                </label>
+              </div>
+            </div>
+          </div>
+          {/* İçerik Alanı */}
+          <div className='mt-6'>
+            <label className='block text-sm font-medium text-gray-700 mb-2'>
+              İçerik *
+            </label>
+            <MarkdownEditor
+              value={createFormData.content}
+              onChange={value =>
+                setCreateFormData({ ...createFormData, content: value })
+              }
+              placeholder='Haber içeriği... (Markdown formatında yazabilirsiniz)'
+              rows={10}
+            />
+          </div>
+          {/* Etiketler */}
+          <div className='mt-6'>
+            <label className='block text-sm font-medium text-gray-700 mb-2'>
+              Etiketler (virgülle ayırın)
+            </label>
+            <input
+              type='text'
+              value={createFormData.tags.join(', ')}
+              onChange={e =>
+                setCreateFormData({
+                  ...createFormData,
+                  tags: e.target.value
+                    .split(',')
+                    .map(tag => tag.trim())
+                    .filter(tag => tag),
+                })
+              }
+              className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+              placeholder='e-ticaret, ihracat, pazaryeri'
+            />
+          </div>
+          {/* SEO Anahtar Kelimeler */}
+          <div className='mt-6'>
+            <label className='block text-sm font-medium text-gray-700 mb-2'>
+              SEO Anahtar Kelimeler (virgülle ayırın)
+            </label>
+            <input
+              type='text'
+              value={createFormData.seo_keywords}
+              onChange={e =>
+                setCreateFormData({
+                  ...createFormData,
+                  seo_keywords: e.target.value,
+                })
+              }
+              className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+              placeholder='e-ticaret, ihracat, pazaryeri, amazon'
+            />
+          </div>
+        </div>
         <ModalFooter>
           <Button
             variant='secondary'
@@ -1475,9 +1474,7 @@ export default function NewsManagement() {
           </Button>
           <Button
             variant='primary'
-            onClick={
-              editingArticle ? handleUpdateArticle : handleCreateArticle
-            }
+            onClick={editingArticle ? handleUpdateArticle : handleCreateArticle}
           >
             {editingArticle ? 'Güncelle' : 'Oluştur'}
           </Button>

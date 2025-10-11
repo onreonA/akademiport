@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Kullanıcı bilgilerini al ve rol kontrolü yap
-    let { data: user, error: userError } = await supabase
+    const { data: user, error: userError } = await supabase
       .from('users')
       .select('id, role, company_id')
       .eq('email', userEmail)

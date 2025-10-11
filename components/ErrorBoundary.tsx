@@ -1,6 +1,7 @@
 'use client';
 
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { Component, ErrorInfo, ReactNode } from 'react';
+
 import Button from './ui/Button';
 
 interface Props {
@@ -17,10 +18,10 @@ interface State {
 
 /**
  * Error Boundary Component
- * 
+ *
  * Catches JavaScript errors anywhere in the child component tree,
  * logs those errors, and displays a fallback UI.
- * 
+ *
  * @example
  * <ErrorBoundary>
  *   <YourComponent />
@@ -138,11 +139,7 @@ class ErrorBoundary extends Component<Props, State> {
 
             {/* Actions */}
             <div className='flex gap-3'>
-              <Button
-                variant='secondary'
-                fullWidth
-                onClick={this.handleReset}
-              >
+              <Button variant='secondary' fullWidth onClick={this.handleReset}>
                 Tekrar Dene
               </Button>
               <Button
@@ -156,12 +153,12 @@ class ErrorBoundary extends Component<Props, State> {
 
             {/* Support Link */}
             <div className='mt-6 text-center'>
-              <a
-                href='/'
+              <button
+                onClick={() => (window.location.href = '/')}
                 className='text-sm text-blue-600 hover:text-blue-700 hover:underline'
               >
                 ← Ana Sayfaya Dön
-              </a>
+              </button>
             </div>
           </div>
         </div>
@@ -265,4 +262,3 @@ export class InlineErrorBoundary extends Component<Props, State> {
     return this.props.children;
   }
 }
-

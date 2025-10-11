@@ -13,7 +13,7 @@ interface ModalProps {
 
 /**
  * Reusable Modal Component
- * 
+ *
  * @example
  * <Modal isOpen={isOpen} onClose={handleClose} title="Modal Title" size="md">
  *   <p>Modal content</p>

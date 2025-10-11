@@ -88,11 +88,13 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(response);
   } catch (error: any) {
     // Handle authentication errors specifically
-    if (error.message === 'Authentication required' || 
-        error.message === 'Admin access required') {
+    if (
+      error.message === 'Authentication required' ||
+      error.message === 'Admin access required'
+    ) {
       return createAuthErrorResponse(error.message, 401);
     }
-    
+
     return NextResponse.json(
       { error: 'Failed to fetch dashboard statistics' },
       { status: 500 }

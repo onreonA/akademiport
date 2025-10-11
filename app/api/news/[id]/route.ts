@@ -115,8 +115,10 @@ export async function PUT(
     if (video_url !== undefined) updateData.video_url = video_url;
     if (podcast_url !== undefined) updateData.podcast_url = podcast_url;
     if (reading_time !== undefined) updateData.reading_time = reading_time;
-    if (difficulty_level !== undefined) updateData.difficulty_level = difficulty_level;
-    if (expert_author_id !== undefined) updateData.expert_author_id = expert_author_id;
+    if (difficulty_level !== undefined)
+      updateData.difficulty_level = difficulty_level;
+    if (expert_author_id !== undefined)
+      updateData.expert_author_id = expert_author_id;
     if (is_featured !== undefined) updateData.is_featured = is_featured;
     if (seo_keywords !== undefined) updateData.seo_keywords = seo_keywords;
     if (source_url !== undefined) updateData.source_url = source_url;

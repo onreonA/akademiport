@@ -1,21 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { createClient } from '@/lib/supabase/server';
 import { requireAuth, createAuthErrorResponse } from '@/lib/jwt-utils';
+import { createClient } from '@/lib/supabase/server';
 // GET /api/projects - Get projects with optional company filter
 export async function GET(request: NextRequest) {
   try {
     // JWT Authentication
     const user = await requireAuth(request);
-    
+
     const supabase = createClient();
-    
+
     // Get query parameters
     const { searchParams } = new URL(request.url);
     const companyId = searchParams.get('company_id');
     const status = searchParams.get('status');
     const limit = searchParams.get('limit');
-    
+
     // Check if user is a company user
     const isCompanyUser = [
       'user',
@@ -110,7 +110,7 @@ export async function GET(request: NextRequest) {
     if (error.message === 'Authentication required') {
       return createAuthErrorResponse(error.message, 401);
     }
-    
+
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -122,11 +122,15 @@ export async function POST(request: NextRequest) {
   try {
     // JWT Authentication - Only admin users can create projects
     const user = await requireAuth(request);
-    
+
     const supabase = createClient();
-    
+
     // Only admin and consultant can create projects
-    if (!['admin', 'consultant', 'master_admin', 'danisman'].includes(user.role || '')) {
+    if (
+      !['admin', 'consultant', 'master_admin', 'danisman'].includes(
+        user.role || ''
+      )
+    ) {
       return NextResponse.json({ error: 'Access denied' }, { status: 403 });
     }
     const body = await request.json();
@@ -184,7 +188,7 @@ export async function POST(request: NextRequest) {
     if (error.message === 'Authentication required') {
       return createAuthErrorResponse(error.message, 401);
     }
-    
+
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -196,11 +200,15 @@ export async function DELETE(request: NextRequest) {
   try {
     // JWT Authentication - Only admin users can delete projects
     const user = await requireAuth(request);
-    
+
     const supabase = createClient();
-    
+
     // Only admin and consultant can delete projects
-    if (!['admin', 'consultant', 'master_admin', 'danisman'].includes(user.role || '')) {
+    if (
+      !['admin', 'consultant', 'master_admin', 'danisman'].includes(
+        user.role || ''
+      )
+    ) {
       return NextResponse.json({ error: 'Access denied' }, { status: 403 });
     }
     const { searchParams } = new URL(request.url);
@@ -225,7 +233,7 @@ export async function DELETE(request: NextRequest) {
     if (error.message === 'Authentication required') {
       return createAuthErrorResponse(error.message, 401);
     }
-    
+
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -237,11 +245,15 @@ export async function PATCH(request: NextRequest) {
   try {
     // JWT Authentication - Only admin users can update projects
     const user = await requireAuth(request);
-    
+
     const supabase = createClient();
-    
+
     // Only admin and consultant can update projects
-    if (!['admin', 'consultant', 'master_admin', 'danisman'].includes(user.role || '')) {
+    if (
+      !['admin', 'consultant', 'master_admin', 'danisman'].includes(
+        user.role || ''
+      )
+    ) {
       return NextResponse.json({ error: 'Access denied' }, { status: 403 });
     }
     const body = await request.json();
@@ -271,7 +283,7 @@ export async function PATCH(request: NextRequest) {
     if (error.message === 'Authentication required') {
       return createAuthErrorResponse(error.message, 401);
     }
-    
+
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

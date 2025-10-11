@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
+import { NextRequest, NextResponse } from 'next/server';
 
 import { authService } from '@/lib/auth-service';
 export async function POST(request: NextRequest) {
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
       sameSite: 'lax', // CSRF koruması
       maxAge: 60 * 60 * 2, // 2 saat
       path: '/',
-      domain: undefined // Explicit domain belirtme (localhost için)
+      domain: undefined, // Explicit domain belirtme (localhost için)
     });
     return response;
   } catch (error: any) {

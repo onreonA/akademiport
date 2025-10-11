@@ -18,10 +18,12 @@ const JWT_SECRET = new TextEncoder().encode(
 /**
  * JWT token'dan kullanıcı bilgilerini çıkar
  */
-export async function verifyJWTToken(request: NextRequest): Promise<JWTUser | null> {
+export async function verifyJWTToken(
+  request: NextRequest
+): Promise<JWTUser | null> {
   try {
     const authToken = request.cookies.get('auth-token')?.value;
-    
+
     if (!authToken) {
       return null;
     }
@@ -45,11 +47,11 @@ export async function verifyJWTToken(request: NextRequest): Promise<JWTUser | nu
  */
 export async function requireAuth(request: NextRequest): Promise<JWTUser> {
   const user = await verifyJWTToken(request);
-  
+
   if (!user) {
     throw new Error('Authentication required');
   }
-  
+
   return user;
 }
 
@@ -58,11 +60,11 @@ export async function requireAuth(request: NextRequest): Promise<JWTUser> {
  */
 export async function requireAdmin(request: NextRequest): Promise<JWTUser> {
   const user = await requireAuth(request);
-  
+
   if (!ROLE_GROUPS.ADMIN_ROLES.includes(user.role)) {
     throw new Error('Admin access required');
   }
-  
+
   return user;
 }
 
@@ -71,11 +73,11 @@ export async function requireAdmin(request: NextRequest): Promise<JWTUser> {
  */
 export async function requireCompany(request: NextRequest): Promise<JWTUser> {
   const user = await requireAuth(request);
-  
+
   if (!ROLE_GROUPS.COMPANY_ROLES.includes(user.role)) {
     throw new Error('Company access required');
   }
-  
+
   return user;
 }
 
@@ -83,31 +85,28 @@ export async function requireCompany(request: NextRequest): Promise<JWTUser> {
  * API route'ları için güvenli error handling
  */
 export function createAuthErrorResponse(error: string, status: number = 401) {
-  return NextResponse.json(
-    { error, success: false },
-    { status }
-  );
+  return NextResponse.json({ error, success: false }, { status });
 }
 
 /**
  * Company kullanıcısının belirli bir company_id'ye erişimi var mı kontrol et
  */
 export async function requireCompanyAccess(
-  request: NextRequest, 
+  request: NextRequest,
   targetCompanyId?: string
 ): Promise<JWTUser> {
   const user = await requireCompany(request);
-  
+
   // Admin kullanıcılar tüm company'lere erişebilir
   if (ROLE_GROUPS.ADMIN_ROLES.includes(user.role)) {
     return user;
   }
-  
+
   // Company kullanıcısı sadece kendi company'sine erişebilir
   if (targetCompanyId && user.company_id !== targetCompanyId) {
     throw new Error('Company access denied');
   }
-  
+
   return user;
 }
 
@@ -119,11 +118,11 @@ export async function requirePermission(
   permission: string
 ): Promise<JWTUser> {
   const user = await requireAuth(request);
-  
+
   if (!hasPermission(user.role, permission)) {
     throw new Error(`Permission denied: ${permission}`);
   }
-  
+
   return user;
 }
 
@@ -135,15 +134,17 @@ export async function requireAnyPermission(
   permissions: string[]
 ): Promise<JWTUser> {
   const user = await requireAuth(request);
-  
-  const hasAnyPerm = permissions.some(permission => 
+
+  const hasAnyPerm = permissions.some(permission =>
     hasPermission(user.role, permission)
   );
-  
+
   if (!hasAnyPerm) {
-    throw new Error(`Permission denied: requires one of [${permissions.join(', ')}]`);
+    throw new Error(
+      `Permission denied: requires one of [${permissions.join(', ')}]`
+    );
   }
-  
+
   return user;
 }
 
@@ -155,14 +156,16 @@ export async function requireAllPermissions(
   permissions: string[]
 ): Promise<JWTUser> {
   const user = await requireAuth(request);
-  
-  const hasAllPerms = permissions.every(permission => 
+
+  const hasAllPerms = permissions.every(permission =>
     hasPermission(user.role, permission)
   );
-  
+
   if (!hasAllPerms) {
-    throw new Error(`Permission denied: requires all of [${permissions.join(', ')}]`);
+    throw new Error(
+      `Permission denied: requires all of [${permissions.join(', ')}]`
+    );
   }
-  
+
   return user;
 }

@@ -11,7 +11,7 @@ interface CardProps {
 
 /**
  * Reusable Card Component
- * 
+ *
  * @example
  * <Card shadow="md" hover padding="lg">
  *   <h3>Card Title</h3>
@@ -117,4 +117,3 @@ export function CardFooter({
     </div>
   );
 }
-
