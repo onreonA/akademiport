@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 import AdminLayout from '@/components/admin/AdminLayout';
+import Button from '@/components/ui/Button';
+import Modal, { ModalFooter } from '@/components/ui/Modal';
 
 interface Document {
   id: string;
@@ -602,185 +604,167 @@ export default function DocumentManagement() {
       </div>
 
       {/* Delete Confirmation Modal */}
-      {showDeleteConfirm && (
-        <div className='fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4'>
-          <div className='bg-white rounded-xl shadow-2xl w-full max-w-md'>
-            <div className='p-6'>
-              <div className='w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4'>
-                <i className='ri-delete-bin-line text-red-600 text-3xl'></i>
-              </div>
-              <h3 className='text-xl font-semibold text-gray-900 text-center mb-2'>
-                Dökümanı Sil
-              </h3>
-              <p className='text-gray-600 text-center mb-6'>
-                Bu dökümanı silmek istediğinizden emin misiniz? Bu işlem geri
-                alınamaz.
-              </p>
-              <div className='flex gap-3'>
-                <button
-                  type='button'
-                  onClick={() => setShowDeleteConfirm(null)}
-                  className='flex-1 px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors'
-                >
-                  İptal
-                </button>
-                <button
-                  type='button'
-                  onClick={() => handleDelete(showDeleteConfirm)}
-                  className='flex-1 px-6 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-200 shadow-lg hover:shadow-xl'
-                >
-                  Sil
-                </button>
-              </div>
-            </div>
+      <Modal
+        isOpen={!!showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(null)}
+        title="Dökümanı Sil"
+        size="md"
+      >
+        <div className='text-center'>
+          <div className='w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4'>
+            <i className='ri-delete-bin-line text-red-600 text-3xl'></i>
           </div>
+          <p className='text-gray-600 mb-6'>
+            Bu dökümanı silmek istediğinizden emin misiniz? Bu işlem geri
+            alınamaz.
+          </p>
         </div>
-      )}
+
+        <ModalFooter>
+          <Button variant="secondary" onClick={() => setShowDeleteConfirm(null)}>
+            İptal
+          </Button>
+          <Button variant="danger" onClick={() => handleDelete(showDeleteConfirm!)}>
+            Sil
+          </Button>
+        </ModalFooter>
+      </Modal>
 
       {/* Create/Edit Document Modal */}
-      {showCreateForm && (
-        <div className='fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4'>
-          <div className='bg-white rounded-xl shadow-2xl w-full max-w-2xl'>
-            <div className='p-6 border-b border-gray-200'>
-              <h3 className='text-xl font-semibold text-gray-900'>
-                {editingDocument ? 'Döküman Düzenle' : 'Yeni Döküman Ekle'}
-              </h3>
-            </div>
-            <form onSubmit={handleCreateOrUpdate} className='p-6 space-y-6'>
-              <div>
-                <label className='block text-sm font-medium text-gray-700 mb-2'>
-                  Döküman Başlığı <span className='text-red-500'>*</span>
-                </label>
-                <input
-                  type='text'
-                  value={formData.title}
-                  onChange={e =>
-                    setFormData({ ...formData, title: e.target.value })
-                  }
-                  className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-                  placeholder='Örn: E-ihracat Stratejileri Rehberi'
-                  required
-                />
-              </div>
-              <div>
-                <label className='block text-sm font-medium text-gray-700 mb-2'>
-                  Açıklama
-                </label>
-                <textarea
-                  rows={3}
-                  value={formData.description}
-                  onChange={e =>
-                    setFormData({ ...formData, description: e.target.value })
-                  }
-                  className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-                  placeholder='Döküman hakkında kısa açıklama...'
-                />
-              </div>
-              <div>
-                <label className='block text-sm font-medium text-gray-700 mb-2'>
-                  Eğitim Seti <span className='text-red-500'>*</span>
-                </label>
-                <select
-                  value={formData.set_id}
-                  onChange={e =>
-                    setFormData({ ...formData, set_id: e.target.value })
-                  }
-                  className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-                  required
-                >
-                  <option value=''>Eğitim Seti Seçin</option>
-                  {educationSets.map(set => (
-                    <option key={set.id} value={set.id}>
-                      {set.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className='block text-sm font-medium text-gray-700 mb-2'>
-                  Dosya URL <span className='text-red-500'>*</span>
-                </label>
-                <input
-                  type='url'
-                  value={formData.file_url}
-                  onChange={e =>
-                    setFormData({ ...formData, file_url: e.target.value })
-                  }
-                  className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-                  placeholder='https://example.com/document.pdf'
-                  required
-                />
-                <p className='text-sm text-gray-500 mt-1'>
-                  🎯 Test için örnek URL: https://example.com/test-document.pdf
-                </p>
-              </div>
-              <div className='grid grid-cols-2 gap-4'>
-                <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-2'>
-                    Dosya Türü <span className='text-red-500'>*</span>
-                  </label>
-                  <select
-                    value={formData.file_type}
-                    onChange={e =>
-                      setFormData({ ...formData, file_type: e.target.value })
-                    }
-                    className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-                    required
-                  >
-                    <option value='PDF'>PDF</option>
-                    <option value='DOCX'>DOCX</option>
-                    <option value='DOC'>DOC</option>
-                    <option value='PPTX'>PPTX</option>
-                    <option value='PPT'>PPT</option>
-                    <option value='XLSX'>XLSX</option>
-                    <option value='XLS'>XLS</option>
-                  </select>
-                </div>
-                <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-2'>
-                    Durum
-                  </label>
-                  <select
-                    value={formData.status}
-                    onChange={e =>
-                      setFormData({ ...formData, status: e.target.value })
-                    }
-                    className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-                  >
-                    <option value='Aktif'>Aktif</option>
-                    <option value='Pasif'>Pasif</option>
-                  </select>
-                </div>
-              </div>
-              <div className='flex justify-end gap-3 pt-4'>
-                <button
-                  type='button'
-                  onClick={() => setShowCreateForm(false)}
-                  className='px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors'
-                >
-                  İptal
-                </button>
-                <button
-                  type='submit'
-                  disabled={isSubmitting}
-                  className='px-6 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2'
-                >
-                  {isSubmitting ? (
-                    <>
-                      <div className='w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin'></div>
-                      {editingDocument
-                        ? 'Güncelleniyor...'
-                        : 'Oluşturuluyor...'}
-                    </>
-                  ) : (
-                    <>{editingDocument ? 'Güncelle' : 'Oluştur'}</>
-                  )}
-                </button>
-              </div>
-            </form>
+      <Modal
+        isOpen={showCreateForm}
+        onClose={() => setShowCreateForm(false)}
+        title={editingDocument ? 'Döküman Düzenle' : 'Yeni Döküman Ekle'}
+        size="lg"
+      >
+        <form onSubmit={handleCreateOrUpdate} className='space-y-6'>
+          <div>
+            <label className='block text-sm font-medium text-gray-700 mb-2'>
+              Döküman Başlığı <span className='text-red-500'>*</span>
+            </label>
+            <input
+              type='text'
+              value={formData.title}
+              onChange={e =>
+                setFormData({ ...formData, title: e.target.value })
+              }
+              className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+              placeholder='Örn: E-ihracat Stratejileri Rehberi'
+              required
+            />
           </div>
-        </div>
-      )}
+          <div>
+            <label className='block text-sm font-medium text-gray-700 mb-2'>
+              Açıklama
+            </label>
+            <textarea
+              rows={3}
+              value={formData.description}
+              onChange={e =>
+                setFormData({ ...formData, description: e.target.value })
+              }
+              className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+              placeholder='Döküman hakkında kısa açıklama...'
+            />
+          </div>
+          <div>
+            <label className='block text-sm font-medium text-gray-700 mb-2'>
+              Eğitim Seti <span className='text-red-500'>*</span>
+            </label>
+            <select
+              value={formData.set_id}
+              onChange={e =>
+                setFormData({ ...formData, set_id: e.target.value })
+              }
+              className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+              required
+            >
+              <option value=''>Eğitim Seti Seçin</option>
+              {educationSets.map(set => (
+                <option key={set.id} value={set.id}>
+                  {set.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className='block text-sm font-medium text-gray-700 mb-2'>
+              Dosya URL <span className='text-red-500'>*</span>
+            </label>
+            <input
+              type='url'
+              value={formData.file_url}
+              onChange={e =>
+                setFormData({ ...formData, file_url: e.target.value })
+              }
+              className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+              placeholder='https://example.com/document.pdf'
+              required
+            />
+            <p className='text-sm text-gray-500 mt-1'>
+              🎯 Test için örnek URL: https://example.com/test-document.pdf
+            </p>
+          </div>
+          <div className='grid grid-cols-2 gap-4'>
+            <div>
+              <label className='block text-sm font-medium text-gray-700 mb-2'>
+                Dosya Türü <span className='text-red-500'>*</span>
+              </label>
+              <select
+                value={formData.file_type}
+                onChange={e =>
+                  setFormData({ ...formData, file_type: e.target.value })
+                }
+                className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                required
+              >
+                <option value='PDF'>PDF</option>
+                <option value='DOCX'>DOCX</option>
+                <option value='DOC'>DOC</option>
+                <option value='PPTX'>PPTX</option>
+                <option value='PPT'>PPT</option>
+                <option value='XLSX'>XLSX</option>
+                <option value='XLS'>XLS</option>
+              </select>
+            </div>
+            <div>
+              <label className='block text-sm font-medium text-gray-700 mb-2'>
+                Durum
+              </label>
+              <select
+                value={formData.status}
+                onChange={e =>
+                  setFormData({ ...formData, status: e.target.value })
+                }
+                className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+              >
+                <option value='Aktif'>Aktif</option>
+                <option value='Pasif'>Pasif</option>
+              </select>
+            </div>
+          </div>
+        </form>
+
+        <ModalFooter>
+          <Button variant="secondary" onClick={() => setShowCreateForm(false)}>
+            İptal
+          </Button>
+          <Button
+            variant="primary"
+            onClick={handleCreateOrUpdate}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <>
+                <div className='w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin inline-block mr-2'></div>
+                {editingDocument ? 'Güncelleniyor...' : 'Oluşturuluyor...'}
+              </>
+            ) : (
+              <>{editingDocument ? 'Güncelle' : 'Oluştur'}</>
+            )}
+          </Button>
+        </ModalFooter>
+      </Modal>
     </AdminLayout>
   );
 }
