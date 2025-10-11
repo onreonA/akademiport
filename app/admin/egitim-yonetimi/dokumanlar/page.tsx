@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 
 import AdminLayout from '@/components/admin/AdminLayout';
 import Button from '@/components/ui/Button';
+import EmptyState, { LoadingEmptyState } from '@/components/ui/EmptyState';
 import Modal, { ModalFooter } from '@/components/ui/Modal';
 
 interface Document {
@@ -481,26 +482,20 @@ export default function DocumentManagement() {
           {/* Documents Grid */}
           <div className='bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white/20 p-6'>
             {loading ? (
-              <div className='text-center py-12'>
-                <div className='w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4'></div>
-                <p className='text-gray-600'>Dökümanlar yükleniyor...</p>
-              </div>
+              <LoadingEmptyState message='Dökümanlar yükleniyor...' />
             ) : error ? (
-              <div className='text-center py-12'>
-                <div className='w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4'>
-                  <i className='ri-error-warning-line text-red-600 text-2xl'></i>
-                </div>
-                <h3 className='text-lg font-medium text-red-900 mb-2'>
-                  Hata Oluştu
-                </h3>
-                <p className='text-red-700 mb-6'>{error}</p>
-                <button
-                  onClick={fetchDocuments}
-                  className='bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-medium transition-colors'
-                >
-                  Tekrar Dene
-                </button>
-              </div>
+              <EmptyState
+                type='custom'
+                title='Hata Oluştu'
+                description={error}
+                color='error'
+                size='md'
+                action={{
+                  label: 'Tekrar Dene',
+                  onClick: fetchDocuments,
+                  variant: 'primary',
+                }}
+              />
             ) : filteredDocuments.length === 0 ? (
               <div className='text-center py-12'>
                 <div className='w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-4'>
