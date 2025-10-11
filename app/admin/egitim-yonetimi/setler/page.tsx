@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 
 import Button from '@/components/ui/Button';
 import Modal, { ModalFooter } from '@/components/ui/Modal';
+import StatusBadge from '@/components/ui/StatusBadge';
 interface EducationSet {
   id: string;
   name: string;
@@ -471,15 +472,9 @@ export default function EducationSetsManagement() {
                         >
                           {set.category}
                         </span>
-                        <span
-                          className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            set.status === 'Aktif'
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-gray-100 text-gray-800'
-                          }`}
-                        >
-                          {set.status}
-                        </span>
+                        <StatusBadge
+                          status={set.status === 'Aktif' ? 'active' : 'inactive'}
+                        />
                       </div>
                       <h3 className='text-lg font-semibold text-gray-900 mb-2'>
                         {set.name}

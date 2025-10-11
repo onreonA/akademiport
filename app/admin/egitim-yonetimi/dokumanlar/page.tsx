@@ -6,6 +6,7 @@ import AdminLayout from '@/components/admin/AdminLayout';
 import Button from '@/components/ui/Button';
 import EmptyState, { LoadingEmptyState } from '@/components/ui/EmptyState';
 import Modal, { ModalFooter } from '@/components/ui/Modal';
+import StatusBadge from '@/components/ui/StatusBadge';
 
 interface Document {
   id: string;
@@ -533,15 +534,11 @@ export default function DocumentManagement() {
                             {doc.title}
                           </h3>
                           <div className='flex items-center gap-2 mt-1'>
-                            <span
-                              className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                doc.status === 'Aktif'
-                                  ? 'bg-green-100 text-green-800'
-                                  : 'bg-gray-100 text-gray-800'
-                              }`}
-                            >
-                              {doc.status}
-                            </span>
+                            <StatusBadge
+                              status={
+                                doc.status === 'Aktif' ? 'active' : 'inactive'
+                              }
+                            />
                           </div>
                         </div>
                       </div>

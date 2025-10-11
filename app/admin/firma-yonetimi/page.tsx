@@ -7,6 +7,7 @@ import AdminLayout from '@/components/admin/AdminLayout';
 import Button from '@/components/ui/Button';
 import { LoadingEmptyState } from '@/components/ui/EmptyState';
 import Modal from '@/components/ui/Modal';
+import StatusBadge from '@/components/ui/StatusBadge';
 import { LazyExportImport } from '@/lib/utils/lazy-imports';
 interface Company {
   id: string;
@@ -126,29 +127,20 @@ const CompanyCard = ({
   onGoToCompany: (companyId: string, companyName: string) => void;
 }) => {
   const [showActionsMenu, setShowActionsMenu] = useState(false);
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'Tamamlanmadı':
-        return 'bg-red-100 text-red-800';
-      case 'İncelemede':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'Tamamlandı':
-        return 'bg-green-100 text-green-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
+  
+  // Map onboarding status to StatusBadge
+  const mapOnboardingStatus = (status: string) => {
+    if (status === 'Tamamlandı') return 'completed';
+    if (status === 'İncelemede') return 'pending';
+    if (status === 'Tamamlanmadı') return 'cancelled';
+    return 'inactive';
   };
-  const getEducationStatusColor = (status: string) => {
-    switch (status) {
-      case 'İzlenmeye Başlanmadı':
-        return 'bg-gray-100 text-gray-800';
-      case 'Devam Ediyor':
-        return 'bg-blue-100 text-blue-800';
-      case 'Tamamlandı':
-        return 'bg-green-100 text-green-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
+  
+  // Map education status to StatusBadge
+  const mapEducationStatus = (status: string) => {
+    if (status === 'Tamamlandı') return 'completed';
+    if (status === 'Devam Ediyor') return 'in-progress';
+    return 'inactive';
   };
   const getProgressColor = (percentage: number) => {
     if (percentage >= 80) return 'bg-green-500';
@@ -262,16 +254,8 @@ const CompanyCard = ({
         </div>
         {/* Status Badges */}
         <div className='flex flex-wrap gap-2 mb-4'>
-          <span
-            className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(company.registrationStatus)}`}
-          >
-            {company.registrationStatus}
-          </span>
-          <span
-            className={`px-2 py-1 rounded-full text-xs font-medium ${getEducationStatusColor(company.educationStatus)}`}
-          >
-            {company.educationStatus}
-          </span>
+          <StatusBadge status={mapOnboardingStatus(company.registrationStatus)} />
+          <StatusBadge status={mapEducationStatus(company.educationStatus)} />
           {company.dysRecord && (
             <span className='px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full font-medium'>
               DYS Kayıtlı

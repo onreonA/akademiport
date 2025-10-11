@@ -6,6 +6,7 @@ import ProjectCard from '@/components/admin/ProjectCard';
 import Breadcrumb from '@/components/ui/Breadcrumb';
 import Button from '@/components/ui/Button';
 import ExportImport from '@/components/ui/ExportImport';
+import StatusBadge from '@/components/ui/StatusBadge';
 interface Project {
   id: string;
   name: string;
@@ -1072,30 +1073,11 @@ function CompanyAssignmentRow({
   currentStatus,
   onStatusChange,
 }: CompanyAssignmentRowProps) {
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active':
-        return 'bg-green-100 text-green-800 border-green-200';
-      case 'locked':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'revoked':
-        return 'bg-red-100 text-red-800 border-red-200';
-      default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
-    }
-  };
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'active':
-        return 'Aktif';
-      case 'locked':
-        return 'Kilitli';
-      case 'revoked':
-        return 'Kaldırılmış';
-      default:
-        return 'Bilinmiyor';
-    }
+  const mapCompanyAssignmentStatus = (status: string) => {
+    if (status === 'active') return 'active';
+    if (status === 'locked') return 'on-hold';
+    if (status === 'revoked') return 'cancelled';
+    return 'inactive';
   };
 
   return (
@@ -1118,11 +1100,7 @@ function CompanyAssignmentRow({
       </div>
 
       <div className='flex items-center gap-3'>
-        <span
-          className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(currentStatus)}`}
-        >
-          {getStatusText(currentStatus)}
-        </span>
+        <StatusBadge status={mapCompanyAssignmentStatus(currentStatus)} />
 
         <select
           value={currentStatus}

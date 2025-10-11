@@ -69,21 +69,6 @@ const priorityLabels = {
   urgent: 'Acil',
 };
 
-const statusColors = {
-  planning: 'bg-yellow-100 text-yellow-800',
-  active: 'bg-green-100 text-green-800',
-  completed: 'bg-blue-100 text-blue-800',
-  paused: 'bg-orange-100 text-orange-800',
-  cancelled: 'bg-red-100 text-red-800',
-};
-
-const priorityColors = {
-  low: 'bg-gray-100 text-gray-800',
-  medium: 'bg-blue-100 text-blue-800',
-  high: 'bg-orange-100 text-orange-800',
-  urgent: 'bg-red-100 text-red-800',
-};
-
 const ProjectCard = ({
   project,
   onViewDetails,

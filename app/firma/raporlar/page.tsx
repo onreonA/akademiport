@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 
 import FirmaLayout from '@/components/firma/FirmaLayout';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import StatusBadge from '@/components/ui/StatusBadge';
 
 interface EvaluationReport {
   id: string;
@@ -294,9 +295,7 @@ export default function FirmaRaporlar() {
                             </span>
                           </div>
                         )}
-                        <span className='inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800'>
-                          Yayınlandı
-                        </span>
+                        <StatusBadge status='published' />
                       </div>
                     </div>
 

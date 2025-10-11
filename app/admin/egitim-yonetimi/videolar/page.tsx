@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 
 import Button from '@/components/ui/Button';
 import Modal, { ModalFooter } from '@/components/ui/Modal';
+import StatusBadge from '@/components/ui/StatusBadge';
 interface Video {
   id: string;
   title: string;
@@ -387,15 +388,9 @@ export default function VideoManagement() {
                         {video.title}
                       </h3>
                       <div className='flex items-center gap-2'>
-                        <span
-                          className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            video.status === 'Aktif'
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-gray-100 text-gray-800'
-                          }`}
-                        >
-                          {video.status}
-                        </span>
+                        <StatusBadge
+                          status={video.status === 'Aktif' ? 'active' : 'inactive'}
+                        />
                         <button
                           onClick={() => handleEditVideo(video)}
                           className='w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors cursor-pointer'

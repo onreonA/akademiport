@@ -194,36 +194,21 @@ const HRPoolPage = () => {
     }
     setFilteredCandidates(filtered);
   }, [candidates, filterType, filterStatus, searchTerm]);
-  const getStatusColor = (status: string) => {
+  // Map HR pool status to StatusBadge status
+  const mapToStatusBadge = (status: string): string => {
     switch (status) {
       case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'pending';
       case 'reviewed':
-        return 'bg-blue-100 text-blue-800';
+        return 'in-progress';
       case 'interviewed':
-        return 'bg-purple-100 text-purple-800';
+        return 'on-hold';
       case 'hired':
-        return 'bg-green-100 text-green-800';
+        return 'approved';
       case 'rejected':
-        return 'bg-red-100 text-red-800';
+        return 'rejected';
       default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'pending':
-        return 'Beklemede';
-      case 'reviewed':
-        return 'İncelendi';
-      case 'interviewed':
-        return 'Mülakat Yapıldı';
-      case 'hired':
-        return 'İşe Alındı';
-      case 'rejected':
-        return 'Reddedildi';
-      default:
-        return status;
+        return 'pending';
     }
   };
   const getTypeText = (type: string) => {
@@ -409,11 +394,7 @@ const HRPoolPage = () => {
                     </p>
                   </div>
                 </div>
-                <span
-                  className={`px-2 py-1 rounded-lg text-xs font-medium ${getStatusColor(candidate.status)}`}
-                >
-                  {getStatusText(candidate.status)}
-                </span>
+                <StatusBadge status={mapToStatusBadge(candidate.status)} />
               </div>
 
               {/* Compact Info */}
