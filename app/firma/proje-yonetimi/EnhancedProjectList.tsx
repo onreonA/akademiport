@@ -378,19 +378,6 @@ export default function EnhancedProjectList() {
 
         const data = await response.json();
 
-        // Debug: Her projenin raw verilerini kontrol et
-        data.projects?.forEach((project: any, index: number) => {
-          console.log(`Project ${index}:`, {
-            id: project.id,
-            name: project.name,
-            end_date: project.end_date,
-            endDate: project.endDate,
-            deadline: project.deadline,
-            company_id: project.company_id,
-            companies: project.companies,
-          });
-        });
-
         // Type guard for API response
         const isValidProjectData = (
           project: unknown
