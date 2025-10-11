@@ -6,6 +6,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import FirmaLayout from '@/components/firma/FirmaLayout';
+import Card from '@/components/ui/Card';
+import StatsCard from '@/components/ui/StatsCard';
 import designSystem from '@/lib/design-system';
 import { useAuthStore } from '@/lib/stores/auth-store';
 import { createClient } from '@/lib/supabase/client';
@@ -323,85 +325,34 @@ export default function FirmaDashboard() {
         {/* Dashboard İstatistikleri - Enhanced Cards */}
         {dashboardStats && (
           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
-            {/* Toplam Eğitim - Blue Gradient */}
-            <div className='group relative'>
-              <div className='absolute inset-0 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg group-hover:shadow-2xl transition-all duration-300 group-hover:-translate-y-2'></div>
-              <div className='relative bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-100'>
-                <div className='w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300'>
-                  <i className='ri-book-open-line w-6 h-6 text-blue-600'></i>
-                </div>
-                <div className='flex items-end justify-between mb-2'>
-                  <span className='text-3xl font-bold text-gray-900'>
-                    {dashboardStats.totalEducation || 0}
-                  </span>
-                  <span className='text-sm font-semibold text-blue-600 flex items-center gap-1'>
-                    <i className='ri-bar-chart-line w-4 h-4'></i>
-                    +12%
-                  </span>
-                </div>
-                <p className='text-gray-600 font-medium'>Toplam Eğitim</p>
-              </div>
-            </div>
-
-            {/* Tamamlanan - Green Gradient */}
-            <div className='group relative'>
-              <div className='absolute inset-0 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg group-hover:shadow-2xl transition-all duration-300 group-hover:-translate-y-2'></div>
-              <div className='relative bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-100'>
-                <div className='w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300'>
-                  <i className='ri-check-line w-6 h-6 text-green-600'></i>
-                </div>
-                <div className='flex items-end justify-between mb-2'>
-                  <span className='text-3xl font-bold text-gray-900'>
-                    {dashboardStats.completedEducation || 0}
-                  </span>
-                  <span className='text-sm font-semibold text-green-600 flex items-center gap-1'>
-                    <i className='ri-bar-chart-line w-4 h-4'></i>
-                    +8%
-                  </span>
-                </div>
-                <p className='text-gray-600 font-medium'>Tamamlanan</p>
-              </div>
-            </div>
-
-            {/* Devam Eden - Orange Gradient */}
-            <div className='group relative'>
-              <div className='absolute inset-0 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg group-hover:shadow-2xl transition-all duration-300 group-hover:-translate-y-2'></div>
-              <div className='relative bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-100'>
-                <div className='w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300'>
-                  <i className='ri-time-line w-6 h-6 text-orange-600'></i>
-                </div>
-                <div className='flex items-end justify-between mb-2'>
-                  <span className='text-3xl font-bold text-gray-900'>
-                    {dashboardStats.inProgressEducation || 0}
-                  </span>
-                  <span className='text-sm font-semibold text-orange-600 flex items-center gap-1'>
-                    <i className='ri-bar-chart-line w-4 h-4'></i>
-                    +5%
-                  </span>
-                </div>
-                <p className='text-gray-600 font-medium'>Devam Eden</p>
-              </div>
-            </div>
-
-            {/* Başarı Oranı - Purple Gradient */}
-            <div className='group relative'>
-              <div className='absolute inset-0 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg group-hover:shadow-2xl transition-all duration-300 group-hover:-translate-y-2'></div>
-              <div className='relative bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-100'>
-                <div className='w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300'>
-                  <i className='ri-trophy-line w-6 h-6 text-purple-600'></i>
-                </div>
-                <div className='flex items-end justify-between mb-2'>
-                  <span className='text-3xl font-bold text-gray-900'>
-                    {dashboardStats.successRate || 0}%
-                  </span>
-                  <span className='text-sm font-semibold text-purple-600 flex items-center gap-1'>
-                    <i className='ri-bar-chart-line w-4 h-4'></i>
-                    +15%
-                  </span>
-                </div>
-                <p className='text-gray-600 font-medium'>Başarı Oranı</p>
-              </div>
-            </div>
+            <StatsCard
+              icon='ri-book-open-line'
+              label='Toplam Eğitim'
+              value={(dashboardStats.totalEducation || 0).toString()}
+              variant='primary'
+              trend={{ value: 12, isPositive: true }}
+            />
+            <StatsCard
+              icon='ri-check-line'
+              label='Tamamlanan'
+              value={(dashboardStats.completedEducation || 0).toString()}
+              variant='success'
+              trend={{ value: 8, isPositive: true }}
+            />
+            <StatsCard
+              icon='ri-time-line'
+              label='Devam Eden'
+              value={(dashboardStats.inProgressEducation || 0).toString()}
+              variant='warning'
+              trend={{ value: 5, isPositive: true }}
+            />
+            <StatsCard
+              icon='ri-trophy-line'
+              label='Başarı Oranı'
+              value={`${dashboardStats.successRate || 0}%`}
+              variant='accent'
+              trend={{ value: 15, isPositive: true }}
+            />
           </div>
         )}
 
