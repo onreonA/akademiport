@@ -160,7 +160,8 @@ export default function StatsCard({
   };
 
   const currentSize = sizeConfig[size];
-  const TrendIcon = trend ? trendConfig[trend].icon : null;
+  const trendKey = trend ? (trend.isPositive ? 'up' : 'down') : null;
+  const TrendIcon = trendKey && trendConfig[trendKey] ? trendConfig[trendKey].icon : null;
 
   if (loading) {
     return (
@@ -225,7 +226,7 @@ export default function StatsCard({
           </p>
 
           {/* Trend */}
-          {trend && TrendIcon && (
+          {trend && TrendIcon && trendKey && (
             <div className='flex items-center gap-1.5'>
               <span
                 className={cn(
@@ -233,8 +234,8 @@ export default function StatsCard({
                   'px-2 py-0.5',
                   'rounded-full',
                   'text-xs font-medium',
-                  trendConfig[trend].color,
-                  trendConfig[trend].bg
+                  trendConfig[trendKey].color,
+                  trendConfig[trendKey].bg
                 )}
               >
                 <TrendIcon className='w-3 h-3' />
