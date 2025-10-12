@@ -1,9 +1,29 @@
 'use client';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 import AdminLayout from '@/components/admin/AdminLayout';
-import DashboardCharts from '@/components/charts/DashboardCharts';
+
+// Lazy load DashboardCharts to avoid webpack bundling issues
+const DashboardCharts = dynamic(
+  () => import('@/components/charts/DashboardCharts'),
+  {
+    loading: () => (
+      <div className='grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8'>
+        {[...Array(4)].map((_, index) => (
+          <div
+            key={index}
+            className='bg-white rounded-lg shadow-sm border border-gray-200 p-6 animate-pulse'
+          >
+            <div className='w-full h-64 bg-gray-200 rounded'></div>
+          </div>
+        ))}
+      </div>
+    ),
+    ssr: false,
+  }
+);
 interface DashboardStats {
   totalProjects: number;
   activeProjects: number;

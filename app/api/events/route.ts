@@ -6,31 +6,12 @@ const supabase = createClient(
 );
 export async function GET(request: NextRequest) {
   try {
-    const userEmail = request.headers.get('X-User-Email');
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category');
     const status = searchParams.get('status');
     const isOnline = searchParams.get('is_online');
     const limit = parseInt(searchParams.get('limit') || '50');
     const offset = parseInt(searchParams.get('offset') || '0');
-    if (!userEmail) {
-      return NextResponse.json(
-        { success: false, error: "Kullanıcı email'i gerekli" },
-        { status: 400 }
-      );
-    }
-    // Get user info
-    const { data: user, error: userError } = await supabase
-      .from('users')
-      .select('id, role, company_id')
-      .eq('email', userEmail)
-      .single();
-    if (userError || !user) {
-      return NextResponse.json(
-        { success: false, error: 'Kullanıcı bulunamadı' },
-        { status: 404 }
-      );
-    }
     // Build query - simplified without joins
     let query = supabase
       .from('events')

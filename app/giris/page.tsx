@@ -1,10 +1,16 @@
 'use client';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
-import ModernNavigation from '@/components/layout/ModernNavigation';
 import { useAuthStore } from '@/lib/stores/auth-store';
+
+// Lazy load ModernNavigation to avoid bundling issues
+const ModernNavigation = dynamic(
+  () => import('@/components/layout/ModernNavigation'),
+  { ssr: false }
+);
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
