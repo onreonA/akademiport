@@ -1,16 +1,29 @@
 'use client';
 
 import jwt from 'jsonwebtoken';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-import FirmaLayout from '@/components/firma/FirmaLayout';
-import Card from '@/components/ui/Card';
 import StatsCard from '@/components/ui/StatsCard';
-import designSystem from '@/lib/design-system';
 import { useAuthStore } from '@/lib/stores/auth-store';
 import { createClient } from '@/lib/supabase/client';
+
+// Lazy load heavy components
+const FirmaLayout = dynamic(() => import('@/components/firma/FirmaLayout'), {
+  loading: () => (
+    <div className='animate-pulse bg-gray-200 h-16 w-full rounded'></div>
+  ),
+});
+
+const Card = dynamic(() => import('@/components/ui/Card'), {
+  loading: () => (
+    <div className='animate-pulse bg-gray-200 h-32 w-full rounded'></div>
+  ),
+});
+
+// designSystem import'u kaldırıldı - lazy loading gerekmiyor
 
 interface Company {
   id: string;
@@ -357,22 +370,16 @@ export default function FirmaDashboard() {
         )}
 
         {/* Firma Bilgileri */}
-        <div className={`${designSystem.components.card.base} p-6`}>
-          <h2
-            className={`text-lg font-semibold ${designSystem.colors.secondary[900]} mb-4`}
-          >
+        <div className='bg-white rounded-xl shadow-sm border border-gray-100 p-6'>
+          <h2 className='text-lg font-semibold text-gray-900 mb-4'>
             Firma Bilgileri
           </h2>
           <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
             <div>
-              <label
-                className={`block text-sm font-medium ${designSystem.colors.secondary[700]} mb-1`}
-              >
+              <label className='block text-sm font-medium text-gray-700 mb-1'>
                 Firma Adı
               </label>
-              <p className={`text-sm ${designSystem.colors.secondary[900]}`}>
-                {company.name}
-              </p>
+              <p className='text-sm text-gray-900'>{company.name}</p>
             </div>
             <div>
               <label className='block text-sm font-medium text-gray-700 mb-1'>

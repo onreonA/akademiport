@@ -1,15 +1,50 @@
 'use client';
+import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 
-import AdminLayout from '@/components/admin/AdminLayout';
-import SmartForm from '@/components/forms/SmartForm';
-import Accordion from '@/components/ui/Accordion';
-import Breadcrumb from '@/components/ui/Breadcrumb';
-import Button from '@/components/ui/Button';
-import Modal from '@/components/ui/Modal';
 import StatusBadge from '@/components/ui/StatusBadge';
 
-import EnhancedAssignmentModal from './EnhancedAssignmentModal';
+// Lazy load heavy components
+const AdminLayout = dynamic(() => import('@/components/admin/AdminLayout'), {
+  loading: () => (
+    <div className='animate-pulse bg-gray-200 h-16 w-full rounded'></div>
+  ),
+});
+
+const SmartForm = dynamic(() => import('@/components/forms/SmartForm'), {
+  loading: () => (
+    <div className='animate-pulse bg-gray-200 h-64 w-full rounded'></div>
+  ),
+});
+
+const Accordion = dynamic(() => import('@/components/ui/Accordion'), {
+  loading: () => (
+    <div className='animate-pulse bg-gray-200 h-32 w-full rounded'></div>
+  ),
+});
+
+const Breadcrumb = dynamic(() => import('@/components/ui/Breadcrumb'), {
+  loading: () => (
+    <div className='animate-pulse bg-gray-200 h-8 w-full rounded'></div>
+  ),
+});
+
+const Button = dynamic(() => import('@/components/ui/Button'), {
+  loading: () => (
+    <div className='animate-pulse bg-gray-200 h-10 w-24 rounded'></div>
+  ),
+});
+
+const Modal = dynamic(() => import('@/components/ui/Modal'), {
+  loading: () => null,
+});
+
+const EnhancedAssignmentModal = dynamic(
+  () => import('./EnhancedAssignmentModal'),
+  {
+    loading: () => null,
+  }
+);
 
 interface Project {
   id: string;
@@ -1264,7 +1299,10 @@ export default function ProjectDetailClient({
               </div>
             </div>
             <div className='flex items-center space-x-2'>
-              <StatusBadge status={mapProjectStatus(subProject.status)} size='sm'>
+              <StatusBadge
+                status={mapProjectStatus(subProject.status)}
+                size='sm'
+              >
                 {subProject.status}
               </StatusBadge>
               <div className='flex items-center space-x-1'>
@@ -1381,10 +1419,16 @@ export default function ProjectDetailClient({
                       </p>
                     </div>
                     <div className='flex items-center space-x-2 ml-4'>
-                      <StatusBadge status={mapTaskPriority(task.priority)} size='xs'>
+                      <StatusBadge
+                        status={mapTaskPriority(task.priority)}
+                        size='xs'
+                      >
                         {task.priority}
                       </StatusBadge>
-                      <StatusBadge status={mapProjectStatus(task.status)} size='xs'>
+                      <StatusBadge
+                        status={mapProjectStatus(task.status)}
+                        size='xs'
+                      >
                         {task.status}
                       </StatusBadge>
                     </div>

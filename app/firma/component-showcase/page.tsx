@@ -286,10 +286,7 @@ export default function ComponentShowcasePage() {
             </div>
           </div>
           <ModalFooter>
-            <Button
-              variant='secondary'
-              onClick={() => setShowModal(false)}
-            >
+            <Button variant='secondary' onClick={() => setShowModal(false)}>
               Kapat
             </Button>
             <Button variant='primary'>Kaydet</Button>

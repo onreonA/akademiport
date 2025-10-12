@@ -132,26 +132,29 @@ export default function StatusBadge({
   const sizeConfig = {
     sm: {
       dot: 'w-1.5 h-1.5',
-      padding: showText ? 'px-2 py-0.5' : 'p-1',
       text: 'text-xs',
       gap: 'gap-1',
+      paddingWithText: 'px-2 py-0.5',
+      paddingWithoutText: 'p-1',
     },
     md: {
       dot: 'w-2 h-2',
-      padding: showText ? 'px-2.5 py-1' : 'p-1.5',
       text: 'text-sm',
       gap: 'gap-1.5',
+      paddingWithText: 'px-2.5 py-1',
+      paddingWithoutText: 'p-1.5',
     },
     lg: {
       dot: 'w-2.5 h-2.5',
-      padding: showText ? 'px-3 py-1.5' : 'p-2',
       text: 'text-base',
       gap: 'gap-2',
+      paddingWithText: 'px-3 py-1.5',
+      paddingWithoutText: 'p-2',
     },
   };
 
-  const config = statusConfig[status];
-  const currentSize = sizeConfig[size];
+  const config = statusConfig[status] || statusConfig['pending'];
+  const currentSize = sizeConfig[size] || sizeConfig['md'];
 
   // If only dot is shown
   if (showDot && !showText) {
@@ -184,7 +187,7 @@ export default function StatusBadge({
         'transition-all duration-200',
 
         // Size
-        currentSize.padding,
+        showText ? currentSize.paddingWithText : currentSize.paddingWithoutText,
         currentSize.text,
         currentSize.gap,
 

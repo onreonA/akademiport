@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 
 import { cn, tokens } from '@/lib/design-tokens';
 
@@ -19,7 +19,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
  *   Click me
  * </Button>
  */
-export default function Button({
+const Button = memo(function Button({
   children,
   variant = 'primary',
   size = 'md',
@@ -82,16 +82,17 @@ export default function Button({
         </>
       ) : (
         <>
-          {icon && (
-            typeof icon === 'string' ? (
+          {icon &&
+            (typeof icon === 'string' ? (
               <i className={`${icon} mr-2`}></i>
             ) : (
-              <span className="mr-2">{icon}</span>
-            )
-          )}
+              <span className='mr-2'>{icon}</span>
+            ))}
           {children}
         </>
       )}
     </button>
   );
-}
+});
+
+export default Button;

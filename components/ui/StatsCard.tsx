@@ -1,16 +1,9 @@
 'use client';
 
-import React from 'react';
-import { TrendingUp, TrendingDown, Minus, type LucideIcon } from 'lucide-react';
+import { Minus, TrendingDown, TrendingUp, type LucideIcon } from 'lucide-react';
+import { memo } from 'react';
 
-import {
-  cn,
-  tokens,
-  spacing,
-  typography,
-  radius,
-  shadow,
-} from '@/lib/design-tokens';
+import { cn, radius, shadow } from '@/lib/design-tokens';
 
 export interface StatsCardProps {
   // Content
@@ -38,7 +31,15 @@ export interface StatsCardProps {
   size?: 'sm' | 'md' | 'lg';
 
   // Style
-  variant?: 'default' | 'gradient' | 'outline' | 'glass';
+  variant?:
+    | 'default'
+    | 'gradient'
+    | 'outline'
+    | 'glass'
+    | 'primary'
+    | 'success'
+    | 'warning'
+    | 'accent';
 
   // Interactive
   onClick?: () => void;
@@ -60,7 +61,7 @@ export interface StatsCardProps {
  *   trendValue="+12%"
  * />
  */
-export default function StatsCard({
+const StatsCard = memo(function StatsCard({
   title,
   label,
   value,
@@ -128,6 +129,30 @@ export default function StatsCard({
       shadow('lg'),
       'hover:bg-white/80'
     ),
+    primary: cn(
+      'bg-blue-50',
+      'border border-blue-200',
+      shadow('md'),
+      'hover:shadow-lg'
+    ),
+    success: cn(
+      'bg-green-50',
+      'border border-green-200',
+      shadow('md'),
+      'hover:shadow-lg'
+    ),
+    warning: cn(
+      'bg-yellow-50',
+      'border border-yellow-200',
+      shadow('md'),
+      'hover:shadow-lg'
+    ),
+    accent: cn(
+      'bg-purple-50',
+      'border border-purple-200',
+      shadow('md'),
+      'hover:shadow-lg'
+    ),
   };
 
   // Icon color configurations
@@ -161,7 +186,8 @@ export default function StatsCard({
 
   const currentSize = sizeConfig[size];
   const trendKey = trend ? (trend.isPositive ? 'up' : 'down') : null;
-  const TrendIcon = trendKey && trendConfig[trendKey] ? trendConfig[trendKey].icon : null;
+  const TrendIcon =
+    trendKey && trendConfig[trendKey] ? trendConfig[trendKey].icon : null;
 
   if (loading) {
     return (
@@ -273,4 +299,6 @@ export default function StatsCard({
       </div>
     </div>
   );
-}
+});
+
+export default StatsCard;
