@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "cross-env NODE_ENV=development next dev -H 0.0.0.0 -p 3000",
-    "build": "next build",
+    "dev": "cross-env NODE_ENV=development NODE_OPTIONS='--max-old-space-size=8192' next dev -H 0.0.0.0 -p 3000",
+    "build": "cross-env NODE_OPTIONS='--max-old-space-size=8192' next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "cross-env NODE_OPTIONS='--max-old-space-size=8192' next lint",
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc --noEmit",
     "type-check": "tsc --noEmit",
@@ -31,7 +31,11 @@
     "test:ci": "jest --ci --coverage --watchAll=false",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "test:e2e:headed": "playwright test --headed"
+    "test:e2e:headed": "playwright test --headed",
+    "cleanup": "bash scripts/dev-cleanup.sh",
+    "dev:clean": "npm run cleanup && npm run dev",
+    "dev:restart": "bash scripts/dev-restart.sh",
+    "perf:check": "node scripts/performance-check.js"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
@@ -105,6 +109,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/supertest": "^6.0.3",
     "@typescript-eslint/eslint-plugin": "^8.43.0",
     "@typescript-eslint/parser": "^8.43.0",
     "concurrently": "^8.2.2",

@@ -26,43 +26,29 @@ const nextConfig = {
       '@': require('path').resolve(__dirname),
     };
 
-    // Production optimizations
-    if (!dev && !isServer) {
-      // Tree shaking optimization
-      config.optimization.usedExports = true;
-      config.optimization.sideEffects = false;
-
-      // Bundle splitting
+    // Development mode - simpler configuration
+    if (dev) {
+      // Disable aggressive chunk splitting in development
       config.optimization.splitChunks = {
-        chunks: 'all',
+        chunks: 'async',
         cacheGroups: {
+          default: {
+            minChunks: 1,
+            priority: -20,
+            reuseExistingChunk: true,
+          },
           vendor: {
             test: /[\\/]node_modules[\\/]/,
             name: 'vendors',
-            chunks: 'all',
-            priority: 10,
-          },
-          common: {
-            name: 'common',
-            minChunks: 2,
-            chunks: 'all',
-            priority: 5,
+            priority: -10,
             reuseExistingChunk: true,
-          },
-          supabase: {
-            test: /[\\/]node_modules[\\/]@supabase[\\/]/,
-            name: 'supabase',
-            chunks: 'all',
-            priority: 20,
-          },
-          zustand: {
-            test: /[\\/]node_modules[\\/]zustand[\\/]/,
-            name: 'zustand',
-            chunks: 'all',
-            priority: 20,
           },
         },
       };
+    } else {
+      // Production optimizations
+      config.optimization.usedExports = true;
+      config.optimization.sideEffects = false;
     }
 
     return config;
