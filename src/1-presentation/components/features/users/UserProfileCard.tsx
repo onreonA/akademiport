@@ -163,16 +163,12 @@ export const UserProfileCard: React.FC<UserProfileCardProps> = ({
         <div className="space-y-3 pt-4 border-t">
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <Calendar className="h-3 w-3" />
-            <span>
-              Kayıt: {new Date(user.createdAt).toLocaleDateString('tr-TR')}
-            </span>
+            <span>Kayıt: {new Date(user.createdAt).toLocaleDateString('tr-TR')}</span>
           </div>
           {user.lastLoginAt && (
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <Calendar className="h-3 w-3" />
-              <span>
-                Son Giriş: {new Date(user.lastLoginAt).toLocaleDateString('tr-TR')}
-              </span>
+              <span>Son Giriş: {new Date(user.lastLoginAt).toLocaleDateString('tr-TR')}</span>
             </div>
           )}
         </div>
@@ -180,4 +176,3 @@ export const UserProfileCard: React.FC<UserProfileCardProps> = ({
     </Card>
   );
 };
-

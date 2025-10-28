@@ -102,4 +102,3 @@ export const UserProgramList: React.FC<UserProgramListProps> = ({
     </Card>
   );
 };
-

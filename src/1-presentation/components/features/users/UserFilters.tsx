@@ -117,14 +117,9 @@ export const UserFilters: React.FC<UserFiltersProps> = ({ onFilterChange, initia
 
         {/* Active Status Filter */}
         <Select
-          value={
-            filters.isActive === undefined ? 'all' : filters.isActive ? 'active' : 'inactive'
-          }
+          value={filters.isActive === undefined ? 'all' : filters.isActive ? 'active' : 'inactive'}
           onValueChange={(value) =>
-            handleFilterChange(
-              'isActive',
-              value === 'all' ? undefined : value === 'active'
-            )
+            handleFilterChange('isActive', value === 'all' ? undefined : value === 'active')
           }
         >
           <SelectTrigger className="w-[150px]">
@@ -176,4 +171,3 @@ export const UserFilters: React.FC<UserFiltersProps> = ({ onFilterChange, initia
     </div>
   );
 };
-

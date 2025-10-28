@@ -135,23 +135,13 @@ export const UserCard = React.forwardRef<HTMLDivElement, UserCardProps>(
         {showActions && (
           <CardFooter className="flex gap-2 pt-0">
             {onView && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => onView(user)}
-                className="flex-1"
-              >
+              <Button variant="outline" size="sm" onClick={() => onView(user)} className="flex-1">
                 <Eye className="h-4 w-4 mr-1" />
                 Görüntüle
               </Button>
             )}
             {onEdit && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => onEdit(user)}
-                className="flex-1"
-              >
+              <Button variant="outline" size="sm" onClick={() => onEdit(user)} className="flex-1">
                 <Edit className="h-4 w-4 mr-1" />
                 Düzenle
               </Button>
@@ -174,4 +164,3 @@ export const UserCard = React.forwardRef<HTMLDivElement, UserCardProps>(
 );
 
 UserCard.displayName = 'UserCard';
-
