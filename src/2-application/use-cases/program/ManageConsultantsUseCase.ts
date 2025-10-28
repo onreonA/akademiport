@@ -63,12 +63,17 @@ export class ManageConsultantsUseCase {
       }
 
       // 4. TODO: Check if consultant user exists and has CONSULTANT role
-      // This will be implemented when we have UserRepository
+      // This will be implemented when we have UserRepository (Sprint 5)
 
-      // 5. TODO: Add consultant to program (user_programs table)
-      // This will be implemented when we add repository methods
-      // For now, return success
-      console.log(`Adding consultant ${input.consultantId} to program ${input.programId}`);
+      // 5. Add consultant to program (user_programs table)
+      const addResult = await this.programRepository.addConsultant(
+        input.programId,
+        input.consultantId
+      );
+
+      if (addResult.isFailure) {
+        return Result.fail(addResult.error || 'Danışman eklenemedi');
+      }
 
       return Result.ok(undefined);
     } catch (error) {
@@ -110,9 +115,15 @@ export class ManageConsultantsUseCase {
         return Result.fail('Program bulunamadı');
       }
 
-      // 4. TODO: Remove consultant from program (user_programs table)
-      // This will be implemented when we add repository methods
-      console.log(`Removing consultant ${input.consultantId} from program ${input.programId}`);
+      // 4. Remove consultant from program (user_programs table)
+      const removeResult = await this.programRepository.removeConsultant(
+        input.programId,
+        input.consultantId
+      );
+
+      if (removeResult.isFailure) {
+        return Result.fail(removeResult.error || 'Danışman çıkarılamadı');
+      }
 
       return Result.ok(undefined);
     } catch (error) {
@@ -139,12 +150,14 @@ export class ManageConsultantsUseCase {
         return Result.fail('Program bulunamadı');
       }
 
-      // 3. TODO: Get consultants from program (user_programs JOIN users)
-      // This will be implemented when we add repository methods
-      console.log(`Getting consultants for program ${input.programId}`);
+      // 3. Get consultants from program (user_programs JOIN users)
+      const consultantsResult = await this.programRepository.getConsultants(input.programId);
 
-      // For now, return empty array
-      return Result.ok([]);
+      if (consultantsResult.isFailure) {
+        return Result.fail(consultantsResult.error || 'Danışmanlar alınamadı');
+      }
+
+      return Result.ok(consultantsResult.value || []);
     } catch (error) {
       return Result.fail(
         error instanceof Error ? error.message : 'Danışmanlar getirilirken bir hata oluştu'

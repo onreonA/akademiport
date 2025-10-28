@@ -33,14 +33,7 @@ export class ListProgramsUseCase {
 
       // If user is PROGRAM_MANAGER, filter by their managed programs
       if (input.userRole === UserRole.PROGRAM_MANAGER && input.userId) {
-        programsResult = await this.programRepository.findByStatus(''); // TODO: Implement findByManagerId
-        // For now, get all and filter
-        if (programsResult.isSuccess && programsResult.value) {
-          const filteredPrograms = programsResult.value.filter(
-            (p) => p.programManagerId === input.userId
-          );
-          programsResult = Result.ok(filteredPrograms);
-        }
+        programsResult = await this.programRepository.findByManagerId(input.userId);
       } else if (input.status) {
         // Filter by status
         programsResult = await this.programRepository.findByStatus(input.status);
