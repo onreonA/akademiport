@@ -9,62 +9,79 @@ import type { NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 
 export async function middleware(request: NextRequest) {
+  // Public pages - authentication gerektirmez
+  const isPublicPage =
+    request.nextUrl.pathname === '/' ||
+    request.nextUrl.pathname.startsWith('/components-demo') ||
+    request.nextUrl.pathname.startsWith('/public') ||
+    request.nextUrl.pathname.startsWith('/_next') ||
+    request.nextUrl.pathname.startsWith('/api/public');
+
+  // Public page ise direkt geç
+  if (isPublicPage) {
+    return NextResponse.next();
+  }
+
   let response = NextResponse.next({
     request: {
       headers: request.headers,
     },
   });
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
+  try {
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return request.cookies.getAll();
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
+            response = NextResponse.next({
+              request,
+            });
+            cookiesToSet.forEach(({ name, value, options }) =>
+              response.cookies.set(name, value, options)
+            );
+          },
         },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
-          response = NextResponse.next({
-            request,
-          });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options)
-          );
-        },
-      },
+      }
+    );
+
+    // Get user session
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    const isAuthPage =
+      request.nextUrl.pathname.startsWith('/auth') ||
+      request.nextUrl.pathname === '/login' ||
+      request.nextUrl.pathname === '/register';
+
+    // Redirect authenticated users away from auth pages
+    if (user && isAuthPage) {
+      return NextResponse.redirect(new URL('/dashboard', request.url));
     }
-  );
 
-  // Get user session
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    // Redirect unauthenticated users to login (except public pages)
+    if (!user && !isAuthPage) {
+      const redirectUrl = new URL('/login', request.url);
+      redirectUrl.searchParams.set('redirect', request.nextUrl.pathname);
+      return NextResponse.redirect(redirectUrl);
+    }
 
-  const isAuthPage =
-    request.nextUrl.pathname.startsWith('/auth') ||
-    request.nextUrl.pathname === '/login' ||
-    request.nextUrl.pathname === '/register';
-
-  const isPublicPage =
-    request.nextUrl.pathname === '/' ||
-    request.nextUrl.pathname.startsWith('/public') ||
-    request.nextUrl.pathname.startsWith('/_next') ||
-    request.nextUrl.pathname.startsWith('/api/public');
-
-  // Redirect authenticated users away from auth pages
-  if (user && isAuthPage) {
-    return NextResponse.redirect(new URL('/dashboard', request.url));
+    return response;
+  } catch (error) {
+    console.error('Middleware error:', error);
+    // Hata durumunda public page'lere izin ver
+    if (isPublicPage) {
+      return NextResponse.next();
+    }
+    // Diğer sayfalarda login'e yönlendir
+    return NextResponse.redirect(new URL('/login', request.url));
   }
-
-  // Redirect unauthenticated users to login (except public pages)
-  if (!user && !isAuthPage && !isPublicPage) {
-    const redirectUrl = new URL('/login', request.url);
-    redirectUrl.searchParams.set('redirect', request.nextUrl.pathname);
-    return NextResponse.redirect(redirectUrl);
-  }
-
-  return response;
 }
 
 export const config = {

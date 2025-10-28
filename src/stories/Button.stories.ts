@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 
 import { fn } from 'storybook/test';
 
@@ -49,13 +49,6 @@ export const Large: Story = {
 export const Small: Story = {
   args: {
     size: 'small',
-    label: 'Button',
-  },
-};
-
-export const AkademiPort: Story = {
-  args: {
-    primary: false,
     label: 'Button',
   },
 };
