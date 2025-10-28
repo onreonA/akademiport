@@ -1,36 +1,125 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🎯 Akademi Port
 
-## Getting Started
+Multi-program e-ihracat dönüşüm platformu.
 
-First, run the development server:
+## 🚀 Teknoloji Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Frontend:** Next.js 16, React 19, TypeScript
+- **Styling:** Tailwind CSS 4, Shadcn/ui
+- **State Management:** Zustand
+- **Database:** Supabase (PostgreSQL)
+- **Authentication:** Supabase Auth (JWT)
+- **AI:** OpenAI GPT-4, Anthropic Claude
+- **Documentation:** Storybook
+
+## 📁 Proje Yapısı
+
+```
+src/
+├── 1-presentation/    # UI Layer
+├── 2-application/     # Business Logic Layer
+├── 3-domain/          # Domain Layer
+├── 4-infrastructure/  # Infrastructure Layer
+├── 5-shared/          # Shared Layer
+└── 6-core/            # Core Layer
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🛠️ Kurulum
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+# Dependencies
+npm install
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Development
+npm run dev
 
-## Learn More
+# Storybook
+npm run storybook
 
-To learn more about Next.js, take a look at the following resources:
+# Build
+npm run build
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Lint
+npm run lint
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Format
+npm run format
 
-## Deploy on Vercel
+# Type Check
+npm run type-check
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📚 Dokümantasyon
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [Mimari Kararlar](./Arşiv/proje-planlama-ve-mimari-kararlar.md)
+- [Sprint Planı](./Arşiv/sprint-plani-genel.md)
+- [Sprint 1 Detayları](./sprint-detaylari/sprint-01-proje-kurulumu.md)
+- [Component Library](http://localhost:6006) (Storybook - yakında)
+
+## 🎨 Design System
+
+Design system Storybook'ta dokümante edilecektir.
+
+```bash
+npm run storybook
+```
+
+## 🏗️ Mimari
+
+Proje **Clean Architecture** ve **Modular Monolith** prensipleriyle geliştirilmektedir.
+
+### Katmanlar
+
+1. **Presentation Layer** - UI components ve pages
+2. **Application Layer** - Business logic ve use cases
+3. **Domain Layer** - Core business entities ve interfaces
+4. **Infrastructure Layer** - Database, API, external services
+5. **Shared Layer** - Utilities, constants, hooks
+6. **Core Layer** - Framework-level kod (errors, result pattern)
+
+### Prensipler
+
+- **Loose Coupling** - Modüller birbirine bağımlı değil
+- **High Cohesion** - Her katman kendi işine odaklı
+- **Dependency Rule** - Bağımlılıklar tek yönlü (dışarıdan içeriye)
+- **Vertical Slice** - Her özellik baştan sona tamamlanır
+
+## 📝 Geliştirme Kuralları
+
+- TypeScript strict mode aktif
+- ESLint kurallarına uyulmalı
+- Prettier ile format edilmeli
+- Her katman için README.md olmalı
+- Component'ler Storybook'ta dokümante edilmeli
+
+## 🎯 Sprint Durumu
+
+**Aktif Sprint:** Sprint 1 - Proje Kurulumu  
+**Durum:** 🏃 Devam Ediyor  
+**Tamamlanma:** %60
+
+### Tamamlanan Görevler
+- ✅ Next.js 16 + TypeScript kurulumu
+- ✅ Tailwind CSS 4 kurulumu
+- ✅ ESLint + Prettier konfigürasyonu
+- ✅ Git repository oluşturuldu
+- ✅ TypeScript path aliases tanımlandı
+
+### Devam Eden Görevler
+- 🏃 Shadcn/ui kurulumu
+- 🏃 Klasör yapısı oluşturma
+- 🏃 Storybook kurulumu
+- 🏃 Design tokens tanımlama
+
+## 📞 İletişim
+
+**Proje Sahibi:** Ömer Ünsal  
+**Geliştirme:** AI Assistant + Ömer Ünsal
+
+## 📝 Lisans
+
+Private Project
+
+---
+
+🚀 **Akademi Port - Yeni Nesil E-İhracat Platformu**
