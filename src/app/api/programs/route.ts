@@ -7,10 +7,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { ProgramRepository } from '@/infrastructure/database/repositories/ProgramRepository';
-import {
-  CreateProgramUseCase,
-  ListProgramsUseCase,
-} from '@/application/use-cases/program';
+import { CreateProgramUseCase, ListProgramsUseCase } from '@/application/use-cases/program';
 import { UserRole } from '@/domain/enums/UserRole';
 import { ProgramStatus } from '@/domain/enums/ProgramStatus';
 import type { ProgramSortField } from '@/application/dto/program/ProgramFilterDto';

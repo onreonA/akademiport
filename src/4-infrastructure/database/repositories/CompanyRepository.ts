@@ -1,57 +1,14 @@
 /**
  * Company Repository Implementation
+ * Sprint 6: Updated with new DTOs and methods
  */
 
 import { createClient } from '@/infrastructure/database/supabase-server';
 import { Result } from '@/core/result/Result';
 import { ICompanyRepository } from '@/domain/interfaces/ICompanyRepository';
 import { Company } from '@/domain/entities/Company';
-
-// TODO: Company DTOs will be created in Sprint 6
-// For now, we'll define them inline
-interface CreateCompanyDto {
-  programId: string;
-  name: string;
-  legalName?: string;
-  taxNumber?: string;
-  tradeRegistryNumber?: string;
-  slug?: string;
-  email?: string;
-  phone?: string;
-  website?: string;
-  address?: string;
-  city?: string;
-  district?: string;
-  postalCode?: string;
-  country?: string;
-  sector?: string;
-  subSector?: string;
-  employeeCount?: number;
-  foundationYear?: number;
-  maxUsers?: number;
-}
-
-interface UpdateCompanyDto {
-  name?: string;
-  legalName?: string;
-  taxNumber?: string;
-  tradeRegistryNumber?: string;
-  email?: string;
-  phone?: string;
-  website?: string;
-  address?: string;
-  city?: string;
-  district?: string;
-  postalCode?: string;
-  sector?: string;
-  subSector?: string;
-  employeeCount?: number;
-  foundationYear?: number;
-  logoUrl?: string;
-  isActive?: boolean;
-  maxUsers?: number;
-  settings?: Record<string, unknown>;
-}
+import { User, UserRole } from '@/domain/entities/User';
+import type { CreateCompanyDto, UpdateCompanyDto, CompanyFilterDto } from '@/application/dto/company';
 
 export class CompanyRepository implements ICompanyRepository {
   async findById(id: string): Promise<Result<Company | null>> {
@@ -231,6 +188,159 @@ export class CompanyRepository implements ICompanyRepository {
     }
   }
 
+  // New methods - Sprint 6
+  async search(query: string): Promise<Result<Company[]>> {
+    try {
+      const supabase = await createClient();
+
+      const { data, error } = await supabase
+        .from('companies')
+        .select('*')
+        .or(`name.ilike.%${query}%,legal_name.ilike.%${query}%,city.ilike.%${query}%,sector.ilike.%${query}%`)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        return Result.fail(error.message);
+      }
+
+      return Result.ok(data.map((item) => this.mapToEntity(item)));
+    } catch (error) {
+      return Result.fail(error instanceof Error ? error.message : 'Arama yapılamadı');
+    }
+  }
+
+  async findWithFilters(filter: CompanyFilterDto): Promise<Result<{ companies: Company[]; total: number }>> {
+    try {
+      const supabase = await createClient();
+
+      // Build query
+      let query = supabase.from('companies').select('*', { count: 'exact' });
+
+      // Apply filters
+      if (filter.search) {
+        query = query.or(`name.ilike.%${filter.search}%,legal_name.ilike.%${filter.search}%,city.ilike.%${filter.search}%`);
+      }
+
+      if (filter.programId) {
+        query = query.eq('program_id', filter.programId);
+      }
+
+      if (filter.city) {
+        query = query.eq('city', filter.city);
+      }
+
+      if (filter.sector) {
+        query = query.eq('sector', filter.sector);
+      }
+
+      if (filter.isActive !== undefined) {
+        query = query.eq('is_active', filter.isActive);
+      }
+
+      // Apply sorting
+      const sortColumn = filter.sortBy === 'createdAt' ? 'created_at' : 
+                        filter.sortBy === 'updatedAt' ? 'updated_at' :
+                        filter.sortBy === 'employeeCount' ? 'employee_count' :
+                        filter.sortBy;
+      query = query.order(sortColumn, { ascending: filter.sortOrder === 'asc' });
+
+      // Apply pagination
+      const from = (filter.page - 1) * filter.limit;
+      const to = from + filter.limit - 1;
+      query = query.range(from, to);
+
+      const { data, error, count } = await query;
+
+      if (error) {
+        return Result.fail(error.message);
+      }
+
+      return Result.ok({
+        companies: data.map((item) => this.mapToEntity(item)),
+        total: count || 0,
+      });
+    } catch (error) {
+      return Result.fail(error instanceof Error ? error.message : 'Firmalar alınamadı');
+    }
+  }
+
+  async getCompanyUsers(companyId: string): Promise<Result<User[]>> {
+    try {
+      const supabase = await createClient();
+
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('company_id', companyId)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        return Result.fail(error.message);
+      }
+
+      return Result.ok(data.map((item) => this.mapToUserEntity(item)));
+    } catch (error) {
+      return Result.fail(error instanceof Error ? error.message : 'Firma kullanıcıları alınamadı');
+    }
+  }
+
+  async addCompanyUser(companyId: string, userId: string): Promise<Result<void>> {
+    try {
+      const supabase = await createClient();
+
+      // Check if company exists
+      const { data: company, error: companyError } = await supabase
+        .from('companies')
+        .select('*')
+        .eq('id', companyId)
+        .single();
+
+      if (companyError || !company) {
+        return Result.fail('Firma bulunamadı');
+      }
+
+      // Check max users limit
+      if (company.current_users >= company.max_users) {
+        return Result.fail('Maksimum kullanıcı sayısına ulaşıldı');
+      }
+
+      // Update user's company_id
+      const { error: updateError } = await supabase
+        .from('users')
+        .update({ company_id: companyId })
+        .eq('id', userId);
+
+      if (updateError) {
+        return Result.fail(updateError.message);
+      }
+
+      return Result.ok(undefined);
+    } catch (error) {
+      return Result.fail(error instanceof Error ? error.message : 'Kullanıcı eklenemedi');
+    }
+  }
+
+  async removeCompanyUser(companyId: string, userId: string): Promise<Result<void>> {
+    try {
+      const supabase = await createClient();
+
+      // Update user's company_id to null
+      const { error } = await supabase
+        .from('users')
+        .update({ company_id: null })
+        .eq('id', userId)
+        .eq('company_id', companyId);
+
+      if (error) {
+        return Result.fail(error.message);
+      }
+
+      return Result.ok(undefined);
+    } catch (error) {
+      return Result.fail(error instanceof Error ? error.message : 'Kullanıcı çıkarılamadı');
+    }
+  }
+
   private mapToEntity(data: Record<string, unknown>): Company {
     return {
       id: data.id as string,
@@ -261,6 +371,22 @@ export class CompanyRepository implements ICompanyRepository {
       updatedAt: new Date(data.updated_at as string),
       createdBy: data.created_by as string | undefined,
       updatedBy: data.updated_by as string | undefined,
+    };
+  }
+
+  private mapToUserEntity(data: Record<string, unknown>): User {
+    return {
+      id: data.id as string,
+      email: data.email as string,
+      fullName: data.full_name as string,
+      role: data.role as UserRole,
+      avatarUrl: data.avatar_url as string | undefined,
+      companyId: data.company_id as string | undefined,
+      isActive: data.is_active as boolean,
+      isEmailVerified: data.is_email_verified as boolean,
+      lastLoginAt: data.last_login_at ? new Date(data.last_login_at as string) : undefined,
+      createdAt: new Date(data.created_at as string),
+      updatedAt: new Date(data.updated_at as string),
     };
   }
 }

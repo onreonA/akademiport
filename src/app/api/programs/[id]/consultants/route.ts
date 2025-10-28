@@ -18,10 +18,7 @@ const manageConsultantsUseCase = new ManageConsultantsUseCase(programRepository)
  * POST /api/programs/[id]/consultants
  * Add a consultant to a program
  */
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id: programId } = await params;
     const body = await request.json();
@@ -83,10 +80,7 @@ export async function POST(
  * GET /api/programs/[id]/consultants
  * Get all consultants for a program
  */
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id: programId } = await params;
 
@@ -123,4 +117,3 @@ export async function GET(
     );
   }
 }
-

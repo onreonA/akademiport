@@ -12,6 +12,7 @@ export interface AuthenticatedUser {
   id: string;
   email: string;
   role: string;
+  companyId?: string;
 }
 
 /**
@@ -48,10 +49,10 @@ export async function getAuthenticatedUser(
       return null;
     }
 
-    // Get user role from database
+    // Get user role and company from database
     const { data: userData } = await supabase
       .from('users')
-      .select('role')
+      .select('role, company_id')
       .eq('id', user.id)
       .single();
 
@@ -59,6 +60,7 @@ export async function getAuthenticatedUser(
       id: user.id,
       email: user.email!,
       role: userData?.role || 'company_user',
+      companyId: userData?.company_id,
     };
   } catch (error) {
     console.error('Auth error:', error);
