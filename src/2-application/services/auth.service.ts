@@ -6,8 +6,18 @@
 
 import { createClient } from '@/infrastructure/database/supabase-server';
 import { Result } from '@/core/result/Result';
-import type { AuthUser, CreateUserDto } from '@/domain/entities/User';
+import type { AuthUser } from '@/domain/entities/User';
 import { UserRole } from '@/domain/enums/UserRole';
+
+// TODO: User DTOs will be created in Sprint 5
+interface CreateUserDto {
+  email: string;
+  fullName: string;
+  password: string;
+  phone?: string;
+  role?: UserRole;
+  companyId?: string;
+}
 
 export class AuthService {
   /**

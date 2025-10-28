@@ -5,7 +5,53 @@
 import { createClient } from '@/infrastructure/database/supabase-server';
 import { Result } from '@/core/result/Result';
 import { ICompanyRepository } from '@/domain/interfaces/ICompanyRepository';
-import { Company, CreateCompanyDto, UpdateCompanyDto } from '@/domain/entities/Company';
+import { Company } from '@/domain/entities/Company';
+
+// TODO: Company DTOs will be created in Sprint 6
+// For now, we'll define them inline
+interface CreateCompanyDto {
+  programId: string;
+  name: string;
+  legalName?: string;
+  taxNumber?: string;
+  tradeRegistryNumber?: string;
+  slug?: string;
+  email?: string;
+  phone?: string;
+  website?: string;
+  address?: string;
+  city?: string;
+  district?: string;
+  postalCode?: string;
+  country?: string;
+  sector?: string;
+  subSector?: string;
+  employeeCount?: number;
+  foundationYear?: number;
+  maxUsers?: number;
+}
+
+interface UpdateCompanyDto {
+  name?: string;
+  legalName?: string;
+  taxNumber?: string;
+  tradeRegistryNumber?: string;
+  email?: string;
+  phone?: string;
+  website?: string;
+  address?: string;
+  city?: string;
+  district?: string;
+  postalCode?: string;
+  sector?: string;
+  subSector?: string;
+  employeeCount?: number;
+  foundationYear?: number;
+  logoUrl?: string;
+  isActive?: boolean;
+  maxUsers?: number;
+  settings?: Record<string, unknown>;
+}
 
 export class CompanyRepository implements ICompanyRepository {
   async findById(id: string): Promise<Result<Company | null>> {

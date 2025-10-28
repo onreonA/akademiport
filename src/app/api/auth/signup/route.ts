@@ -6,7 +6,17 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { AuthService } from '@/application/services/auth.service';
-import { CreateUserDto } from '@/domain/entities/User';
+import { UserRole } from '@/domain/enums/UserRole';
+
+// TODO: User DTOs will be created in Sprint 5
+interface CreateUserDto {
+  email: string;
+  fullName: string;
+  password: string;
+  phone?: string;
+  role?: UserRole;
+  companyId?: string;
+}
 
 export async function POST(request: NextRequest) {
   try {

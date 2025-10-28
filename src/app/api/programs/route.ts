@@ -7,7 +7,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { ProgramRepository } from '@/infrastructure/database/repositories/ProgramRepository';
-import { CreateProgramDto } from '@/domain/entities/Program';
+import { CreateProgramDto } from '@/application/dto/program';
 
 const repository = new ProgramRepository();
 

@@ -3,7 +3,8 @@
  */
 
 import { Result } from '@/core/result/Result';
-import { Program, CreateProgramDto, UpdateProgramDto } from '../entities/Program';
+import { Program } from '../entities/Program';
+import { CreateProgramDto, UpdateProgramDto } from '@/application/dto/program';
 
 export interface IProgramRepository {
   findById(id: string): Promise<Result<Program | null>>;

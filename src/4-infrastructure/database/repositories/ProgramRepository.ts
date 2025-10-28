@@ -5,7 +5,8 @@
 import { createClient } from '@/infrastructure/database/supabase-server';
 import { Result } from '@/core/result/Result';
 import { IProgramRepository } from '@/domain/interfaces/IProgramRepository';
-import { Program, CreateProgramDto, UpdateProgramDto } from '@/domain/entities/Program';
+import { Program } from '@/domain/entities/Program';
+import { CreateProgramDto, UpdateProgramDto } from '@/application/dto/program';
 import { ProgramStatus } from '@/domain/enums/ProgramStatus';
 
 export class ProgramRepository implements IProgramRepository {

@@ -37,25 +37,6 @@ export interface UserSettings {
   timezone: string;
 }
 
-export interface CreateUserDto {
-  email: string;
-  fullName: string;
-  password: string;
-  phone?: string;
-  role?: UserRole;
-  companyId?: string;
-}
-
-export interface UpdateUserDto {
-  fullName?: string;
-  phone?: string;
-  avatarUrl?: string;
-  bio?: string;
-  expertiseAreas?: string[];
-  socialLinks?: Record<string, string>;
-  settings?: Partial<UserSettings>;
-}
-
 export interface AuthUser {
   id: string;
   email: string;

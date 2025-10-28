@@ -8,7 +8,29 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { CompanyRepository } from '@/infrastructure/database/repositories/CompanyRepository';
-import { UpdateCompanyDto } from '@/domain/entities/Company';
+
+// TODO: Company DTOs will be created in Sprint 6
+interface UpdateCompanyDto {
+  name?: string;
+  legalName?: string;
+  taxNumber?: string;
+  tradeRegistryNumber?: string;
+  email?: string;
+  phone?: string;
+  website?: string;
+  address?: string;
+  city?: string;
+  district?: string;
+  postalCode?: string;
+  sector?: string;
+  subSector?: string;
+  employeeCount?: number;
+  foundationYear?: number;
+  logoUrl?: string;
+  isActive?: boolean;
+  maxUsers?: number;
+  settings?: Record<string, unknown>;
+}
 
 const repository = new CompanyRepository();
 
