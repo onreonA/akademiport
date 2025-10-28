@@ -27,32 +27,43 @@ src/
 ## 🛠️ Kurulum
 
 ```bash
-# Dependencies
+# 1. Dependencies
 npm install
 
-# Development
+# 2. Environment Variables
+cp .env.local.example .env.local
+# .env.local dosyasını Supabase bilgilerinizle doldurun
+
+# 3. Database Migration
+# Supabase Dashboard → SQL Editor'de çalıştırın:
+# src/4-infrastructure/database/migrations/combined_initial_schema.sql
+
+# 4. Development
 npm run dev
 
-# Storybook
+# 5. Storybook
 npm run storybook
+```
 
-# Build
-npm run build
+## 📝 Scripts
 
-# Lint
-npm run lint
-
-# Format
-npm run format
-
-# Type Check
-npm run type-check
+```bash
+npm run dev          # Dev server (Turbopack)
+npm run build        # Production build
+npm run start        # Production server
+npm run lint         # ESLint
+npm run lint:fix     # ESLint fix
+npm run format       # Prettier format
+npm run type-check   # TypeScript check
+npm run storybook    # Storybook dev
 ```
 
 ## 📚 Dokümantasyon
 
-- [Mimari Kararlar](./Arşiv/proje-planlama-ve-mimari-kararlar.md)
-- [Sprint Planı](./Arşiv/sprint-plani-genel.md)
+- [API Documentation](./docs/API.md)
+- [Sprint 2 Summary](./docs/SPRINT-2-SUMMARY.md)
+- [Database README](./src/4-infrastructure/database/README.md)
+- [Storybook](http://localhost:6006) (npm run storybook)
 - [Sprint 1 Detayları](./sprint-detaylari/sprint-01-proje-kurulumu.md)
 - [Component Library](http://localhost:6006) (Storybook - yakında)
 

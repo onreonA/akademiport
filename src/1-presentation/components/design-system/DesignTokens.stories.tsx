@@ -93,7 +93,7 @@ export const Spacing = () => (
     <div>
       <h1 className="text-4xl font-bold mb-2">Spacing</h1>
       <p className="text-muted-foreground mb-8">
-        8px grid sistemi. Tüm spacing değerleri 8'in katlarıdır.
+        8px grid sistemi. Tüm spacing değerleri 8&apos;in katlarıdır.
       </p>
     </div>
 
@@ -176,7 +176,7 @@ export const Overview = () => (
     <div>
       <h1 className="text-4xl font-bold mb-2">Design Tokens Overview</h1>
       <p className="text-muted-foreground mb-8">
-        Akademi Port tasarım sisteminin tüm token'larına genel bakış.
+        Akademi Port tasarım sisteminin tüm token&apos;larına genel bakış.
       </p>
     </div>
 

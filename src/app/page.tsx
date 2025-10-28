@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { Button } from '@/presentation/components/ui/atoms/button';
 import {
   Card,
@@ -15,7 +16,7 @@ export default function Home() {
         {/* Hero Section */}
         <div className="text-center space-y-4">
           <Badge variant="secondary" className="mb-4">
-            Sprint 1 - Gün 2 ✅
+            Sprint 2 - Authentication ✅
           </Badge>
           <h1 className="text-6xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
             Akademi Port
@@ -23,98 +24,80 @@ export default function Home() {
           <p className="text-xl text-muted-foreground">Multi-Program E-İhracat Dönüşüm Platformu</p>
         </div>
 
-        {/* Button Showcase */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Button Components</CardTitle>
-            <CardDescription>Canlı ve renkli button örnekleri</CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-wrap gap-4">
-            <Button>Primary Button</Button>
-            <Button variant="secondary">Secondary Button</Button>
-            <Button variant="outline">Outline Button</Button>
-            <Button variant="destructive">Destructive Button</Button>
-            <Button variant="ghost">Ghost Button</Button>
-            <Button variant="link">Link Button</Button>
-          </CardContent>
-        </Card>
+        {/* CTA Buttons */}
+        <div className="flex gap-4 justify-center">
+          <Link href="/login">
+            <Button size="lg">Giriş Yap</Button>
+          </Link>
+          <Link href="/dashboard">
+            <Button size="lg" variant="outline">
+              Dashboard
+            </Button>
+          </Link>
+        </div>
 
-        {/* Color Showcase */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Color Palette</CardTitle>
-            <CardDescription>Canlı ve enerji dolu renkler</CardDescription>
-          </CardHeader>
-          <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="space-y-2">
-              <div className="h-20 bg-primary rounded-lg flex items-center justify-center text-primary-foreground font-semibold">
-                Primary
-              </div>
-              <p className="text-sm text-center text-muted-foreground">Canlı Mavi</p>
-            </div>
-            <div className="space-y-2">
-              <div className="h-20 bg-secondary rounded-lg flex items-center justify-center text-secondary-foreground font-semibold">
-                Secondary
-              </div>
-              <p className="text-sm text-center text-muted-foreground">Canlı Mor</p>
-            </div>
-            <div className="space-y-2">
-              <div className="h-20 bg-accent rounded-lg flex items-center justify-center text-accent-foreground font-semibold">
-                Accent
-              </div>
-              <p className="text-sm text-center text-muted-foreground">Canlı Turuncu</p>
-            </div>
-            <div className="space-y-2">
-              <div className="h-20 bg-destructive rounded-lg flex items-center justify-center text-destructive-foreground font-semibold">
-                Destructive
-              </div>
-              <p className="text-sm text-center text-muted-foreground">Canlı Kırmızı</p>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Features */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-primary">Multi-Program</CardTitle>
+              <CardDescription>Birden fazla program ve grup yönetimi</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Badge variant="default">Yeni</Badge>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-secondary">Güvenli Auth</CardTitle>
+              <CardDescription>Supabase + RLS ile güvenli authentication</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Badge variant="default">Aktif</Badge>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-accent">Clean Architecture</CardTitle>
+              <CardDescription>6 katmanlı modüler mimari</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Badge variant="default">Hazır</Badge>
+            </CardContent>
+          </Card>
+        </div>
 
         {/* Status */}
         <Card className="bg-gradient-to-r from-primary/10 via-secondary/10 to-accent/10">
           <CardHeader>
-            <CardTitle>🎉 Sprint 1 İlerleme</CardTitle>
+            <CardTitle>🎉 Sprint 2 İlerleme</CardTitle>
             <CardDescription>Tamamlanan görevler</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
             <div className="flex items-center gap-2">
               <Badge variant="default">✅</Badge>
-              <span>Next.js 16 + TypeScript kurulumu</span>
+              <span>Supabase Client kurulumu</span>
             </div>
             <div className="flex items-center gap-2">
               <Badge variant="default">✅</Badge>
-              <span>Tailwind CSS 4 + Shadcn/ui entegrasyonu</span>
+              <span>Database Schema (Programs, Users, Companies)</span>
             </div>
             <div className="flex items-center gap-2">
               <Badge variant="default">✅</Badge>
-              <span>Canlı renk paleti tanımlandı</span>
+              <span>Migration dosyaları</span>
             </div>
             <div className="flex items-center gap-2">
               <Badge variant="default">✅</Badge>
-              <span>Inter font yüklendi</span>
+              <span>Authentication sistemi</span>
             </div>
             <div className="flex items-center gap-2">
               <Badge variant="default">✅</Badge>
-              <span>İlk componentler eklendi</span>
+              <span>Middleware ve route protection</span>
             </div>
           </CardContent>
         </Card>
-
-        {/* Next Steps */}
-        <div className="text-center space-y-4">
-          <p className="text-sm text-muted-foreground">
-            Sonraki Adım: 6 Katmanlı Klasör Yapısı Oluşturma
-          </p>
-          <div className="flex gap-4 justify-center">
-            <Button size="lg">Devam Et</Button>
-            <Button size="lg" variant="outline">
-              Dokümantasyon
-            </Button>
-          </div>
-        </div>
       </div>
     </main>
   );

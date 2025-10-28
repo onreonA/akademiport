@@ -22,7 +22,7 @@ export const createClient = async () => {
           cookiesToSet.forEach(({ name, value, options }) => {
             cookieStore.set(name, value, options);
           });
-        } catch (error) {
+        } catch {
           // Cookie setting can fail in middleware
           // This is expected and can be ignored
         }
