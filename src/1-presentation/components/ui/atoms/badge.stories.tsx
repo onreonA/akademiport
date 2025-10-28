@@ -98,4 +98,3 @@ export const SprintBadges: Story = {
     </div>
   ),
 };
-

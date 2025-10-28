@@ -157,4 +157,3 @@ export const FullWidth: Story = {
     className: 'w-full',
   },
 };
-

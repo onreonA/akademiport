@@ -100,4 +100,3 @@ export const Interactive: Story = {
     </Card>
   ),
 };
-
