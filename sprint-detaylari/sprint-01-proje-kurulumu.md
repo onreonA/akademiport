@@ -11,9 +11,11 @@
 ## 🎯 SPRINT HEDEFLERİ
 
 ### Ana Hedef
+
 Akademi Port projesinin temel altyapısını kurmak ve geliştirme ortamını hazırlamak.
 
 ### Spesifik Hedefler
+
 1. ✅ Next.js 15 + TypeScript projesi çalışır durumda
 2. ✅ Tailwind CSS + Shadcn/ui entegre edilmiş
 3. ✅ 6 katmanlı klasör yapısı oluşturulmuş
@@ -29,6 +31,7 @@ Akademi Port projesinin temel altyapısını kurmak ve geliştirme ortamını ha
 ### 🗓️ GÜN 1: Next.js + TypeScript Kurulumu
 
 #### Görevler
+
 - [ ] Next.js 15 projesi oluştur
 - [ ] TypeScript konfigürasyonu
 - [ ] ESLint + Prettier kurulumu
@@ -37,6 +40,7 @@ Akademi Port projesinin temel altyapısını kurmak ve geliştirme ortamını ha
 - [ ] README.md oluşturma
 
 #### Komutlar
+
 ```bash
 # Next.js projesi oluştur
 npx create-next-app@latest akademi-port --typescript --tailwind --app --src-dir --import-alias "@/*"
@@ -56,6 +60,7 @@ git commit -m "Initial commit: Next.js 15 + TypeScript setup"
 #### Konfigürasyon Dosyaları
 
 **tsconfig.json**
+
 ```json
 {
   "compilerOptions": {
@@ -93,13 +98,10 @@ git commit -m "Initial commit: Next.js 15 + TypeScript setup"
 ```
 
 **.eslintrc.json**
+
 ```json
 {
-  "extends": [
-    "next/core-web-vitals",
-    "plugin:@typescript-eslint/recommended",
-    "prettier"
-  ],
+  "extends": ["next/core-web-vitals", "plugin:@typescript-eslint/recommended", "prettier"],
   "rules": {
     "@typescript-eslint/no-unused-vars": "error",
     "@typescript-eslint/no-explicit-any": "warn",
@@ -109,6 +111,7 @@ git commit -m "Initial commit: Next.js 15 + TypeScript setup"
 ```
 
 **.prettierrc**
+
 ```json
 {
   "semi": true,
@@ -121,6 +124,7 @@ git commit -m "Initial commit: Next.js 15 + TypeScript setup"
 ```
 
 #### Kabul Kriterleri
+
 - ✅ `npm run dev` çalışıyor
 - ✅ TypeScript hataları yok
 - ✅ ESLint çalışıyor
@@ -131,6 +135,7 @@ git commit -m "Initial commit: Next.js 15 + TypeScript setup"
 ### 🗓️ GÜN 2: Tailwind CSS + Shadcn/ui Kurulumu
 
 #### Görevler
+
 - [ ] Tailwind CSS konfigürasyonu
 - [ ] Shadcn/ui kurulumu
 - [ ] Custom colors tanımlama
@@ -138,6 +143,7 @@ git commit -m "Initial commit: Next.js 15 + TypeScript setup"
 - [ ] İlk component test (Button)
 
 #### Komutlar
+
 ```bash
 # Shadcn/ui init
 npx shadcn-ui@latest init
@@ -153,6 +159,7 @@ npx shadcn-ui@latest add avatar
 #### Konfigürasyon
 
 **tailwind.config.ts**
+
 ```typescript
 import type { Config } from 'tailwindcss';
 
@@ -293,11 +300,12 @@ export default config;
 ```
 
 **app/layout.tsx** (Font setup)
+
 ```typescript
 import { Inter } from 'next/font/google';
 import './globals.css';
 
-const inter = Inter({ 
+const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
 });
@@ -316,6 +324,7 @@ export default function RootLayout({
 ```
 
 #### Kabul Kriterleri
+
 - ✅ Tailwind CSS çalışıyor
 - ✅ Shadcn/ui componentleri eklenmiş
 - ✅ Custom colors tanımlanmış
@@ -327,12 +336,14 @@ export default function RootLayout({
 ### 🗓️ GÜN 3: Klasör Yapısı Oluşturma
 
 #### Görevler
+
 - [ ] 6 katmanlı klasör yapısı oluştur
 - [ ] Her katman için README.md ekle
 - [ ] Index.ts barrel exports oluştur
 - [ ] Örnek dosyalar ekle
 
 #### Klasör Yapısı
+
 ```bash
 mkdir -p src/1-presentation/{components/{ui/{atoms,molecules,organisms,templates},features,shared},app}
 mkdir -p src/2-application/{use-cases,services,dto}
@@ -345,12 +356,14 @@ mkdir -p src/6-core/{errors,result,events}
 #### README Dosyaları
 
 **src/1-presentation/README.md**
+
 ```markdown
 # Presentation Layer
 
 Bu katman kullanıcı arayüzünden sorumludur.
 
 ## İçerik
+
 - `components/ui/atoms`: Temel UI bileşenleri (Button, Input, etc.)
 - `components/ui/molecules`: Bileşik UI bileşenleri (FormField, Card, etc.)
 - `components/ui/organisms`: Karmaşık UI bileşenleri (Header, Sidebar, etc.)
@@ -360,94 +373,110 @@ Bu katman kullanıcı arayüzünden sorumludur.
 - `app`: Next.js App Router sayfaları
 
 ## Kurallar
+
 - Bu katman sadece Application katmanına bağımlıdır
 - Business logic içermez
 - Sadece UI logic içerir
 ```
 
 **src/2-application/README.md**
+
 ```markdown
 # Application Layer
 
 Bu katman iş mantığından sorumludur.
 
 ## İçerik
+
 - `use-cases`: Use case pattern implementasyonları
 - `services`: Business servisler
 - `dto`: Data Transfer Objects
 
 ## Kurallar
+
 - Bu katman Domain ve Infrastructure katmanlarına bağımlıdır
 - Business logic burada yer alır
 - Use case'ler tek sorumluluk prensibine uyar
 ```
 
 **src/3-domain/README.md**
+
 ```markdown
 # Domain Layer
 
 Bu katman core business domain'inden sorumludur.
 
 ## İçerik
+
 - `entities`: Domain entities
 - `interfaces`: Contracts ve interfaces
 - `value-objects`: Value objects
 - `enums`: Domain enums
 
 ## Kurallar
+
 - Bu katman HİÇBİR ŞEYE bağımlı değildir
 - Pure business logic içerir
 - Framework'lerden bağımsızdır
 ```
 
 **src/4-infrastructure/README.md**
+
 ```markdown
 # Infrastructure Layer
 
 Bu katman dış dünya ile iletişimden sorumludur.
 
 ## İçerik
+
 - `database`: Database işlemleri
 - `api`: API routes
 - `external`: Dış servisler (AI, Email, etc.)
 - `config`: Konfigürasyon dosyaları
 
 ## Kurallar
+
 - Bu katman Domain interface'lerini implement eder
 - Dış servislere bağlanır
 - Database işlemlerini yönetir
 ```
 
 **src/5-shared/README.md**
+
 ```markdown
 # Shared Layer
 
 Bu katman tüm katmanlar tarafından kullanılan ortak kodları içerir.
 
 ## İçerik
+
 - `utils`: Utility fonksiyonları
 - `constants`: Sabitler
 - `hooks`: Custom React hooks
 - `types`: Paylaşılan TypeScript tipleri
 
 ## Kurallar
+
 - Tüm katmanlar tarafından kullanılabilir
 - Business logic içermez
 - Pure fonksiyonlar içerir
 ```
 
 **src/6-core/README.md**
+
 ```markdown
 # Core Layer
 
 Bu katman core framework kodlarını içerir.
 
 ## İçerik
+
 - `errors`: Custom error sınıfları
 - `result`: Result pattern implementasyonu
 - `events`: Event system
 
 ## Kurallar
+
 - Framework-level kod içerir
 - Tüm katmanlar tarafından kullanılabilir
 - Business logic içermez
@@ -456,6 +485,7 @@ Bu katman core framework kodlarını içerir.
 #### Örnek Dosyalar
 
 **src/6-core/result/Result.ts**
+
 ```typescript
 export class Result<T> {
   public isSuccess: boolean;
@@ -489,6 +519,7 @@ export class Result<T> {
 ```
 
 **src/6-core/errors/AppError.ts**
+
 ```typescript
 export class AppError extends Error {
   constructor(
@@ -525,6 +556,7 @@ export class UnauthorizedError extends AppError {
 ```
 
 #### Kabul Kriterleri
+
 - ✅ Klasör yapısı oluşturuldu
 - ✅ README dosyaları eklendi
 - ✅ Örnek dosyalar çalışıyor
@@ -535,6 +567,7 @@ export class UnauthorizedError extends AppError {
 ### 🗓️ GÜN 4: Storybook Kurulumu
 
 #### Görevler
+
 - [ ] Storybook kurulumu
 - [ ] Storybook konfigürasyonu
 - [ ] Tailwind entegrasyonu
@@ -542,6 +575,7 @@ export class UnauthorizedError extends AppError {
 - [ ] Addon'lar kurulumu
 
 #### Komutlar
+
 ```bash
 # Storybook kurulumu
 npx storybook@latest init
@@ -553,6 +587,7 @@ npm install -D @storybook/addon-a11y
 #### Konfigürasyon
 
 **.storybook/main.ts**
+
 ```typescript
 import type { StorybookConfig } from '@storybook/nextjs';
 
@@ -577,6 +612,7 @@ export default config;
 ```
 
 **.storybook/preview.ts**
+
 ```typescript
 import type { Preview } from '@storybook/react';
 import '../src/app/globals.css';
@@ -599,6 +635,7 @@ export default preview;
 #### İlk Story
 
 **src/1-presentation/components/ui/atoms/Button.stories.tsx**
+
 ```typescript
 import type { Meta, StoryObj } from '@storybook/react';
 import { Button } from './Button';
@@ -684,6 +721,7 @@ export const Loading: Story = {
 ```
 
 #### Kabul Kriterleri
+
 - ✅ `npm run storybook` çalışıyor
 - ✅ Button story görüntüleniyor
 - ✅ Dark mode toggle çalışıyor
@@ -694,6 +732,7 @@ export const Loading: Story = {
 ### 🗓️ GÜN 5: Design Tokens
 
 #### Görevler
+
 - [ ] Design tokens dosyaları oluştur
 - [ ] Color palette tanımla
 - [ ] Typography tanımla
@@ -704,6 +743,7 @@ export const Loading: Story = {
 #### Design Tokens
 
 **src/5-shared/constants/design-tokens.ts**
+
 ```typescript
 export const colors = {
   primary: {
@@ -797,6 +837,7 @@ export type DesignTokens = typeof designTokens;
 #### Storybook Documentation
 
 **src/1-presentation/components/ui/DesignTokens.stories.tsx**
+
 ```typescript
 import type { Meta } from '@storybook/react';
 import { colors, typography, spacing } from '@/shared/constants/design-tokens';
@@ -864,6 +905,7 @@ export const Spacing = () => (
 ```
 
 #### Kabul Kriterleri
+
 - ✅ Design tokens tanımlandı
 - ✅ Storybook'ta görüntüleniyor
 - ✅ TypeScript tipleri çalışıyor
@@ -874,6 +916,7 @@ export const Spacing = () => (
 ### 🗓️ GÜN 6-7: Dokümantasyon ve Test
 
 #### Görevler
+
 - [ ] README.md güncelle
 - [ ] CONTRIBUTING.md oluştur
 - [ ] package.json scripts güncelle
@@ -882,6 +925,7 @@ export const Spacing = () => (
 - [ ] Git commit ve push
 
 #### README.md
+
 ```markdown
 # 🎯 Akademi Port
 
@@ -898,16 +942,17 @@ Multi-program e-ihracat dönüşüm platformu.
 - **Documentation:** Storybook
 
 ## 📁 Proje Yapısı
+```
 
-```
 src/
-├── 1-presentation/    # UI Layer
-├── 2-application/     # Business Logic Layer
-├── 3-domain/          # Domain Layer
-├── 4-infrastructure/  # Infrastructure Layer
-├── 5-shared/          # Shared Layer
-└── 6-core/            # Core Layer
-```
+├── 1-presentation/ # UI Layer
+├── 2-application/ # Business Logic Layer
+├── 3-domain/ # Domain Layer
+├── 4-infrastructure/ # Infrastructure Layer
+├── 5-shared/ # Shared Layer
+└── 6-core/ # Core Layer
+
+````
 
 ## 🛠️ Kurulum
 
@@ -926,7 +971,7 @@ npm run build
 
 # Lint
 npm run lint
-```
+````
 
 ## 📚 Dokümantasyon
 
@@ -945,7 +990,8 @@ npm run storybook
 ## 📝 Lisans
 
 Private Project
-```
+
+````
 
 #### package.json scripts
 ```json
@@ -962,9 +1008,10 @@ Private Project
     "type-check": "tsc --noEmit"
   }
 }
-```
+````
 
 #### .env.local.example
+
 ```bash
 # Supabase
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
@@ -987,6 +1034,7 @@ ZOOM_API_SECRET=your_zoom_api_secret
 #### Test Sayfası
 
 **src/app/page.tsx**
+
 ```typescript
 import { Button } from '@/presentation/components/ui/atoms/Button';
 
@@ -1019,6 +1067,7 @@ export default function Home() {
 ```
 
 #### Kabul Kriterleri
+
 - ✅ README.md güncel
 - ✅ Environment variables setup
 - ✅ Test sayfası çalışıyor
@@ -1029,6 +1078,7 @@ export default function Home() {
 ## ✅ SPRINT KABUL KRİTERLERİ
 
 ### Teknik Kriterler
+
 - [ ] `npm run dev` çalışıyor
 - [ ] `npm run build` başarılı
 - [ ] `npm run lint` hatasız
@@ -1037,6 +1087,7 @@ export default function Home() {
 - [ ] Import path'ler çalışıyor
 
 ### Fonksiyonel Kriterler
+
 - [ ] Next.js 15 kuruldu
 - [ ] TypeScript konfigüre edildi
 - [ ] Tailwind CSS çalışıyor
@@ -1047,12 +1098,14 @@ export default function Home() {
 - [ ] İlk Button component çalışıyor
 
 ### Dokümantasyon Kriterleri
+
 - [ ] README.md güncel
 - [ ] Her katman için README.md var
 - [ ] Storybook'ta ilk story var
 - [ ] Design tokens dokümante edildi
 
 ### Kalite Kriterleri
+
 - [ ] ESLint kuralları tanımlı
 - [ ] Prettier konfigüre edildi
 - [ ] Git repository kuruldu
@@ -1063,6 +1116,7 @@ export default function Home() {
 ## 📊 SPRINT ÇIKTILARI
 
 ### Deliverables
+
 1. ✅ Çalışan Next.js 15 projesi
 2. ✅ Tailwind CSS + Shadcn/ui entegrasyonu
 3. ✅ 6 katmanlı klasör yapısı
@@ -1073,6 +1127,7 @@ export default function Home() {
 8. ✅ Git repository
 
 ### Demo İçin Hazır
+
 - Ana sayfa (test sayfası)
 - Storybook (Button stories)
 - Design tokens (colors, typography, spacing)
@@ -1082,15 +1137,19 @@ export default function Home() {
 ## 🔄 SPRINT RETROSPECTIVE
 
 ### Ne İyi Gitti?
+
 - (Sprint sonunda doldurulacak)
 
 ### Ne Geliştirilebilir?
+
 - (Sprint sonunda doldurulacak)
 
 ### Öğrenilen Dersler
+
 - (Sprint sonunda doldurulacak)
 
 ### Action Items
+
 - (Sprint sonunda doldurulacak)
 
 ---
@@ -1098,15 +1157,18 @@ export default function Home() {
 ## 📝 NOTLAR
 
 ### Önemli Kararlar
+
 - Next.js 15 App Router kullanıldı
 - Shadcn/ui copy-paste yaklaşımı seçildi
 - 6 katmanlı Clean Architecture uygulandı
 - Storybook dokümantasyon aracı olarak seçildi
 
 ### Teknik Borçlar
+
 - (Varsa not edilecek)
 
 ### Sonraki Sprint İçin
+
 - Sprint 2: Database & Auth
 - Supabase kurulumu
 - Authentication sistemi
@@ -1123,4 +1185,3 @@ export default function Home() {
 ---
 
 🚀 **SPRINT 1 BAŞLAMAYA HAZIR!**
-

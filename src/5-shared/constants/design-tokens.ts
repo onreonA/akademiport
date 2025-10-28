@@ -332,4 +332,3 @@ export type Breakpoint = keyof typeof breakpoints;
 export type Gradient = keyof typeof gradients;
 
 export type DesignTokens = typeof designTokens;
-

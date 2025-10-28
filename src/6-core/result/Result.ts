@@ -84,4 +84,3 @@ export class Result<T> {
     return Result.ok(results.map((r) => r.value));
   }
 }
-

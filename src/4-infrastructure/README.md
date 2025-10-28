@@ -3,6 +3,7 @@
 Bu katman dış dünya ile iletişimden sorumludur.
 
 ## İçerik
+
 - `database`: Database işlemleri
   - `repositories`: Repository implementasyonları
   - `migrations`: Database migration dosyaları
@@ -15,6 +16,7 @@ Bu katman dış dünya ile iletişimden sorumludur.
 - `config`: Konfigürasyon dosyaları
 
 ## Kurallar
+
 - Bu katman Domain interface'lerini implement eder
 - Dış servislere bağlanır
 - Database işlemlerini yönetir
@@ -24,16 +26,17 @@ Bu katman dış dünya ile iletişimden sorumludur.
 
 \`\`\`typescript
 export class ProgramRepository implements IProgramRepository {
-  async create(program: Program): Promise<Program> {
-    const { data, error } = await supabase
-      .from('programs')
-      .insert(this.mapToDatabase(program))
-      .select()
-      .single();
-    
+async create(program: Program): Promise<Program> {
+const { data, error } = await supabase
+.from('programs')
+.insert(this.mapToDatabase(program))
+.select()
+.single();
+
     if (error) throw error;
     return this.mapToDomain(data);
-  }
+
+}
 }
 \`\`\`
 

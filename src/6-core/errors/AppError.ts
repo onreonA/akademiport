@@ -21,7 +21,10 @@ export class AppError extends Error {
  * Input validation hatalarında kullanılır
  */
 export class ValidationError extends AppError {
-  constructor(message: string, public readonly fields?: Record<string, string>) {
+  constructor(
+    message: string,
+    public readonly fields?: Record<string, string>
+  ) {
     super(message, 400, 'VALIDATION_ERROR');
     this.name = 'ValidationError';
   }
@@ -86,4 +89,3 @@ export class InternalServerError extends AppError {
     this.name = 'InternalServerError';
   }
 }
-

@@ -3,11 +3,13 @@
 Bu katman iş mantığından sorumludur.
 
 ## İçerik
+
 - `use-cases`: Use case pattern implementasyonları
 - `services`: Business servisler
 - `dto`: Data Transfer Objects
 
 ## Kurallar
+
 - Bu katman Domain ve Infrastructure katmanlarına bağımlıdır
 - Business logic burada yer alır
 - Use case'ler tek sorumluluk prensibine uyar
@@ -16,6 +18,7 @@ Bu katman iş mantığından sorumludur.
 ## Use Case Pattern
 
 Her use case:
+
 - Tek bir iş akışını gerçekleştirir
 - Input olarak DTO alır
 - Output olarak Result<T> döndürür

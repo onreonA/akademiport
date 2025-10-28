@@ -20,9 +20,7 @@ export default function Home() {
           <h1 className="text-6xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
             Akademi Port
           </h1>
-          <p className="text-xl text-muted-foreground">
-            Multi-Program E-İhracat Dönüşüm Platformu
-          </p>
+          <p className="text-xl text-muted-foreground">Multi-Program E-İhracat Dönüşüm Platformu</p>
         </div>
 
         {/* Button Showcase */}

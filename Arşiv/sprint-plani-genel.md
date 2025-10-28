@@ -9,14 +9,15 @@
 
 ## 📊 SPRINT DURUMU
 
-| Sprint | Durum | Başlangıç | Bitiş | Süre |
-|--------|-------|-----------|-------|------|
-| Sprint 1 | ⏳ Hazır | - | - | 1 hafta |
-| Sprint 2 | 📋 Planlandı | - | - | 1 hafta |
-| Sprint 3 | 📋 Planlandı | - | - | 1 hafta |
-| ... | ... | ... | ... | ... |
+| Sprint   | Durum        | Başlangıç | Bitiş | Süre    |
+| -------- | ------------ | --------- | ----- | ------- |
+| Sprint 1 | ⏳ Hazır     | -         | -     | 1 hafta |
+| Sprint 2 | 📋 Planlandı | -         | -     | 1 hafta |
+| Sprint 3 | 📋 Planlandı | -         | -     | 1 hafta |
+| ...      | ...          | ...       | ...   | ...     |
 
 **Gösterim:**
+
 - ⏳ Hazır (Başlamaya hazır)
 - 🏃 Devam Ediyor
 - ✅ Tamamlandı
@@ -29,9 +30,11 @@
 ## 🎯 FAZ 1: TEMEL ALTYAPI (2-3 Hafta)
 
 ### Sprint 1: Proje Kurulumu (1 hafta)
+
 **Hedef:** Çalışan boş proje + Design System temeli
 
 **Görevler:**
+
 - Next.js 15 + TypeScript kurulumu
 - Tailwind CSS + Shadcn/ui kurulumu
 - 6 katmanlı klasör yapısı oluşturma
@@ -41,6 +44,7 @@
 - Design tokens (colors, typography, spacing)
 
 **Çıktılar:**
+
 - ✅ Çalışan Next.js projesi
 - ✅ Klasör yapısı hazır
 - ✅ Design tokens tanımlandı
@@ -48,6 +52,7 @@
 - ✅ Git repository hazır
 
 **Kabul Kriterleri:**
+
 - `npm run dev` çalışıyor
 - `npm run storybook` çalışıyor
 - Klasör yapısı dokümana uygun
@@ -60,9 +65,11 @@
 ---
 
 ### Sprint 2: Database & Auth (1 hafta)
+
 **Hedef:** Supabase + Authentication sistemi çalışıyor
 
 **Görevler:**
+
 - Supabase projesi oluşturma
 - Database schema tasarımı (tüm tablolar)
 - Migration dosyaları (programs, users, companies, etc.)
@@ -72,6 +79,7 @@
 - API route structure
 
 **Çıktılar:**
+
 - ✅ Supabase projesi hazır
 - ✅ Tüm tablolar oluşturuldu
 - ✅ Login/Logout çalışıyor
@@ -79,6 +87,7 @@
 - ✅ Middleware koruma aktif
 
 **Kabul Kriterleri:**
+
 - Login yapılabiliyor
 - Roller kontrol ediliyor
 - Database'e bağlanılıyor
@@ -91,9 +100,11 @@
 ---
 
 ### Sprint 3: UI Foundation (1 hafta)
+
 **Hedef:** Atomic Design System + Layout'lar hazır
 
 **Görevler:**
+
 - Atomic components (Button, Input, Badge, Avatar, etc.)
 - Molecule components (FormField, Card, Modal, etc.)
 - Organism components (Header, Sidebar, DataTable)
@@ -103,6 +114,7 @@
 - Accessibility testing (WCAG 2.1 AA)
 
 **Çıktılar:**
+
 - ✅ 20+ atom component
 - ✅ 10+ molecule component
 - ✅ 5+ organism component
@@ -111,6 +123,7 @@
 - ✅ Storybook'ta dokümante edildi
 
 **Kabul Kriterleri:**
+
 - Tüm componentler Storybook'ta
 - Dark mode toggle çalışıyor
 - Accessibility testleri geçiyor
@@ -125,9 +138,11 @@
 ## 🎯 FAZ 2: CORE MODULES (3-4 Hafta)
 
 ### Sprint 4: Program Yönetimi (1 hafta)
+
 **Hedef:** Program CRUD + Master Admin paneli çalışıyor
 
 **Görevler:**
+
 - Program entity + repository
 - Program use cases (Create, Update, Delete, Get)
 - Program API routes
@@ -139,6 +154,7 @@
 - Program filtreleme ve arama
 
 **Çıktılar:**
+
 - ✅ Program oluşturulabiliyor
 - ✅ Program yöneticisi atanabiliyor
 - ✅ Danışman atanabiliyor
@@ -146,6 +162,7 @@
 - ✅ Program listesi görüntülenebiliyor
 
 **Kabul Kriterleri:**
+
 - Master Admin program oluşturabiliyor
 - Program yöneticisi atayabiliyor
 - Danışman atayabiliyor
@@ -158,9 +175,11 @@
 ---
 
 ### Sprint 5: Kullanıcı Yönetimi (1 hafta)
+
 **Hedef:** Multi-role kullanıcı yönetimi çalışıyor
 
 **Görevler:**
+
 - User entity + repository
 - User use cases (CRUD, role management)
 - User API routes
@@ -172,12 +191,14 @@
 - Program atama (user_programs)
 
 **Çıktılar:**
+
 - ✅ Kullanıcı oluşturulabiliyor
 - ✅ Roller atanabiliyor
 - ✅ Program'a kullanıcı atanabiliyor
 - ✅ Profil güncellenebiliyor
 
 **Kabul Kriterleri:**
+
 - Master Admin kullanıcı ekleyebiliyor
 - Roller doğru çalışıyor
 - Program ataması yapılabiliyor
@@ -190,9 +211,11 @@
 ---
 
 ### Sprint 6: Firma Yönetimi (1 hafta)
+
 **Hedef:** Firma CRUD + Firma paneli temeli
 
 **Görevler:**
+
 - Company entity + repository
 - Company use cases (CRUD)
 - Company API routes
@@ -204,12 +227,14 @@
 - Alt kullanıcı ekleme/çıkarma (max 2 aktif)
 
 **Çıktılar:**
+
 - ✅ Firma oluşturulabiliyor
 - ✅ Programa atanabiliyor
 - ✅ Alt kullanıcı eklenebiliyor
 - ✅ Firma dashboard çalışıyor
 
 **Kabul Kriterleri:**
+
 - Firma oluşturulabiliyor
 - Programa atanabiliyor
 - Alt kullanıcı eklenebiliyor (max 2)
@@ -222,9 +247,11 @@
 ---
 
 ### Sprint 7: Danışman Paneli (1 hafta)
+
 **Hedef:** Danışman paneli + Program seçici çalışıyor
 
 **Görevler:**
+
 - Consultant dashboard
 - Program seçici component
 - Atandığı programlar listesi
@@ -235,12 +262,14 @@
 - İstatistikler (program bazlı)
 
 **Çıktılar:**
+
 - ✅ Danışman paneline giriş yapılabiliyor
 - ✅ Program seçebiliyor
 - ✅ Firmalarını görebiliyor
 - ✅ Quick actions çalışıyor
 
 **Kabul Kriterleri:**
+
 - Danışman giriş yapabiliyor
 - Program seçebiliyor
 - Sadece atandığı firmaları görebiliyor
@@ -255,9 +284,11 @@
 ## 🎯 FAZ 3: İŞ MODÜLLERİ (4-5 Hafta)
 
 ### Sprint 8: Proje Yönetimi (1.5 hafta)
+
 **Hedef:** Ana Proje → Alt Proje → Görev hiyerarşisi çalışıyor
 
 **Görevler:**
+
 - Project entity + repository
 - SubProject entity + repository
 - Task entity + repository
@@ -274,6 +305,7 @@
 - Görev altında yorum/soru sistemi
 
 **Çıktılar:**
+
 - ✅ Proje oluşturulabiliyor
 - ✅ Alt proje eklenebiliyor
 - ✅ Görev atanabiliyor
@@ -282,6 +314,7 @@
 - ✅ Danışman onaylayabiliyor
 
 **Kabul Kriterleri:**
+
 - Proje hiyerarşisi çalışıyor
 - Görev atama çalışıyor
 - Durum değişiklikleri çalışıyor
@@ -295,9 +328,11 @@
 ---
 
 ### Sprint 9: Eğitim Yönetimi (1.5 hafta)
+
 **Hedef:** Video + Döküman eğitim sistemi çalışıyor
 
 **Görevler:**
+
 - Training entity + repository
 - TrainingVideo entity + repository
 - TrainingDocument entity + repository
@@ -316,6 +351,7 @@
 - İzleme yüzdesi hesaplama
 
 **Çıktılar:**
+
 - ✅ Eğitim oluşturulabiliyor
 - ✅ Video eklenebiliyor (YouTube)
 - ✅ Döküman eklenebiliyor
@@ -324,6 +360,7 @@
 - ✅ Sıralı sistem çalışıyor
 
 **Kabul Kriterleri:**
+
 - Eğitim oluşturulabiliyor
 - Video izlenebiliyor
 - Döküman okunabiliyor
@@ -337,9 +374,11 @@
 ---
 
 ### Sprint 10: Etkinlik Yönetimi (1 hafta)
+
 **Hedef:** Etkinlik + Takvim + Zoom entegrasyonu çalışıyor
 
 **Görevler:**
+
 - Event entity + repository
 - Use cases (CRUD, attendance)
 - API routes (events, attendance)
@@ -356,6 +395,7 @@
 - Zoom link paylaşımı
 
 **Çıktılar:**
+
 - ✅ Etkinlik oluşturulabiliyor
 - ✅ Zoom meeting otomatik oluşuyor
 - ✅ Takvim görünümü çalışıyor
@@ -363,6 +403,7 @@
 - ✅ Hatırlatmalar gidiyor
 
 **Kabul Kriterleri:**
+
 - Etkinlik oluşturulabiliyor
 - Zoom entegrasyonu çalışıyor
 - Takvim görünümü çalışıyor
@@ -375,9 +416,11 @@
 ---
 
 ### Sprint 11: Randevu Yönetimi (1 hafta)
+
 **Hedef:** Danışman-Firma randevu sistemi çalışıyor
 
 **Görevler:**
+
 - Appointment entity + repository
 - Use cases (CRUD, reschedule)
 - API routes (appointments)
@@ -394,6 +437,7 @@
 - Randevu notları
 
 **Çıktılar:**
+
 - ✅ Randevu oluşturulabiliyor
 - ✅ Müsaitlik takvimi çalışıyor
 - ✅ Zoom meeting oluşuyor
@@ -401,6 +445,7 @@
 - ✅ Revize yapılabiliyor
 
 **Kabul Kriterleri:**
+
 - Randevu oluşturulabiliyor
 - Müsaitlik kontrolü çalışıyor
 - Zoom entegrasyonu çalışıyor
@@ -415,9 +460,11 @@
 ## 🎯 FAZ 4: AI & OTOMASYON (2-3 Hafta)
 
 ### Sprint 12: AI Altyapısı (1 hafta)
+
 **Hedef:** OpenAI + Claude entegrasyonu çalışıyor
 
 **Görevler:**
+
 - OpenAI API entegrasyonu
 - Anthropic (Claude) API entegrasyonu
 - Vercel AI SDK setup
@@ -431,6 +478,7 @@
 - Caching stratejisi
 
 **Çıktılar:**
+
 - ✅ OpenAI API çalışıyor
 - ✅ Claude API çalışıyor
 - ✅ AI service layer hazır
@@ -438,6 +486,7 @@
 - ✅ Cost tracking çalışıyor
 
 **Kabul Kriterleri:**
+
 - AI API'ler çalışıyor
 - Token sayılıyor
 - Maliyet hesaplanıyor
@@ -450,9 +499,11 @@
 ---
 
 ### Sprint 13: AI Özellikleri (1 hafta)
+
 **Hedef:** AI asistan özellikleri çalışıyor
 
 **Görevler:**
+
 - Görev açıklaması üretimi (AI)
 - Eğitim özeti çıkarma (AI)
 - Rapor otomatik oluşturma (AI)
@@ -465,6 +516,7 @@
 - AI geçmişi görüntüleme
 
 **Çıktılar:**
+
 - ✅ Görev açıklaması AI ile üretilebiliyor
 - ✅ Eğitim özeti AI ile çıkarılabiliyor
 - ✅ Rapor AI ile oluşturulabiliyor
@@ -472,6 +524,7 @@
 - ✅ Başarı tahmini çalışıyor
 
 **Kabul Kriterleri:**
+
 - AI özellikleri çalışıyor
 - Sonuçlar kullanılabilir kalitede
 - Kullanıcı AI önerilerini görebiliyor
@@ -484,9 +537,11 @@
 ---
 
 ### Sprint 14: Chatbot (1 hafta)
+
 **Hedef:** AI Chatbot tüm panellerde çalışıyor
 
 **Görevler:**
+
 - Chatbot UI component
 - Chatbot backend (streaming)
 - Context management (conversation history)
@@ -502,6 +557,7 @@
 - Conversation history
 
 **Çıktılar:**
+
 - ✅ Chatbot UI çalışıyor
 - ✅ Streaming responses çalışıyor
 - ✅ Context management çalışıyor
@@ -509,6 +565,7 @@
 - ✅ Akıllı yönlendirme çalışıyor
 
 **Kabul Kriterleri:**
+
 - Chatbot tüm panellerde çalışıyor
 - Streaming responses çalışıyor
 - Context hatırlanıyor
@@ -523,9 +580,11 @@
 ## 🎯 FAZ 5: İLETİŞİM & BİLDİRİMLER (2 Hafta)
 
 ### Sprint 15: Email Sistemi (1 hafta)
+
 **Hedef:** Email otomasyonu çalışıyor
 
 **Görevler:**
+
 - SendGrid entegrasyonu
 - Email templates (MJML)
 - Transactional emails:
@@ -542,6 +601,7 @@
 - AI personalization (email içeriği)
 
 **Çıktılar:**
+
 - ✅ SendGrid entegrasyonu çalışıyor
 - ✅ Email templates hazır
 - ✅ Otomatik emailler gidiyor
@@ -549,6 +609,7 @@
 - ✅ Analytics çalışıyor
 
 **Kabul Kriterleri:**
+
 - Emailler gönderiliyor
 - Templates çalışıyor
 - Queue sistemi çalışıyor
@@ -561,9 +622,11 @@
 ---
 
 ### Sprint 16: Bildirim Sistemi (1 hafta)
+
 **Hedef:** Multi-channel bildirim sistemi çalışıyor
 
 **Görevler:**
+
 - In-app notifications
 - Push notifications (OneSignal)
 - WhatsApp Business API entegrasyonu
@@ -583,6 +646,7 @@
   - Yeni eğitim eklendi
 
 **Çıktılar:**
+
 - ✅ In-app bildirimler çalışıyor
 - ✅ Push notifications çalışıyor
 - ✅ WhatsApp entegrasyonu çalışıyor
@@ -590,6 +654,7 @@
 - ✅ Otomatik kurallar çalışıyor
 
 **Kabul Kriterleri:**
+
 - Bildirimler gönderiliyor
 - Kullanıcı tercihleri çalışıyor
 - WhatsApp mesajları gidiyor
@@ -604,9 +669,11 @@
 ## 🎯 FAZ 6: RAPORLAMA & ANALİTİK (2 Hafta)
 
 ### Sprint 17: Dashboard & Raporlar (1 hafta)
+
 **Hedef:** Tüm paneller için dashboard ve raporlar çalışıyor
 
 **Görevler:**
+
 - Master Admin dashboard:
   - Tüm programlar özeti
   - Toplam istatistikler
@@ -633,12 +700,14 @@
 - Grafik ve chartlar (Recharts)
 
 **Çıktılar:**
+
 - ✅ Tüm dashboard'lar çalışıyor
 - ✅ Raporlar oluşturulabiliyor
 - ✅ Export çalışıyor
 - ✅ Grafikler görüntüleniyor
 
 **Kabul Kriterleri:**
+
 - Dashboard'lar çalışıyor
 - Raporlar doğru
 - Export çalışıyor
@@ -651,9 +720,11 @@
 ---
 
 ### Sprint 18: Analytics (1 hafta)
+
 **Hedef:** Google Analytics + Mixpanel entegrasyonu çalışıyor
 
 **Görevler:**
+
 - Google Analytics 4 entegrasyonu
 - Mixpanel entegrasyonu
 - Custom event tracking:
@@ -673,6 +744,7 @@
 - Custom reports
 
 **Çıktılar:**
+
 - ✅ Google Analytics çalışıyor
 - ✅ Mixpanel çalışıyor
 - ✅ Event tracking çalışıyor
@@ -680,6 +752,7 @@
 - ✅ AI insights çalışıyor
 
 **Kabul Kriterleri:**
+
 - Analytics çalışıyor
 - Events kaydediliyor
 - Funnel görüntülenebiliyor
@@ -694,9 +767,11 @@
 ## 🎯 FAZ 7: PUBLIC WEBSITE (1-2 Hafta)
 
 ### Sprint 19: Public Pages (1 hafta)
+
 **Hedef:** Public website tamamlandı
 
 **Görevler:**
+
 - Ana sayfa:
   - Hero section
   - Program özeti
@@ -732,12 +807,14 @@
   - Firma İK havuzu
 
 **Çıktılar:**
+
 - ✅ Tüm public sayfalar tamamlandı
 - ✅ Responsive tasarım
 - ✅ SEO optimizasyonu
 - ✅ Performance optimizasyonu
 
 **Kabul Kriterleri:**
+
 - Tüm sayfalar çalışıyor
 - Mobile responsive
 - SEO skorları yüksek
@@ -750,9 +827,11 @@
 ---
 
 ### Sprint 20: SEO & Performance (1 hafta)
+
 **Hedef:** SEO ve performance optimizasyonu tamamlandı
 
 **Görevler:**
+
 - SEO optimization:
   - Meta tags
   - Open Graph tags
@@ -779,12 +858,14 @@
   - CLS < 0.1
 
 **Çıktılar:**
+
 - ✅ SEO optimizasyonu tamamlandı
 - ✅ Performance optimizasyonu tamamlandı
 - ✅ Lighthouse skorları > 90
 - ✅ Core Web Vitals iyi
 
 **Kabul Kriterleri:**
+
 - Lighthouse skorları > 90
 - Core Web Vitals yeşil
 - Sitemap çalışıyor
@@ -799,9 +880,11 @@
 ## 🎯 FAZ 8: TESTING & QA (2 Hafta)
 
 ### Sprint 21: Testing (1 hafta)
+
 **Hedef:** Test coverage > 80%
 
 **Görevler:**
+
 - Unit tests (Jest):
   - Use cases
   - Services
@@ -830,6 +913,7 @@
   - Stress testing
 
 **Çıktılar:**
+
 - ✅ Unit test coverage > 80%
 - ✅ Integration tests yazıldı
 - ✅ E2E tests yazıldı
@@ -837,6 +921,7 @@
 - ✅ Performance tests geçiyor
 
 **Kabul Kriterleri:**
+
 - Test coverage > 80%
 - Tüm critical flows test edildi
 - Accessibility testleri geçiyor
@@ -849,9 +934,11 @@
 ---
 
 ### Sprint 22: QA & Bug Fixes (1 hafta)
+
 **Hedef:** Tüm bug'lar düzeltildi, QA tamamlandı
 
 **Görevler:**
+
 - Manual testing:
   - Tüm user flows
   - Tüm paneller
@@ -884,6 +971,7 @@
   - Security
 
 **Çıktılar:**
+
 - ✅ Tüm critical bug'lar düzeltildi
 - ✅ Cross-browser uyumlu
 - ✅ Mobile responsive
@@ -891,6 +979,7 @@
 - ✅ Performance audit geçti
 
 **Kabul Kriterleri:**
+
 - Kritik bug kalmadı
 - Tüm tarayıcılarda çalışıyor
 - Mobile'da çalışıyor
@@ -905,9 +994,11 @@
 ## 🎯 FAZ 9: DEPLOYMENT & LAUNCH (1 Hafta)
 
 ### Sprint 23: Production Setup & Launch (1 hafta)
+
 **Hedef:** Production'a deploy edildi, sistem canlıda
 
 **Görevler:**
+
 - Production database setup:
   - Supabase production project
   - Migration'ları çalıştırma
@@ -954,6 +1045,7 @@
   - Onboarding
 
 **Çıktılar:**
+
 - ✅ Production'da canlı
 - ✅ CI/CD çalışıyor
 - ✅ Monitoring aktif
@@ -962,6 +1054,7 @@
 - ✅ Kullanıcı eğitimleri hazır
 
 **Kabul Kriterleri:**
+
 - Production'da çalışıyor
 - Monitoring çalışıyor
 - Backup'lar alınıyor
@@ -975,31 +1068,31 @@
 
 ## 📊 SPRINT ÖZET TABLOSU
 
-| Faz | Sprint | Konu | Süre | Bağımlılık | Durum |
-|-----|--------|------|------|------------|-------|
-| **Faz 1** | Sprint 1 | Proje Kurulumu | 1 hafta | - | ⏳ Hazır |
-| **Faz 1** | Sprint 2 | Database & Auth | 1 hafta | Sprint 1 | 📋 Planlandı |
-| **Faz 1** | Sprint 3 | UI Foundation | 1 hafta | Sprint 1 | 📋 Planlandı |
-| **Faz 2** | Sprint 4 | Program Yönetimi | 1 hafta | Sprint 2, 3 | 📋 Planlandı |
-| **Faz 2** | Sprint 5 | Kullanıcı Yönetimi | 1 hafta | Sprint 2, 3, 4 | 📋 Planlandı |
-| **Faz 2** | Sprint 6 | Firma Yönetimi | 1 hafta | Sprint 4, 5 | 📋 Planlandı |
-| **Faz 2** | Sprint 7 | Danışman Paneli | 1 hafta | Sprint 4, 5, 6 | 📋 Planlandı |
-| **Faz 3** | Sprint 8 | Proje Yönetimi | 1.5 hafta | Sprint 6, 7 | 📋 Planlandı |
-| **Faz 3** | Sprint 9 | Eğitim Yönetimi | 1.5 hafta | Sprint 6, 7 | 📋 Planlandı |
-| **Faz 3** | Sprint 10 | Etkinlik Yönetimi | 1 hafta | Sprint 6, 7 | 📋 Planlandı |
-| **Faz 3** | Sprint 11 | Randevu Yönetimi | 1 hafta | Sprint 7, 10 | 📋 Planlandı |
-| **Faz 4** | Sprint 12 | AI Altyapısı | 1 hafta | Sprint 2 | 📋 Planlandı |
-| **Faz 4** | Sprint 13 | AI Özellikleri | 1 hafta | Sprint 8, 9, 12 | 📋 Planlandı |
-| **Faz 4** | Sprint 14 | Chatbot | 1 hafta | Sprint 12, 13 | 📋 Planlandı |
-| **Faz 5** | Sprint 15 | Email Sistemi | 1 hafta | Sprint 8, 9, 10, 11 | 📋 Planlandı |
-| **Faz 5** | Sprint 16 | Bildirim Sistemi | 1 hafta | Sprint 8, 9, 10, 11, 15 | 📋 Planlandı |
-| **Faz 6** | Sprint 17 | Dashboard & Raporlar | 1 hafta | Sprint 4-9 | 📋 Planlandı |
-| **Faz 6** | Sprint 18 | Analytics | 1 hafta | Sprint 17 | 📋 Planlandı |
-| **Faz 7** | Sprint 19 | Public Pages | 1 hafta | Sprint 3 | 📋 Planlandı |
-| **Faz 7** | Sprint 20 | SEO & Performance | 1 hafta | Sprint 19 | 📋 Planlandı |
-| **Faz 8** | Sprint 21 | Testing | 1 hafta | Tümü | 📋 Planlandı |
-| **Faz 8** | Sprint 22 | QA & Bug Fixes | 1 hafta | Sprint 21 | 📋 Planlandı |
-| **Faz 9** | Sprint 23 | Production & Launch | 1 hafta | Sprint 22 | 📋 Planlandı |
+| Faz       | Sprint    | Konu                 | Süre      | Bağımlılık              | Durum        |
+| --------- | --------- | -------------------- | --------- | ----------------------- | ------------ |
+| **Faz 1** | Sprint 1  | Proje Kurulumu       | 1 hafta   | -                       | ⏳ Hazır     |
+| **Faz 1** | Sprint 2  | Database & Auth      | 1 hafta   | Sprint 1                | 📋 Planlandı |
+| **Faz 1** | Sprint 3  | UI Foundation        | 1 hafta   | Sprint 1                | 📋 Planlandı |
+| **Faz 2** | Sprint 4  | Program Yönetimi     | 1 hafta   | Sprint 2, 3             | 📋 Planlandı |
+| **Faz 2** | Sprint 5  | Kullanıcı Yönetimi   | 1 hafta   | Sprint 2, 3, 4          | 📋 Planlandı |
+| **Faz 2** | Sprint 6  | Firma Yönetimi       | 1 hafta   | Sprint 4, 5             | 📋 Planlandı |
+| **Faz 2** | Sprint 7  | Danışman Paneli      | 1 hafta   | Sprint 4, 5, 6          | 📋 Planlandı |
+| **Faz 3** | Sprint 8  | Proje Yönetimi       | 1.5 hafta | Sprint 6, 7             | 📋 Planlandı |
+| **Faz 3** | Sprint 9  | Eğitim Yönetimi      | 1.5 hafta | Sprint 6, 7             | 📋 Planlandı |
+| **Faz 3** | Sprint 10 | Etkinlik Yönetimi    | 1 hafta   | Sprint 6, 7             | 📋 Planlandı |
+| **Faz 3** | Sprint 11 | Randevu Yönetimi     | 1 hafta   | Sprint 7, 10            | 📋 Planlandı |
+| **Faz 4** | Sprint 12 | AI Altyapısı         | 1 hafta   | Sprint 2                | 📋 Planlandı |
+| **Faz 4** | Sprint 13 | AI Özellikleri       | 1 hafta   | Sprint 8, 9, 12         | 📋 Planlandı |
+| **Faz 4** | Sprint 14 | Chatbot              | 1 hafta   | Sprint 12, 13           | 📋 Planlandı |
+| **Faz 5** | Sprint 15 | Email Sistemi        | 1 hafta   | Sprint 8, 9, 10, 11     | 📋 Planlandı |
+| **Faz 5** | Sprint 16 | Bildirim Sistemi     | 1 hafta   | Sprint 8, 9, 10, 11, 15 | 📋 Planlandı |
+| **Faz 6** | Sprint 17 | Dashboard & Raporlar | 1 hafta   | Sprint 4-9              | 📋 Planlandı |
+| **Faz 6** | Sprint 18 | Analytics            | 1 hafta   | Sprint 17               | 📋 Planlandı |
+| **Faz 7** | Sprint 19 | Public Pages         | 1 hafta   | Sprint 3                | 📋 Planlandı |
+| **Faz 7** | Sprint 20 | SEO & Performance    | 1 hafta   | Sprint 19               | 📋 Planlandı |
+| **Faz 8** | Sprint 21 | Testing              | 1 hafta   | Tümü                    | 📋 Planlandı |
+| **Faz 8** | Sprint 22 | QA & Bug Fixes       | 1 hafta   | Sprint 21               | 📋 Planlandı |
+| **Faz 9** | Sprint 23 | Production & Launch  | 1 hafta   | Sprint 22               | 📋 Planlandı |
 
 **TOPLAM:** 18-22 Hafta (4.5-5.5 Ay)
 
@@ -1008,6 +1101,7 @@
 ## 🎯 KRİTİK YOLLAR (Critical Path)
 
 ### MVP İçin Minimum Sprint'ler
+
 ```
 Sprint 1 → Sprint 2 → Sprint 3 → Sprint 4 → Sprint 5 → Sprint 6 → Sprint 7 → Sprint 8 → Sprint 23
 
@@ -1015,6 +1109,7 @@ Minimum Süre: 10 hafta (2.5 ay)
 ```
 
 ### Full Launch İçin
+
 ```
 Tüm 23 sprint tamamlanmalı
 
@@ -1026,18 +1121,21 @@ Tahmini Süre: 18-22 hafta (4.5-5.5 ay)
 ## 📝 NOTLAR
 
 ### Sprint Değişiklik Yönetimi
+
 - Her sprint sonunda retrospective yapılacak
 - Öğrenilen dersler kaydedilecek
 - Gerekirse sonraki sprint'ler güncellenecek
 - Bu dosya yaşayan bir döküman
 
 ### Sprint Detayları
+
 - Her sprint başında detaylı plan oluşturulacak
 - `sprint-detaylari/sprint-XX-konu.md` formatında
 - Günlük görev breakdown'u içerecek
 - Kabul kriterleri net olacak
 
 ### Başarı Kriterleri
+
 - Her sprint sonunda demo yapılacak
 - Kabul kriterleri kontrol edilecek
 - Test coverage kontrol edilecek
@@ -1047,16 +1145,17 @@ Tahmini Süre: 18-22 hafta (4.5-5.5 ay)
 
 ## 🔄 VERSİYON TAKIP
 
-| Versiyon | Tarih | Değişiklik | Yapan |
-|----------|-------|------------|-------|
-| 1.0 | 28 Ekim 2025 | İlk versiyon oluşturuldu | AI + Ömer |
-| | | | |
+| Versiyon | Tarih        | Değişiklik               | Yapan     |
+| -------- | ------------ | ------------------------ | --------- |
+| 1.0      | 28 Ekim 2025 | İlk versiyon oluşturuldu | AI + Ömer |
+|          |              |                          |           |
 
 ---
 
 ## 📞 İLETİŞİM
 
 Sprint planı ile ilgili sorular, öneriler veya değişiklikler için:
+
 - Bu dökümanı güncelleyin
 - Versiyon numarasını artırın
 - Değişiklik tarihini ekleyin
@@ -1071,4 +1170,3 @@ Sprint planı ile ilgili sorular, öneriler veya değişiklikler için:
 ---
 
 🎉 **AKADEMİ PORT - SPRINT PLANI HAZIR!** 🚀
-

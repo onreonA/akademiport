@@ -23,6 +23,7 @@
 ## 🎯 PROJE VİZYONU VE TEMEL FARK {#proje-vizyonu}
 
 ### Eski Proje (ia-6) Problemi
+
 ```
 ❌ Tek Havuz Sistemi
 - Sadece Kayseri'de 20 firma
@@ -32,6 +33,7 @@
 ```
 
 ### Yeni Proje (Akademi Port) Çözümü
+
 ```
 ✅ Multi-Program/Grup Sistemi
 - Farklı illerde farklı programlar
@@ -54,6 +56,7 @@
 ### Seçilen Mimari: Clean Architecture + Modular Monolith
 
 #### Neden Bu Mimari?
+
 ```
 ✅ Loose Coupling - Modüller birbirine bağımlı değil
 ✅ High Cohesion - Her katman kendi işine odaklı
@@ -296,6 +299,7 @@ akademi-port/
 ### Katmanlar Arası İletişim Kuralları
 
 #### ✅ İZİN VERİLEN
+
 ```
 Presentation → Application → Domain → Infrastructure
      ↓              ↓           ↓            ↓
@@ -303,6 +307,7 @@ Presentation → Application → Domain → Infrastructure
 ```
 
 #### ❌ YASAK (Bağımlılık Ters Yönde Olamaz)
+
 ```
 Infrastructure → Domain (X)
 Infrastructure → Application (X)
@@ -323,17 +328,17 @@ import { ProgramDto } from '@/application/dto';
 
 export function ProgramForm() {
   const createProgram = new CreateProgramUseCase();
-  
+
   const handleSubmit = async (data: ProgramDto) => {
     const result = await createProgram.execute(data);
-    
+
     if (result.isSuccess) {
       toast.success('Program oluşturuldu!');
     } else {
       toast.error(result.error.message);
     }
   };
-  
+
   return <form onSubmit={handleSubmit}>...</form>;
 }
 
@@ -347,22 +352,22 @@ export class CreateProgramUseCase {
   constructor(
     private programRepository: IProgramRepository
   ) {}
-  
+
   async execute(dto: ProgramDto): Promise<Result<Program>> {
     // 1. Validation
     if (!dto.name) {
       return Result.fail('Program adı gerekli');
     }
-    
+
     // 2. Business Logic
     const program = Program.create(dto);
-    
+
     // 3. Save
     const savedProgram = await this.programRepository.create(program);
-    
+
     // 4. Event (optional)
     EventEmitter.emit('program.created', savedProgram);
-    
+
     return Result.ok(savedProgram);
   }
 }
@@ -380,7 +385,7 @@ export class Program {
     public startDate: Date,
     public endDate: Date
   ) {}
-  
+
   static create(data: any): Program {
     return new Program(
       crypto.randomUUID(),
@@ -391,7 +396,7 @@ export class Program {
       new Date(data.endDate)
     );
   }
-  
+
   // Domain methods
   activate(): void {
     if (this.status !== ProgramStatus.PLANNED) {
@@ -399,7 +404,7 @@ export class Program {
     }
     this.status = ProgramStatus.ACTIVE;
   }
-  
+
   isActive(): boolean {
     return this.status === ProgramStatus.ACTIVE;
   }
@@ -425,12 +430,12 @@ export class ProgramRepository implements IProgramRepository {
       })
       .select()
       .single();
-    
+
     if (error) throw error;
-    
+
     return this.mapToDomain(data);
   }
-  
+
   private mapToDomain(data: any): Program {
     return new Program(
       data.id,
@@ -451,6 +456,7 @@ export class ProgramRepository implements IProgramRepository {
 ### Seçilen Stack: Shadcn/ui + Tailwind CSS
 
 #### Neden Shadcn/ui?
+
 ```
 ✅ Modern, minimal, accessible
 ✅ Radix UI primitives (accessibility built-in)
@@ -476,13 +482,13 @@ export const colors = {
     200: '#bae6fd',
     300: '#7dd3fc',
     400: '#38bdf8',
-    500: '#0ea5e9',  // Ana mavi
+    500: '#0ea5e9', // Ana mavi
     600: '#0284c7',
     700: '#0369a1',
     800: '#075985',
     900: '#0c4a6e',
   },
-  
+
   // Secondary (Canlı Mor)
   secondary: {
     50: '#faf5ff',
@@ -490,13 +496,13 @@ export const colors = {
     200: '#e9d5ff',
     300: '#d8b4fe',
     400: '#c084fc',
-    500: '#a855f7',  // Ana mor
+    500: '#a855f7', // Ana mor
     600: '#9333ea',
     700: '#7e22ce',
     800: '#6b21a8',
     900: '#581c87',
   },
-  
+
   // Accent (Canlı Turuncu)
   accent: {
     50: '#fff7ed',
@@ -504,13 +510,13 @@ export const colors = {
     200: '#fed7aa',
     300: '#fdba74',
     400: '#fb923c',
-    500: '#f97316',  // Ana turuncu
+    500: '#f97316', // Ana turuncu
     600: '#ea580c',
     700: '#c2410c',
     800: '#9a3412',
     900: '#7c2d12',
   },
-  
+
   // Success (Canlı Yeşil)
   success: {
     50: '#f0fdf4',
@@ -518,13 +524,13 @@ export const colors = {
     200: '#bbf7d0',
     300: '#86efac',
     400: '#4ade80',
-    500: '#22c55e',  // Ana yeşil
+    500: '#22c55e', // Ana yeşil
     600: '#16a34a',
     700: '#15803d',
     800: '#166534',
     900: '#14532d',
   },
-  
+
   // Warning (Canlı Sarı)
   warning: {
     50: '#fefce8',
@@ -532,13 +538,13 @@ export const colors = {
     200: '#fef08a',
     300: '#fde047',
     400: '#facc15',
-    500: '#eab308',  // Ana sarı
+    500: '#eab308', // Ana sarı
     600: '#ca8a04',
     700: '#a16207',
     800: '#854d0e',
     900: '#713f12',
   },
-  
+
   // Error (Canlı Kırmızı)
   error: {
     50: '#fef2f2',
@@ -546,13 +552,13 @@ export const colors = {
     200: '#fecaca',
     300: '#fca5a5',
     400: '#f87171',
-    500: '#ef4444',  // Ana kırmızı
+    500: '#ef4444', // Ana kırmızı
     600: '#dc2626',
     700: '#b91c1c',
     800: '#991b1b',
     900: '#7f1d1d',
   },
-  
+
   // Info (Canlı Cyan)
   info: {
     50: '#ecfeff',
@@ -560,13 +566,13 @@ export const colors = {
     200: '#a5f3fc',
     300: '#67e8f9',
     400: '#22d3ee',
-    500: '#06b6d4',  // Ana cyan
+    500: '#06b6d4', // Ana cyan
     600: '#0891b2',
     700: '#0e7490',
     800: '#155e75',
     900: '#164e63',
   },
-  
+
   // Neutral (Modern Gri)
   gray: {
     50: '#f9fafb',
@@ -581,7 +587,7 @@ export const colors = {
     900: '#111827',
     950: '#030712',
   },
-  
+
   // Gradients (Canlı Gradient'ler)
   gradients: {
     primary: 'linear-gradient(135deg, #0ea5e9 0%, #a855f7 100%)',
@@ -590,7 +596,7 @@ export const colors = {
     sunset: 'linear-gradient(135deg, #f97316 0%, #ef4444 100%)',
     ocean: 'linear-gradient(135deg, #06b6d4 0%, #0ea5e9 100%)',
     purple: 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)',
-  }
+  },
 };
 
 // Typography
@@ -599,19 +605,19 @@ export const typography = {
     sans: ['Inter', 'system-ui', 'sans-serif'],
     mono: ['Fira Code', 'monospace'],
   },
-  
+
   fontSize: {
-    xs: ['0.75rem', { lineHeight: '1rem' }],      // 12px
-    sm: ['0.875rem', { lineHeight: '1.25rem' }],  // 14px
-    base: ['1rem', { lineHeight: '1.5rem' }],     // 16px
-    lg: ['1.125rem', { lineHeight: '1.75rem' }],  // 18px
-    xl: ['1.25rem', { lineHeight: '1.75rem' }],   // 20px
-    '2xl': ['1.5rem', { lineHeight: '2rem' }],    // 24px
+    xs: ['0.75rem', { lineHeight: '1rem' }], // 12px
+    sm: ['0.875rem', { lineHeight: '1.25rem' }], // 14px
+    base: ['1rem', { lineHeight: '1.5rem' }], // 16px
+    lg: ['1.125rem', { lineHeight: '1.75rem' }], // 18px
+    xl: ['1.25rem', { lineHeight: '1.75rem' }], // 20px
+    '2xl': ['1.5rem', { lineHeight: '2rem' }], // 24px
     '3xl': ['1.875rem', { lineHeight: '2.25rem' }], // 30px
-    '4xl': ['2.25rem', { lineHeight: '2.5rem' }],   // 36px
-    '5xl': ['3rem', { lineHeight: '1' }],           // 48px
+    '4xl': ['2.25rem', { lineHeight: '2.5rem' }], // 36px
+    '5xl': ['3rem', { lineHeight: '1' }], // 48px
   },
-  
+
   fontWeight: {
     normal: '400',
     medium: '500',
@@ -623,18 +629,18 @@ export const typography = {
 // Spacing (8px grid system)
 export const spacing = {
   0: '0',
-  1: '0.25rem',   // 4px
-  2: '0.5rem',    // 8px
-  3: '0.75rem',   // 12px
-  4: '1rem',      // 16px
-  5: '1.25rem',   // 20px
-  6: '1.5rem',    // 24px
-  8: '2rem',      // 32px
-  10: '2.5rem',   // 40px
-  12: '3rem',     // 48px
-  16: '4rem',     // 64px
-  20: '5rem',     // 80px
-  24: '6rem',     // 96px
+  1: '0.25rem', // 4px
+  2: '0.5rem', // 8px
+  3: '0.75rem', // 12px
+  4: '1rem', // 16px
+  5: '1.25rem', // 20px
+  6: '1.5rem', // 24px
+  8: '2rem', // 32px
+  10: '2.5rem', // 40px
+  12: '3rem', // 48px
+  16: '4rem', // 64px
+  20: '5rem', // 80px
+  24: '6rem', // 96px
 };
 ```
 
@@ -657,6 +663,7 @@ Pages (Gerçek sayfalar)
 #### Component Örnekleri
 
 **Atoms:**
+
 - Button (Primary, Secondary, Outline, Ghost, Danger)
 - Input (Text, Email, Password, Number)
 - Badge (Success, Warning, Error, Info)
@@ -668,6 +675,7 @@ Pages (Gerçek sayfalar)
 - Switch
 
 **Molecules:**
+
 - FormField (Label + Input + Error)
 - Card (Header + Body + Footer)
 - Modal (Overlay + Content + Actions)
@@ -677,6 +685,7 @@ Pages (Gerçek sayfalar)
 - Toast
 
 **Organisms:**
+
 - Header (Logo + Navigation + UserMenu)
 - Sidebar (Navigation + User + Settings)
 - DataTable (Header + Body + Pagination + Filters)
@@ -684,6 +693,7 @@ Pages (Gerçek sayfalar)
 - Dashboard Card (Stats + Chart + Actions)
 
 **Templates:**
+
 - DashboardLayout (Sidebar + Header + Content)
 - AuthLayout (Centered + Card)
 - PublicLayout (Header + Content + Footer)
@@ -757,6 +767,7 @@ npm run storybook
 ### 1️⃣ İçerik AI Asistanı 📝
 
 #### A. Görev Açıklaması Üretimi
+
 ```
 Danışman: "Firma için Amazon mağaza açılışı"
     ↓ AI
@@ -764,6 +775,7 @@ Detaylı görev açıklaması + Adımlar + İlgili eğitimler + Dikkat edilecekl
 ```
 
 #### B. Eğitim İçeriği Özetleme
+
 ```
 45 dakikalık video → AI → 2 dakikalık özet
 - Ana konular
@@ -772,6 +784,7 @@ Detaylı görev açıklaması + Adımlar + İlgili eğitimler + Dikkat edilecekl
 ```
 
 #### C. Rapor Otomatik Oluşturma
+
 ```
 Aylık firma ilerleme raporu
 - Tamamlanan görevler
@@ -786,6 +799,7 @@ Aylık firma ilerleme raporu
 ### 2️⃣ Analiz & Tahmin AI 🔍
 
 #### A. Firma Risk Analizi
+
 ```typescript
 {
   riskScore: 65,
@@ -802,6 +816,7 @@ Aylık firma ilerleme raporu
 ```
 
 #### B. Başarı Tahmini
+
 ```
 Program başında AI tahmin yapar:
 - Başarı olasılığı: %78
@@ -811,6 +826,7 @@ Program başında AI tahmin yapar:
 ```
 
 #### C. Trend Analizi
+
 ```
 Tüm programları karşılaştırır:
 - Genel durum
@@ -824,6 +840,7 @@ Tüm programları karşılaştırır:
 ### 3️⃣ Destek AI (Chatbot) 💬
 
 #### Chatbot Konumları
+
 ```
 ✅ Public Website (Ziyaretçi desteği)
 ✅ Firma Paneli (7/24 destek)
@@ -833,6 +850,7 @@ Tüm programları karşılaştırır:
 ```
 
 #### Özellikler
+
 ```
 ✅ 7/24 otomatik yanıt
 ✅ Eğitim içeriği arama
@@ -848,6 +866,7 @@ Tüm programları karşılaştırır:
 ### 4️⃣ Otomasyon Workflows ⚙️
 
 #### A. Görev Otomasyonu
+
 ```
 Trigger: Görev tamamlandı
 → AI: Sonraki görev ne?
@@ -857,6 +876,7 @@ Trigger: Görev tamamlandı
 ```
 
 #### B. Hatırlatma Otomasyonu
+
 ```
 IF firma 3 gündür eğitim izlemedi
   → Email + WhatsApp + Dashboard bildirimi
@@ -871,6 +891,7 @@ IF firma 1 haftadır sisteme girmedi
 ```
 
 #### C. Akıllı Atama
+
 ```
 Yeni firma geldiğinde AI önerir:
 - En uygun danışman
@@ -943,6 +964,7 @@ Yeni firma geldiğinde AI önerir:
 ### Entegrasyon Detayları
 
 #### 📅 Zoom API
+
 ```typescript
 Özellikler:
 ✅ Otomatik toplantı oluşturma
@@ -959,6 +981,7 @@ Kullanım:
 ```
 
 #### 📧 Email (SendGrid)
+
 ```typescript
 Email Tipleri:
 ✅ Hoş geldiniz emaili
@@ -976,6 +999,7 @@ Email Tipleri:
 ```
 
 #### 💬 WhatsApp Business API
+
 ```typescript
 Kullanım:
 ✅ Acil bildirimler
@@ -986,6 +1010,7 @@ Kullanım:
 ```
 
 #### 🎥 YouTube (Eğitim Videoları)
+
 ```typescript
 Neden YouTube?
 ✅ Ücretsiz
@@ -1002,6 +1027,7 @@ Kullanım:
 ```
 
 #### 📊 Analytics Stack
+
 ```typescript
 Google Analytics 4:
 - Sayfa görüntülemeleri
@@ -1022,6 +1048,7 @@ Custom Dashboards:
 ```
 
 #### 🗄️ Storage
+
 ```typescript
 Supabase Storage:
 - CV ve belgeler
@@ -1041,6 +1068,7 @@ Cloudflare R2 (ileride):
 ## 💻 TEKNOLOJİ STACK {#teknoloji-stack}
 
 ### Frontend
+
 ```
 - Next.js 15+ (App Router)
 - React 19+
@@ -1057,6 +1085,7 @@ Cloudflare R2 (ileride):
 ```
 
 ### Backend
+
 ```
 - Next.js API Routes
 - Supabase (PostgreSQL)
@@ -1067,6 +1096,7 @@ Cloudflare R2 (ileride):
 ```
 
 ### AI & ML
+
 ```
 - OpenAI API (GPT-4)
 - Anthropic API (Claude)
@@ -1076,6 +1106,7 @@ Cloudflare R2 (ileride):
 ```
 
 ### DevOps & Tools
+
 ```
 - Vercel (Hosting)
 - GitHub (Version control)
@@ -1088,6 +1119,7 @@ Cloudflare R2 (ileride):
 ```
 
 ### External Services
+
 ```
 - SendGrid (Email)
 - Zoom API (Meetings)
@@ -1141,7 +1173,7 @@ CREATE TABLE user_programs (
   role VARCHAR(50) NOT NULL, -- 'program_manager', 'consultant'
   assigned_at TIMESTAMP DEFAULT NOW(),
   assigned_by UUID REFERENCES users(id),
-  
+
   UNIQUE(user_id, program_id)
 );
 
@@ -1155,25 +1187,25 @@ CREATE INDEX idx_user_programs_program ON user_programs(program_id);
 
 ```sql
 -- companies tablosuna program_id ekle
-ALTER TABLE companies 
+ALTER TABLE companies
 ADD COLUMN program_id UUID REFERENCES programs(id);
 
 CREATE INDEX idx_companies_program ON companies(program_id);
 
 -- projects tablosuna program_id ekle
-ALTER TABLE projects 
+ALTER TABLE projects
 ADD COLUMN program_id UUID REFERENCES programs(id);
 
 CREATE INDEX idx_projects_program ON projects(program_id);
 
 -- trainings tablosuna program_id ekle (NULL ise global)
-ALTER TABLE trainings 
+ALTER TABLE trainings
 ADD COLUMN program_id UUID REFERENCES programs(id) NULL;
 
 CREATE INDEX idx_trainings_program ON trainings(program_id);
 
 -- events tablosuna program_id ekle
-ALTER TABLE events 
+ALTER TABLE events
 ADD COLUMN program_id UUID REFERENCES programs(id);
 
 CREATE INDEX idx_events_program ON events(program_id);
@@ -1209,6 +1241,7 @@ export enum ProgramStatus {
 ### Faz 1: Temel Altyapı (2-3 hafta)
 
 #### Sprint 1: Proje Kurulumu (1 hafta)
+
 ```
 ✅ Next.js 15 + TypeScript kurulumu
 ✅ Tailwind CSS + Shadcn/ui kurulumu
@@ -1220,6 +1253,7 @@ export enum ProgramStatus {
 ```
 
 #### Sprint 2: Database & Auth (1 hafta)
+
 ```
 ✅ Supabase projesi oluşturma
 ✅ Database schema tasarımı
@@ -1231,6 +1265,7 @@ export enum ProgramStatus {
 ```
 
 #### Sprint 3: UI Foundation (1 hafta)
+
 ```
 ✅ Atomic components (Atoms)
 ✅ Molecule components
@@ -1245,6 +1280,7 @@ export enum ProgramStatus {
 ### Faz 2: Core Modules (3-4 hafta)
 
 #### Sprint 4: Program Yönetimi (1 hafta)
+
 ```
 ✅ Program CRUD operations
 ✅ Program dashboard (Master Admin)
@@ -1255,6 +1291,7 @@ export enum ProgramStatus {
 ```
 
 #### Sprint 5: Kullanıcı Yönetimi (1 hafta)
+
 ```
 ✅ User CRUD operations
 ✅ Multi-role support
@@ -1264,6 +1301,7 @@ export enum ProgramStatus {
 ```
 
 #### Sprint 6: Firma Yönetimi (1 hafta)
+
 ```
 ✅ Company CRUD operations
 ✅ Program'a firma atama
@@ -1273,6 +1311,7 @@ export enum ProgramStatus {
 ```
 
 #### Sprint 7: Danışman Paneli (1 hafta)
+
 ```
 ✅ Consultant dashboard
 ✅ Program seçici
@@ -1286,6 +1325,7 @@ export enum ProgramStatus {
 ### Faz 3: İş Modülleri (4-5 hafta)
 
 #### Sprint 8: Proje Yönetimi (1.5 hafta)
+
 ```
 ✅ Ana Proje → Alt Proje → Görev hiyerarşisi
 ✅ Proje CRUD operations
@@ -1297,6 +1337,7 @@ export enum ProgramStatus {
 ```
 
 #### Sprint 9: Eğitim Yönetimi (1.5 hafta)
+
 ```
 ✅ Video eğitim yönetimi
 ✅ Döküman yönetimi
@@ -1308,6 +1349,7 @@ export enum ProgramStatus {
 ```
 
 #### Sprint 10: Etkinlik Yönetimi (1 hafta)
+
 ```
 ✅ Etkinlik CRUD operations
 ✅ Takvim görünümü (FullCalendar)
@@ -1317,6 +1359,7 @@ export enum ProgramStatus {
 ```
 
 #### Sprint 11: Randevu Yönetimi (1 hafta)
+
 ```
 ✅ Randevu oluşturma
 ✅ Danışman müsaitlik takvimi
@@ -1330,6 +1373,7 @@ export enum ProgramStatus {
 ### Faz 4: AI & Otomasyon (2-3 hafta)
 
 #### Sprint 12: AI Altyapısı (1 hafta)
+
 ```
 ✅ OpenAI API entegrasyonu
 ✅ Claude API entegrasyonu
@@ -1340,6 +1384,7 @@ export enum ProgramStatus {
 ```
 
 #### Sprint 13: AI Özellikleri (1 hafta)
+
 ```
 ✅ Görev açıklaması üretimi
 ✅ Eğitim özeti çıkarma
@@ -1349,6 +1394,7 @@ export enum ProgramStatus {
 ```
 
 #### Sprint 14: Chatbot (1 hafta)
+
 ```
 ✅ Chatbot UI component
 ✅ Chatbot backend
@@ -1363,6 +1409,7 @@ export enum ProgramStatus {
 ### Faz 5: İletişim & Bildirimler (2 hafta)
 
 #### Sprint 15: Email Sistemi (1 hafta)
+
 ```
 ✅ SendGrid entegrasyonu
 ✅ Email templates (MJML)
@@ -1372,6 +1419,7 @@ export enum ProgramStatus {
 ```
 
 #### Sprint 16: Bildirim Sistemi (1 hafta)
+
 ```
 ✅ In-app notifications
 ✅ Push notifications (OneSignal)
@@ -1385,6 +1433,7 @@ export enum ProgramStatus {
 ### Faz 6: Raporlama & Analitik (2 hafta)
 
 #### Sprint 17: Dashboard & Raporlar (1 hafta)
+
 ```
 ✅ Master Admin dashboard
 ✅ Program Manager dashboard
@@ -1395,6 +1444,7 @@ export enum ProgramStatus {
 ```
 
 #### Sprint 18: Analytics (1 hafta)
+
 ```
 ✅ Google Analytics 4 entegrasyonu
 ✅ Mixpanel entegrasyonu
@@ -1408,6 +1458,7 @@ export enum ProgramStatus {
 ### Faz 7: Public Website (1-2 hafta)
 
 #### Sprint 19: Public Pages (1 hafta)
+
 ```
 ✅ Ana sayfa
 ✅ Program hakkında
@@ -1419,6 +1470,7 @@ export enum ProgramStatus {
 ```
 
 #### Sprint 20: SEO & Performance (1 hafta)
+
 ```
 ✅ SEO optimization
 ✅ Meta tags
@@ -1433,6 +1485,7 @@ export enum ProgramStatus {
 ### Faz 8: Testing & QA (2 hafta)
 
 #### Sprint 21: Testing (1 hafta)
+
 ```
 ✅ Unit tests (Jest)
 ✅ Integration tests
@@ -1442,6 +1495,7 @@ export enum ProgramStatus {
 ```
 
 #### Sprint 22: QA & Bug Fixes (1 hafta)
+
 ```
 ✅ Manual testing
 ✅ Bug fixing
@@ -1455,6 +1509,7 @@ export enum ProgramStatus {
 ### Faz 9: Deployment & Launch (1 hafta)
 
 #### Sprint 23: Production Setup
+
 ```
 ✅ Production database setup
 ✅ Environment variables
@@ -1547,6 +1602,7 @@ TOPLAM İKİNCİ YIL: ~$11,568-15,768
 ## 📊 BAŞARI KRİTERLERİ
 
 ### Teknik Metrikler
+
 ```
 ✅ Lighthouse Score > 90
 ✅ First Contentful Paint < 1.5s
@@ -1558,6 +1614,7 @@ TOPLAM İKİNCİ YIL: ~$11,568-15,768
 ```
 
 ### Kullanıcı Metrikleri
+
 ```
 ✅ User Satisfaction > 4.5/5
 ✅ Task Completion Rate > 90%
@@ -1567,6 +1624,7 @@ TOPLAM İKİNCİ YIL: ~$11,568-15,768
 ```
 
 ### İş Metrikleri
+
 ```
 ✅ Firma Başarı Oranı > 75%
 ✅ Görev Tamamlama > 80%
@@ -1580,6 +1638,7 @@ TOPLAM İKİNCİ YIL: ~$11,568-15,768
 ## 🎯 ÖNEMLİ NOTLAR
 
 ### Mimari Prensipler
+
 ```
 1. ✅ Her modül bağımsız olmalı (Loose Coupling)
 2. ✅ Katmanlar arası bağımlılık tek yönlü (Dependency Rule)
@@ -1590,6 +1649,7 @@ TOPLAM İKİNCİ YIL: ~$11,568-15,768
 ```
 
 ### Tasarım Prensipler
+
 ```
 1. ✅ Tutarlılık her şeyden önemli
 2. ✅ Accessibility first
@@ -1602,6 +1662,7 @@ TOPLAM İKİNCİ YIL: ~$11,568-15,768
 ```
 
 ### AI Kullanım Prensipler
+
 ```
 1. ✅ AI asistan olmalı, karar verici değil
 2. ✅ Her AI önerisi review edilmeli
@@ -1612,6 +1673,7 @@ TOPLAM İKİNCİ YIL: ~$11,568-15,768
 ```
 
 ### Güvenlik Prensipler
+
 ```
 1. ✅ Never trust user input
 2. ✅ Always validate on server
@@ -1627,6 +1689,7 @@ TOPLAM İKİNCİ YIL: ~$11,568-15,768
 ## 📚 REFERANS DÖKÜMANLAR
 
 ### Proje Dökümanları
+
 ```
 1. ia-6-proje-analizi.md (Eski proje analizi)
 2. proje-planlama-ve-mimari-kararlar.md (Bu döküman)
@@ -1636,6 +1699,7 @@ TOPLAM İKİNCİ YIL: ~$11,568-15,768
 ```
 
 ### Dış Kaynaklar
+
 ```
 - Clean Architecture (Robert C. Martin)
 - Atomic Design (Brad Frost)
@@ -1652,6 +1716,7 @@ TOPLAM İKİNCİ YIL: ~$11,568-15,768
 ## 🎓 ÖĞRENME KAYNAKLARI
 
 ### Ekip İçin Önerilen Kaynaklar
+
 ```
 1. Clean Architecture in TypeScript
 2. Atomic Design Methodology
@@ -1666,6 +1731,7 @@ TOPLAM İKİNCİ YIL: ~$11,568-15,768
 ## 🔄 VERSİYON TAKİBİ
 
 ### v1.0 - MVP (İlk 3 Ay)
+
 ```
 ✅ Multi-program sistemi
 ✅ Temel modüller (Program, Firma, Danışman, Proje, Eğitim)
@@ -1675,6 +1741,7 @@ TOPLAM İKİNCİ YIL: ~$11,568-15,768
 ```
 
 ### v1.1 - Enhanced (Ay 4-5)
+
 ```
 ✅ Etkinlik yönetimi
 ✅ Randevu sistemi
@@ -1684,6 +1751,7 @@ TOPLAM İKİNCİ YIL: ~$11,568-15,768
 ```
 
 ### v1.2 - Advanced AI (Ay 6)
+
 ```
 ✅ Risk analizi
 ✅ Başarı tahmini
@@ -1693,6 +1761,7 @@ TOPLAM İKİNCİ YIL: ~$11,568-15,768
 ```
 
 ### v2.0 - Scale (Ay 7+)
+
 ```
 ✅ Mobile app
 ✅ Advanced analytics
@@ -1707,12 +1776,14 @@ TOPLAM İKİNCİ YIL: ~$11,568-15,768
 ## ✅ ONAYLANAN KARARLAR - ÖZET
 
 ### Mimari
+
 - ✅ Clean Architecture + Modular Monolith
 - ✅ 6 Katmanlı yapı
 - ✅ Loose coupling, High cohesion
 - ✅ Domain-driven design
 
 ### Tasarım
+
 - ✅ Shadcn/ui + Tailwind CSS
 - ✅ Canlı ve renkli palet
 - ✅ Atomic Design System
@@ -1721,6 +1792,7 @@ TOPLAM İKİNCİ YIL: ~$11,568-15,768
 - ✅ WCAG 2.1 AA compliance
 
 ### AI & Otomasyon
+
 - ✅ Hybrid AI (OpenAI GPT-4 + Claude)
 - ✅ İçerik AI (Görev, özet, rapor)
 - ✅ Analiz AI (Risk, tahmin, trend)
@@ -1728,6 +1800,7 @@ TOPLAM İKİNCİ YIL: ~$11,568-15,768
 - ✅ Otomatik workflow'lar
 
 ### Entegrasyonlar
+
 - ✅ Zoom API
 - ✅ WhatsApp Business API
 - ✅ SendGrid (Email)
@@ -1736,6 +1809,7 @@ TOPLAM İKİNCİ YIL: ~$11,568-15,768
 - ✅ Sentry (Error tracking)
 
 ### Temel Özellikler
+
 - ✅ Multi-Program/Grup sistemi
 - ✅ 5 Rol (Master Admin, Program Manager, Consultant, Company Admin, Company User)
 - ✅ Program Yöneticisi rolü
@@ -1766,6 +1840,7 @@ TOPLAM İKİNCİ YIL: ~$11,568-15,768
 ## 📞 İLETİŞİM
 
 Proje ile ilgili sorular, öneriler veya değişiklikler için:
+
 - Bu dökümanı güncelleyin
 - Versiyon numarasını artırın
 - Değişiklik tarihini ekleyin
@@ -1777,4 +1852,3 @@ Proje ile ilgili sorular, öneriler veya değişiklikler için:
 ---
 
 🎉 **AKADEMİ PORT PROJESİ BAŞLIYOR!** 🚀
-
