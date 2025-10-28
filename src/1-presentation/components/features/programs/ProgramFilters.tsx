@@ -60,14 +60,14 @@ export function ProgramFilters({ onFilterChange, initialFilters = {} }: ProgramF
       <div className="flex flex-wrap gap-3">
         {/* Status Filter */}
         <Select
-          value={filters.status || ''}
-          onValueChange={(value) => handleFilterChange('status', value)}
+          value={filters.status || 'all'}
+          onValueChange={(value) => handleFilterChange('status', value === 'all' ? undefined : value)}
         >
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Durum" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Tümü</SelectItem>
+            <SelectItem value="all">Tümü</SelectItem>
             {Object.entries(ProgramStatusLabels).map(([key, label]) => (
               <SelectItem key={key} value={key}>
                 {label}
