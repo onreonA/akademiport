@@ -1,6 +1,6 @@
 /**
  * New Program Page
- * 
+ *
  * Page for creating a new program
  */
 
@@ -10,7 +10,10 @@ import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/presentation/components/ui/atoms/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/presentation/components/ui/atoms/card';
-import { ProgramForm, type ProgramFormData } from '@/presentation/components/features/programs/ProgramForm';
+import {
+  ProgramForm,
+  type ProgramFormData,
+} from '@/presentation/components/features/programs/ProgramForm';
 import { ArrowLeft } from 'lucide-react';
 
 export default function NewProgramPage() {
@@ -54,9 +57,7 @@ export default function NewProgramPage() {
         </Button>
         <div>
           <h1 className="text-3xl font-bold">Yeni Program Oluştur</h1>
-          <p className="text-muted-foreground">
-            E-ihracat dönüşüm programı bilgilerini girin
-          </p>
+          <p className="text-muted-foreground">E-ihracat dönüşüm programı bilgilerini girin</p>
         </div>
       </div>
 
@@ -72,4 +73,3 @@ export default function NewProgramPage() {
     </div>
   );
 }
-
