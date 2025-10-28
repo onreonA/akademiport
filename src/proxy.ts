@@ -1,14 +1,15 @@
 /**
- * Middleware
+ * Proxy (Next.js 16+)
  *
  * Route protection ve authentication kontrolü
+ * Not: middleware.ts yerine proxy.ts kullanılıyor (Next.js 16 standardı)
  */
 
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   // Public pages - authentication gerektirmez
   const isPublicPage =
     request.nextUrl.pathname === '/' ||
@@ -74,7 +75,7 @@ export async function middleware(request: NextRequest) {
 
     return response;
   } catch (error) {
-    console.error('Middleware error:', error);
+    console.error('Proxy error:', error);
     // Hata durumunda public page'lere izin ver
     if (isPublicPage) {
       return NextResponse.next();
@@ -96,3 +97,4 @@ export const config = {
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 };
+
