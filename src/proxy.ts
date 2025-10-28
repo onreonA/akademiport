@@ -14,12 +14,10 @@ export async function proxy(request: NextRequest) {
   const isPublicPage =
     request.nextUrl.pathname === '/' ||
     request.nextUrl.pathname.startsWith('/components-demo') ||
-    request.nextUrl.pathname.startsWith('/dashboard') || // 👈 GEÇİCİ: Sprint 4 test için
-    request.nextUrl.pathname.startsWith('/api/programs') || // 👈 GEÇİCİ: Sprint 4 test için
-    request.nextUrl.pathname.startsWith('/api/companies') || // 👈 GEÇİCİ: Sprint 4 test için
     request.nextUrl.pathname.startsWith('/public') ||
     request.nextUrl.pathname.startsWith('/_next') ||
-    request.nextUrl.pathname.startsWith('/api/public');
+    request.nextUrl.pathname.startsWith('/api/public') ||
+    request.nextUrl.pathname.startsWith('/api/auth'); // Auth endpoints public
 
   // Public page ise direkt geç
   if (isPublicPage) {
@@ -62,7 +60,10 @@ export async function proxy(request: NextRequest) {
     const isAuthPage =
       request.nextUrl.pathname.startsWith('/auth') ||
       request.nextUrl.pathname === '/login' ||
-      request.nextUrl.pathname === '/register';
+      request.nextUrl.pathname === '/register' ||
+      request.nextUrl.pathname.startsWith('/forgot-password') ||
+      request.nextUrl.pathname.startsWith('/reset-password') ||
+      request.nextUrl.pathname.startsWith('/verify-email');
 
     // Redirect authenticated users away from auth pages
     if (user && isAuthPage) {
