@@ -15,6 +15,8 @@ export async function proxy(request: NextRequest) {
     request.nextUrl.pathname === '/' ||
     request.nextUrl.pathname.startsWith('/components-demo') ||
     request.nextUrl.pathname.startsWith('/dashboard') || // 👈 GEÇİCİ: Sprint 4 test için
+    request.nextUrl.pathname.startsWith('/api/programs') || // 👈 GEÇİCİ: Sprint 4 test için
+    request.nextUrl.pathname.startsWith('/api/companies') || // 👈 GEÇİCİ: Sprint 4 test için
     request.nextUrl.pathname.startsWith('/public') ||
     request.nextUrl.pathname.startsWith('/_next') ||
     request.nextUrl.pathname.startsWith('/api/public');

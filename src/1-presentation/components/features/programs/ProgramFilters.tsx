@@ -1,6 +1,6 @@
 /**
  * Program Filters Component
- * 
+ *
  * Filter and search programs
  */
 
@@ -9,7 +9,13 @@
 import * as React from 'react';
 import { Input } from '@/presentation/components/ui/atoms/input';
 import { Button } from '@/presentation/components/ui/atoms/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/presentation/components/ui/atoms/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/presentation/components/ui/atoms/select';
 import { Search, X } from 'lucide-react';
 import { ProgramStatus, ProgramStatusLabels } from '@/domain/enums/ProgramStatus';
 
@@ -41,7 +47,9 @@ export function ProgramFilters({ onFilterChange, initialFilters = {} }: ProgramF
     onFilterChange(emptyFilters);
   };
 
-  const hasActiveFilters = Object.values(filters).some((value) => value !== undefined && value !== '');
+  const hasActiveFilters = Object.values(filters).some(
+    (value) => value !== undefined && value !== ''
+  );
 
   return (
     <div className="space-y-4">
@@ -61,7 +69,9 @@ export function ProgramFilters({ onFilterChange, initialFilters = {} }: ProgramF
         {/* Status Filter */}
         <Select
           value={filters.status || 'all'}
-          onValueChange={(value) => handleFilterChange('status', value === 'all' ? undefined : value)}
+          onValueChange={(value) =>
+            handleFilterChange('status', value === 'all' ? undefined : value)
+          }
         >
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Durum" />
@@ -125,4 +135,3 @@ export function ProgramFilters({ onFilterChange, initialFilters = {} }: ProgramF
     </div>
   );
 }
-
