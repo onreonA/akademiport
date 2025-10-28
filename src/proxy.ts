@@ -14,6 +14,7 @@ export async function proxy(request: NextRequest) {
   const isPublicPage =
     request.nextUrl.pathname === '/' ||
     request.nextUrl.pathname.startsWith('/components-demo') ||
+    request.nextUrl.pathname.startsWith('/dashboard') || // 👈 GEÇİCİ: Sprint 4 test için
     request.nextUrl.pathname.startsWith('/public') ||
     request.nextUrl.pathname.startsWith('/_next') ||
     request.nextUrl.pathname.startsWith('/api/public');
