@@ -103,10 +103,7 @@ export const Spacing = () => (
           <div className="w-16 text-sm font-mono text-muted-foreground">{name}</div>
           <div className="w-24 text-sm text-muted-foreground">{size}</div>
           <div className="flex items-center gap-2">
-            <div
-              className="bg-primary rounded"
-              style={{ width: size, height: '2rem' }}
-            />
+            <div className="bg-primary rounded" style={{ width: size, height: '2rem' }} />
             <span className="text-xs text-muted-foreground">({size})</span>
           </div>
         </div>
@@ -151,7 +148,7 @@ export const Gradients = () => (
     <div>
       <h1 className="text-4xl font-bold mb-2">Gradients</h1>
       <p className="text-muted-foreground mb-8">
-        Canlı gradient'ler. Özel vurgular ve hero bölümler için kullanılır.
+        Canlı gradient&apos;ler. Özel vurgular ve hero bölümler için kullanılır.
       </p>
     </div>
 
@@ -186,49 +183,37 @@ export const Overview = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <div className="p-6 border rounded-lg space-y-2">
         <h3 className="text-lg font-semibold">Colors</h3>
-        <p className="text-sm text-muted-foreground">
-          8 renk ailesi, her biri 11 tonla
-        </p>
+        <p className="text-sm text-muted-foreground">8 renk ailesi, her biri 11 tonla</p>
         <p className="text-2xl font-bold text-primary">88 renk</p>
       </div>
 
       <div className="p-6 border rounded-lg space-y-2">
         <h3 className="text-lg font-semibold">Typography</h3>
-        <p className="text-sm text-muted-foreground">
-          Font boyutları, ağırlıkları ve aileler
-        </p>
+        <p className="text-sm text-muted-foreground">Font boyutları, ağırlıkları ve aileler</p>
         <p className="text-2xl font-bold text-secondary">11 boyut</p>
       </div>
 
       <div className="p-6 border rounded-lg space-y-2">
         <h3 className="text-lg font-semibold">Spacing</h3>
-        <p className="text-sm text-muted-foreground">
-          8px grid sistemi
-        </p>
+        <p className="text-sm text-muted-foreground">8px grid sistemi</p>
         <p className="text-2xl font-bold text-accent">32 değer</p>
       </div>
 
       <div className="p-6 border rounded-lg space-y-2">
         <h3 className="text-lg font-semibold">Shadows</h3>
-        <p className="text-sm text-muted-foreground">
-          Derinlik ve hiyerarşi
-        </p>
+        <p className="text-sm text-muted-foreground">Derinlik ve hiyerarşi</p>
         <p className="text-2xl font-bold text-success">8 seviye</p>
       </div>
 
       <div className="p-6 border rounded-lg space-y-2">
         <h3 className="text-lg font-semibold">Gradients</h3>
-        <p className="text-sm text-muted-foreground">
-          Canlı gradient efektleri
-        </p>
+        <p className="text-sm text-muted-foreground">Canlı gradient efektleri</p>
         <p className="text-2xl font-bold text-info">7 gradient</p>
       </div>
 
       <div className="p-6 border rounded-lg space-y-2">
         <h3 className="text-lg font-semibold">Border Radius</h3>
-        <p className="text-sm text-muted-foreground">
-          Köşe yuvarlaklıkları
-        </p>
+        <p className="text-sm text-muted-foreground">Köşe yuvarlaklıkları</p>
         <p className="text-2xl font-bold text-warning">9 değer</p>
       </div>
     </div>
@@ -250,4 +235,3 @@ const padding = spacing[4];`}</code>
     </div>
   </div>
 );
-
