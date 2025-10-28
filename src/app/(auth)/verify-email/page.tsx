@@ -11,7 +11,14 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/presentation/components/ui/atoms/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/presentation/components/ui/atoms/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/presentation/components/ui/atoms/card';
 import { Spinner } from '@/presentation/components/ui/atoms/spinner';
 import { CheckCircle2, XCircle } from 'lucide-react';
 import { toast } from 'sonner';
@@ -128,4 +135,3 @@ export default function VerifyEmailPage() {
     </div>
   );
 }
-

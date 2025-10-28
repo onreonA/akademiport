@@ -9,6 +9,7 @@ import { UserRepository } from '@/infrastructure/database/repositories/UserRepos
 import { ProgramRepository } from '@/infrastructure/database/repositories/ProgramRepository';
 import { RemoveProgramUseCase } from '@/application/use-cases/user';
 import { UserRole } from '@/domain/enums/UserRole';
+import { requireAuth } from '@/infrastructure/api/helpers/auth';
 
 const userRepository = new UserRepository();
 const programRepository = new ProgramRepository();
@@ -26,8 +27,9 @@ export async function DELETE(
     const { id, programId } = await params;
 
     // TODO: Get authenticated user from session (Sprint 5 - Faz H)
-    const userId = 'mock-user-id';
-    const userRole = UserRole.MASTER_ADMIN;
+    const user = await requireAuth(request);
+    const userId = user.id;
+    const userRole = user.role as UserRole;
 
     // Execute use case
     const result = await removeProgramUseCase.execute({

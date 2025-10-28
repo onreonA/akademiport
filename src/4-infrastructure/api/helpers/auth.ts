@@ -22,7 +22,7 @@ export async function getAuthenticatedUser(
 ): Promise<AuthenticatedUser | null> {
   try {
     const cookieStore = await cookies();
-    
+
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -71,11 +71,10 @@ export async function getAuthenticatedUser(
  */
 export async function requireAuth(request: NextRequest): Promise<AuthenticatedUser> {
   const user = await getAuthenticatedUser(request);
-  
+
   if (!user) {
     throw new Error('Unauthorized');
   }
-  
+
   return user;
 }
-

@@ -14,6 +14,7 @@ import {
 import { UserRole } from '@/domain/enums/UserRole';
 import { ProgramStatus } from '@/domain/enums/ProgramStatus';
 import type { ProgramSortField } from '@/application/dto/program/ProgramFilterDto';
+import { requireAuth } from '@/infrastructure/api/helpers/auth';
 
 const programRepository = new ProgramRepository();
 const createProgramUseCase = new CreateProgramUseCase(programRepository);
@@ -27,10 +28,10 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = request.nextUrl;
 
-    // TODO: Get authenticated user from session (Sprint 5)
-    // For now, we'll use mock data
-    const userId = 'mock-user-id';
-    const userRole = UserRole.MASTER_ADMIN;
+    // Get authenticated user
+    const user = await requireAuth(request);
+    const userId = user.id;
+    const userRole = user.role as UserRole;
 
     // Parse query parameters
     const status = searchParams.get('status') as ProgramStatus | undefined;
@@ -101,10 +102,10 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    // TODO: Get authenticated user from session (Sprint 5)
-    // For now, we'll use mock data
-    const userId = 'mock-user-id';
-    const userRole = UserRole.MASTER_ADMIN;
+    // Get authenticated user
+    const user = await requireAuth(request);
+    const userId = user.id;
+    const userRole = user.role as UserRole;
 
     // Convert dates
     if (body.startDate) {

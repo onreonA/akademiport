@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { ProgramRepository } from '@/infrastructure/database/repositories/ProgramRepository';
 import { ManageConsultantsUseCase } from '@/application/use-cases/program';
 import { UserRole } from '@/domain/enums/UserRole';
+import { requireAuth } from '@/infrastructure/api/helpers/auth';
 
 const programRepository = new ProgramRepository();
 const manageConsultantsUseCase = new ManageConsultantsUseCase(programRepository);
@@ -23,10 +24,11 @@ export async function DELETE(
   try {
     const { id: programId, consultantId } = await params;
 
-    // TODO: Get authenticated user from session (Sprint 5)
-    // For now, we'll use mock data
-    const userId = 'mock-user-id';
-    const userRole = UserRole.MASTER_ADMIN;
+    // Get authenticated user
+    
+    const user = await requireAuth(request);
+    const userId = user.id;
+    const userRole = user.role as UserRole;
 
     // Execute use case
     const result = await manageConsultantsUseCase.removeConsultant({

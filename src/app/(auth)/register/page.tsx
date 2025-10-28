@@ -13,7 +13,14 @@ import Link from 'next/link';
 import { Button } from '@/presentation/components/ui/atoms/button';
 import { Input } from '@/presentation/components/ui/atoms/input';
 import { Label } from '@/presentation/components/ui/atoms/label';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/presentation/components/ui/atoms/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/presentation/components/ui/atoms/card';
 import { Spinner } from '@/presentation/components/ui/atoms/spinner';
 import { toast } from 'sonner';
 
@@ -146,4 +153,3 @@ export default function RegisterPage() {
     </div>
   );
 }
-

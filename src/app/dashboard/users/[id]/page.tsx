@@ -11,10 +11,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/presentation/components/ui/atoms/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/presentation/components/ui/atoms/tabs';
-import {
-  UserProfileCard,
-  UserProgramList,
-} from '@/presentation/components/features/users';
+import { UserProfileCard, UserProgramList } from '@/presentation/components/features/users';
 import { User } from '@/domain/entities/User';
 import { Program } from '@/domain/entities/Program';
 import { ArrowLeft, Edit, Loader2 } from 'lucide-react';
@@ -135,4 +132,3 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
     </div>
   );
 }
-

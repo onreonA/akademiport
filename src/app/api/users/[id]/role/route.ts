@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { UserRepository } from '@/infrastructure/database/repositories/UserRepository';
 import { AssignRoleUseCase } from '@/application/use-cases/user';
 import { UserRole } from '@/domain/enums/UserRole';
+import { requireAuth } from '@/infrastructure/api/helpers/auth';
 
 const userRepository = new UserRepository();
 const assignRoleUseCase = new AssignRoleUseCase(userRepository);
@@ -22,8 +23,9 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const body = await request.json();
 
     // TODO: Get authenticated user from session (Sprint 5 - Faz H)
-    const userId = 'mock-user-id';
-    const userRole = UserRole.MASTER_ADMIN;
+    const user = await requireAuth(request);
+    const userId = user.id;
+    const userRole = user.role as UserRole;
 
     // Execute use case
     const result = await assignRoleUseCase.execute({

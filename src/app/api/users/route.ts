@@ -9,6 +9,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { UserRepository } from '@/infrastructure/database/repositories/UserRepository';
 import { CreateUserUseCase, ListUsersUseCase } from '@/application/use-cases/user';
 import { UserRole } from '@/domain/enums/UserRole';
+import { requireAuth } from '@/infrastructure/api/helpers/auth';
 import { createUserFilterFromQuery } from '@/application/dto/user';
 
 const userRepository = new UserRepository();
@@ -22,9 +23,10 @@ const listUsersUseCase = new ListUsersUseCase(userRepository);
 export async function GET(request: NextRequest) {
   try {
     // TODO: Get authenticated user from session (Sprint 5 - Faz H)
-    // For now, we'll use mock data
-    const userId = 'mock-user-id';
-    const userRole = UserRole.MASTER_ADMIN;
+    
+    const user = await requireAuth(request);
+    const userId = user.id;
+    const userRole = user.role as UserRole;
 
     // Parse query parameters
     const { searchParams } = request.nextUrl;
@@ -86,9 +88,10 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     // TODO: Get authenticated user from session (Sprint 5 - Faz H)
-    // For now, we'll use mock data
-    const userId = 'mock-user-id';
-    const userRole = UserRole.MASTER_ADMIN;
+    
+    const user = await requireAuth(request);
+    const userId = user.id;
+    const userRole = user.role as UserRole;
 
     // Execute use case
     const result = await createUserUseCase.execute({

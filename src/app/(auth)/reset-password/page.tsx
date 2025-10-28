@@ -13,7 +13,14 @@ import Link from 'next/link';
 import { Button } from '@/presentation/components/ui/atoms/button';
 import { Input } from '@/presentation/components/ui/atoms/input';
 import { Label } from '@/presentation/components/ui/atoms/label';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/presentation/components/ui/atoms/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/presentation/components/ui/atoms/card';
 import { Spinner } from '@/presentation/components/ui/atoms/spinner';
 import { toast } from 'sonner';
 
@@ -134,7 +141,10 @@ export default function ResetPasswordPage() {
                 'Şifreyi Sıfırla'
               )}
             </Button>
-            <Link href="/login" className="text-sm text-center text-muted-foreground hover:text-primary">
+            <Link
+              href="/login"
+              className="text-sm text-center text-muted-foreground hover:text-primary"
+            >
               Giriş Sayfasına Dön
             </Link>
           </CardFooter>
@@ -143,4 +153,3 @@ export default function ResetPasswordPage() {
     </div>
   );
 }
-

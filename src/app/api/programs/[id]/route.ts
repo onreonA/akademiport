@@ -15,6 +15,7 @@ import {
   DeleteProgramUseCase,
 } from '@/application/use-cases/program';
 import { UserRole } from '@/domain/enums/UserRole';
+import { requireAuth } from '@/infrastructure/api/helpers/auth';
 
 const programRepository = new ProgramRepository();
 const companyRepository = new CompanyRepository();
@@ -73,10 +74,10 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     const { id } = await params;
     const body = await request.json();
 
-    // TODO: Get authenticated user from session (Sprint 5)
-    // For now, we'll use mock data
-    const userId = 'mock-user-id';
-    const userRole = UserRole.MASTER_ADMIN;
+    // Get authenticated user
+    const user = await requireAuth(request);
+    const userId = user.id;
+    const userRole = user.role as UserRole;
 
     // Convert dates if provided
     if (body.startDate) {
@@ -136,10 +137,10 @@ export async function DELETE(
   try {
     const { id } = await params;
 
-    // TODO: Get authenticated user from session (Sprint 5)
-    // For now, we'll use mock data
-    const userId = 'mock-user-id';
-    const userRole = UserRole.MASTER_ADMIN;
+    // Get authenticated user
+    const user = await requireAuth(request);
+    const userId = user.id;
+    const userRole = user.role as UserRole;
 
     // Execute use case
     const result = await deleteProgramUseCase.execute({
