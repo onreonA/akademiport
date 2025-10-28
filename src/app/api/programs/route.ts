@@ -1,66 +1,134 @@
 /**
  * API Route: Programs
  *
- * GET /api/programs - List all programs
+ * GET /api/programs - List all programs (with filters and pagination)
  * POST /api/programs - Create new program
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { ProgramRepository } from '@/infrastructure/database/repositories/ProgramRepository';
-import { CreateProgramDto } from '@/application/dto/program';
+import {
+  CreateProgramUseCase,
+  ListProgramsUseCase,
+} from '@/application/use-cases/program';
+import { UserRole } from '@/domain/enums/UserRole';
+import { ProgramStatus } from '@/domain/enums/ProgramStatus';
+import type { ProgramSortField } from '@/application/dto/program/ProgramFilterDto';
 
-const repository = new ProgramRepository();
+const programRepository = new ProgramRepository();
+const createProgramUseCase = new CreateProgramUseCase(programRepository);
+const listProgramsUseCase = new ListProgramsUseCase(programRepository);
 
+/**
+ * GET /api/programs
+ * List programs with filters and pagination
+ */
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const status = searchParams.get('status');
-    const city = searchParams.get('city');
+    const { searchParams } = request.nextUrl;
 
-    let result;
+    // TODO: Get authenticated user from session (Sprint 5)
+    // For now, we'll use mock data
+    const userId = 'mock-user-id';
+    const userRole = UserRole.MASTER_ADMIN;
 
-    if (status) {
-      result = await repository.findByStatus(status);
-    } else if (city) {
-      result = await repository.findByCity(city);
-    } else {
-      result = await repository.findAll();
-    }
+    // Parse query parameters
+    const status = searchParams.get('status') as ProgramStatus | undefined;
+    const city = searchParams.get('city') || undefined;
+    const region = searchParams.get('region') || undefined;
+    const search = searchParams.get('search') || undefined;
+    const managerId = searchParams.get('managerId') || undefined;
+    const page = parseInt(searchParams.get('page') || '1', 10);
+    const limit = parseInt(searchParams.get('limit') || '20', 10);
+    const sortBy = (searchParams.get('sortBy') || 'createdAt') as ProgramSortField;
+    const sortOrder = (searchParams.get('sortOrder') || 'desc') as 'asc' | 'desc';
+
+    // Execute use case
+    const result = await listProgramsUseCase.execute({
+      userId,
+      userRole,
+      status,
+      city,
+      region,
+      search,
+      managerId,
+      page,
+      limit,
+      sortBy,
+      sortOrder,
+    });
 
     if (result.isFailure) {
-      return NextResponse.json({ error: result.error }, { status: 400 });
-    }
-
-    return NextResponse.json({
-      success: true,
-      data: result.value,
-      count: result.value.length,
-    });
-  } catch {
-    return NextResponse.json({ error: 'Programlar alınamadı' }, { status: 500 });
-  }
-}
-
-export async function POST(request: NextRequest) {
-  try {
-    const body: CreateProgramDto = await request.json();
-
-    // Validation
-    if (!body.name || !body.startDate || !body.endDate) {
       return NextResponse.json(
-        { error: 'Program adı, başlangıç ve bitiş tarihi zorunludur' },
+        {
+          success: false,
+          error: result.error,
+        },
         { status: 400 }
       );
     }
 
-    // Convert dates
-    body.startDate = new Date(body.startDate);
-    body.endDate = new Date(body.endDate);
+    return NextResponse.json(
+      {
+        success: true,
+        data: result.value?.programs,
+        pagination: {
+          total: result.value?.total,
+          page: result.value?.page,
+          limit: result.value?.limit,
+          totalPages: result.value?.totalPages,
+        },
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error('List programs error:', error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: 'Programlar alınamadı',
+      },
+      { status: 500 }
+    );
+  }
+}
 
-    const result = await repository.create(body);
+/**
+ * POST /api/programs
+ * Create a new program
+ */
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+
+    // TODO: Get authenticated user from session (Sprint 5)
+    // For now, we'll use mock data
+    const userId = 'mock-user-id';
+    const userRole = UserRole.MASTER_ADMIN;
+
+    // Convert dates
+    if (body.startDate) {
+      body.startDate = new Date(body.startDate);
+    }
+    if (body.endDate) {
+      body.endDate = new Date(body.endDate);
+    }
+
+    // Execute use case
+    const result = await createProgramUseCase.execute({
+      ...body,
+      createdBy: userId,
+      userRole,
+    });
 
     if (result.isFailure) {
-      return NextResponse.json({ error: result.error }, { status: 400 });
+      return NextResponse.json(
+        {
+          success: false,
+          error: result.error,
+        },
+        { status: 400 }
+      );
     }
 
     return NextResponse.json(
@@ -71,7 +139,14 @@ export async function POST(request: NextRequest) {
       },
       { status: 201 }
     );
-  } catch {
-    return NextResponse.json({ error: 'Program oluşturulamadı' }, { status: 500 });
+  } catch (error) {
+    console.error('Create program error:', error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: 'Program oluşturulamadı',
+      },
+      { status: 500 }
+    );
   }
 }

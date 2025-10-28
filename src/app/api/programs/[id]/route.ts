@@ -8,74 +8,171 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { ProgramRepository } from '@/infrastructure/database/repositories/ProgramRepository';
-import { UpdateProgramDto } from '@/application/dto/program';
+import { CompanyRepository } from '@/infrastructure/database/repositories/CompanyRepository';
+import {
+  GetProgramUseCase,
+  UpdateProgramUseCase,
+  DeleteProgramUseCase,
+} from '@/application/use-cases/program';
+import { UserRole } from '@/domain/enums/UserRole';
 
-const repository = new ProgramRepository();
+const programRepository = new ProgramRepository();
+const companyRepository = new CompanyRepository();
+const getProgramUseCase = new GetProgramUseCase(programRepository);
+const updateProgramUseCase = new UpdateProgramUseCase(programRepository);
+const deleteProgramUseCase = new DeleteProgramUseCase(programRepository, companyRepository);
 
+/**
+ * GET /api/programs/[id]
+ * Get a program by ID
+ */
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    const result = await repository.findById(id);
+
+    // Execute use case
+    const result = await getProgramUseCase.execute({ id });
 
     if (result.isFailure) {
-      return NextResponse.json({ error: result.error }, { status: 400 });
+      const errorMessage = result.error?.message || 'Program alınamadı';
+      const isNotFound = errorMessage.includes('bulunamadı');
+      return NextResponse.json(
+        {
+          success: false,
+          error: errorMessage,
+        },
+        { status: isNotFound ? 404 : 400 }
+      );
     }
 
-    if (!result.value) {
-      return NextResponse.json({ error: 'Program bulunamadı' }, { status: 404 });
-    }
-
-    return NextResponse.json({
-      success: true,
-      data: result.value,
-    });
-  } catch {
-    return NextResponse.json({ error: 'Program alınamadı' }, { status: 500 });
+    return NextResponse.json(
+      {
+        success: true,
+        data: result.value,
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error('Get program error:', error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: 'Program alınamadı',
+      },
+      { status: 500 }
+    );
   }
 }
 
+/**
+ * PATCH /api/programs/[id]
+ * Update a program
+ */
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    const body: UpdateProgramDto = await request.json();
+    const body = await request.json();
+
+    // TODO: Get authenticated user from session (Sprint 5)
+    // For now, we'll use mock data
+    const userId = 'mock-user-id';
+    const userRole = UserRole.MASTER_ADMIN;
 
     // Convert dates if provided
-    if (body.startDate) body.startDate = new Date(body.startDate);
-    if (body.endDate) body.endDate = new Date(body.endDate);
-
-    const result = await repository.update(id, body);
-
-    if (result.isFailure) {
-      return NextResponse.json({ error: result.error }, { status: 400 });
+    if (body.startDate) {
+      body.startDate = new Date(body.startDate);
+    }
+    if (body.endDate) {
+      body.endDate = new Date(body.endDate);
     }
 
-    return NextResponse.json({
-      success: true,
-      data: result.value,
-      message: 'Program başarıyla güncellendi',
+    // Execute use case
+    const result = await updateProgramUseCase.execute({
+      id,
+      userId,
+      userRole,
+      updatedBy: userId,
+      ...body,
     });
-  } catch {
-    return NextResponse.json({ error: 'Program güncellenemedi' }, { status: 500 });
+
+    if (result.isFailure) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: result.error,
+        },
+        { status: 400 }
+      );
+    }
+
+    return NextResponse.json(
+      {
+        success: true,
+        data: result.value,
+        message: 'Program başarıyla güncellendi',
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error('Update program error:', error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: 'Program güncellenemedi',
+      },
+      { status: 500 }
+    );
   }
 }
 
+/**
+ * DELETE /api/programs/[id]
+ * Delete a program
+ */
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
-    const result = await repository.delete(id);
+
+    // TODO: Get authenticated user from session (Sprint 5)
+    // For now, we'll use mock data
+    const userId = 'mock-user-id';
+    const userRole = UserRole.MASTER_ADMIN;
+
+    // Execute use case
+    const result = await deleteProgramUseCase.execute({
+      id,
+      userId,
+      userRole,
+    });
 
     if (result.isFailure) {
-      return NextResponse.json({ error: result.error }, { status: 400 });
+      return NextResponse.json(
+        {
+          success: false,
+          error: result.error,
+        },
+        { status: 400 }
+      );
     }
 
-    return NextResponse.json({
-      success: true,
-      message: 'Program başarıyla silindi',
-    });
-  } catch {
-    return NextResponse.json({ error: 'Program silinemedi' }, { status: 500 });
+    return NextResponse.json(
+      {
+        success: true,
+        message: 'Program başarıyla silindi',
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error('Delete program error:', error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: 'Program silinemedi',
+      },
+      { status: 500 }
+    );
   }
 }
