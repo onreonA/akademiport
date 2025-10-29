@@ -39,4 +39,3 @@ export class AssignCompanyProgramUseCase {
     return await this.companyRepository.update(companyId, { programId } as any);
   }
 }
-

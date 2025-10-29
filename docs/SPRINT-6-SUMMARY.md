@@ -1,6 +1,7 @@
 # 📋 Sprint 6: Company Management - Özet Rapor
 
 ## 🎯 Sprint Hedefi
+
 **Firma CRUD + Firma paneli temeli**
 
 ---
@@ -8,6 +9,7 @@
 ## ✅ Tamamlanan Görevler
 
 ### Faz A: Company DTOs (6 dosya, ~350 satır) ✅
+
 1. ✅ `CreateCompanyDto.ts` - Zod validation + slug generation
 2. ✅ `UpdateCompanyDto.ts` - Zod validation
 3. ✅ `CompanyFilterDto.ts` - Filtering & pagination
@@ -16,6 +18,7 @@
 6. ✅ `index.ts` - Barrel export
 
 **Özellikler:**
+
 - Zod schema validation
 - Slug auto-generation helper
 - Max users validation (1-10, default: 2)
@@ -24,10 +27,12 @@
 ---
 
 ### Faz B: Repository Güncelleme (2 dosya, ~150 satır) ✅
+
 1. ✅ `ICompanyRepository.ts` - 5 yeni method eklendi
 2. ✅ `CompanyRepository.ts` - 5 yeni method implement edildi
 
 **Yeni Methodlar:**
+
 - `search(query: string)` - Full-text search
 - `findWithFilters(filter: CompanyFilterDto)` - Advanced filtering & pagination
 - `getCompanyUsers(companyId: string)` - List users
@@ -37,6 +42,7 @@
 ---
 
 ### Faz C: Company Use Cases (10 dosya, ~850 satır) ✅
+
 1. ✅ `CreateCompanyUseCase.ts` - Authorization & validation
 2. ✅ `UpdateCompanyUseCase.ts` - Role-based restrictions
 3. ✅ `DeleteCompanyUseCase.ts` - Business rules (no active users)
@@ -58,6 +64,7 @@
 | COMPANY_USER | ❌ | ✅ Own | ❌ | ❌ | ❌ |
 
 **Business Rules:**
+
 - ✅ Max 2 aktif kullanıcı per company
 - ✅ Firma silinirken aktif kullanıcı varsa hata
 - ✅ COMPANY_ADMIN kendini çıkaramaz
@@ -67,15 +74,18 @@
 ### Faz D: Company API Routes (4 yeni + 2 güncelleme, ~450 satır) ✅
 
 #### Güncellenen Routes:
+
 1. ✅ `GET/POST /api/companies` - Use Case'lere bağlandı
 2. ✅ `GET/PATCH/DELETE /api/companies/[id]` - Use Case'lere bağlandı
 
 #### Yeni Routes:
+
 3. ✅ `POST /api/companies/[id]/program` - Assign program
 4. ✅ `GET/POST /api/companies/[id]/users` - List & Add users
 5. ✅ `DELETE /api/companies/[id]/users/[userId]` - Remove user
 
 **Özellikler:**
+
 - Real Supabase SSR authentication
 - Zod validation
 - Error handling (400, 404, 500)
@@ -84,6 +94,7 @@
 ---
 
 ### Faz E: Company UI Components (8 dosya, ~1250 satır) ✅
+
 1. ✅ `CompanyCard.tsx` - Summary card with actions
 2. ✅ `CompanyFilters.tsx` - Search & filters (city, sector, status, sort)
 3. ✅ `CompanyForm.tsx` - Create/Edit form (React Hook Form + Zod)
@@ -94,6 +105,7 @@
 8. ✅ `index.ts` - Barrel export
 
 **UI Features:**
+
 - Responsive design (mobile-first)
 - Dark mode support
 - Loading states
@@ -104,6 +116,7 @@
 ---
 
 ### Faz F: Company Admin Pages (5 dosya, ~750 satır) ✅
+
 1. ✅ `/dashboard/companies` - List with filters & pagination
 2. ✅ `/dashboard/companies/[id]` - Detail with tabs (Overview, Users, Program)
 3. ✅ `/dashboard/companies/new` - Create form
@@ -111,6 +124,7 @@
 5. ✅ `/dashboard/companies/[id]/users` - Users management
 
 **Page Features:**
+
 - Server-side data fetching
 - Real-time updates
 - Confirmation dialogs
@@ -120,12 +134,14 @@
 ---
 
 ### Faz G: Company Dashboard (4 dosya, ~550 satır) ✅
+
 1. ✅ `/company-dashboard` - Main dashboard (stats + quick actions)
 2. ✅ `/company-dashboard/profile` - Company profile view
 3. ✅ `/company-dashboard/users` - Manage users (COMPANY_ADMIN only)
 4. ✅ `/company-dashboard/settings` - Company settings
 
 **Dashboard Features:**
+
 - Role-based access (COMPANY_ADMIN, COMPANY_USER)
 - Stats cards (4 metrics)
 - Quick actions
@@ -135,6 +151,7 @@
 ---
 
 ### Faz H: Test & Documentation (~250 satır) ✅
+
 1. ✅ TypeScript type checking
 2. ✅ Sprint 6 Summary documentation
 3. ✅ API documentation update
@@ -144,19 +161,21 @@
 ## 📊 Sprint 6 İstatistikleri
 
 ### Dosya Sayıları
-| Kategori | Dosya Sayısı | Gerçek Satır | Tahmini |
-|----------|--------------|--------------|---------|
-| DTOs | 6 | ~350 | ~350 |
-| Repository Update | 2 | ~150 | ~100 |
-| Use Cases | 10 | ~850 | ~800 |
-| API Routes | 6 | ~450 | ~400 |
-| UI Components | 8 | ~1250 | ~1200 |
-| Admin Pages | 5 | ~750 | ~700 |
-| Company Dashboard | 4 | ~550 | ~500 |
-| Documentation | 1 | ~250 | ~200 |
-| **TOPLAM** | **42** | **~4600** | **~4250** |
+
+| Kategori          | Dosya Sayısı | Gerçek Satır | Tahmini   |
+| ----------------- | ------------ | ------------ | --------- |
+| DTOs              | 6            | ~350         | ~350      |
+| Repository Update | 2            | ~150         | ~100      |
+| Use Cases         | 10           | ~850         | ~800      |
+| API Routes        | 6            | ~450         | ~400      |
+| UI Components     | 8            | ~1250        | ~1200     |
+| Admin Pages       | 5            | ~750         | ~700      |
+| Company Dashboard | 4            | ~550         | ~500      |
+| Documentation     | 1            | ~250         | ~200      |
+| **TOPLAM**        | **42**       | **~4600**    | **~4250** |
 
 ### Kod Satırları (LOC)
+
 - **Backend:** ~1800 satır (DTOs, Use Cases, Repositories, API Routes)
 - **Frontend:** ~2550 satır (Components, Pages)
 - **Documentation:** ~250 satır
@@ -166,6 +185,7 @@
 ## 🎯 Kabul Kriterleri - Tamamlanma Durumu
 
 ### Backend ✅
+
 - ✅ Firma oluşturulabiliyor (MASTER_ADMIN, PROGRAM_MANAGER)
 - ✅ Programa atanabiliyor (MASTER_ADMIN)
 - ✅ Alt kullanıcı eklenebiliyor (max 2)
@@ -174,6 +194,7 @@
 - ✅ Authorization çalışıyor (5 rol için)
 
 ### Frontend - Admin ✅
+
 - ✅ Firma listesi görüntülenebiliyor (filters, pagination)
 - ✅ Firma detayı görüntülenebiliyor (tabs: overview, users, program)
 - ✅ Firma oluşturulabiliyor (form validation)
@@ -182,6 +203,7 @@
 - ✅ Kullanıcı yönetimi çalışıyor (max 2 check)
 
 ### Frontend - Company Dashboard ✅
+
 - ✅ Firma dashboard'u çalışıyor (stats + quick actions)
 - ✅ Firma profili görüntülenebiliyor
 - ✅ Alt kullanıcı eklenebiliyor (COMPANY_ADMIN, max 2)
@@ -193,6 +215,7 @@
 ## 🔑 Önemli Özellikler
 
 ### 1. Max Users Validation
+
 ```typescript
 // Business Rule: Max 2 aktif kullanıcı
 if (company.currentUsers >= company.maxUsers) {
@@ -201,6 +224,7 @@ if (company.currentUsers >= company.maxUsers) {
 ```
 
 ### 2. Role-Based Access Control
+
 ```typescript
 // Authorization Matrix
 - MASTER_ADMIN: Tüm işlemler
@@ -211,9 +235,11 @@ if (company.currentUsers >= company.maxUsers) {
 ```
 
 ### 3. Slug Auto-Generation
+
 ```typescript
 // Turkish character normalization
-const slug = name.toLowerCase()
+const slug = name
+  .toLowerCase()
   .replace(/ş/g, 's')
   .replace(/ğ/g, 'g')
   .replace(/ü/g, 'u')
@@ -225,6 +251,7 @@ const slug = name.toLowerCase()
 ```
 
 ### 4. Advanced Filtering
+
 ```typescript
 // CompanyFilterDto
 - search: Full-text search (name, legal_name, city, sector)
@@ -242,6 +269,7 @@ const slug = name.toLowerCase()
 ## 🚀 Teknoloji Stack
 
 ### Backend
+
 - **Clean Architecture:** 6-layered structure
 - **DTOs:** Zod validation
 - **Use Cases:** Business logic + authorization
@@ -249,6 +277,7 @@ const slug = name.toLowerCase()
 - **Supabase:** Database + Authentication
 
 ### Frontend
+
 - **Next.js 16:** App Router + Turbopack
 - **React Hook Form:** Form management
 - **Zod:** Client-side validation
@@ -261,6 +290,7 @@ const slug = name.toLowerCase()
 ## 📝 API Endpoints
 
 ### Company Management
+
 ```
 GET    /api/companies              - List companies (with filters)
 POST   /api/companies              - Create company
@@ -303,6 +333,7 @@ DELETE /api/companies/[id]/users/[userId] - Remove user
 ## 🐛 Bilinen Sorunlar
 
 ### TypeScript Errors
+
 - ⚠️ Form type inference issues (CompanyForm.tsx)
 - ⚠️ ProgramStatus enum comparison (CompanyProgramsList.tsx)
 - ⚠️ Minor type mismatches in some components
@@ -314,16 +345,19 @@ DELETE /api/companies/[id]/users/[userId] - Remove user
 ## 🔜 Sonraki Adımlar (Sprint 7+)
 
 ### Sprint 7: Consultant Management
+
 - Consultant assignment to programs
 - Consultant dashboard
 - Consultant-company relationships
 
 ### Sprint 8: Reporting & Analytics
+
 - Company reports
 - Program analytics
 - User activity tracking
 
 ### Sprint 9: Advanced Features
+
 - File uploads (logos, documents)
 - Email notifications
 - Export functionality (PDF, Excel)
@@ -333,6 +367,7 @@ DELETE /api/companies/[id]/users/[userId] - Remove user
 ## 📊 Proje Durumu
 
 ### Tamamlanan Sprintler
+
 - ✅ Sprint 1: Proje Kurulumu
 - ✅ Sprint 2: Database & Auth
 - ✅ Sprint 3: UI Foundation
@@ -341,6 +376,7 @@ DELETE /api/companies/[id]/users/[userId] - Remove user
 - ✅ Sprint 6: Company Management
 
 ### Toplam İlerleme
+
 - **Backend:** ~75% tamamlandı
 - **Frontend:** ~70% tamamlandı
 - **Genel:** ~72% tamamlandı
@@ -352,7 +388,7 @@ DELETE /api/companies/[id]/users/[userId] - Remove user
 **Tarih:** 28 Ekim 2025  
 **Toplam Dosya:** 42 dosya  
 **Toplam Kod:** ~4600 satır  
-**Süre:** ~2.5 saat  
+**Süre:** ~2.5 saat
 
 **Sonraki Sprint:** Sprint 7 - Consultant Management
 
@@ -361,4 +397,3 @@ DELETE /api/companies/[id]/users/[userId] - Remove user
 **Hazırlayan:** AI Assistant  
 **Versiyon:** 1.0  
 **Son Güncelleme:** 28 Ekim 2025
-

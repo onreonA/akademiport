@@ -66,4 +66,3 @@ export function CompanyStatsCard({ company }: CompanyStatsCardProps) {
     </Card>
   );
 }
-

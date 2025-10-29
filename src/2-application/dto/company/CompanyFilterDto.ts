@@ -6,7 +6,13 @@
 import { z } from 'zod';
 
 // Sort fields
-export type CompanySortField = 'name' | 'createdAt' | 'updatedAt' | 'city' | 'sector' | 'employeeCount';
+export type CompanySortField =
+  | 'name'
+  | 'createdAt'
+  | 'updatedAt'
+  | 'city'
+  | 'sector'
+  | 'employeeCount';
 
 // Zod Schema
 export const CompanyFilterSchema = z.object({
@@ -24,7 +30,9 @@ export const CompanyFilterSchema = z.object({
   limit: z.number().int().min(1).max(100).default(10),
 
   // Sorting
-  sortBy: z.enum(['name', 'createdAt', 'updatedAt', 'city', 'sector', 'employeeCount']).default('createdAt'),
+  sortBy: z
+    .enum(['name', 'createdAt', 'updatedAt', 'city', 'sector', 'employeeCount'])
+    .default('createdAt'),
   sortOrder: z.enum(['asc', 'desc']).default('desc'),
 });
 
@@ -45,4 +53,3 @@ export function parseCompanyFilterParams(params: URLSearchParams): CompanyFilter
     sortOrder: (params.get('sortOrder') as 'asc' | 'desc') || 'desc',
   };
 }
-

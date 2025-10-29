@@ -36,4 +36,3 @@ export class DeleteCompanyUseCase {
     return await this.companyRepository.delete(companyId);
   }
 }
-

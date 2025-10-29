@@ -9,10 +9,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Plus } from 'lucide-react';
 import { Button } from '@/presentation/components/ui/atoms/button';
-import {
-  CompanyCard,
-  CompanyFilters,
-} from '@/presentation/components/features/companies';
+import { CompanyCard, CompanyFilters } from '@/presentation/components/features/companies';
 import type { Company } from '@/domain/entities/Company';
 
 export default function CompaniesPage() {
@@ -176,4 +173,3 @@ export default function CompaniesPage() {
     </div>
   );
 }
-

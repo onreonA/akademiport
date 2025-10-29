@@ -13,7 +13,11 @@ import { prepareCreateCompanyDto } from '@/application/dto/company';
 export class CreateCompanyUseCase {
   constructor(private companyRepository: ICompanyRepository) {}
 
-  async execute(dto: CreateCompanyDto, userId: string, userRole: UserRole): Promise<Result<Company>> {
+  async execute(
+    dto: CreateCompanyDto,
+    userId: string,
+    userRole: UserRole
+  ): Promise<Result<Company>> {
     // Authorization: Only MASTER_ADMIN and PROGRAM_MANAGER can create companies
     if (userRole !== UserRole.MASTER_ADMIN && userRole !== UserRole.PROGRAM_MANAGER) {
       return Result.fail('Bu işlem için yetkiniz yok');
@@ -26,4 +30,3 @@ export class CreateCompanyUseCase {
     return await this.companyRepository.create(preparedDto);
   }
 }
-

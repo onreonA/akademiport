@@ -52,4 +52,3 @@ export class AddCompanyUserUseCase {
     return await this.companyRepository.addCompanyUser(companyId, targetUserId);
   }
 }
-

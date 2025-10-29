@@ -36,7 +36,7 @@ export function useAuth() {
     }
   };
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (email: string, password: string, redirectTo?: string) => {
     try {
       const response = await fetch('/api/auth/signin', {
         method: 'POST',
@@ -51,7 +51,7 @@ export function useAuth() {
       }
 
       setUser(data.data);
-      router.push('/dashboard');
+      router.push(redirectTo || '/dashboard');
       router.refresh();
 
       return { success: true };

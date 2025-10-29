@@ -49,4 +49,3 @@ export class GetCompanyUseCase {
     return Result.ok(company);
   }
 }
-

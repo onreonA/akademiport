@@ -107,4 +107,3 @@ export function CompanyUsersList({
     </div>
   );
 }
-

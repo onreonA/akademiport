@@ -38,9 +38,7 @@ export function CompanyCard({ company, onEdit, onDelete }: CompanyCardProps) {
             )}
             <div>
               <h3 className="font-semibold text-lg">{company.name}</h3>
-              {company.sector && (
-                <p className="text-sm text-muted-foreground">{company.sector}</p>
-              )}
+              {company.sector && <p className="text-sm text-muted-foreground">{company.sector}</p>}
             </div>
           </div>
           <Badge variant={company.isActive ? 'default' : 'secondary'}>
@@ -90,4 +88,3 @@ export function CompanyCard({ company, onEdit, onDelete }: CompanyCardProps) {
     </Card>
   );
 }
-

@@ -124,4 +124,3 @@ export function CompanyFilters({
     </div>
   );
 }
-

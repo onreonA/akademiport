@@ -69,9 +69,7 @@ export function CompanyForm({
             ))}
           </SelectContent>
         </Select>
-        {errors.programId && (
-          <p className="text-sm text-destructive">{errors.programId.message}</p>
-        )}
+        {errors.programId && <p className="text-sm text-destructive">{errors.programId.message}</p>}
       </div>
 
       {/* Basic Info */}
@@ -220,4 +218,3 @@ export function CompanyForm({
     </form>
   );
 }
-

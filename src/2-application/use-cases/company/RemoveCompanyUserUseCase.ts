@@ -52,4 +52,3 @@ export class RemoveCompanyUserUseCase {
     return await this.companyRepository.removeCompanyUser(companyId, targetUserId);
   }
 }
-

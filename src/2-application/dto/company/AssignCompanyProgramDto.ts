@@ -12,4 +12,3 @@ export const AssignCompanyProgramSchema = z.object({
 
 // TypeScript Type
 export type AssignCompanyProgramDto = z.infer<typeof AssignCompanyProgramSchema>;
-

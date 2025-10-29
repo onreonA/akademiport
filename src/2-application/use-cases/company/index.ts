@@ -12,4 +12,3 @@ export * from './AssignCompanyProgramUseCase';
 export * from './AddCompanyUserUseCase';
 export * from './RemoveCompanyUserUseCase';
 export * from './ListCompanyUsersUseCase';
-

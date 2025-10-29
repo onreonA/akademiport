@@ -50,4 +50,3 @@ export class ListCompanyUsersUseCase {
     return await this.companyRepository.getCompanyUsers(companyId);
   }
 }
-

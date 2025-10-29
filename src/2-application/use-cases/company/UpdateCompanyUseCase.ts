@@ -49,4 +49,3 @@ export class UpdateCompanyUseCase {
     return await this.companyRepository.update(companyId, dto);
   }
 }
-

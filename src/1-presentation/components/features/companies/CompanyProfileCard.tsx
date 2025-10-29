@@ -167,4 +167,3 @@ export function CompanyProfileCard({ company, onEdit, canEdit = false }: Company
     </Card>
   );
 }
-

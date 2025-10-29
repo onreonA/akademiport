@@ -6,7 +6,11 @@
 import { Result } from '@/core/result/Result';
 import { Company } from '../entities/Company';
 import { User } from '../entities/User';
-import type { CreateCompanyDto, UpdateCompanyDto, CompanyFilterDto } from '@/application/dto/company';
+import type {
+  CreateCompanyDto,
+  UpdateCompanyDto,
+  CompanyFilterDto,
+} from '@/application/dto/company';
 
 export interface ICompanyRepository {
   // Existing methods
@@ -20,7 +24,9 @@ export interface ICompanyRepository {
 
   // New methods - Sprint 6
   search(query: string): Promise<Result<Company[]>>;
-  findWithFilters(filter: CompanyFilterDto): Promise<Result<{ companies: Company[]; total: number }>>;
+  findWithFilters(
+    filter: CompanyFilterDto
+  ): Promise<Result<{ companies: Company[]; total: number }>>;
   getCompanyUsers(companyId: string): Promise<Result<User[]>>;
   addCompanyUser(companyId: string, userId: string): Promise<Result<void>>;
   removeCompanyUser(companyId: string, userId: string): Promise<Result<void>>;

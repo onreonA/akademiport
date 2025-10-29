@@ -8,7 +8,11 @@ import { Result } from '@/core/result/Result';
 import { ICompanyRepository } from '@/domain/interfaces/ICompanyRepository';
 import { Company } from '@/domain/entities/Company';
 import { User, UserRole } from '@/domain/entities/User';
-import type { CreateCompanyDto, UpdateCompanyDto, CompanyFilterDto } from '@/application/dto/company';
+import type {
+  CreateCompanyDto,
+  UpdateCompanyDto,
+  CompanyFilterDto,
+} from '@/application/dto/company';
 
 export class CompanyRepository implements ICompanyRepository {
   async findById(id: string): Promise<Result<Company | null>> {
@@ -196,7 +200,9 @@ export class CompanyRepository implements ICompanyRepository {
       const { data, error } = await supabase
         .from('companies')
         .select('*')
-        .or(`name.ilike.%${query}%,legal_name.ilike.%${query}%,city.ilike.%${query}%,sector.ilike.%${query}%`)
+        .or(
+          `name.ilike.%${query}%,legal_name.ilike.%${query}%,city.ilike.%${query}%,sector.ilike.%${query}%`
+        )
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -209,7 +215,9 @@ export class CompanyRepository implements ICompanyRepository {
     }
   }
 
-  async findWithFilters(filter: CompanyFilterDto): Promise<Result<{ companies: Company[]; total: number }>> {
+  async findWithFilters(
+    filter: CompanyFilterDto
+  ): Promise<Result<{ companies: Company[]; total: number }>> {
     try {
       const supabase = await createClient();
 
@@ -218,7 +226,9 @@ export class CompanyRepository implements ICompanyRepository {
 
       // Apply filters
       if (filter.search) {
-        query = query.or(`name.ilike.%${filter.search}%,legal_name.ilike.%${filter.search}%,city.ilike.%${filter.search}%`);
+        query = query.or(
+          `name.ilike.%${filter.search}%,legal_name.ilike.%${filter.search}%,city.ilike.%${filter.search}%`
+        );
       }
 
       if (filter.programId) {
@@ -238,10 +248,14 @@ export class CompanyRepository implements ICompanyRepository {
       }
 
       // Apply sorting
-      const sortColumn = filter.sortBy === 'createdAt' ? 'created_at' : 
-                        filter.sortBy === 'updatedAt' ? 'updated_at' :
-                        filter.sortBy === 'employeeCount' ? 'employee_count' :
-                        filter.sortBy;
+      const sortColumn =
+        filter.sortBy === 'createdAt'
+          ? 'created_at'
+          : filter.sortBy === 'updatedAt'
+            ? 'updated_at'
+            : filter.sortBy === 'employeeCount'
+              ? 'employee_count'
+              : filter.sortBy;
       query = query.order(sortColumn, { ascending: filter.sortOrder === 'asc' });
 
       // Apply pagination
