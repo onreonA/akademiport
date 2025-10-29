@@ -73,7 +73,7 @@ export function ConsultantStats({ stats, isLoading }: ConsultantStatsProps) {
     {
       title: 'Bekleyen Görevler',
       value: stats.pendingTasks || 0,
-      subtitle: 'Sprint 8\'de aktif',
+      subtitle: "Sprint 8'de aktif",
       icon: Clock,
       iconColor: 'text-orange-600',
       bgColor: 'bg-orange-100 dark:bg-orange-950',
@@ -102,4 +102,3 @@ export function ConsultantStats({ stats, isLoading }: ConsultantStatsProps) {
     </div>
   );
 }
-

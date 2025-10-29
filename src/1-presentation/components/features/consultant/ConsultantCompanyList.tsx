@@ -9,7 +9,13 @@
 
 import React, { useEffect, useState } from 'react';
 import { Building2, MapPin, Users, ArrowRight } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/presentation/components/ui/atoms/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/presentation/components/ui/atoms/card';
 import { Button } from '@/presentation/components/ui/atoms/button';
 import { Badge } from '@/presentation/components/ui/atoms/badge';
 import { useConsultantProgram } from '@/shared/contexts/ConsultantProgramContext';
@@ -211,4 +217,3 @@ export function ConsultantCompanyList({ onCompanyClick, limit = 10 }: Consultant
     </Card>
   );
 }
-

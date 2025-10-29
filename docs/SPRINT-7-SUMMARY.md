@@ -12,6 +12,7 @@
 **Ana Hedef:** Danışman (Consultant) paneli ve yönetim sistemi tam çalışır hale geldi.
 
 **Tamamlanan Hedefler:**
+
 - ✅ Consultant dashboard oluşturuldu
 - ✅ Program seçici component çalışıyor
 - ✅ Consultant-Program ilişkisi yönetiliyor
@@ -25,6 +26,7 @@
 ### Toplam: 19 dosya, ~2100 satır kod
 
 ### Faz A: Consultant DTOs (4 dosya, ~320 satır)
+
 ```
 src/2-application/dto/consultant/
 ├── ConsultantDashboardDto.ts    (İstatistikler)
@@ -34,6 +36,7 @@ src/2-application/dto/consultant/
 ```
 
 ### Faz B: Consultant Use Cases (4 dosya, ~550 satır)
+
 ```
 src/2-application/use-cases/consultant/
 ├── GetConsultantDashboardUseCase.ts     (Dashboard data)
@@ -43,6 +46,7 @@ src/2-application/use-cases/consultant/
 ```
 
 ### Faz C: Consultant API Routes (3 dosya, ~200 satır)
+
 ```
 src/app/api/consultant/
 ├── dashboard/route.ts                    (GET dashboard)
@@ -51,6 +55,7 @@ src/app/api/consultant/
 ```
 
 ### Faz D: Program Selector + Context (4 dosya, ~250 satır)
+
 ```
 src/5-shared/contexts/
 └── ConsultantProgramContext.tsx  (State management)
@@ -62,6 +67,7 @@ src/1-presentation/components/features/consultant/
 ```
 
 ### Faz E: Consultant Dashboard UI (4 dosya, ~450 satır)
+
 ```
 src/1-presentation/components/features/consultant/
 ├── ConsultantStats.tsx           (Stats cards)
@@ -73,6 +79,7 @@ src/app/consultant-dashboard/
 ```
 
 ### Faz F: Company Detail Page (2 dosya, ~250 satır)
+
 ```
 src/app/consultant-dashboard/
 ├── companies/[id]/page.tsx       (Detail page)
@@ -80,10 +87,12 @@ src/app/consultant-dashboard/
 ```
 
 ### Faz G: Navigation & Layout
+
 - Layout dosyası oluşturuldu
 - Sidebar güncellemesi (ihtiyaç yok, basit layout yeterli)
 
 ### Faz H: Documentation (1 dosya)
+
 ```
 docs/
 └── SPRINT-7-SUMMARY.md           (Bu dosya)
@@ -94,6 +103,7 @@ docs/
 ## 🎯 Özellikler
 
 ### Backend
+
 - ✅ Consultant-specific DTOs
 - ✅ Consultant Use Cases (Dashboard, Programs, Companies)
 - ✅ Consultant API endpoints
@@ -101,6 +111,7 @@ docs/
 - ✅ Program bazlı filtreleme
 
 ### Frontend
+
 - ✅ Consultant Dashboard
 - ✅ Program Selector Component
 - ✅ Consultant Context (state management)
@@ -117,17 +128,18 @@ docs/
 
 ## 🔐 Authorization Matrix
 
-| Role | Dashboard | Programs | Companies | Company Detail |
-|------|-----------|----------|-----------|----------------|
-| CONSULTANT | ✅ Kendi | ✅ Atandığı | ✅ Atandığı | ✅ Atandığı |
-| MASTER_ADMIN | ✅ Tümü | ✅ Tümü | ✅ Tümü | ✅ Tümü |
-| PROGRAM_MANAGER | ❌ | ✅ Kendi | ✅ Kendi | ✅ Kendi |
+| Role            | Dashboard | Programs    | Companies   | Company Detail |
+| --------------- | --------- | ----------- | ----------- | -------------- |
+| CONSULTANT      | ✅ Kendi  | ✅ Atandığı | ✅ Atandığı | ✅ Atandığı    |
+| MASTER_ADMIN    | ✅ Tümü   | ✅ Tümü     | ✅ Tümü     | ✅ Tümü        |
+| PROGRAM_MANAGER | ❌        | ✅ Kendi    | ✅ Kendi    | ✅ Kendi       |
 
 ---
 
 ## 📊 API Endpoints
 
 ### Consultant Dashboard
+
 ```
 GET /api/consultant/dashboard
 - Returns: ConsultantDashboardData
@@ -135,6 +147,7 @@ GET /api/consultant/dashboard
 ```
 
 ### Consultant Programs
+
 ```
 GET /api/consultant/programs
 - Query: status, search, sortBy, sortOrder, page, limit
@@ -143,6 +156,7 @@ GET /api/consultant/programs
 ```
 
 ### Consultant Companies
+
 ```
 GET /api/consultant/programs/[programId]/companies
 - Query: search, city, sector, isActive, sortBy, sortOrder, page, limit
@@ -156,27 +170,32 @@ GET /api/consultant/programs/[programId]/companies
 ## 🧪 Test Senaryoları
 
 ### 1. Consultant Login
+
 - ✅ Consultant rolü ile login
 - ✅ `/consultant-dashboard` sayfasına yönlendirme
 - ✅ Dashboard verilerini görüntüleme
 
 ### 2. Program Seçimi
+
 - ✅ Program dropdown'ını açma
 - ✅ Program seçme
 - ✅ Seçilen programın localStorage'a kaydedilmesi
 - ✅ Sayfa yenilendiğinde seçimin korunması
 
 ### 3. Firma Listesi
+
 - ✅ Seçilen programa göre firmaların listelenmesi
 - ✅ Firma kartlarına tıklama
 - ✅ Firma detay sayfasına yönlendirme
 
 ### 4. Firma Detayı
+
 - ✅ Firma bilgilerini görüntüleme
 - ✅ Firma kullanıcılarını görüntüleme
 - ✅ Tabs (Genel Bakış, Kullanıcılar, Projeler)
 
 ### 5. Authorization
+
 - ✅ Sadece atandığı programları görebilme
 - ✅ Atanmadığı programa erişim engelleme (403)
 - ✅ Atanmadığı firmaya erişim engelleme (403)
@@ -186,6 +205,7 @@ GET /api/consultant/programs/[programId]/companies
 ## ✅ Kabul Kriterleri
 
 ### Fonksiyonel Gereksinimler
+
 - ✅ Consultant login yapabiliyor
 - ✅ Consultant dashboard görüntülenebiliyor
 - ✅ Program seçici çalışıyor
@@ -196,6 +216,7 @@ GET /api/consultant/programs/[programId]/companies
 - ✅ Program değiştiğinde liste güncelleniyor
 
 ### Teknik Gereksinimler
+
 - ✅ Clean Architecture'e uygun
 - ✅ TypeScript tip güvenli
 - ✅ Zod validation çalışıyor
@@ -205,6 +226,7 @@ GET /api/consultant/programs/[programId]/companies
 - ✅ Dark mode destekli
 
 ### Güvenlik Gereksinimleri
+
 - ✅ Authentication kontrol ediliyor
 - ✅ Authorization doğru çalışıyor
 - ✅ Sadece kendi verilerine erişebiliyor
@@ -225,18 +247,21 @@ GET /api/consultant/programs/[programId]/companies
 ## 🔜 Sonraki Adımlar (Sprint 8+)
 
 ### Sprint 8: Project Management
+
 - Ana Proje → Alt Proje → Görev hiyerarşisi
 - Consultant: Proje oluşturma/atama
 - Consultant: Görev oluşturma/atama
 - Firma: Görev görüntüleme/tamamlama
 
 ### Sprint 9: Training Management
+
 - Video eğitim yönetimi
 - Consultant: Eğitim atama
 - Firma: Eğitim izleme
 - İlerleme takibi
 
 ### Sprint 10: Dashboard & Analytics
+
 - Gerçek istatistikler
 - Grafikler ve chartlar
 - Advanced filtering
@@ -267,4 +292,3 @@ GET /api/consultant/programs/[programId]/companies
 **Hazırlayan:** AI Assistant  
 **Versiyon:** 1.0  
 **Son Güncelleme:** 29 Ekim 2025
-

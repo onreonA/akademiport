@@ -9,10 +9,20 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/presentation/components/ui/atoms/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/presentation/components/ui/atoms/card';
 import { Button } from '@/presentation/components/ui/atoms/button';
 import { ConsultantProgramProvider } from '@/shared/contexts/ConsultantProgramContext';
-import { ProgramSelector, ConsultantStats, ConsultantCompanyList } from '@/presentation/components/features/consultant';
+import {
+  ProgramSelector,
+  ConsultantStats,
+  ConsultantCompanyList,
+} from '@/presentation/components/features/consultant';
 import type { ConsultantDashboardData } from '@/application/dto/consultant';
 import { Loader2 } from 'lucide-react';
 
@@ -89,18 +99,14 @@ function ConsultantDashboardContent() {
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Danışman Paneli</h1>
-        <p className="text-muted-foreground mt-2">
-          Atandığınız programları ve firmaları yönetin
-        </p>
+        <p className="text-muted-foreground mt-2">Atandığınız programları ve firmaları yönetin</p>
       </div>
 
       {/* Program Selector */}
       <Card>
         <CardHeader>
           <CardTitle>Program Seçin</CardTitle>
-          <CardDescription>
-            Firma ve görevleri görüntülemek için bir program seçin
-          </CardDescription>
+          <CardDescription>Firma ve görevleri görüntülemek için bir program seçin</CardDescription>
         </CardHeader>
         <CardContent>
           <ProgramSelector />
@@ -159,4 +165,3 @@ function ConsultantDashboardContent() {
     </div>
   );
 }
-

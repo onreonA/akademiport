@@ -10,7 +10,13 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Building2, MapPin, Users, Mail, Phone, Globe, ArrowLeft } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/presentation/components/ui/atoms/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/presentation/components/ui/atoms/card';
 import { Button } from '@/presentation/components/ui/atoms/button';
 import { Badge } from '@/presentation/components/ui/atoms/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/presentation/components/ui/atoms/tabs';
@@ -145,7 +151,12 @@ export default function CompanyDetailPage({ params }: CompanyDetailPageProps) {
             {company.website && (
               <div className="flex items-center gap-2 text-sm">
                 <Globe className="h-4 w-4 text-muted-foreground" />
-                <a href={company.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                <a
+                  href={company.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline"
+                >
                   {company.website}
                 </a>
               </div>
@@ -194,7 +205,9 @@ export default function CompanyDetailPage({ params }: CompanyDetailPageProps) {
           <Card>
             <CardHeader>
               <CardTitle>Kullanıcılar</CardTitle>
-              <CardDescription>{users.length} / {company.maxUsers} kullanıcı</CardDescription>
+              <CardDescription>
+                {users.length} / {company.maxUsers} kullanıcı
+              </CardDescription>
             </CardHeader>
             <CardContent>
               {users.length === 0 ? (
@@ -205,7 +218,10 @@ export default function CompanyDetailPage({ params }: CompanyDetailPageProps) {
               ) : (
                 <div className="space-y-4">
                   {users.map((user) => (
-                    <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div
+                      key={user.id}
+                      className="flex items-center justify-between p-4 border rounded-lg"
+                    >
                       <div>
                         <p className="font-medium">{user.fullName}</p>
                         <p className="text-sm text-muted-foreground">{user.email}</p>
@@ -236,4 +252,3 @@ export default function CompanyDetailPage({ params }: CompanyDetailPageProps) {
     </div>
   );
 }
-

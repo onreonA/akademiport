@@ -127,8 +127,24 @@ export type ConsultantProgramListDto = z.infer<typeof ConsultantProgramListRespo
 export function parseConsultantProgramFilterParams(
   searchParams: URLSearchParams
 ): ConsultantProgramFilterDto {
+  // Parse status string to enum
+  const statusParam = searchParams.get('status');
+  let status: ProgramStatus | undefined = undefined;
+
+  if (statusParam) {
+    // Convert string to enum value
+    const statusMap: Record<string, ProgramStatus> = {
+      planned: ProgramStatus.PLANNED,
+      active: ProgramStatus.ACTIVE,
+      completed: ProgramStatus.COMPLETED,
+      paused: ProgramStatus.PAUSED,
+      cancelled: ProgramStatus.CANCELLED,
+    };
+    status = statusMap[statusParam.toLowerCase()];
+  }
+
   const filter: ConsultantProgramFilter = {
-    status: searchParams.get('status') as ProgramStatus | undefined,
+    status,
     search: searchParams.get('search') || undefined,
     sortBy: (searchParams.get('sortBy') as any) || 'assignedAt',
     sortOrder: (searchParams.get('sortOrder') as 'asc' | 'desc') || 'desc',
