@@ -1,7 +1,7 @@
 /**
  * Consultant Program DTO
  * Sprint 7: Consultant Management
- * 
+ *
  * Consultant'ın atandığı programlar için DTO
  */
 
@@ -20,19 +20,19 @@ import type { Program } from '@/domain/entities/Program';
 export interface ConsultantProgramWithStats {
   // Program bilgileri
   program: Program;
-  
+
   // İstatistikler
   companiesCount: number;
   activeCompaniesCount: number;
-  
+
   // Görev istatistikleri (Sprint 8'de kullanılacak)
   tasksCount?: number;
   pendingTasksCount?: number;
-  
+
   // Eğitim istatistikleri (Sprint 9'da kullanılacak)
   trainingsCount?: number;
   activeTrainingsCount?: number;
-  
+
   // Atanma bilgisi
   assignedAt: Date;
   roleInProgram: 'consultant' | 'observer';
@@ -64,14 +64,14 @@ export type ConsultantProgramDto = z.infer<typeof ConsultantProgramWithStatsSche
 export interface ConsultantProgramFilter {
   // Status filter
   status?: ProgramStatus;
-  
+
   // Search
   search?: string;
-  
+
   // Sorting
   sortBy?: 'name' | 'startDate' | 'companiesCount' | 'assignedAt';
   sortOrder?: 'asc' | 'desc';
-  
+
   // Pagination
   page?: number;
   limit?: number;
@@ -159,4 +159,3 @@ export function createEmptyProgramListResponse(): ConsultantProgramListResponse 
     totalPages: 0,
   };
 }
-

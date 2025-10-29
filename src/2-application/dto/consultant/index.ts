@@ -54,4 +54,3 @@ export {
   calculateTotalPages as calculateCompanyTotalPages,
   createEmptyCompanyListResponse,
 } from './ConsultantCompanyDto';
-

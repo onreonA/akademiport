@@ -1,7 +1,7 @@
 /**
  * Consultant Dashboard DTO
  * Sprint 7: Consultant Management
- * 
+ *
  * Consultant dashboard için gerekli istatistik ve veri yapıları
  */
 
@@ -19,16 +19,16 @@ export interface ConsultantDashboardStats {
   // Program istatistikleri
   totalPrograms: number;
   activePrograms: number;
-  
+
   // Firma istatistikleri
   totalCompanies: number;
   companiesByProgram: Record<string, number>; // programId -> company count
-  
+
   // Görev istatistikleri (Sprint 8'de kullanılacak)
   totalTasks?: number;
   pendingTasks?: number;
   completedTasks?: number;
-  
+
   // Eğitim istatistikleri (Sprint 9'da kullanılacak)
   totalTrainings?: number;
   activeTrainings?: number;
@@ -113,9 +113,11 @@ export function createEmptyDashboardStats(): ConsultantDashboardStats {
 /**
  * Dashboard stats validation
  */
-export function validateDashboardStats(
-  stats: unknown
-): { valid: boolean; data?: ConsultantDashboardStats; errors?: string[] } {
+export function validateDashboardStats(stats: unknown): {
+  valid: boolean;
+  data?: ConsultantDashboardStats;
+  errors?: string[];
+} {
   const result = ConsultantDashboardStatsSchema.safeParse(stats);
 
   if (result.success) {
@@ -127,4 +129,3 @@ export function validateDashboardStats(
     errors: result.error.issues.map((issue) => issue.message),
   };
 }
-

@@ -1,7 +1,7 @@
 /**
  * Consultant Company DTO
  * Sprint 7: Consultant Management
- * 
+ *
  * Consultant'ın görüntülediği firmalar için DTO
  */
 
@@ -19,23 +19,23 @@ import type { Company } from '@/domain/entities/Company';
 export interface ConsultantCompanyWithStats {
   // Firma bilgileri
   company: Company;
-  
+
   // Program bilgisi
   programId: string;
   programName: string;
-  
+
   // İstatistikler
   usersCount: number;
   activeUsersCount: number;
-  
+
   // Görev istatistikleri (Sprint 8'de kullanılacak)
   tasksCount?: number;
   completedTasksCount?: number;
-  
+
   // Eğitim istatistikleri (Sprint 9'da kullanılacak)
   trainingsCount?: number;
   completedTrainingsCount?: number;
-  
+
   // Son aktivite
   lastActivityAt?: Date;
 }
@@ -68,19 +68,19 @@ export type ConsultantCompanyDto = z.infer<typeof ConsultantCompanyWithStatsSche
 export interface ConsultantCompanyFilter {
   // Program filter (required)
   programId: string;
-  
+
   // Search
   search?: string;
-  
+
   // Filters
   city?: string;
   sector?: string;
   isActive?: boolean;
-  
+
   // Sorting
   sortBy?: 'name' | 'city' | 'sector' | 'usersCount' | 'lastActivityAt';
   sortOrder?: 'asc' | 'desc';
-  
+
   // Pagination
   page?: number;
   limit?: number;
@@ -184,4 +184,3 @@ export function createEmptyCompanyListResponse(
     programName,
   };
 }
-
