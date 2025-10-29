@@ -42,4 +42,3 @@ export const CustomClassName: Story = {
     className: 'w-96',
   },
 };
-

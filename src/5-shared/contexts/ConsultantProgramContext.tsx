@@ -27,9 +27,7 @@ interface ConsultantProgramContextType {
 // CONTEXT
 // =====================================================
 
-const ConsultantProgramContext = createContext<ConsultantProgramContextType | undefined>(
-  undefined
-);
+const ConsultantProgramContext = createContext<ConsultantProgramContextType | undefined>(undefined);
 
 // =====================================================
 // PROVIDER
@@ -75,9 +73,7 @@ export function ConsultantProgramProvider({ children }: ConsultantProgramProvide
   };
 
   return (
-    <ConsultantProgramContext.Provider value={value}>
-      {children}
-    </ConsultantProgramContext.Provider>
+    <ConsultantProgramContext.Provider value={value}>{children}</ConsultantProgramContext.Provider>
   );
 }
 
@@ -92,4 +88,3 @@ export function useConsultantProgram() {
   }
   return context;
 }
-

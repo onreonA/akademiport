@@ -136,4 +136,3 @@ export function ProgramSelector({ onProgramChange, className }: ProgramSelectorP
     </Select>
   );
 }
-
