@@ -103,9 +103,7 @@ export class ListConsultantCompaniesUseCase {
 
       return Result.ok(response);
     } catch (error) {
-      return Result.fail(
-        error instanceof Error ? error.message : 'Firmalar listelenemedi'
-      );
+      return Result.fail(error instanceof Error ? error.message : 'Firmalar listelenemedi');
     }
   }
 
@@ -204,8 +202,7 @@ export class ListConsultantCompaniesUseCase {
           compareValue = a.usersCount - b.usersCount;
           break;
         case 'lastActivityAt':
-          compareValue =
-            (a.lastActivityAt?.getTime() || 0) - (b.lastActivityAt?.getTime() || 0);
+          compareValue = (a.lastActivityAt?.getTime() || 0) - (b.lastActivityAt?.getTime() || 0);
           break;
         default:
           compareValue = 0;
@@ -217,4 +214,3 @@ export class ListConsultantCompaniesUseCase {
     return sorted;
   }
 }
-

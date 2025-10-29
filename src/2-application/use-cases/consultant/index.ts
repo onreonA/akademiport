@@ -6,4 +6,3 @@
 export { GetConsultantDashboardUseCase } from './GetConsultantDashboardUseCase';
 export { ListConsultantProgramsUseCase } from './ListConsultantProgramsUseCase';
 export { ListConsultantCompaniesUseCase } from './ListConsultantCompaniesUseCase';
-

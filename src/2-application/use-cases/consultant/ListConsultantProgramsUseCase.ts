@@ -77,9 +77,7 @@ export class ListConsultantProgramsUseCase {
 
       return Result.ok(response);
     } catch (error) {
-      return Result.fail(
-        error instanceof Error ? error.message : 'Programlar listelenemedi'
-      );
+      return Result.fail(error instanceof Error ? error.message : 'Programlar listelenemedi');
     }
   }
 
@@ -111,9 +109,7 @@ export class ListConsultantProgramsUseCase {
   /**
    * Her program için istatistikleri ekle
    */
-  private async addStatsToPrograms(
-    programs: any[]
-  ): Promise<ConsultantProgramWithStats[]> {
+  private async addStatsToPrograms(programs: any[]): Promise<ConsultantProgramWithStats[]> {
     const programsWithStats: ConsultantProgramWithStats[] = [];
 
     for (const program of programs) {
@@ -176,4 +172,3 @@ export class ListConsultantProgramsUseCase {
     return sorted;
   }
 }
-

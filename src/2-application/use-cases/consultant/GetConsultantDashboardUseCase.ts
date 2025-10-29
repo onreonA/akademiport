@@ -64,19 +64,14 @@ export class GetConsultantDashboardUseCase {
 
       return Result.ok(dashboardData);
     } catch (error) {
-      return Result.fail(
-        error instanceof Error ? error.message : 'Dashboard verileri alınamadı'
-      );
+      return Result.fail(error instanceof Error ? error.message : 'Dashboard verileri alınamadı');
     }
   }
 
   /**
    * İstatistikleri hesapla
    */
-  private async calculateStats(
-    userId: string,
-    programs: any[]
-  ): Promise<ConsultantDashboardStats> {
+  private async calculateStats(userId: string, programs: any[]): Promise<ConsultantDashboardStats> {
     // Program istatistikleri
     const totalPrograms = programs.length;
     const activePrograms = programs.filter((p) => p.status === ProgramStatus.ACTIVE).length;
@@ -154,9 +149,6 @@ export class GetConsultantDashboardUseCase {
     }
 
     // Son 10 firmayı döndür
-    return allCompanies
-      .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
-      .slice(0, 10);
+    return allCompanies.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime()).slice(0, 10);
   }
 }
-
