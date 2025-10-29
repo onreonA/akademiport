@@ -4,7 +4,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/shared/hooks/useAuth';
 import { Button } from '@/presentation/components/ui/atoms/button';
@@ -17,7 +17,7 @@ import {
   CardTitle,
 } from '@/presentation/components/ui/atoms/card';
 
-export default function LoginPage() {
+function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -26,11 +26,15 @@ export default function LoginPage() {
   const searchParams = useSearchParams();
   const redirect = searchParams.get('redirect');
 
+  // Debug: redirect parametresini konsola yazdır
+  console.log('🔍 Login Page - Redirect parameter:', redirect);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
+    console.log('🚀 Signing in with redirect:', redirect);
     const result = await signIn(email, password, redirect || undefined);
 
     if (!result.success) {
@@ -96,5 +100,13 @@ export default function LoginPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LoginForm />
+    </Suspense>
   );
 }
