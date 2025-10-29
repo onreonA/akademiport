@@ -39,7 +39,7 @@ export function useAuth() {
   const signIn = async (email: string, password: string, redirectTo?: string) => {
     try {
       console.log('🔐 useAuth.signIn called with redirectTo:', redirectTo);
-      
+
       const response = await fetch('/api/auth/signin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
