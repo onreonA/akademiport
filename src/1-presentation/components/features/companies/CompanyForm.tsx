@@ -44,16 +44,62 @@ export function CompanyForm({
     formState: { errors },
   } = useForm<any>({
     resolver: zodResolver(CreateCompanySchema),
-    defaultValues: initialData || {
+    defaultValues: {
       country: 'Türkiye',
       maxUsers: 2,
+      ...initialData,
+      // Convert numeric strings to numbers
+      employeeCount: initialData?.employeeCount ? Number(initialData.employeeCount) : undefined,
+      foundationYear: initialData?.foundationYear ? Number(initialData.foundationYear) : undefined,
+      maxUsers: initialData?.maxUsers ? Number(initialData.maxUsers) : 2,
     },
   });
 
   const programId = watch('programId');
 
+  // Debug: Log all errors
+  React.useEffect(() => {
+    if (Object.keys(errors).length > 0) {
+      console.error('🔴 Form Validation Errors:', errors);
+    }
+  }, [errors]);
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form
+      onSubmit={handleSubmit((data) => {
+        // Clean up empty strings to undefined/null
+        const cleanedData = {
+          ...data,
+          legalName: data.legalName?.trim() || undefined,
+          taxNumber: data.taxNumber?.trim() || undefined,
+          tradeRegistryNumber: data.tradeRegistryNumber?.trim() || undefined,
+          email: data.email?.trim() || undefined,
+          phone: data.phone?.trim() || undefined,
+          website: data.website?.trim() || undefined,
+          address: data.address?.trim() || undefined,
+          city: data.city?.trim() || undefined,
+          district: data.district?.trim() || undefined,
+          postalCode: data.postalCode?.trim() || undefined,
+          sector: data.sector?.trim() || undefined,
+          subSector: data.subSector?.trim() || undefined,
+        };
+        onSubmit(cleanedData as CreateCompanyDto);
+      })}
+      className="space-y-6"
+    >
+      {/* Show validation errors summary */}
+      {Object.keys(errors).length > 0 && (
+        <div className="bg-destructive/10 border border-destructive rounded-lg p-4">
+          <p className="text-sm font-semibold text-destructive mb-2">Form hataları:</p>
+          <ul className="text-sm text-destructive list-disc list-inside space-y-1">
+            {Object.entries(errors).map(([field, error]: [string, any]) => (
+              <li key={field}>
+                <strong>{field}:</strong> {error.message}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
       {/* Program Selection */}
       <div className="space-y-2">
         <Label htmlFor="programId">Program *</Label>

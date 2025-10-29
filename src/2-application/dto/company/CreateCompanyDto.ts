@@ -16,48 +16,67 @@ export const CreateCompanySchema = z.object({
     .string()
     .min(2, 'Yasal ad en az 2 karakter olmalıdır')
     .max(200, 'Yasal ad en fazla 200 karakter olabilir')
+    .nullable()
     .optional(),
   taxNumber: z
     .string()
     .regex(/^[0-9]{10,11}$/, 'Vergi numarası 10 veya 11 haneli olmalıdır')
+    .nullable()
     .optional(),
   tradeRegistryNumber: z
     .string()
     .max(50, 'Ticaret sicil numarası en fazla 50 karakter olabilir')
+    .nullable()
     .optional(),
   slug: z
     .string()
     .regex(/^[a-z0-9-]+$/, 'Slug sadece küçük harf, rakam ve tire içerebilir')
+    .nullable()
     .optional(),
-  email: z.string().email('Geçerli bir e-posta adresi giriniz').optional(),
+  email: z
+    .string()
+    .email('Geçerli bir e-posta adresi giriniz')
+    .nullable()
+    .optional()
+    .or(z.literal('')),
   phone: z
     .string()
     .regex(
       /^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,9}$/,
       'Geçerli bir telefon numarası giriniz'
     )
-    .optional(),
-  website: z.string().url('Geçerli bir web sitesi adresi giriniz').optional(),
-  address: z.string().max(500, 'Adres en fazla 500 karakter olabilir').optional(),
-  city: z.string().max(100, 'Şehir en fazla 100 karakter olabilir').optional(),
-  district: z.string().max(100, 'İlçe en fazla 100 karakter olabilir').optional(),
+    .nullable()
+    .optional()
+    .or(z.literal('')),
+  website: z
+    .string()
+    .url('Geçerli bir web sitesi adresi giriniz')
+    .nullable()
+    .optional()
+    .or(z.literal('')),
+  address: z.string().max(500, 'Adres en fazla 500 karakter olabilir').nullable().optional(),
+  city: z.string().max(100, 'Şehir en fazla 100 karakter olabilir').nullable().optional(),
+  district: z.string().max(100, 'İlçe en fazla 100 karakter olabilir').nullable().optional(),
   postalCode: z
     .string()
     .regex(/^[0-9]{5}$/, 'Posta kodu 5 haneli olmalıdır')
+    .nullable()
     .optional(),
   country: z.string().max(100, 'Ülke en fazla 100 karakter olabilir').default('Türkiye'),
-  sector: z.string().max(100, 'Sektör en fazla 100 karakter olabilir').optional(),
-  subSector: z.string().max(100, 'Alt sektör en fazla 100 karakter olabilir').optional(),
+  sector: z.string().max(100, 'Sektör en fazla 100 karakter olabilir').nullable().optional(),
+  subSector: z.string().max(100, 'Alt sektör en fazla 100 karakter olabilir').nullable().optional(),
   employeeCount: z
     .number()
     .int('Çalışan sayısı tam sayı olmalıdır')
     .min(0, 'Çalışan sayısı 0 veya daha büyük olmalıdır')
+    .nullable()
     .optional(),
   foundationYear: z
     .number()
     .int('Kuruluş yılı tam sayı olmalıdır')
     .min(1800, 'Kuruluş yılı 1800 veya daha büyük olmalıdır')
     .max(new Date().getFullYear(), 'Kuruluş yılı gelecekte olamaz')
+    .nullable()
     .optional(),
   maxUsers: z
     .number()
