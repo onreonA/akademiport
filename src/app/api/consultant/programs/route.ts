@@ -7,6 +7,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { ProgramRepository } from '@/infrastructure/database/repositories/ProgramRepository';
 import { UserRepository } from '@/infrastructure/database/repositories/UserRepository';
 import { CompanyRepository } from '@/infrastructure/database/repositories/CompanyRepository';
 import { ListConsultantProgramsUseCase } from '@/application/use-cases/consultant';
@@ -14,9 +15,11 @@ import { parseConsultantProgramFilterParams } from '@/application/dto/consultant
 import { requireAuth } from '@/infrastructure/api/helpers/auth';
 import { UserRole } from '@/domain/enums/UserRole';
 
+const programRepository = new ProgramRepository();
 const userRepository = new UserRepository();
 const companyRepository = new CompanyRepository();
 const listConsultantProgramsUseCase = new ListConsultantProgramsUseCase(
+  programRepository,
   userRepository,
   companyRepository
 );
@@ -53,11 +56,10 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      data: result.value!.programs,
-      total: result.value!.total,
-      page: result.value!.page,
-      limit: result.value!.limit,
-      totalPages: result.value!.totalPages,
+      data: result.value?.programs || [],
+      total: result.value?.total || 0,
+      page: filter.page,
+      limit: filter.limit,
     });
   } catch (error) {
     console.error('Consultant programs error:', error);

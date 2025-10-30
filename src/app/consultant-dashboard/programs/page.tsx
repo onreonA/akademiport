@@ -1,7 +1,7 @@
 /**
  * Consultant Programs Page
  * Sprint 7: Consultant Management
- * 
+ *
  * Consultant'ın atandığı programları listeler
  */
 
@@ -20,7 +20,10 @@ import {
 import { Badge } from '@/presentation/components/ui/atoms/badge';
 import { Button } from '@/presentation/components/ui/atoms/button';
 import { Skeleton } from '@/presentation/components/ui/atoms/skeleton';
-import { ConsultantProgramProvider, useConsultantProgram } from '@/shared/contexts/ConsultantProgramContext';
+import {
+  ConsultantProgramProvider,
+  useConsultantProgram,
+} from '@/shared/contexts/ConsultantProgramContext';
 import type { ConsultantProgramDto } from '@/application/dto/consultant';
 import { ProgramStatus } from '@/domain/enums/ProgramStatus';
 
@@ -29,7 +32,8 @@ import { ProgramStatus } from '@/domain/enums/ProgramStatus';
 // =====================================================
 function ConsultantProgramsContent() {
   const router = useRouter();
-  const { programs, setPrograms, setSelectedProgram, isLoading, setIsLoading } = useConsultantProgram();
+  const { programs, setPrograms, setSelectedProgram, isLoading, setIsLoading } =
+    useConsultantProgram();
   const [allPrograms, setAllPrograms] = useState<ConsultantProgramDto[]>([]);
 
   useEffect(() => {
@@ -141,9 +145,7 @@ function ConsultantProgramsContent() {
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Programlarım</h1>
-        <p className="text-muted-foreground mt-2">
-          Toplam {allPrograms.length} programa atandınız
-        </p>
+        <p className="text-muted-foreground mt-2">Toplam {allPrograms.length} programa atandınız</p>
       </div>
 
       {/* Programs Grid */}
@@ -173,9 +175,7 @@ function ConsultantProgramsContent() {
             <CardContent className="space-y-4">
               {/* Description */}
               {program.description && (
-                <p className="text-sm text-muted-foreground line-clamp-2">
-                  {program.description}
-                </p>
+                <p className="text-sm text-muted-foreground line-clamp-2">{program.description}</p>
               )}
 
               {/* Stats */}
