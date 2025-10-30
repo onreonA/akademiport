@@ -19,6 +19,9 @@ import {
 import { Button } from '@/presentation/components/ui/atoms/button';
 import { StatCard } from '@/presentation/components/ui/atoms/stat-card';
 import { MetricCard } from '@/presentation/components/ui/atoms/metric-card';
+import { EnhancedCard } from '@/presentation/components/ui/atoms/enhanced-card';
+import { GradientHeader } from '@/presentation/components/ui/molecules/gradient-header';
+import { ModernStatCard } from '@/presentation/components/ui/atoms/modern-stat-card';
 import { ConsultantProgramProvider } from '@/shared/contexts/ConsultantProgramContext';
 import {
   ProgramSelector,
@@ -106,33 +109,41 @@ function ConsultantDashboardContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
-      <div className="max-w-7xl mx-auto p-6 space-y-8">
-        {/* Header */}
-        <div className="space-y-1">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-            Danışman Paneli
-          </h1>
-          <p className="text-muted-foreground text-lg">
-            Atandığınız programları ve firmaları yönetin
-          </p>
-        </div>
+    <div className="min-h-screen bg-linear-to-br from-background via-background to-primary/5 dark:from-background dark:via-background dark:to-primary/10">
+      <div className="max-w-7xl mx-auto p-4 md:p-6 space-y-6 md:space-y-8">
+        {/* Modern Gradient Header */}
+        <GradientHeader
+          title="Danışman Paneli"
+          subtitle="Atandığınız programları ve firmaları yönetin"
+          icon={BarChart3}
+          progress={75}
+          actions={
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+              <Button
+                variant="outline"
+                size="sm"
+                className="bg-white/20 hover:bg-white/30 text-white border-white/30 w-full sm:w-auto"
+              >
+                <Activity className="h-4 w-4 mr-2" />
+                Aktivite
+              </Button>
+            </div>
+          }
+        />
 
-        {/* Program Selector - Enhanced */}
-        <Card className="border-primary/20 shadow-lg">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="h-5 w-5" />
+        {/* Enhanced Program Selector */}
+        <EnhancedCard variant="glass" className="p-6">
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold flex items-center gap-2 mb-2">
+              <BarChart3 className="h-5 w-5 text-primary" />
               Program Seçin
-            </CardTitle>
-            <CardDescription>
+            </h3>
+            <p className="text-sm text-muted-foreground">
               Firma ve görevleri görüntülemek için bir program seçin
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ProgramSelector />
-          </CardContent>
-        </Card>
+            </p>
+          </div>
+          <ProgramSelector />
+        </EnhancedCard>
 
         {/* Stats */}
         {isLoading ? (
@@ -144,139 +155,160 @@ function ConsultantDashboardContent() {
           </div>
         ) : dashboardData ? (
           <>
-            {/* Enhanced Stats Grid */}
+            {/* Modern Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <StatCard
+              <ModernStatCard
                 title="Toplam Program"
                 value={dashboardData.stats.totalPrograms}
-                subtitle={`${dashboardData.stats.activePrograms} aktif`}
                 icon={BarChart3}
-                trend={{
-                  value: 12.5,
-                  direction: 'up',
-                  period: 'bu ay',
-                }}
                 color="blue"
+                trend={{ value: 12.5, direction: 'up' }}
+                progress={85}
+                showGlow
               />
-              <StatCard
+              <ModernStatCard
                 title="Atandığım Firmalar"
                 value={dashboardData.stats.totalCompanies}
-                subtitle="Tüm programlarda"
                 icon={Building2}
-                trend={{
-                  value: 8.3,
-                  direction: 'up',
-                  period: 'bu hafta',
-                }}
                 color="green"
+                trend={{ value: 8.3, direction: 'up' }}
+                progress={92}
+                showGlow
               />
-              <StatCard
+              <ModernStatCard
                 title="Tamamlanan Görevler"
                 value={dashboardData.stats.completedTasks || 0}
-                subtitle={`${dashboardData.stats.totalTasks || 0} görevden`}
                 icon={CheckCircle}
-                trend={{
-                  value: 5.7,
-                  direction: 'up',
-                  period: 'bu hafta',
-                }}
                 color="purple"
+                trend={{ value: 5.7, direction: 'up' }}
+                progress={75}
+                showGlow
               />
-              <StatCard
+              <ModernStatCard
                 title="Bekleyen Görevler"
                 value={dashboardData.stats.pendingTasks || 0}
-                subtitle="Sprint 8'de aktif"
                 icon={Clock}
-                trend={{
-                  value: -2.1,
-                  direction: 'down',
-                  period: 'bu hafta',
-                }}
                 color="orange"
+                trend={{ value: -2.1, direction: 'down' }}
+                progress={45}
+                showGlow
               />
             </div>
 
-            {/* Metrics Row */}
+            {/* Enhanced Metrics Row */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <MetricCard
-                label="Program İlerlemesi"
-                value="85%"
-                icon={TrendingUp}
-                progress={85}
-                color="blue"
-                size="lg"
-              />
-              <MetricCard
-                label="Firma Memnuniyeti"
-                value="4.7/5"
-                icon={Users}
-                progress={94}
-                color="green"
-                size="lg"
-              />
-              <MetricCard
-                label="Aktif Görevler"
-                value="18"
-                icon={Activity}
-                progress={75}
-                color="purple"
-                size="lg"
-              />
+              <EnhancedCard variant="gradient" className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="p-3 bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-xl">
+                    <TrendingUp className="w-6 h-6" />
+                  </div>
+                  <div className="text-right">
+                    <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">85%</div>
+                    <div className="text-sm text-muted-foreground">Program İlerlemesi</div>
+                  </div>
+                </div>
+                <div className="h-2 bg-muted rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-blue-500 rounded-full transition-all duration-1000"
+                    style={{ width: '85%' }}
+                  />
+                </div>
+              </EnhancedCard>
+
+              <EnhancedCard variant="glass" className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="p-3 bg-green-500/20 text-green-600 dark:text-green-400 rounded-xl">
+                    <Users className="w-6 h-6" />
+                  </div>
+                  <div className="text-right">
+                    <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                      4.7/5
+                    </div>
+                    <div className="text-sm text-muted-foreground">Firma Memnuniyeti</div>
+                  </div>
+                </div>
+                <div className="h-2 bg-muted rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-green-500 rounded-full transition-all duration-1000"
+                    style={{ width: '94%' }}
+                  />
+                </div>
+              </EnhancedCard>
+
+              <EnhancedCard variant="neon" className="p-6 glow-primary">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="p-3 bg-purple-500/20 text-purple-600 dark:text-purple-400 rounded-xl">
+                    <Activity className="w-6 h-6" />
+                  </div>
+                  <div className="text-right">
+                    <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                      18
+                    </div>
+                    <div className="text-sm text-muted-foreground">Aktif Görevler</div>
+                  </div>
+                </div>
+                <div className="h-2 bg-muted rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-purple-500 rounded-full transition-all duration-1000"
+                    style={{ width: '75%' }}
+                  />
+                </div>
+              </EnhancedCard>
             </div>
 
-            {/* Quick Actions */}
-            <Card className="border-primary/20 shadow-lg">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Activity className="h-5 w-5" />
+            {/* Enhanced Quick Actions */}
+            <EnhancedCard variant="glass" className="p-6">
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold flex items-center gap-2 mb-2">
+                  <Activity className="h-5 w-5 text-primary" />
                   Hızlı İşlemler
-                </CardTitle>
-                <CardDescription>Sık kullanılan işlemler için kısayollar</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <Button
-                    variant="outline"
-                    className="h-auto flex-col items-start p-4 hover:bg-primary/5 hover:border-primary transition-all"
-                    onClick={() => alert('Görev atama özelliği Sprint 8\'de eklenecek')}
-                  >
-                    <CheckCircle className="h-6 w-6 mb-2 text-primary" />
-                    <div className="text-left">
-                      <div className="font-semibold">Görev Ata</div>
-                      <div className="text-xs text-muted-foreground mt-1">
-                        Firmaya yeni görev oluştur
-                      </div>
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Sık kullanılan işlemler için kısayollar
+                </p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Button
+                  variant="outline"
+                  className="h-auto flex-col items-start p-4 hover:bg-primary/5 hover:border-primary hover:scale-[1.02] transition-all duration-200"
+                  onClick={() => alert("Görev atama özelliği Sprint 8'de eklenecek")}
+                >
+                  <CheckCircle className="h-6 w-6 mb-2 text-primary" />
+                  <div className="text-left">
+                    <div className="font-semibold">Görev Ata</div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      Firmaya yeni görev oluştur
                     </div>
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="h-auto flex-col items-start p-4 hover:bg-primary/5 hover:border-primary transition-all"
-                    onClick={() => alert('Randevu oluşturma özelliği Sprint 11\'de eklenecek')}
-                  >
-                    <Clock className="h-6 w-6 mb-2 text-primary" />
-                    <div className="text-left">
-                      <div className="font-semibold">Randevu Oluştur</div>
-                      <div className="text-xs text-muted-foreground mt-1">
-                        Firma ile görüşme planla
-                      </div>
+                  </div>
+                </Button>
+                <Button
+                  variant="outline"
+                  className="h-auto flex-col items-start p-4 hover:bg-primary/5 hover:border-primary hover:scale-[1.02] transition-all duration-200"
+                  onClick={() => alert("Randevu oluşturma özelliği Sprint 11'de eklenecek")}
+                >
+                  <Clock className="h-6 w-6 mb-2 text-primary" />
+                  <div className="text-left">
+                    <div className="font-semibold">Randevu Oluştur</div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      Firma ile görüşme planla
                     </div>
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="h-auto flex-col items-start p-4 hover:bg-primary/5 hover:border-primary transition-all"
-                    onClick={() => alert('Eğitim atama özelliği Sprint 9\'da eklenecek')}
-                  >
-                    <Users className="h-6 w-6 mb-2 text-primary" />
-                    <div className="text-left">
-                      <div className="font-semibold">Eğitim Ata</div>
-                      <div className="text-xs text-muted-foreground mt-1">
-                        Firmaya eğitim içeriği paylaş
-                      </div>
+                  </div>
+                </Button>
+                <Button
+                  variant="outline"
+                  className="h-auto flex-col items-start p-4 hover:bg-primary/5 hover:border-primary hover:scale-[1.02] transition-all duration-200"
+                  onClick={() => alert("Eğitim atama özelliği Sprint 9'da eklenecek")}
+                >
+                  <Users className="h-6 w-6 mb-2 text-primary" />
+                  <div className="text-left">
+                    <div className="font-semibold">Eğitim Ata</div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      Firmaya eğitim içeriği paylaş
                     </div>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+                  </div>
+                </Button>
+              </div>
+            </EnhancedCard>
 
             {/* Companies List */}
             <ConsultantCompanyList onCompanyClick={handleCompanyClick} />

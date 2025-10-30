@@ -16,6 +16,9 @@ import {
 import { StatCard } from '@/presentation/components/ui/atoms/stat-card';
 import { MetricCard } from '@/presentation/components/ui/atoms/metric-card';
 import { Spinner } from '@/presentation/components/ui/atoms/spinner';
+import { EnhancedCard } from '@/presentation/components/ui/atoms/enhanced-card';
+import { GradientHeader } from '@/presentation/components/ui/molecules/gradient-header';
+import { ModernStatCard } from '@/presentation/components/ui/atoms/modern-stat-card';
 import {
   Building2,
   Users,
@@ -96,165 +99,198 @@ export default function CompanyDashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
-      <div className="container mx-auto p-6 space-y-8">
-        {/* Header */}
-        <div className="space-y-2">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-            Firma Paneli
-          </h1>
-          <p className="text-muted-foreground text-lg">
-            {mockData.company.name} - {mockData.company.programName}
-          </p>
-        </div>
+    <div className="min-h-screen bg-linear-to-br from-background via-background to-primary/5 dark:from-background dark:via-background dark:to-primary/10">
+      <div className="container mx-auto p-4 md:p-6 space-y-6 md:space-y-8">
+        {/* Modern Gradient Header */}
+        <GradientHeader
+          title="Firma Paneli"
+          subtitle={`${mockData.company.name} - ${mockData.company.programName}`}
+          icon={Building2}
+          progress={mockData.stats.completionRate}
+          actions={
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+              <div className="text-center sm:text-right">
+                <div className="text-sm text-white/80">Tamamlanma Oranı</div>
+                <div className="text-lg font-bold text-white">{mockData.stats.completionRate}%</div>
+              </div>
+            </div>
+          }
+        />
 
-        {/* Stats Cards */}
+        {/* Modern Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatCard
+          <ModernStatCard
             title="Toplam Projeler"
-            value={mockData.stats.totalProjects.toString()}
-            description="Tüm projeler"
+            value={mockData.stats.totalProjects}
             icon={FolderKanban}
             color="blue"
-            trend={{
-              value: mockData.stats.activeProjects,
-              direction: 'up',
-              period: 'aktif',
-            }}
+            trend={{ value: mockData.stats.activeProjects, direction: 'up' }}
+            progress={Math.round(
+              (mockData.stats.completedProjects / mockData.stats.totalProjects) * 100
+            )}
+            showGlow
           />
-          <StatCard
+          <ModernStatCard
             title="Tamamlanan Projeler"
-            value={mockData.stats.completedProjects.toString()}
-            description="Başarıyla tamamlandı"
+            value={mockData.stats.completedProjects}
             icon={CheckCircle}
             color="green"
+            trend={{ value: 15, direction: 'up' }}
+            progress={Math.round(
+              (mockData.stats.completedProjects / mockData.stats.totalProjects) * 100
+            )}
+            showGlow
           />
-          <StatCard
+          <ModernStatCard
             title="Eğitimler"
             value={`${mockData.stats.completedTrainings}/${mockData.stats.totalTrainings}`}
-            description="Tamamlanan eğitimler"
             icon={GraduationCap}
             color="purple"
-          />
-          <StatCard
-            title="Kullanıcılar"
-            value={mockData.stats.totalUsers.toString()}
-            description="Aktif kullanıcı"
-            icon={Users}
-            color="orange"
-          />
-        </div>
-
-        {/* Progress Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <MetricCard
-            title="Proje Tamamlanma"
-            value={mockData.stats.completionRate}
-            description="Genel ilerleme oranı"
-            icon={TrendingUp}
-            color="blue"
-            showProgress
-          />
-          <MetricCard
-            title="Eğitim Tamamlanma"
-            value={Math.round(
+            trend={{ value: 8, direction: 'up' }}
+            progress={Math.round(
               (mockData.stats.completedTrainings / mockData.stats.totalTrainings) * 100
             )}
-            description="Eğitim ilerleme oranı"
-            icon={BookOpen}
-            color="green"
-            showProgress
+            showGlow
+          />
+          <ModernStatCard
+            title="Kullanıcılar"
+            value={mockData.stats.totalUsers}
+            icon={Users}
+            color="orange"
+            trend={{ value: 2, direction: 'up' }}
+            progress={100}
+            showGlow
           />
         </div>
 
-        {/* Quick Actions */}
+        {/* Enhanced Progress Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <EnhancedCard variant="gradient" className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-xl">
+                <TrendingUp className="w-6 h-6" />
+              </div>
+              <div className="text-right">
+                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                  {mockData.stats.completionRate}%
+                </div>
+                <div className="text-sm text-muted-foreground">Proje Tamamlanma</div>
+              </div>
+            </div>
+            <div className="h-2 bg-muted rounded-full overflow-hidden">
+              <div
+                className="h-full bg-blue-500 rounded-full transition-all duration-1000"
+                style={{ width: `${mockData.stats.completionRate}%` }}
+              />
+            </div>
+          </EnhancedCard>
+
+          <EnhancedCard variant="glass" className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-green-500/20 text-green-600 dark:text-green-400 rounded-xl">
+                <BookOpen className="w-6 h-6" />
+              </div>
+              <div className="text-right">
+                <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                  {Math.round(
+                    (mockData.stats.completedTrainings / mockData.stats.totalTrainings) * 100
+                  )}
+                  %
+                </div>
+                <div className="text-sm text-muted-foreground">Eğitim Tamamlanma</div>
+              </div>
+            </div>
+            <div className="h-2 bg-muted rounded-full overflow-hidden">
+              <div
+                className="h-full bg-green-500 rounded-full transition-all duration-1000"
+                style={{
+                  width: `${Math.round((mockData.stats.completedTrainings / mockData.stats.totalTrainings) * 100)}%`,
+                }}
+              />
+            </div>
+          </EnhancedCard>
+        </div>
+
+        {/* Enhanced Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Card className="hover-lift border-border/50 cursor-pointer transition-all">
-            <CardHeader>
-              <div className="flex items-center gap-3">
-                <div className="p-3 rounded-lg bg-blue-500/10">
-                  <FolderKanban className="w-6 h-6 text-blue-500" />
+          <EnhancedCard variant="glass" hover className="cursor-pointer">
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-3 rounded-lg bg-blue-500/20 text-blue-600 dark:text-blue-400">
+                  <FolderKanban className="w-6 h-6" />
                 </div>
                 <div>
-                  <CardTitle className="text-lg">Projelerim</CardTitle>
-                  <CardDescription>Proje listesi ve detayları</CardDescription>
+                  <h3 className="text-lg font-semibold">Projelerim</h3>
+                  <p className="text-sm text-muted-foreground">Proje listesi ve detayları</p>
                 </div>
               </div>
-            </CardHeader>
-            <CardContent>
               <p className="text-sm text-muted-foreground">
                 {mockData.stats.activeProjects} aktif proje
               </p>
-            </CardContent>
-          </Card>
+            </div>
+          </EnhancedCard>
 
-          <Card className="hover-lift border-border/50 cursor-pointer transition-all">
-            <CardHeader>
-              <div className="flex items-center gap-3">
-                <div className="p-3 rounded-lg bg-green-500/10">
-                  <GraduationCap className="w-6 h-6 text-green-500" />
+          <EnhancedCard variant="gradient" hover className="cursor-pointer">
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-3 rounded-lg bg-green-500/20 text-green-600 dark:text-green-400">
+                  <GraduationCap className="w-6 h-6" />
                 </div>
                 <div>
-                  <CardTitle className="text-lg">Eğitimlerim</CardTitle>
-                  <CardDescription>Eğitim materyalleri</CardDescription>
+                  <h3 className="text-lg font-semibold">Eğitimlerim</h3>
+                  <p className="text-sm text-muted-foreground">Eğitim materyalleri</p>
                 </div>
               </div>
-            </CardHeader>
-            <CardContent>
               <p className="text-sm text-muted-foreground">
                 {mockData.stats.totalTrainings - mockData.stats.completedTrainings} eğitim devam
                 ediyor
               </p>
-            </CardContent>
-          </Card>
+            </div>
+          </EnhancedCard>
 
-          <Card className="hover-lift border-border/50 cursor-pointer transition-all">
-            <CardHeader>
-              <div className="flex items-center gap-3">
-                <div className="p-3 rounded-lg bg-purple-500/10">
-                  <Users className="w-6 h-6 text-purple-500" />
+          <EnhancedCard variant="neon" hover glow className="cursor-pointer">
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-3 rounded-lg bg-purple-500/20 text-purple-600 dark:text-purple-400">
+                  <Users className="w-6 h-6" />
                 </div>
                 <div>
-                  <CardTitle className="text-lg">Ekibim</CardTitle>
-                  <CardDescription>Firma kullanıcıları</CardDescription>
+                  <h3 className="text-lg font-semibold">Ekibim</h3>
+                  <p className="text-sm text-muted-foreground">Firma kullanıcıları</p>
                 </div>
               </div>
-            </CardHeader>
-            <CardContent>
               <p className="text-sm text-muted-foreground">{mockData.stats.totalUsers} kullanıcı</p>
-            </CardContent>
-          </Card>
+            </div>
+          </EnhancedCard>
         </div>
 
-        {/* Info Card */}
-        <Card className="border-blue-500/20 bg-blue-500/5">
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
+        {/* Enhanced Info Card */}
+        <EnhancedCard variant="glass" className="p-6">
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold flex items-center gap-2 mb-2">
               <Building2 className="w-5 h-5 text-blue-500" />
               Firma Bilgileri
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-              <div>
-                <p className="text-muted-foreground">Firma Adı</p>
-                <p className="font-medium">{mockData.company.name}</p>
-              </div>
-              <div>
-                <p className="text-muted-foreground">Yasal Ünvan</p>
-                <p className="font-medium">{mockData.company.legalName}</p>
-              </div>
-              <div>
-                <p className="text-muted-foreground">Program</p>
-                <p className="font-medium">{mockData.company.programName}</p>
-              </div>
-              <div>
-                <p className="text-muted-foreground">Durum</p>
-                <p className="font-medium text-green-600">Aktif</p>
-              </div>
+            </h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+            <div className="space-y-2">
+              <p className="text-muted-foreground font-medium">Firma Adı</p>
+              <p className="font-semibold text-lg">{mockData.company.name}</p>
             </div>
-          </CardContent>
-        </Card>
+            <div className="space-y-2">
+              <p className="text-muted-foreground font-medium">Yasal Ünvan</p>
+              <p className="font-semibold text-lg">{mockData.company.legalName}</p>
+            </div>
+            <div className="space-y-2">
+              <p className="text-muted-foreground font-medium">Program</p>
+              <p className="font-semibold text-lg">{mockData.company.programName}</p>
+            </div>
+            <div className="space-y-2">
+              <p className="text-muted-foreground font-medium">Durum</p>
+              <p className="font-semibold text-lg text-green-600">Aktif</p>
+            </div>
+          </div>
+        </EnhancedCard>
       </div>
     </div>
   );

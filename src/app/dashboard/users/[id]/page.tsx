@@ -85,15 +85,24 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
   }
 
   return (
-    <div className="container mx-auto py-8 space-y-6">
+    <div className="container mx-auto py-4 md:py-8 px-4 space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <Button variant="ghost" onClick={() => router.back()}>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <Button
+          variant="ghost"
+          onClick={() => router.back()}
+          size="sm"
+          className="w-full sm:w-auto"
+        >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Geri
         </Button>
-        <Button onClick={() => router.push(`/dashboard/users/${id}/edit`)}>
-          <Edit className="h-4 w-4 mr-1" />
+        <Button
+          onClick={() => router.push(`/dashboard/users/${id}/edit`)}
+          size="sm"
+          className="w-full sm:w-auto"
+        >
+          <Edit className="h-4 w-4 mr-2" />
           Düzenle
         </Button>
       </div>

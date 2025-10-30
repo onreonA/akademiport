@@ -149,6 +149,24 @@ export const CONSULTANT_NAVIGATION: NavigationConfig = {
       href: '/consultant-dashboard/companies',
     },
     {
+      id: 'projects',
+      label: 'Projeler',
+      icon: FileText,
+      href: '/consultant-dashboard/projects',
+      children: [
+        {
+          id: 'projects-all',
+          label: 'Tüm Projeler',
+          href: '/consultant-dashboard/projects',
+        },
+        {
+          id: 'projects-new',
+          label: 'Yeni Proje',
+          href: '/consultant-dashboard/projects/new',
+        },
+      ],
+    },
+    {
       id: 'tasks',
       label: 'Görevler',
       icon: ListTodo,

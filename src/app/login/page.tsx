@@ -16,6 +16,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/presentation/components/ui/atoms/card';
+import { EnhancedCard } from '@/presentation/components/ui/atoms/enhanced-card';
+import { GradientHeader } from '@/presentation/components/ui/molecules/gradient-header';
 
 function LoginForm() {
   const [email, setEmail] = useState('');
@@ -41,60 +43,78 @@ function LoginForm() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary/10 via-background to-secondary/10 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-3xl font-bold text-center">Akademi Port</CardTitle>
-          <CardDescription className="text-center">E-İhracat Dönüşüm Platformu</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <label htmlFor="email" className="text-sm font-medium">
-                Email
-              </label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="ornek@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                disabled={loading}
-              />
-            </div>
+    <div className="min-h-screen bg-linear-to-br from-primary/10 via-background to-secondary/10">
+      {/* Modern Gradient Header */}
+      <div className="p-4 md:p-6 lg:p-8">
+        <GradientHeader
+          title="Akademi Port"
+          subtitle="E-İhracat Dönüşüm Platformu"
+          icon={undefined}
+          progress={undefined}
+          actions={undefined}
+          className="mb-4 md:mb-6 lg:mb-8"
+        />
+      </div>
 
-            <div className="space-y-2">
-              <label htmlFor="password" className="text-sm font-medium">
-                Şifre
-              </label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                disabled={loading}
-              />
-            </div>
-
-            {error && (
-              <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">
-                {error}
+      {/* Login Form */}
+      <div className="flex items-center justify-center px-4 pb-8">
+        <EnhancedCard variant="glass" className="w-full max-w-md p-6 md:p-8">
+          <div className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="space-y-2">
+                <label htmlFor="email" className="text-sm font-medium text-foreground">
+                  Email
+                </label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="ornek@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  disabled={loading}
+                  className="transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+                />
               </div>
-            )}
 
-            <Button type="submit" className="w-full" disabled={loading} variant="default">
-              {loading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
-            </Button>
-          </form>
+              <div className="space-y-2">
+                <label htmlFor="password" className="text-sm font-medium text-foreground">
+                  Şifre
+                </label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  disabled={loading}
+                  className="transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+                />
+              </div>
 
-          <div className="mt-4 text-center text-sm text-muted-foreground">
-            <p>Demo: admin@akademiport.com / demo123</p>
+              {error && (
+                <div className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/20 p-3 rounded-lg border border-red-200 dark:border-red-800">
+                  {error}
+                </div>
+              )}
+
+              <Button
+                type="submit"
+                className="w-full bg-linear-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white font-medium py-2.5 transition-all duration-200 hover:scale-[1.02] shadow-lg"
+                disabled={loading}
+              >
+                {loading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
+              </Button>
+            </form>
+
+            <div className="mt-6 text-center text-sm text-muted-foreground bg-muted/50 p-4 rounded-lg">
+              <p className="font-medium">Demo Hesap:</p>
+              <p>admin@akademiport.com / demo123</p>
+            </div>
           </div>
-        </CardContent>
-      </Card>
+        </EnhancedCard>
+      </div>
     </div>
   );
 }
