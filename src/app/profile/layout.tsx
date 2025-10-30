@@ -9,4 +9,3 @@ import { DashboardLayout } from '@/presentation/components/features/layout';
 export default function ProfileLayout({ children }: { children: React.ReactNode }) {
   return <DashboardLayout>{children}</DashboardLayout>;
 }
-
