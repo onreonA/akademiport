@@ -449,7 +449,9 @@ export class UserRepository implements IUserRepository {
   async getPrograms(userId: string): Promise<Result<Program[]>> {
     try {
       console.log('🔍 UserRepository.getPrograms - Start', { userId });
+      console.log('⏳ Creating Supabase client...');
       const supabase = await createClient();
+      console.log('✅ Supabase client created');
 
       // Join user_programs with programs
       const { data, error } = await supabase

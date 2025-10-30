@@ -44,7 +44,10 @@ export class ListConsultantProgramsUseCase {
 
       // 2. Consultant'ın programlarını al
       console.log('🔍 Fetching programs for user:', userId);
+      console.log('📦 userRepository:', this.userRepository);
+      console.log('🎯 About to call getPrograms...');
       const programsResult = await this.userRepository.getPrograms(userId);
+      console.log('🎉 getPrograms returned!');
       console.log('📊 Programs result:', {
         isSuccess: programsResult.isSuccess,
         isFailure: programsResult.isFailure,
@@ -87,6 +90,8 @@ export class ListConsultantProgramsUseCase {
 
       return Result.ok(response);
     } catch (error) {
+      console.error('💥 ListConsultantProgramsUseCase - Exception:', error);
+      console.error('Stack trace:', error instanceof Error ? error.stack : 'No stack');
       return Result.fail(error instanceof Error ? error.message : 'Programlar listelenemedi');
     }
   }
