@@ -93,8 +93,8 @@ export default function ProgramDetailPage({ params }: { params: Promise<{ id: st
   const fetchConsultants = async () => {
     try {
       setLoadingConsultants(true);
-      // For now, fetch all consultants (programId filter will be implemented later)
-      const response = await fetch(`/api/users?role=consultant`);
+      // Fetch consultants assigned to this program
+      const response = await fetch(`/api/programs/${id}/consultants`);
       const data = await response.json();
 
       if (data.success) {
@@ -414,7 +414,20 @@ export default function ProgramDetailPage({ params }: { params: Promise<{ id: st
                 )}
               </TabsContent>
 
-              <TabsContent value="consultants" className="mt-0">
+              <TabsContent value="consultants" className="mt-0 space-y-4">
+                <div className="flex justify-end">
+                  <Button
+                    onClick={() => {
+                      // TODO: Open modal to add consultant
+                      alert('Danışman ekleme özelliği yakında eklenecek');
+                    }}
+                    className="hover-lift"
+                  >
+                    <Users className="mr-2 h-4 w-4" />
+                    Danışman Ekle
+                  </Button>
+                </div>
+
                 {loadingConsultants ? (
                   <div className="flex items-center justify-center py-12">
                     <Spinner size="lg" />
@@ -423,25 +436,51 @@ export default function ProgramDetailPage({ params }: { params: Promise<{ id: st
                   <EmptyState
                     icon={UserCheck}
                     title="Henüz danışman atanmamış"
-                    description="Bu programa henüz danışman atanmamış. Danışman atamak için kullanıcılar sayfasına gidin."
-                    action={{
-                      label: 'Danışman Ekle',
-                      onClick: () => router.push('/dashboard/users/new'),
-                    }}
+                    description="Bu programa henüz danışman atanmamış. Yukarıdaki butona tıklayarak danışman ekleyebilirsiniz."
                   />
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {consultants.map((consultant) => (
-                      <Card
-                        key={consultant.id}
-                        className="hover-lift cursor-pointer border-border/50"
-                        onClick={() => router.push(`/dashboard/users/${consultant.id}`)}
-                      >
+                      <Card key={consultant.id} className="border-border/50 hover-lift">
                         <CardHeader>
-                          <CardTitle className="text-base">
-                            {consultant.firstName} {consultant.lastName}
-                          </CardTitle>
-                          <CardDescription>{consultant.email}</CardDescription>
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <CardTitle className="text-base">
+                                {consultant.firstName} {consultant.lastName}
+                              </CardTitle>
+                              <CardDescription>{consultant.email}</CardDescription>
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-destructive hover:bg-destructive/10"
+                              onClick={async (e) => {
+                                e.stopPropagation();
+                                if (
+                                  confirm(
+                                    `${consultant.firstName} ${consultant.lastName} danışmanını programdan çıkarmak istediğinizden emin misiniz?`
+                                  )
+                                ) {
+                                  try {
+                                    const response = await fetch(
+                                      `/api/programs/${id}/consultants/${consultant.id}`,
+                                      { method: 'DELETE' }
+                                    );
+                                    const data = await response.json();
+                                    if (data.success) {
+                                      fetchConsultants();
+                                    } else {
+                                      alert(data.error || 'Danışman çıkarılamadı');
+                                    }
+                                  } catch (err) {
+                                    alert('Bir hata oluştu');
+                                  }
+                                }
+                              }}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </CardHeader>
                         <CardContent>
                           <div className="flex items-center gap-2 text-sm text-muted-foreground">
