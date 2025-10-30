@@ -45,10 +45,11 @@ export class ListConsultantProgramsUseCase {
       // 2. Consultant'ın programlarını al
       const programsResult = await this.userRepository.getPrograms(userId);
       if (programsResult.isFailure) {
-        return Result.fail(programsResult.error!);
+        // Eğer programa atanmamışsa, boş liste döndür (hata değil)
+        console.warn('⚠️ User programs fetch failed:', programsResult.error);
       }
 
-      let programs = programsResult.value!;
+      let programs = programsResult.value || [];
 
       // 3. Filtreleme
       programs = this.applyFilters(programs, filter);

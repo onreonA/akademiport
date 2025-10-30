@@ -43,6 +43,9 @@ export async function GET(request: NextRequest) {
     const userId = user.id;
     const userRole = user.role as UserRole;
 
+    // Debug: Log user info
+    console.log('🔍 Consultant Programs API - User:', { userId, userRole, email: user.email });
+
     // Parse filter params
     const { searchParams } = request.nextUrl;
     const filter = parseConsultantProgramFilterParams(searchParams);
