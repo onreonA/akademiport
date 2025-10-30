@@ -52,7 +52,13 @@ export const UserCard = React.forwardRef<HTMLDivElement, UserCardProps>(
     };
 
     return (
-      <Card ref={ref} className={cn('hover:shadow-lg transition-shadow', className)}>
+      <Card
+        ref={ref}
+        className={cn(
+          'group hover:shadow-xl hover:scale-[1.02] transition-all duration-300 border-0 shadow-md bg-gradient-to-br from-card to-card/50',
+          className
+        )}
+      >
         <CardContent className="pt-6">
           {/* Avatar & Name */}
           <div className="flex items-start gap-4">
@@ -62,10 +68,10 @@ export const UserCard = React.forwardRef<HTMLDivElement, UserCardProps>(
                 <img
                   src={user.avatarUrl}
                   alt={user.fullName}
-                  className="w-16 h-16 rounded-full object-cover"
+                  className="w-16 h-16 rounded-full object-cover shadow-sm"
                 />
               ) : (
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center shadow-sm">
                   <span className="text-lg font-semibold text-primary">{initials}</span>
                 </div>
               )}
@@ -80,31 +86,42 @@ export const UserCard = React.forwardRef<HTMLDivElement, UserCardProps>(
 
             {/* Info */}
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-lg truncate">{user.fullName}</h3>
-              <Badge variant={getRoleBadgeVariant(user.role)} className="mt-1">
+              <h3 className="font-semibold text-lg group-hover:text-primary transition-colors truncate">
+                {user.fullName}
+              </h3>
+              <Badge
+                variant={getRoleBadgeVariant(user.role)}
+                className="mt-1 font-medium px-3 py-1"
+              >
                 {UserRoleLabels[user.role]}
               </Badge>
             </div>
           </div>
 
           {/* Contact Info */}
-          <div className="mt-4 space-y-2">
+          <div className="mt-4 space-y-3">
             {user.email && (
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Mail className="h-4 w-4 flex-shrink-0" />
-                <span className="truncate">{user.email}</span>
+              <div className="flex items-center gap-3 text-sm">
+                <div className="p-1.5 rounded-md bg-blue-100 dark:bg-blue-950">
+                  <Mail className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                </div>
+                <span className="font-medium truncate">{user.email}</span>
               </div>
             )}
             {user.phone && (
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Phone className="h-4 w-4 flex-shrink-0" />
-                <span>{user.phone}</span>
+              <div className="flex items-center gap-3 text-sm">
+                <div className="p-1.5 rounded-md bg-green-100 dark:bg-green-950">
+                  <Phone className="h-4 w-4 text-green-600 dark:text-green-400" />
+                </div>
+                <span className="font-medium">{user.phone}</span>
               </div>
             )}
             {user.companyId && (
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Building2 className="h-4 w-4 flex-shrink-0" />
-                <span>Firmaya Bağlı</span>
+              <div className="flex items-center gap-3 text-sm">
+                <div className="p-1.5 rounded-md bg-purple-100 dark:bg-purple-950">
+                  <Building2 className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                </div>
+                <span className="font-medium">Firmaya Bağlı</span>
               </div>
             )}
           </div>
@@ -133,25 +150,35 @@ export const UserCard = React.forwardRef<HTMLDivElement, UserCardProps>(
 
         {/* Actions */}
         {showActions && (
-          <CardFooter className="flex gap-2 pt-0">
+          <CardFooter className="flex gap-2 pt-4">
             {onView && (
-              <Button variant="outline" size="sm" onClick={() => onView(user)} className="flex-1">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onView(user)}
+                className="flex-1 hover:bg-primary hover:text-primary-foreground transition-colors"
+              >
                 <Eye className="h-4 w-4 mr-1" />
                 Görüntüle
               </Button>
             )}
             {onEdit && (
-              <Button variant="outline" size="sm" onClick={() => onEdit(user)} className="flex-1">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onEdit(user)}
+                className="flex-1 hover:bg-secondary transition-colors"
+              >
                 <Edit className="h-4 w-4 mr-1" />
                 Düzenle
               </Button>
             )}
             {onDelete && (
               <Button
-                variant="outline"
+                variant="destructive"
                 size="sm"
                 onClick={() => onDelete(user)}
-                className="text-destructive hover:text-destructive"
+                className="hover:bg-destructive/90 transition-colors"
               >
                 <Trash2 className="h-4 w-4" />
               </Button>

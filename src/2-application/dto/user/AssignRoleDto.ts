@@ -108,4 +108,3 @@ export function getRoleDescription(role: UserRole): string {
 
   return roleDescriptions[role];
 }
-

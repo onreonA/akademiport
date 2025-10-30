@@ -45,4 +45,3 @@ export interface UpdateUserDto {
  * Note: Email cannot be updated through this DTO (security)
  * Note: Password cannot be updated through this DTO (use ChangePasswordDto)
  */
-

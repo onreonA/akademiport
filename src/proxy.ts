@@ -67,6 +67,23 @@ export async function proxy(request: NextRequest) {
 
     // Redirect authenticated users away from auth pages
     if (user && isAuthPage) {
+      // Get user role to redirect to appropriate dashboard
+      const { data: userData } = await supabase
+        .from('users')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+
+      const role = userData?.role || 'company_user';
+
+      if (role === 'master_admin' || role === 'program_manager') {
+        return NextResponse.redirect(new URL('/dashboard', request.url));
+      } else if (role === 'consultant') {
+        return NextResponse.redirect(new URL('/consultant-dashboard', request.url));
+      } else if (role === 'company_user') {
+        return NextResponse.redirect(new URL('/company-dashboard', request.url));
+      }
+
       return NextResponse.redirect(new URL('/dashboard', request.url));
     }
 
@@ -75,6 +92,52 @@ export async function proxy(request: NextRequest) {
       const redirectUrl = new URL('/login', request.url);
       redirectUrl.searchParams.set('redirect', request.nextUrl.pathname);
       return NextResponse.redirect(redirectUrl);
+    }
+
+    // Role-based access control
+    if (user) {
+      const { data: userData } = await supabase
+        .from('users')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+
+      const role = userData?.role || 'company_user';
+      const pathname = request.nextUrl.pathname;
+
+      // Master Admin and Program Manager can access /dashboard
+      if (pathname.startsWith('/dashboard')) {
+        if (role !== 'master_admin' && role !== 'program_manager') {
+          // Redirect to appropriate dashboard
+          if (role === 'consultant') {
+            return NextResponse.redirect(new URL('/consultant-dashboard', request.url));
+          } else if (role === 'company_user') {
+            return NextResponse.redirect(new URL('/company-dashboard', request.url));
+          }
+        }
+      }
+
+      // Consultant can only access /consultant-dashboard
+      if (pathname.startsWith('/consultant-dashboard')) {
+        if (role !== 'consultant') {
+          if (role === 'master_admin' || role === 'program_manager') {
+            return NextResponse.redirect(new URL('/dashboard', request.url));
+          } else if (role === 'company_user') {
+            return NextResponse.redirect(new URL('/company-dashboard', request.url));
+          }
+        }
+      }
+
+      // Company User can only access /company-dashboard
+      if (pathname.startsWith('/company-dashboard')) {
+        if (role !== 'company_user') {
+          if (role === 'master_admin' || role === 'program_manager') {
+            return NextResponse.redirect(new URL('/dashboard', request.url));
+          } else if (role === 'consultant') {
+            return NextResponse.redirect(new URL('/consultant-dashboard', request.url));
+          }
+        }
+      }
     }
 
     return response;

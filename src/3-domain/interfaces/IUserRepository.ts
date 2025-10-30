@@ -7,11 +7,7 @@
 import { Result } from '@/core/result/Result';
 import { User } from '../entities/User';
 import { Program } from '../entities/Program';
-import {
-  CreateUserDto,
-  UpdateUserDto,
-  UserFilterDto,
-} from '@/application/dto/user';
+import { CreateUserDto, UpdateUserDto, UserFilterDto } from '@/application/dto/user';
 
 export interface IUserRepository {
   // Basic CRUD
@@ -55,4 +51,3 @@ export interface IUserRepository {
   countByCompany(companyId: string): Promise<Result<number>>;
   countByProgram(programId: string): Promise<Result<number>>;
 }
-

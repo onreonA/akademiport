@@ -23,7 +23,7 @@ const listUsersUseCase = new ListUsersUseCase(userRepository);
 export async function GET(request: NextRequest) {
   try {
     // TODO: Get authenticated user from session (Sprint 5 - Faz H)
-    
+
     const user = await requireAuth(request);
     const userId = user.id;
     const userRole = user.role as UserRole;
@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     // TODO: Get authenticated user from session (Sprint 5 - Faz H)
-    
+
     const user = await requireAuth(request);
     const userId = user.id;
     const userRole = user.role as UserRole;
@@ -129,4 +129,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-

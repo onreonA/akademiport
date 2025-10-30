@@ -1,6 +1,6 @@
 /**
  * List Programs Use Case
- * 
+ *
  * Business logic for listing and filtering programs
  */
 
@@ -104,11 +104,7 @@ export class ListProgramsUseCase {
     }
   }
 
-  private sortPrograms(
-    programs: Program[],
-    sortBy: string,
-    sortOrder: 'asc' | 'desc'
-  ): Program[] {
+  private sortPrograms(programs: Program[], sortBy: string, sortOrder: 'asc' | 'desc'): Program[] {
     return programs.sort((a, b) => {
       let aValue: any;
       let bValue: any;

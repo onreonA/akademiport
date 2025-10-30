@@ -92,9 +92,7 @@ export function CommandPalette() {
                 <Icon className="mr-2 h-4 w-4" />
                 <span>{item.label}</span>
                 {item.badge && (
-                  <span className="ml-auto text-xs text-muted-foreground">
-                    {item.badge}
-                  </span>
+                  <span className="ml-auto text-xs text-muted-foreground">{item.badge}</span>
                 )}
               </CommandItem>
             );
@@ -147,4 +145,3 @@ export function CommandPalette() {
     </CommandDialog>
   );
 }
-

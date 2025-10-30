@@ -61,24 +61,24 @@ export function useRecentPages() {
 // Helper to generate page title from pathname
 function getPageTitle(pathname: string): string {
   const segments = pathname.split('/').filter(Boolean);
-  
+
   if (segments.length === 0) return 'Ana Sayfa';
-  
+
   const lastSegment = segments[segments.length - 1];
-  
+
   // Special cases
   const titleMap: Record<string, string> = {
-    'dashboard': 'Dashboard',
-    'programs': 'Programlar',
-    'companies': 'Firmalar',
-    'users': 'Kullanıcılar',
-    'tasks': 'Görevler',
-    'trainings': 'Eğitimler',
-    'reports': 'Raporlar',
-    'settings': 'Ayarlar',
-    'profile': 'Profil',
-    'new': 'Yeni Kayıt',
-    'edit': 'Düzenle',
+    dashboard: 'Dashboard',
+    programs: 'Programlar',
+    companies: 'Firmalar',
+    users: 'Kullanıcılar',
+    tasks: 'Görevler',
+    trainings: 'Eğitimler',
+    reports: 'Raporlar',
+    settings: 'Ayarlar',
+    profile: 'Profil',
+    new: 'Yeni Kayıt',
+    edit: 'Düzenle',
     'consultant-dashboard': 'Danışman Paneli',
     'company-dashboard': 'Firma Paneli',
   };
@@ -89,4 +89,3 @@ function getPageTitle(pathname: string): string {
 function capitalize(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
-

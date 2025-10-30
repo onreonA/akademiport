@@ -37,10 +37,7 @@ function DashboardLayoutInner({
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <AppHeader
-        showBreadcrumbs={showBreadcrumbs}
-        showNotifications={showNotifications}
-      />
+      <AppHeader showBreadcrumbs={showBreadcrumbs} showNotifications={showNotifications} />
 
       {/* Sidebar - Desktop */}
       <div className="hidden md:block">
@@ -83,4 +80,3 @@ export function DashboardLayout(props: DashboardLayoutProps) {
     </SidebarProvider>
   );
 }
-

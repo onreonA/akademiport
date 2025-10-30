@@ -13,7 +13,7 @@ import { Button } from '@/presentation/components/ui/atoms/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/presentation/components/ui/atoms/card';
 import { UserForm, type UserFormData } from '@/presentation/components/features/users/UserForm';
 import { User } from '@/domain/entities/User';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { ArrowLeft, Loader2, Users } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function EditUserPage({ params }: { params: Promise<{ id: string }> }) {
@@ -94,40 +94,58 @@ export default function EditUserPage({ params }: { params: Promise<{ id: string 
   }
 
   return (
-    <div className="container mx-auto py-8 space-y-6 max-w-3xl">
-      {/* Header */}
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" onClick={() => router.back()}>
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Geri
-        </Button>
-        <div>
-          <h1 className="text-3xl font-bold">Kullanıcıyı Düzenle</h1>
-          <p className="text-muted-foreground">{user.fullName}</p>
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
+      <div className="max-w-3xl mx-auto p-6 space-y-8">
+        {/* Header */}
+        <div className="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            onClick={() => router.back()}
+            className="hover:bg-primary/10 transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Geri
+          </Button>
+          <div className="space-y-1">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              Kullanıcıyı Düzenle
+            </h1>
+            <p className="text-muted-foreground text-lg">
+              {user.fullName} - Kullanıcı bilgilerini güncelleyin
+            </p>
+          </div>
         </div>
-      </div>
 
-      {/* Form */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Kullanıcı Bilgileri</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <UserForm
-            initialData={{
-              email: user.email,
-              fullName: user.fullName,
-              phone: user.phone,
-              role: user.role,
-              companyId: user.companyId,
-              bio: user.bio,
-            }}
-            onSubmit={handleSubmit}
-            onCancel={() => router.back()}
-            isEdit={true}
-          />
-        </CardContent>
-      </Card>
+        {/* Form */}
+        <Card className="border-0 shadow-xl bg-card/50 backdrop-blur-sm">
+          <CardHeader className="border-b border-border/50">
+            <CardTitle className="flex items-center gap-2 text-xl">
+              <div className="p-2 rounded-lg bg-primary/10">
+                <Users className="h-5 w-5 text-primary" />
+              </div>
+              Kullanıcı Bilgileri
+            </CardTitle>
+            <p className="text-muted-foreground">
+              Kullanıcı bilgilerini güncelleyin ve değişiklikleri kaydedin
+            </p>
+          </CardHeader>
+          <CardContent className="p-8">
+            <UserForm
+              initialData={{
+                email: user.email,
+                fullName: user.fullName,
+                phone: user.phone,
+                role: user.role,
+                companyId: user.companyId,
+                bio: user.bio,
+              }}
+              onSubmit={handleSubmit}
+              onCancel={() => router.back()}
+              isEdit={true}
+            />
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

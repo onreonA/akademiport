@@ -1,6 +1,6 @@
 /**
  * Program Use Cases Index
- * 
+ *
  * Central export for all program-related use cases
  */
 

@@ -54,17 +54,17 @@ export function SidebarMenuItem({ item }: SidebarMenuItemProps) {
         title={isCollapsed ? item.label : undefined}
       >
         <Icon className={cn('h-5 w-5 shrink-0', isActive && 'text-primary')} />
-        
+
         {!isCollapsed && (
           <>
             <span className="flex-1">{item.label}</span>
-            
+
             {item.badge && (
               <Badge variant="secondary" className="text-xs">
                 {item.badge}
               </Badge>
             )}
-            
+
             {hasChildren && (
               <div className="ml-auto">
                 {isExpanded ? (
@@ -106,4 +106,3 @@ export function SidebarMenuItem({ item }: SidebarMenuItemProps) {
     </div>
   );
 }
-

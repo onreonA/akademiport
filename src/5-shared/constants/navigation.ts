@@ -288,4 +288,3 @@ export function getNavigationByRole(role: UserRole): NavigationConfig {
       return COMPANY_USER_NAVIGATION;
   }
 }
-

@@ -25,7 +25,7 @@ export async function DELETE(
     const { id: programId, consultantId } = await params;
 
     // Get authenticated user
-    
+
     const user = await requireAuth(request);
     const userId = user.id;
     const userRole = user.role as UserRole;
@@ -66,4 +66,3 @@ export async function DELETE(
     );
   }
 }
-

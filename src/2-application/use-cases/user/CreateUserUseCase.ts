@@ -29,10 +29,7 @@ export class CreateUserUseCase {
 
       // 2. PROGRAM_MANAGER cannot create MASTER_ADMIN or PROGRAM_MANAGER
       if (request.userRole === UserRole.PROGRAM_MANAGER) {
-        if (
-          request.role === UserRole.MASTER_ADMIN ||
-          request.role === UserRole.PROGRAM_MANAGER
-        ) {
+        if (request.role === UserRole.MASTER_ADMIN || request.role === UserRole.PROGRAM_MANAGER) {
           return Result.fail('Program Manager bu role kullanıcı oluşturamaz');
         }
       }
@@ -42,14 +39,22 @@ export class CreateUserUseCase {
         return Result.fail('Email zorunludur');
       }
 
-      // 4. Validation: Full name is required
-      if (!request.fullName || !request.fullName.trim()) {
-        return Result.fail('Ad Soyad zorunludur');
+      // 4. Validation: First name and last name are required
+      if (!request.firstName || !request.firstName.trim()) {
+        return Result.fail('Ad zorunludur');
       }
 
-      // 5. Validation: Full name length
-      if (request.fullName.length < 2 || request.fullName.length > 100) {
-        return Result.fail('Ad Soyad 2-100 karakter arasında olmalıdır');
+      if (!request.lastName || !request.lastName.trim()) {
+        return Result.fail('Soyad zorunludur');
+      }
+
+      // 5. Validation: Name length
+      if (request.firstName.length < 2 || request.firstName.length > 100) {
+        return Result.fail('Ad 2-100 karakter arasında olmalıdır');
+      }
+
+      if (request.lastName.length < 2 || request.lastName.length > 100) {
+        return Result.fail('Soyad 2-100 karakter arasında olmalıdır');
       }
 
       // 6. Validation: Email format
@@ -84,7 +89,9 @@ export class CreateUserUseCase {
       // 10. Create user (Note: Supabase Auth user creation should be done before this)
       const createResult = await this.userRepository.create({
         email: request.email,
-        fullName: request.fullName,
+        firstName: request.firstName,
+        lastName: request.lastName,
+        fullName: `${request.firstName} ${request.lastName}`,
         password: request.password,
         phone: request.phone,
         role: request.role || UserRole.COMPANY_USER,
@@ -105,4 +112,3 @@ export class CreateUserUseCase {
     }
   }
 }
-

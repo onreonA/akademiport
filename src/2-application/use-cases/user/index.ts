@@ -21,4 +21,3 @@ export * from './AssignRoleUseCase';
 // Program Assignment
 export * from './AssignProgramUseCase';
 export * from './RemoveProgramUseCase';
-

@@ -1,6 +1,6 @@
 /**
  * Program Filter DTO
- * 
+ *
  * Data Transfer Object for filtering and searching programs
  */
 
@@ -62,7 +62,9 @@ export const ProgramFilterDtoValidation = {
 /**
  * Helper function to convert query params to filter DTO
  */
-export function createProgramFilterFromQuery(query: Record<string, string | string[] | undefined>): ProgramFilterDto {
+export function createProgramFilterFromQuery(
+  query: Record<string, string | string[] | undefined>
+): ProgramFilterDto {
   const filter: ProgramFilterDto = {};
 
   if (query.status && typeof query.status === 'string') {

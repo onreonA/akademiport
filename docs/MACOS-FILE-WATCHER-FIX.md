@@ -9,16 +9,19 @@
 ## ⚠️ Sorun
 
 ### Hata Mesajı
+
 ```
 Watchpack Error (watcher): Error: EMFILE: too many open files, watch
 ```
 
 ### Sebep
+
 - **macOS Limiti:** Varsayılan file descriptor limiti düşük (256-1024)
 - **Next.js/Turbopack:** Çok sayıda dosya izliyor (hot reload için)
 - **Proje Boyutu:** 200+ dosya, node_modules, .next cache
 
 ### Etki
+
 - ⚠️ Hot reload çalışmayabilir
 - ⚠️ Development server yavaşlayabilir
 - ⚠️ Build hatası verebilir
@@ -50,6 +53,7 @@ sudo nano /Library/LaunchDaemons/limit.maxfiles.plist
 ```
 
 **Dosya İçeriği:**
+
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -147,11 +151,11 @@ source ~/.bash_profile
 
 ## 📊 Limit Seviyeleri
 
-| Seviye | Soft Limit | Hard Limit | Kullanım |
-|--------|-----------|-----------|----------|
-| **Düşük** | 256 | 1024 | ❌ Küçük projeler |
-| **Orta** | 4096 | 8192 | ⚠️ Orta projeler |
-| **Yüksek** | 65536 | 200000 | ✅ Büyük projeler |
+| Seviye     | Soft Limit | Hard Limit | Kullanım          |
+| ---------- | ---------- | ---------- | ----------------- |
+| **Düşük**  | 256        | 1024       | ❌ Küçük projeler |
+| **Orta**   | 4096       | 8192       | ⚠️ Orta projeler  |
+| **Yüksek** | 65536      | 200000     | ✅ Büyük projeler |
 
 **Akademi Port:** Yüksek seviye gerekli (200+ dosya)
 
@@ -209,6 +213,7 @@ node_modules/
 ### Hala Hata Alıyorsanız
 
 1. **Terminal'i Yeniden Başlat:**
+
 ```bash
 # Mevcut process'leri durdur
 pkill -f "next dev"
@@ -219,17 +224,20 @@ ulimit -n
 ```
 
 2. **Bilgisayarı Yeniden Başlat:**
+
 ```bash
 sudo reboot
 ```
 
 3. **Limit Uygulandı mı Kontrol Et:**
+
 ```bash
 launchctl limit maxfiles
 ulimit -n
 ```
 
 4. **macOS Versiyonunu Kontrol Et:**
+
 ```bash
 sw_vers
 # Sonoma/Sequoia için yukarıdaki çözüm geçerli
@@ -259,7 +267,8 @@ sw_vers
 
 **Etki:** Düşük (Geçici çözümle çalışıyor)
 
-**Öneri:** 
+**Öneri:**
+
 1. Kalıcı çözümü uygula (LaunchDaemon)
 2. Bilgisayarı yeniden başlat
 3. Sprint 4'e devam et
@@ -276,4 +285,3 @@ sw_vers
 ---
 
 **Not:** Bu ayar bir kez yapıldığında tüm Node.js projeleri için geçerli olur. Sadece Akademi Port için değil.
-

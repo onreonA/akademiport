@@ -15,10 +15,7 @@ const updateProfileUseCase = new UpdateProfileUseCase(userRepository);
  * PATCH /api/users/[id]/profile
  * Update user profile (self-service)
  */
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     const body = await request.json();
@@ -68,4 +65,3 @@ export async function PATCH(
     );
   }
 }
-

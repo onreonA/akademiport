@@ -1,6 +1,6 @@
 /**
  * Create Program DTO
- * 
+ *
  * Data Transfer Object for creating a new program
  */
 

@@ -8,11 +8,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { UserRepository } from '@/4-infrastructure/database/repositories/UserRepository';
-import {
-  GetUserUseCase,
-  UpdateUserUseCase,
-  DeleteUserUseCase,
-} from '@/application/use-cases/user';
+import { GetUserUseCase, UpdateUserUseCase, DeleteUserUseCase } from '@/application/use-cases/user';
 import { UserRole } from '@/domain/enums/UserRole';
 import { requireAuth } from '@/4-infrastructure/api/helpers/auth';
 
@@ -175,4 +171,3 @@ export async function DELETE(
     );
   }
 }
-

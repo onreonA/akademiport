@@ -53,18 +53,12 @@ export class UpdateUserUseCase {
 
       // 4. PROGRAM_MANAGER restrictions: Cannot update MASTER_ADMIN or PROGRAM_MANAGER
       if (isProgramManager && !isMasterAdmin) {
-        if (
-          user.role === UserRole.MASTER_ADMIN ||
-          user.role === UserRole.PROGRAM_MANAGER
-        ) {
+        if (user.role === UserRole.MASTER_ADMIN || user.role === UserRole.PROGRAM_MANAGER) {
           return Result.fail('Program Manager bu kullanıcıyı güncelleyemez');
         }
 
         // Cannot assign MASTER_ADMIN or PROGRAM_MANAGER role
-        if (
-          request.role === UserRole.MASTER_ADMIN ||
-          request.role === UserRole.PROGRAM_MANAGER
-        ) {
+        if (request.role === UserRole.MASTER_ADMIN || request.role === UserRole.PROGRAM_MANAGER) {
           return Result.fail('Program Manager bu rolleri atayamaz');
         }
       }
@@ -111,4 +105,3 @@ export class UpdateUserUseCase {
     }
   }
 }
-

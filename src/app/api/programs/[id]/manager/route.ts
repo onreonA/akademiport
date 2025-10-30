@@ -17,16 +17,13 @@ const assignManagerUseCase = new AssignManagerUseCase(programRepository);
  * POST /api/programs/[id]/manager
  * Assign a manager to a program
  */
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id: programId } = await params;
     const body = await request.json();
 
     // Get authenticated user
-    
+
     const user = await requireAuth(request);
     const userId = user.id;
     const userRole = user.role as UserRole;
@@ -79,4 +76,3 @@ export async function POST(
     );
   }
 }
-

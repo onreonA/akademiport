@@ -63,4 +63,3 @@ export interface RemoveProgramDto {
  * - PROGRAM_MANAGER can remove users from their own programs
  * - Cannot remove if user has active tasks/projects in the program
  */
-

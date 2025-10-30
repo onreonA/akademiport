@@ -148,21 +148,26 @@ Desktop: > 1024px   → Expanded sidebar (default)
 ## 🎨 Design Tokens
 
 ### Sidebar
+
 - **Collapsed Width:** 64px (4rem)
 - **Expanded Width:** 256px (16rem)
 - **Transition:** 300ms ease-in-out
 
 ### Header
+
 - **Height:** 56px (3.5rem)
 - **Z-Index:** 50
 
 ### Sidebar
+
 - **Z-Index:** 40
 
 ### Mobile Overlay
+
 - **Z-Index:** 30
 
 ### Content
+
 - **Z-Index:** 10
 
 ## 🔧 Konfigürasyon
@@ -293,4 +298,3 @@ MIT
 **Son Güncelleme:** 29 Ekim 2025
 **Versiyon:** 1.0.0
 **Yazar:** AI Assistant + Ömer Ünsal
-

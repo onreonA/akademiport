@@ -1,6 +1,6 @@
 /**
  * Get Program Use Case
- * 
+ *
  * Business logic for retrieving a single program
  */
 

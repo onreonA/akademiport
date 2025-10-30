@@ -1,6 +1,6 @@
 /**
  * Program DTOs Index
- * 
+ *
  * Central export for all program-related DTOs
  */
 

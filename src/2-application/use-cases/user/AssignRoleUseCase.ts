@@ -38,10 +38,7 @@ export class AssignRoleUseCase {
       }
 
       // 3. Cannot assign role to self (except MASTER_ADMIN)
-      if (
-        request.assignedBy === request.userId &&
-        request.assignerRole !== UserRole.MASTER_ADMIN
-      ) {
+      if (request.assignedBy === request.userId && request.assignerRole !== UserRole.MASTER_ADMIN) {
         return Result.fail('Kendi rolünüzü değiştiremezsiniz');
       }
 
@@ -64,4 +61,3 @@ export class AssignRoleUseCase {
     }
   }
 }
-

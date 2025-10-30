@@ -1,6 +1,6 @@
 /**
  * Update Program DTO
- * 
+ *
  * Data Transfer Object for updating an existing program
  */
 

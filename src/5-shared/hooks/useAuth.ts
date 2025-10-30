@@ -38,8 +38,6 @@ export function useAuth() {
 
   const signIn = async (email: string, password: string, redirectTo?: string) => {
     try {
-      console.log('🔐 useAuth.signIn called with redirectTo:', redirectTo);
-
       const response = await fetch('/api/auth/signin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -54,13 +52,11 @@ export function useAuth() {
 
       setUser(data.data);
       const finalRedirect = redirectTo || '/dashboard';
-      console.log('✅ Login successful, redirecting to:', finalRedirect);
       router.push(finalRedirect);
       router.refresh();
 
       return { success: true };
     } catch (error) {
-      console.error('❌ Login error:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Giriş başarısız',

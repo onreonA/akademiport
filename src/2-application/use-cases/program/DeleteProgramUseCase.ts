@@ -1,6 +1,6 @@
 /**
  * Delete Program Use Case
- * 
+ *
  * Business logic for deleting a program
  */
 

@@ -1,6 +1,6 @@
 /**
  * Assign Manager Use Case
- * 
+ *
  * Business logic for assigning a program manager to a program
  */
 

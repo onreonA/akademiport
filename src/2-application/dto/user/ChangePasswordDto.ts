@@ -90,4 +90,3 @@ export function calculatePasswordStrength(password: string): {
     label: labels[score],
   };
 }
-

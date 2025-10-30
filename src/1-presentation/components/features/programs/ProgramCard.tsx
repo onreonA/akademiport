@@ -1,6 +1,6 @@
 /**
  * Program Card Component
- * 
+ *
  * Displays a program summary card with key information
  */
 
@@ -8,7 +8,13 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/presentation/components/ui/atoms/card';
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/presentation/components/ui/atoms/card';
 import { Badge } from '@/presentation/components/ui/atoms/badge';
 import { Button } from '@/presentation/components/ui/atoms/button';
 import { Calendar, MapPin, Users, Building2 } from 'lucide-react';
@@ -39,11 +45,11 @@ export function ProgramCard({ program, onEdit, onDelete }: ProgramCardProps) {
   };
 
   return (
-    <Card className="hover:shadow-lg transition-shadow">
-      <CardHeader>
+    <Card className="group hover:shadow-xl hover:scale-[1.02] transition-all duration-300 border-0 shadow-md bg-gradient-to-br from-card to-card/50">
+      <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            <CardTitle className="text-xl mb-2">
+            <CardTitle className="text-xl mb-2 group-hover:text-primary transition-colors">
               <Link
                 href={`/dashboard/programs/${program.id}`}
                 className="hover:text-primary transition-colors"
@@ -52,23 +58,25 @@ export function ProgramCard({ program, onEdit, onDelete }: ProgramCardProps) {
               </Link>
             </CardTitle>
             {program.description && (
-              <p className="text-sm text-muted-foreground line-clamp-2">
+              <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
                 {program.description}
               </p>
             )}
           </div>
-          <Badge className={statusColors[program.status]}>
+          <Badge className={`${statusColors[program.status]} font-medium px-3 py-1`}>
             {ProgramStatusLabels[program.status]}
           </Badge>
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-4">
         {/* Location */}
         {program.city && (
-          <div className="flex items-center gap-2 text-sm">
-            <MapPin className="h-4 w-4 text-muted-foreground" />
-            <span>
+          <div className="flex items-center gap-3 text-sm">
+            <div className="p-1.5 rounded-md bg-blue-100 dark:bg-blue-950">
+              <MapPin className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+            </div>
+            <span className="font-medium">
               {program.city}
               {program.region && ` - ${program.region}`}
             </span>
@@ -76,22 +84,41 @@ export function ProgramCard({ program, onEdit, onDelete }: ProgramCardProps) {
         )}
 
         {/* Dates */}
-        <div className="flex items-center gap-2 text-sm">
-          <Calendar className="h-4 w-4 text-muted-foreground" />
-          <span>
-            {formatDate(program.startDate)} - {formatDate(program.endDate)}
-          </span>
+        <div className="flex items-center gap-3 text-sm">
+          <div className="p-1.5 rounded-md bg-green-100 dark:bg-green-950">
+            <Calendar className="h-4 w-4 text-green-600 dark:text-green-400" />
+          </div>
+          <div className="flex flex-col">
+            <span className="font-medium">
+              {formatDate(program.startDate)} - {formatDate(program.endDate)}
+            </span>
+            <span className="text-xs text-muted-foreground">
+              {Math.ceil(
+                (new Date(program.endDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
+              )}{' '}
+              gün kaldı
+            </span>
+          </div>
         </div>
 
-        {/* Companies */}
-        <div className="flex items-center gap-2 text-sm">
-          <Building2 className="h-4 w-4 text-muted-foreground" />
-          <span>
-            {program.currentCompanies} / {program.maxCompanies} Firma
-          </span>
-          <div className="flex-1 bg-secondary rounded-full h-2 overflow-hidden">
+        {/* Companies Progress */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between text-sm">
+            <div className="flex items-center gap-3">
+              <div className="p-1.5 rounded-md bg-purple-100 dark:bg-purple-950">
+                <Building2 className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+              </div>
+              <span className="font-medium">
+                {program.currentCompanies} / {program.maxCompanies} Firma
+              </span>
+            </div>
+            <span className="text-xs text-muted-foreground">
+              {Math.round((program.currentCompanies / program.maxCompanies) * 100)}%
+            </span>
+          </div>
+          <div className="w-full bg-muted rounded-full h-2.5 overflow-hidden">
             <div
-              className="bg-primary h-full transition-all"
+              className="bg-gradient-to-r from-primary to-primary/80 h-full transition-all duration-500 ease-out"
               style={{
                 width: `${(program.currentCompanies / program.maxCompanies) * 100}%`,
               }}
@@ -101,24 +128,41 @@ export function ProgramCard({ program, onEdit, onDelete }: ProgramCardProps) {
 
         {/* Program Type */}
         {program.programType && (
-          <div className="flex items-center gap-2 text-sm">
-            <Users className="h-4 w-4 text-muted-foreground" />
-            <span>{program.programType}</span>
+          <div className="flex items-center gap-3 text-sm">
+            <div className="p-1.5 rounded-md bg-orange-100 dark:bg-orange-950">
+              <Users className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+            </div>
+            <span className="font-medium">{program.programType}</span>
           </div>
         )}
       </CardContent>
 
-      <CardFooter className="flex gap-2 justify-end">
-        <Button variant="outline" size="sm" asChild>
+      <CardFooter className="flex gap-2 justify-end pt-4">
+        <Button
+          variant="outline"
+          size="sm"
+          asChild
+          className="hover:bg-primary hover:text-primary-foreground transition-colors"
+        >
           <Link href={`/dashboard/programs/${program.id}`}>Detay</Link>
         </Button>
         {onEdit && (
-          <Button variant="outline" size="sm" onClick={() => onEdit(program)}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onEdit(program)}
+            className="hover:bg-secondary transition-colors"
+          >
             Düzenle
           </Button>
         )}
         {onDelete && (
-          <Button variant="destructive" size="sm" onClick={() => onDelete(program)}>
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={() => onDelete(program)}
+            className="hover:bg-destructive/90 transition-colors"
+          >
             Sil
           </Button>
         )}
@@ -126,4 +170,3 @@ export function ProgramCard({ program, onEdit, onDelete }: ProgramCardProps) {
     </Card>
   );
 }
-

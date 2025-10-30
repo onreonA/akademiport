@@ -175,7 +175,9 @@ function ConsultantProgramsContent() {
             <CardContent className="space-y-4">
               {/* Description */}
               {item.program.description && (
-                <p className="text-sm text-muted-foreground line-clamp-2">{item.program.description}</p>
+                <p className="text-sm text-muted-foreground line-clamp-2">
+                  {item.program.description}
+                </p>
               )}
 
               {/* Stats */}

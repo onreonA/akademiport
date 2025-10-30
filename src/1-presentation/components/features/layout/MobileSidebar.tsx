@@ -42,12 +42,7 @@ export function MobileSidebar() {
         <SheetHeader className="border-b px-4 py-3">
           <div className="flex items-center justify-between">
             <SheetTitle>Menü</SheetTitle>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={closeMobileSidebar}
-              className="h-8 w-8"
-            >
+            <Button variant="ghost" size="icon" onClick={closeMobileSidebar} className="h-8 w-8">
               <X className="h-4 w-4" />
             </Button>
           </div>
@@ -104,4 +99,3 @@ export function MobileSidebar() {
     </Sheet>
   );
 }
-

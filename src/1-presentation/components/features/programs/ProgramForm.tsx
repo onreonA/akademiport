@@ -1,6 +1,6 @@
 /**
  * Program Form Component
- * 
+ *
  * Form for creating and editing programs
  */
 
@@ -10,7 +10,13 @@ import * as React from 'react';
 import { Button } from '@/presentation/components/ui/atoms/button';
 import { Input } from '@/presentation/components/ui/atoms/input';
 import { Textarea } from '@/presentation/components/ui/atoms/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/presentation/components/ui/atoms/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/presentation/components/ui/atoms/select';
 import { Spinner } from '@/presentation/components/ui/atoms/spinner';
 import { ProgramStatus, ProgramStatusLabels } from '@/domain/enums/ProgramStatus';
 import type { Program } from '@/domain/entities/Program';
@@ -45,9 +51,7 @@ export function ProgramForm({ program, onSubmit, onCancel }: ProgramFormProps) {
     city: program?.city || '',
     region: program?.region || '',
     programType: program?.programType || '',
-    startDate: program?.startDate
-      ? new Date(program.startDate).toISOString().split('T')[0]
-      : '',
+    startDate: program?.startDate ? new Date(program.startDate).toISOString().split('T')[0] : '',
     endDate: program?.endDate ? new Date(program.endDate).toISOString().split('T')[0] : '',
     maxCompanies: program?.maxCompanies || 20,
     status: program?.status,
@@ -246,9 +250,7 @@ export function ProgramForm({ program, onSubmit, onCancel }: ProgramFormProps) {
             onChange={(e) => handleChange('maxCompanies', parseInt(e.target.value, 10))}
             className={errors.maxCompanies ? 'border-destructive' : ''}
           />
-          {errors.maxCompanies && (
-            <p className="text-sm text-destructive">{errors.maxCompanies}</p>
-          )}
+          {errors.maxCompanies && <p className="text-sm text-destructive">{errors.maxCompanies}</p>}
         </div>
       </div>
 
@@ -334,4 +336,3 @@ export function ProgramForm({ program, onSubmit, onCancel }: ProgramFormProps) {
     </form>
   );
 }
-

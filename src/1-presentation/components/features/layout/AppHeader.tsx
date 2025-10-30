@@ -27,10 +27,7 @@ interface AppHeaderProps {
 // =====================================================
 // COMPONENT
 // =====================================================
-export function AppHeader({
-  showBreadcrumbs = true,
-  showNotifications = true,
-}: AppHeaderProps) {
+export function AppHeader({ showBreadcrumbs = true, showNotifications = true }: AppHeaderProps) {
   const { theme, setTheme } = useTheme();
   const { toggleMobileSidebar } = useSidebar();
   const [notificationCount] = React.useState(3); // TODO: Connect to real notification system
@@ -90,12 +87,7 @@ export function AppHeader({
 
           {/* Notifications */}
           {showNotifications && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="relative"
-              title="Bildirimler"
-            >
+            <Button variant="ghost" size="icon" className="relative" title="Bildirimler">
               <Bell className="h-5 w-5" />
               {notificationCount > 0 && (
                 <Badge
@@ -127,4 +119,3 @@ export function AppHeader({
     </header>
   );
 }
-

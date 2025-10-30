@@ -7,7 +7,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Building2 } from 'lucide-react';
 import { Button } from '@/presentation/components/ui/atoms/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/presentation/components/ui/atoms/card';
 import { CompanyForm } from '@/presentation/components/features/companies';
@@ -98,52 +98,71 @@ export default function EditCompanyPage() {
   }
 
   return (
-    <div className="container mx-auto py-8 space-y-6">
-      {/* Header */}
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={() => router.back()}>
-          <ArrowLeft className="w-4 h-4" />
-        </Button>
-        <div>
-          <h1 className="text-3xl font-bold">Firma Düzenle</h1>
-          <p className="text-muted-foreground">{company.name}</p>
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
+      <div className="max-w-4xl mx-auto p-6 space-y-8">
+        {/* Header */}
+        <div className="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => router.back()}
+            className="hover:bg-primary/10 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+          </Button>
+          <div className="space-y-1">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              Firma Düzenle
+            </h1>
+            <p className="text-muted-foreground text-lg">
+              {company.name} - Firma bilgilerini güncelleyin
+            </p>
+          </div>
         </div>
-      </div>
 
-      {/* Form */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Firma Bilgileri</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <CompanyForm
-            initialData={{
-              programId: company.programId,
-              name: company.name,
-              legalName: company.legalName,
-              taxNumber: company.taxNumber,
-              tradeRegistryNumber: company.tradeRegistryNumber,
-              email: company.email,
-              phone: company.phone,
-              website: company.website,
-              address: company.address,
-              city: company.city,
-              district: company.district,
-              postalCode: company.postalCode,
-              country: company.country,
-              sector: company.sector,
-              subSector: company.subSector,
-              employeeCount: company.employeeCount,
-              foundationYear: company.foundationYear,
-              maxUsers: company.maxUsers,
-            }}
-            programs={programs}
-            onSubmit={handleSubmit}
-            onCancel={() => router.back()}
-            isLoading={loading}
-          />
-        </CardContent>
-      </Card>
+        {/* Form */}
+        <Card className="border-0 shadow-xl bg-card/50 backdrop-blur-sm">
+          <CardHeader className="border-b border-border/50">
+            <CardTitle className="flex items-center gap-2 text-xl">
+              <div className="p-2 rounded-lg bg-primary/10">
+                <Building2 className="h-5 w-5 text-primary" />
+              </div>
+              Firma Bilgileri
+            </CardTitle>
+            <p className="text-muted-foreground">
+              Firma bilgilerini güncelleyin ve değişiklikleri kaydedin
+            </p>
+          </CardHeader>
+          <CardContent className="p-8">
+            <CompanyForm
+              initialData={{
+                programId: company.programId,
+                name: company.name,
+                legalName: company.legalName,
+                taxNumber: company.taxNumber,
+                tradeRegistryNumber: company.tradeRegistryNumber,
+                email: company.email,
+                phone: company.phone,
+                website: company.website,
+                address: company.address,
+                city: company.city,
+                district: company.district,
+                postalCode: company.postalCode,
+                country: company.country,
+                sector: company.sector,
+                subSector: company.subSector,
+                employeeCount: company.employeeCount,
+                foundationYear: company.foundationYear,
+                maxUsers: company.maxUsers,
+              }}
+              programs={programs}
+              onSubmit={handleSubmit}
+              onCancel={() => router.back()}
+              isLoading={loading}
+            />
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

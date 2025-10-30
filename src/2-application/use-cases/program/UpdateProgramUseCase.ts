@@ -1,6 +1,6 @@
 /**
  * Update Program Use Case
- * 
+ *
  * Business logic for updating an existing program
  */
 
@@ -63,9 +63,7 @@ export class UpdateProgramUseCase {
 
       // 4. Business Rules: Date validation
       if (input.startDate || input.endDate) {
-        const startDate = input.startDate
-          ? new Date(input.startDate)
-          : existingProgram.startDate;
+        const startDate = input.startDate ? new Date(input.startDate) : existingProgram.startDate;
         const endDate = input.endDate ? new Date(input.endDate) : existingProgram.endDate;
 
         if (startDate >= endDate) {

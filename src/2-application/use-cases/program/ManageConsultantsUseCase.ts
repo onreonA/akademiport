@@ -1,6 +1,6 @@
 /**
  * Manage Consultants Use Case
- * 
+ *
  * Business logic for adding/removing consultants to/from a program
  */
 

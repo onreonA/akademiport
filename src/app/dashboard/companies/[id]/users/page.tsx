@@ -1,18 +1,27 @@
-'use client';
-
 /**
  * Company Users Management Page
- * Sprint 6: Company Management
+ * Sprint 7.5: Company User Management
  */
+
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, UserPlus, Users, Mail, Phone, Edit, Trash2, Shield } from 'lucide-react';
 import { Button } from '@/presentation/components/ui/atoms/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/presentation/components/ui/atoms/card';
-import { CompanyUsersList } from '@/presentation/components/features/companies';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from '@/presentation/components/ui/atoms/card';
+import { EmptyState } from '@/presentation/components/ui/atoms/empty-state';
+import { Badge } from '@/presentation/components/ui/atoms/badge';
+import { Spinner } from '@/presentation/components/ui/atoms/spinner';
 import type { Company } from '@/domain/entities/Company';
 import type { User } from '@/domain/entities/User';
+import { toast } from 'sonner';
 
 export default function CompanyUsersPage() {
   const router = useRouter();
@@ -57,11 +66,16 @@ export default function CompanyUsersPage() {
   };
 
   const handleAddUser = () => {
-    alert('Kullanıcı ekleme özelliği yakında eklenecek');
+    router.push(`/dashboard/companies/${id}/users/new`);
   };
 
-  const handleRemoveUser = async (userId: string) => {
-    if (!confirm('Bu kullanıcıyı çıkarmak istediğinizden emin misiniz?')) return;
+  const handleEditUser = (userId: string) => {
+    router.push(`/dashboard/companies/${id}/users/${userId}/edit`);
+  };
+
+  const handleRemoveUser = async (userId: string, userName: string) => {
+    if (!confirm(`${userName} kullanıcısını firmadan çıkarmak istediğinizden emin misiniz?`))
+      return;
 
     try {
       const response = await fetch(`/api/companies/${id}/users/${userId}`, {
@@ -71,21 +85,22 @@ export default function CompanyUsersPage() {
       const data = await response.json();
 
       if (data.success) {
+        toast.success('Kullanıcı başarıyla çıkarıldı');
         fetchUsers();
-        fetchCompany(); // Refresh to update currentUsers count
+        fetchCompany();
       } else {
-        alert(data.error || 'Kullanıcı çıkarılamadı');
+        toast.error(data.error || 'Kullanıcı çıkarılamadı');
       }
     } catch (error) {
       console.error('Failed to remove user:', error);
-      alert('Kullanıcı çıkarılamadı');
+      toast.error('Kullanıcı çıkarılamadı');
     }
   };
 
   if (loading) {
     return (
-      <div className="container mx-auto py-8">
-        <p className="text-center text-muted-foreground">Yükleniyor...</p>
+      <div className="flex items-center justify-center min-h-screen">
+        <Spinner size="lg" />
       </div>
     );
   }
@@ -98,34 +113,173 @@ export default function CompanyUsersPage() {
     );
   }
 
-  return (
-    <div className="container mx-auto py-8 space-y-6">
-      {/* Header */}
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={() => router.back()}>
-          <ArrowLeft className="w-4 h-4" />
-        </Button>
-        <div>
-          <h1 className="text-3xl font-bold">Kullanıcı Yönetimi</h1>
-          <p className="text-muted-foreground">{company.name}</p>
-        </div>
-      </div>
+  const canAddMore = company.currentUsers < company.maxUsers;
 
-      {/* Users List */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Firma Kullanıcıları</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <CompanyUsersList
-            users={users}
-            maxUsers={company.maxUsers}
-            onAddUser={handleAddUser}
-            onRemoveUser={handleRemoveUser}
-            canManage
-          />
-        </CardContent>
-      </Card>
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
+      <div className="container mx-auto p-6 space-y-8">
+        {/* Header */}
+        <div className="flex items-start justify-between">
+          <div className="flex items-start gap-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => router.back()}
+              className="hover:bg-primary/10 transition-colors mt-1"
+            >
+              <ArrowLeft className="w-4 h-4" />
+            </Button>
+            <div className="space-y-2">
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                Kullanıcı Yönetimi
+              </h1>
+              <p className="text-muted-foreground text-lg">{company.name}</p>
+              <div className="flex items-center gap-2">
+                <Badge variant={canAddMore ? 'default' : 'destructive'}>
+                  {company.currentUsers} / {company.maxUsers} Kullanıcı
+                </Badge>
+                {!canAddMore && (
+                  <Badge variant="outline" className="text-orange-500 border-orange-500">
+                    Limit Doldu
+                  </Badge>
+                )}
+              </div>
+            </div>
+          </div>
+          <Button onClick={handleAddUser} disabled={!canAddMore} className="hover-lift">
+            <UserPlus className="mr-2 h-4 w-4" />
+            Kullanıcı Ekle
+          </Button>
+        </div>
+
+        {/* Users List */}
+        <Card className="border-0 shadow-xl bg-card/50 backdrop-blur-sm">
+          <CardHeader className="border-b border-border/50">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2 text-xl">
+                  <Users className="w-5 h-5" />
+                  Firma Kullanıcıları
+                </CardTitle>
+                <CardDescription>
+                  Firmaya kayıtlı kullanıcıları görüntüleyin ve yönetin
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="p-6">
+            {users.length === 0 ? (
+              <EmptyState
+                icon={Users}
+                title="Henüz kullanıcı eklenmemiş"
+                description="Bu firmaya henüz kullanıcı eklenmemiş. Kullanıcı eklemek için yukarıdaki butonu kullanın."
+                action={
+                  canAddMore
+                    ? {
+                        label: 'İlk Kullanıcıyı Ekle',
+                        onClick: handleAddUser,
+                      }
+                    : undefined
+                }
+              />
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {users.map((user) => (
+                  <Card key={user.id} className="hover-lift border-border/50 transition-all">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold text-lg">
+                            {user.firstName?.[0]}
+                            {user.lastName?.[0]}
+                          </div>
+                          <div>
+                            <CardTitle className="text-base">
+                              {user.firstName} {user.lastName}
+                            </CardTitle>
+                            <div className="flex items-center gap-1 mt-1">
+                              <Badge
+                                variant={user.isActive ? 'default' : 'secondary'}
+                                className="text-xs"
+                              >
+                                {user.isActive ? 'Aktif' : 'Pasif'}
+                              </Badge>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <div className="space-y-2 text-sm">
+                        <div className="flex items-center gap-2 text-muted-foreground">
+                          <Mail className="w-4 h-4" />
+                          <span className="truncate">{user.email}</span>
+                        </div>
+                        {user.phone && (
+                          <div className="flex items-center gap-2 text-muted-foreground">
+                            <Phone className="w-4 h-4" />
+                            <span>{user.phone}</span>
+                          </div>
+                        )}
+                        <div className="flex items-center gap-2 text-muted-foreground">
+                          <Shield className="w-4 h-4" />
+                          <span>Firma Kullanıcısı</span>
+                        </div>
+                      </div>
+                      <div className="flex gap-2 pt-2 border-t border-border/50">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEditUser(user.id)}
+                          className="flex-1"
+                        >
+                          <Edit className="w-3 h-3 mr-1" />
+                          Düzenle
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() =>
+                            handleRemoveUser(user.id, `${user.firstName} ${user.lastName}`)
+                          }
+                          className="text-destructive hover:bg-destructive/10"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Info Card */}
+        {!canAddMore && (
+          <Card className="border-orange-500/20 bg-orange-500/5">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2 text-orange-600">
+                ⚠️ Kullanıcı Limiti Doldu
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                Bu firma maksimum kullanıcı sayısına ulaştı. Yeni kullanıcı eklemek için firma
+                limitini artırmanız gerekiyor.
+              </p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => router.push(`/dashboard/companies/${id}/edit`)}
+                className="mt-4"
+              >
+                Firmayı Düzenle
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+      </div>
     </div>
   );
 }

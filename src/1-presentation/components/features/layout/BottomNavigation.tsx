@@ -23,7 +23,7 @@ export function BottomNavigation() {
   if (!user) return null;
 
   const navigation = getNavigationByRole(user.role as UserRole);
-  
+
   // Show only first 4 main items in bottom nav
   const bottomNavItems = navigation.main.slice(0, 4);
 
@@ -57,4 +57,3 @@ export function BottomNavigation() {
     </nav>
   );
 }
-

@@ -27,7 +27,8 @@ import { Spinner } from '@/presentation/components/ui/atoms/spinner';
 // Form schema
 const userFormSchema = z.object({
   email: z.string().email('Geçerli bir email adresi girin'),
-  fullName: z.string().min(2, 'Ad Soyad en az 2 karakter olmalıdır').max(100),
+  firstName: z.string().min(2, 'Ad en az 2 karakter olmalıdır').max(100),
+  lastName: z.string().min(2, 'Soyad en az 2 karakter olmalıdır').max(100),
   password: z.string().min(8, 'Şifre en az 8 karakter olmalıdır').optional().or(z.literal('')),
   phone: z.string().optional(),
   role: z.nativeEnum(UserRole),
@@ -42,6 +43,8 @@ export interface UserFormProps {
   onSubmit: (data: UserFormData) => Promise<void>;
   onCancel?: () => void;
   isEdit?: boolean;
+  hideRoleSelection?: boolean;
+  hideCompanySelection?: boolean;
 }
 
 export const UserForm: React.FC<UserFormProps> = ({
@@ -49,6 +52,8 @@ export const UserForm: React.FC<UserFormProps> = ({
   onSubmit,
   onCancel,
   isEdit = false,
+  hideRoleSelection = false,
+  hideCompanySelection = false,
 }) => {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
@@ -62,7 +67,8 @@ export const UserForm: React.FC<UserFormProps> = ({
     resolver: zodResolver(userFormSchema),
     defaultValues: {
       email: initialData?.email || '',
-      fullName: initialData?.fullName || '',
+      firstName: initialData?.firstName || '',
+      lastName: initialData?.lastName || '',
       password: '',
       phone: initialData?.phone || '',
       role: initialData?.role || UserRole.COMPANY_USER,
@@ -103,18 +109,32 @@ export const UserForm: React.FC<UserFormProps> = ({
         {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
       </div>
 
-      {/* Full Name */}
+      {/* First Name */}
       <div className="space-y-2">
-        <Label htmlFor="fullName">
-          Ad Soyad <span className="text-destructive">*</span>
+        <Label htmlFor="firstName">
+          Ad <span className="text-destructive">*</span>
         </Label>
         <Input
-          id="fullName"
-          placeholder="Ahmet Yılmaz"
-          {...register('fullName')}
+          id="firstName"
+          placeholder="Ahmet"
+          {...register('firstName')}
           disabled={isSubmitting}
         />
-        {errors.fullName && <p className="text-sm text-destructive">{errors.fullName.message}</p>}
+        {errors.firstName && <p className="text-sm text-destructive">{errors.firstName.message}</p>}
+      </div>
+
+      {/* Last Name */}
+      <div className="space-y-2">
+        <Label htmlFor="lastName">
+          Soyad <span className="text-destructive">*</span>
+        </Label>
+        <Input
+          id="lastName"
+          placeholder="Yılmaz"
+          {...register('lastName')}
+          disabled={isSubmitting}
+        />
+        {errors.lastName && <p className="text-sm text-destructive">{errors.lastName.message}</p>}
       </div>
 
       {/* Password (only for create) */}
@@ -149,31 +169,33 @@ export const UserForm: React.FC<UserFormProps> = ({
       </div>
 
       {/* Role */}
-      <div className="space-y-2">
-        <Label htmlFor="role">
-          Rol <span className="text-destructive">*</span>
-        </Label>
-        <Select
-          value={selectedRole}
-          onValueChange={(value) => setValue('role', value as UserRole)}
-          disabled={isSubmitting}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Rol seçin" />
-          </SelectTrigger>
-          <SelectContent>
-            {Object.entries(UserRoleLabels).map(([key, label]) => (
-              <SelectItem key={key} value={key}>
-                {label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        {errors.role && <p className="text-sm text-destructive">{errors.role.message}</p>}
-      </div>
+      {!hideRoleSelection && (
+        <div className="space-y-2">
+          <Label htmlFor="role">
+            Rol <span className="text-destructive">*</span>
+          </Label>
+          <Select
+            value={selectedRole}
+            onValueChange={(value) => setValue('role', value as UserRole)}
+            disabled={isSubmitting}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Rol seçin" />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.entries(UserRoleLabels).map(([key, label]) => (
+                <SelectItem key={key} value={key}>
+                  {label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {errors.role && <p className="text-sm text-destructive">{errors.role.message}</p>}
+        </div>
+      )}
 
       {/* Company ID (conditional) */}
-      {isCompanyRequired && (
+      {!hideCompanySelection && isCompanyRequired && (
         <div className="space-y-2">
           <Label htmlFor="companyId">
             Firma ID <span className="text-destructive">*</span>

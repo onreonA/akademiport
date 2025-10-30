@@ -1,6 +1,6 @@
 /**
  * Program Detail Page
- * 
+ *
  * Detailed view of a single program with management options
  */
 
@@ -11,19 +11,30 @@ import { use } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/presentation/components/ui/atoms/button';
 import { Badge } from '@/presentation/components/ui/atoms/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/presentation/components/ui/atoms/card';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from '@/presentation/components/ui/atoms/card';
 import { Spinner } from '@/presentation/components/ui/atoms/spinner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/presentation/components/ui/atoms/tabs';
-import { 
-  Calendar, 
-  MapPin, 
-  Users, 
-  Building2, 
-  DollarSign, 
+import { EmptyState } from '@/presentation/components/ui/atoms/empty-state';
+import { StatCard } from '@/presentation/components/ui/atoms/stat-card';
+import {
+  Calendar,
+  MapPin,
+  Users,
+  Building2,
+  DollarSign,
   AlertCircle,
   ArrowLeft,
   Edit,
-  Trash2
+  Trash2,
+  TrendingUp,
+  Briefcase,
+  UserCheck,
 } from 'lucide-react';
 import type { Program } from '@/domain/entities/Program';
 import { ProgramStatusLabels } from '@/domain/enums/ProgramStatus';
@@ -34,6 +45,10 @@ export default function ProgramDetailPage({ params }: { params: Promise<{ id: st
   const [program, setProgram] = React.useState<Program | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
+  const [companies, setCompanies] = React.useState<any[]>([]);
+  const [consultants, setConsultants] = React.useState<any[]>([]);
+  const [loadingCompanies, setLoadingCompanies] = React.useState(false);
+  const [loadingConsultants, setLoadingConsultants] = React.useState(false);
 
   React.useEffect(() => {
     const fetchProgram = async () => {
@@ -59,9 +74,42 @@ export default function ProgramDetailPage({ params }: { params: Promise<{ id: st
     fetchProgram();
   }, [id]);
 
+  const fetchCompanies = async () => {
+    try {
+      setLoadingCompanies(true);
+      const response = await fetch(`/api/companies?programId=${id}`);
+      const data = await response.json();
+
+      if (data.success) {
+        setCompanies(data.data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch companies:', err);
+    } finally {
+      setLoadingCompanies(false);
+    }
+  };
+
+  const fetchConsultants = async () => {
+    try {
+      setLoadingConsultants(true);
+      // For now, fetch all consultants (programId filter will be implemented later)
+      const response = await fetch(`/api/users?role=consultant`);
+      const data = await response.json();
+
+      if (data.success) {
+        setConsultants(data.data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch consultants:', err);
+    } finally {
+      setLoadingConsultants(false);
+    }
+  };
+
   const handleDelete = async () => {
     if (!program) return;
-    
+
     if (!confirm(`"${program.name}" programını silmek istediğinizden emin misiniz?`)) {
       return;
     }
@@ -112,9 +160,7 @@ export default function ProgramDetailPage({ params }: { params: Promise<{ id: st
         <div className="flex flex-col items-center justify-center py-12 space-y-4">
           <AlertCircle className="h-12 w-12 text-destructive" />
           <p className="text-lg font-medium">{error || 'Program bulunamadı'}</p>
-          <Button onClick={() => router.push('/dashboard/programs')}>
-            Programlara Dön
-          </Button>
+          <Button onClick={() => router.push('/dashboard/programs')}>Programlara Dön</Button>
         </div>
       </div>
     );
@@ -129,174 +175,289 @@ export default function ProgramDetailPage({ params }: { params: Promise<{ id: st
   };
 
   return (
-    <div className="container mx-auto py-8 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => router.back()}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold">{program.name}</h1>
-            <p className="text-muted-foreground">{program.description}</p>
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
+      <div className="container mx-auto p-6 space-y-8">
+        {/* Header */}
+        <div className="flex items-start justify-between">
+          <div className="flex items-start gap-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => router.back()}
+              className="hover:bg-primary/10 transition-colors mt-1"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <div className="space-y-2">
+              <div className="flex items-center gap-3">
+                <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                  {program.name}
+                </h1>
+                <Badge className={statusColors[program.status]}>
+                  {ProgramStatusLabels[program.status]}
+                </Badge>
+              </div>
+              {program.description && (
+                <p className="text-muted-foreground text-lg">{program.description}</p>
+              )}
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => router.push(`/dashboard/programs/${id}/edit`)}
+              className="hover-lift"
+            >
+              <Edit className="mr-2 h-4 w-4" />
+              Düzenle
+            </Button>
+            <Button variant="destructive" size="sm" onClick={handleDelete} className="hover-lift">
+              <Trash2 className="mr-2 h-4 w-4" />
+              Sil
+            </Button>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Badge className={statusColors[program.status]}>
-            {ProgramStatusLabels[program.status]}
-          </Badge>
-          <Button variant="outline" size="sm">
-            <Edit className="mr-2 h-4 w-4" />
-            Düzenle
-          </Button>
-          <Button variant="destructive" size="sm" onClick={handleDelete}>
-            <Trash2 className="mr-2 h-4 w-4" />
-            Sil
-          </Button>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <StatCard
+            title="Konum"
+            value={program.city || 'Belirtilmemiş'}
+            description={program.region}
+            icon={MapPin}
+            color="blue"
+          />
+          <StatCard
+            title="Süre"
+            value={`${program.durationMonths || 0} Ay`}
+            description={`${formatDate(program.startDate)} - ${formatDate(program.endDate)}`}
+            icon={Calendar}
+            color="green"
+          />
+          <StatCard
+            title="Firmalar"
+            value={`${program.currentCompanies} / ${program.maxCompanies}`}
+            description={`%${Math.round((program.currentCompanies / program.maxCompanies) * 100)} doluluk`}
+            icon={Building2}
+            color="purple"
+            trend={{
+              value: program.currentCompanies,
+              direction: program.currentCompanies > 0 ? 'up' : 'neutral',
+              period: 'toplam',
+            }}
+          />
+          <StatCard
+            title="Bütçe"
+            value={program.budget ? formatCurrency(program.budget) : 'Belirtilmemiş'}
+            description={program.sponsor}
+            icon={DollarSign}
+            color="orange"
+          />
         </div>
+
+        {/* Tabs */}
+        <Card className="border-0 shadow-xl bg-card/50 backdrop-blur-sm">
+          <Tabs defaultValue="overview" className="space-y-6">
+            <CardHeader className="border-b border-border/50">
+              <TabsList className="bg-muted/50">
+                <TabsTrigger value="overview" className="data-[state=active]:bg-primary/10">
+                  <Briefcase className="w-4 h-4 mr-2" />
+                  Genel Bakış
+                </TabsTrigger>
+                <TabsTrigger
+                  value="companies"
+                  className="data-[state=active]:bg-primary/10"
+                  onClick={() => companies.length === 0 && fetchCompanies()}
+                >
+                  <Building2 className="w-4 h-4 mr-2" />
+                  Firmalar
+                </TabsTrigger>
+                <TabsTrigger
+                  value="consultants"
+                  className="data-[state=active]:bg-primary/10"
+                  onClick={() => consultants.length === 0 && fetchConsultants()}
+                >
+                  <UserCheck className="w-4 h-4 mr-2" />
+                  Danışmanlar
+                </TabsTrigger>
+              </TabsList>
+            </CardHeader>
+
+            <CardContent className="p-6">
+              <TabsContent value="overview" className="space-y-6 mt-0">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <Card className="border-border/50">
+                    <CardHeader>
+                      <CardTitle className="text-lg">Program Bilgileri</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium text-muted-foreground">Program Tipi</p>
+                        <p className="text-base font-medium">
+                          {program.programType || 'Belirtilmemiş'}
+                        </p>
+                      </div>
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium text-muted-foreground">Slug</p>
+                        <p className="text-base font-mono text-sm bg-muted px-2 py-1 rounded">
+                          {program.slug}
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-border/50">
+                    <CardHeader>
+                      <CardTitle className="text-lg">Zaman Bilgileri</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium text-muted-foreground">Oluşturulma</p>
+                        <p className="text-base font-medium">{formatDate(program.createdAt)}</p>
+                      </div>
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium text-muted-foreground">Son Güncelleme</p>
+                        <p className="text-base font-medium">{formatDate(program.updatedAt)}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                <Card className="border-border/50">
+                  <CardHeader>
+                    <CardTitle className="text-lg">İstatistikler</CardTitle>
+                    <CardDescription>Program performans göstergeleri</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/20">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm font-medium text-muted-foreground">
+                              Doluluk Oranı
+                            </p>
+                            <p className="text-2xl font-bold text-blue-600">
+                              %{Math.round((program.currentCompanies / program.maxCompanies) * 100)}
+                            </p>
+                          </div>
+                          <TrendingUp className="w-8 h-8 text-blue-500" />
+                        </div>
+                      </div>
+                      <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm font-medium text-muted-foreground">
+                              Aktif Firmalar
+                            </p>
+                            <p className="text-2xl font-bold text-green-600">
+                              {program.currentCompanies}
+                            </p>
+                          </div>
+                          <Building2 className="w-8 h-8 text-green-500" />
+                        </div>
+                      </div>
+                      <div className="p-4 rounded-lg bg-purple-500/10 border border-purple-500/20">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm font-medium text-muted-foreground">Kapasite</p>
+                            <p className="text-2xl font-bold text-purple-600">
+                              {program.maxCompanies}
+                            </p>
+                          </div>
+                          <Users className="w-8 h-8 text-purple-500" />
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="companies" className="mt-0">
+                {loadingCompanies ? (
+                  <div className="flex items-center justify-center py-12">
+                    <Spinner size="lg" />
+                  </div>
+                ) : companies.length === 0 ? (
+                  <EmptyState
+                    icon={Building2}
+                    title="Henüz firma eklenmemiş"
+                    description="Bu programa henüz firma eklenmemiş. Firma eklemek için firmalar sayfasına gidin."
+                    action={{
+                      label: 'Firma Ekle',
+                      onClick: () => router.push('/dashboard/companies/new'),
+                    }}
+                  />
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {companies.map((company) => (
+                      <Card
+                        key={company.id}
+                        className="hover-lift cursor-pointer border-border/50"
+                        onClick={() => router.push(`/dashboard/companies/${company.id}`)}
+                      >
+                        <CardHeader>
+                          <CardTitle className="text-base">{company.name}</CardTitle>
+                          <CardDescription>{company.legalName}</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <Users className="w-4 h-4" />
+                            <span>
+                              {company.currentUsers || 0} / {company.maxUsers} kullanıcı
+                            </span>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </TabsContent>
+
+              <TabsContent value="consultants" className="mt-0">
+                {loadingConsultants ? (
+                  <div className="flex items-center justify-center py-12">
+                    <Spinner size="lg" />
+                  </div>
+                ) : consultants.length === 0 ? (
+                  <EmptyState
+                    icon={UserCheck}
+                    title="Henüz danışman atanmamış"
+                    description="Bu programa henüz danışman atanmamış. Danışman atamak için kullanıcılar sayfasına gidin."
+                    action={{
+                      label: 'Danışman Ekle',
+                      onClick: () => router.push('/dashboard/users/new'),
+                    }}
+                  />
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {consultants.map((consultant) => (
+                      <Card
+                        key={consultant.id}
+                        className="hover-lift cursor-pointer border-border/50"
+                        onClick={() => router.push(`/dashboard/users/${consultant.id}`)}
+                      >
+                        <CardHeader>
+                          <CardTitle className="text-base">
+                            {consultant.firstName} {consultant.lastName}
+                          </CardTitle>
+                          <CardDescription>{consultant.email}</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <UserCheck className="w-4 h-4" />
+                            <span>Danışman</span>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </TabsContent>
+            </CardContent>
+          </Tabs>
+        </Card>
       </div>
-
-      {/* Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Location */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Konum</CardTitle>
-            <MapPin className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {program.city || 'Belirtilmemiş'}
-            </div>
-            {program.region && (
-              <p className="text-xs text-muted-foreground">{program.region}</p>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Duration */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Süre</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{program.durationMonths || 0} Ay</div>
-            <p className="text-xs text-muted-foreground">
-              {formatDate(program.startDate)} - {formatDate(program.endDate)}
-            </p>
-          </CardContent>
-        </Card>
-
-        {/* Companies */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Firmalar</CardTitle>
-            <Building2 className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {program.currentCompanies} / {program.maxCompanies}
-            </div>
-            <div className="mt-2 bg-secondary rounded-full h-2 overflow-hidden">
-              <div
-                className="bg-primary h-full transition-all"
-                style={{
-                  width: `${(program.currentCompanies / program.maxCompanies) * 100}%`,
-                }}
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Budget */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Bütçe</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {program.budget ? formatCurrency(program.budget) : 'Belirtilmemiş'}
-            </div>
-            {program.sponsor && (
-              <p className="text-xs text-muted-foreground">{program.sponsor}</p>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Tabs */}
-      <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="overview">Genel Bakış</TabsTrigger>
-          <TabsTrigger value="companies">Firmalar</TabsTrigger>
-          <TabsTrigger value="consultants">Danışmanlar</TabsTrigger>
-          <TabsTrigger value="settings">Ayarlar</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="overview" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Program Detayları</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Program Tipi</p>
-                  <p className="text-base">{program.programType || 'Belirtilmemiş'}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Slug</p>
-                  <p className="text-base font-mono text-sm">{program.slug}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Oluşturulma</p>
-                  <p className="text-base">{formatDate(program.createdAt)}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Son Güncelleme</p>
-                  <p className="text-base">{formatDate(program.updatedAt)}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="companies">
-          <Card>
-            <CardHeader>
-              <CardTitle>Firmalar</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">Firma listesi yakında eklenecek...</p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="consultants">
-          <Card>
-            <CardHeader>
-              <CardTitle>Danışmanlar</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">Danışman listesi yakında eklenecek...</p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="settings">
-          <Card>
-            <CardHeader>
-              <CardTitle>Ayarlar</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">Program ayarları yakında eklenecek...</p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
     </div>
   );
 }
-

@@ -47,10 +47,7 @@ export function Breadcrumbs() {
             {isLast ? (
               <span className="font-medium text-foreground">{crumb.label}</span>
             ) : (
-              <Link
-                href={crumb.href}
-                className="hover:text-foreground transition-colors"
-              >
+              <Link href={crumb.href} className="hover:text-foreground transition-colors">
                 {crumb.label}
               </Link>
             )}
@@ -96,17 +93,17 @@ function generateBreadcrumbs(pathname: string): BreadcrumbItem[] {
 
 function getSegmentLabel(segment: string): string {
   const labelMap: Record<string, string> = {
-    'dashboard': 'Dashboard',
-    'programs': 'Programlar',
-    'companies': 'Firmalar',
-    'users': 'Kullanıcılar',
-    'tasks': 'Görevler',
-    'trainings': 'Eğitimler',
-    'reports': 'Raporlar',
-    'settings': 'Ayarlar',
-    'profile': 'Profil',
-    'new': 'Yeni',
-    'edit': 'Düzenle',
+    dashboard: 'Dashboard',
+    programs: 'Programlar',
+    companies: 'Firmalar',
+    users: 'Kullanıcılar',
+    tasks: 'Görevler',
+    trainings: 'Eğitimler',
+    reports: 'Raporlar',
+    settings: 'Ayarlar',
+    profile: 'Profil',
+    new: 'Yeni',
+    edit: 'Düzenle',
     'consultant-dashboard': 'Danışman Paneli',
     'company-dashboard': 'Firma Paneli',
   };
@@ -116,9 +113,9 @@ function getSegmentLabel(segment: string): string {
 
 function getDetailLabel(parentSegment: string): string {
   const labelMap: Record<string, string> = {
-    'programs': 'Program Detayı',
-    'companies': 'Firma Detayı',
-    'users': 'Kullanıcı Detayı',
+    programs: 'Program Detayı',
+    companies: 'Firma Detayı',
+    users: 'Kullanıcı Detayı',
   };
 
   return labelMap[parentSegment] || 'Detay';
@@ -132,4 +129,3 @@ function isUUID(str: string): boolean {
 function capitalize(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
-

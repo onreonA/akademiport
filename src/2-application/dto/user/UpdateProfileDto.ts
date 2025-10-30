@@ -102,4 +102,3 @@ export const SupportedTimezones = [
 ] as const;
 
 export type Timezone = (typeof SupportedTimezones)[number];
-

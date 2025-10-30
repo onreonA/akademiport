@@ -1,184 +1,261 @@
-'use client';
-
 /**
- * Company Dashboard - Main Page
- * Sprint 6: Company Management
- * For COMPANY_ADMIN and COMPANY_USER roles
+ * Company Dashboard Page
+ * Sprint 7.5: Company User Management
  */
 
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { Building2, Users, Calendar, Activity } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/presentation/components/ui/atoms/card';
-import { Button } from '@/presentation/components/ui/atoms/button';
-import type { Company } from '@/domain/entities/Company';
-import type { User } from '@/domain/entities/User';
+'use client';
+
+import * as React from 'react';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/presentation/components/ui/atoms/card';
+import { StatCard } from '@/presentation/components/ui/atoms/stat-card';
+import { MetricCard } from '@/presentation/components/ui/atoms/metric-card';
+import { Spinner } from '@/presentation/components/ui/atoms/spinner';
+import {
+  Building2,
+  Users,
+  BookOpen,
+  CheckCircle,
+  Clock,
+  TrendingUp,
+  FolderKanban,
+  GraduationCap,
+} from 'lucide-react';
+
+interface CompanyDashboardData {
+  company: {
+    id: string;
+    name: string;
+    legalName: string;
+    programName: string;
+  };
+  stats: {
+    totalProjects: number;
+    completedProjects: number;
+    activeProjects: number;
+    totalTrainings: number;
+    completedTrainings: number;
+    totalUsers: number;
+    completionRate: number;
+  };
+}
 
 export default function CompanyDashboardPage() {
-  const router = useRouter();
-  const [company, setCompany] = useState<Company | null>(null);
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [data, setData] = React.useState<CompanyDashboardData | null>(null);
+  const [loading, setLoading] = React.useState(true);
 
-  useEffect(() => {
-    fetchCurrentUser();
+  React.useEffect(() => {
+    fetchDashboardData();
   }, []);
 
-  const fetchCurrentUser = async () => {
+  const fetchDashboardData = async () => {
     try {
-      const response = await fetch('/api/auth/me');
-      const data = await response.json();
+      const response = await fetch('/api/company-dashboard');
+      const result = await response.json();
 
-      if (data.success && data.user.companyId) {
-        fetchCompany(data.user.companyId);
-        fetchUsers(data.user.companyId);
+      if (result.success) {
+        setData(result.data);
       }
     } catch (error) {
-      console.error('Failed to fetch current user:', error);
+      console.error('Failed to fetch dashboard data:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchCompany = async (companyId: string) => {
-    try {
-      const response = await fetch(`/api/companies/${companyId}`);
-      const data = await response.json();
-
-      if (data.success) {
-        setCompany(data.data);
-      }
-    } catch (error) {
-      console.error('Failed to fetch company:', error);
-    }
-  };
-
-  const fetchUsers = async (companyId: string) => {
-    try {
-      const response = await fetch(`/api/companies/${companyId}/users`);
-      const data = await response.json();
-
-      if (data.success) {
-        setUsers(data.data);
-      }
-    } catch (error) {
-      console.error('Failed to fetch users:', error);
-    }
-  };
-
   if (loading) {
     return (
-      <div className="container mx-auto py-8">
-        <p className="text-center text-muted-foreground">Yükleniyor...</p>
+      <div className="flex items-center justify-center min-h-screen">
+        <Spinner size="lg" />
       </div>
     );
   }
 
-  if (!company) {
-    return (
-      <div className="container mx-auto py-8">
-        <p className="text-center text-muted-foreground">Firma bilgisi bulunamadı</p>
-      </div>
-    );
-  }
-
-  const stats = [
-    {
-      title: 'Firma Durumu',
-      value: company.isActive ? 'Aktif' : 'Pasif',
-      icon: Activity,
-      color: company.isActive ? 'text-green-600' : 'text-gray-600',
+  // Mock data for now (API will be implemented later)
+  const mockData: CompanyDashboardData = data || {
+    company: {
+      id: '1',
+      name: 'Demo Firma',
+      legalName: 'Demo Firma A.Ş.',
+      programName: 'E-İhracat Dönüşüm Programı',
     },
-    {
-      title: 'Toplam Kullanıcı',
-      value: `${company.currentUsers} / ${company.maxUsers}`,
-      icon: Users,
-      color: 'text-blue-600',
+    stats: {
+      totalProjects: 8,
+      completedProjects: 3,
+      activeProjects: 5,
+      totalTrainings: 12,
+      completedTrainings: 7,
+      totalUsers: 5,
+      completionRate: 58,
     },
-    {
-      title: 'Şehir',
-      value: company.city || '-',
-      icon: Building2,
-      color: 'text-purple-600',
-    },
-    {
-      title: 'Kuruluş Yılı',
-      value: company.foundationYear || '-',
-      icon: Calendar,
-      color: 'text-orange-600',
-    },
-  ];
+  };
 
   return (
-    <div className="container mx-auto py-8 space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold">{company.name}</h1>
-        <p className="text-muted-foreground">Firma Paneli</p>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {stats.map((stat) => {
-          const Icon = stat.icon;
-          return (
-            <Card key={stat.title}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
-                <Icon className={`w-4 h-4 ${stat.color}`} />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stat.value}</div>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
-
-      {/* Quick Actions */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Hızlı Erişim</CardTitle>
-        </CardHeader>
-        <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Button
-            variant="outline"
-            className="h-20"
-            onClick={() => router.push('/company-dashboard/profile')}
-          >
-            <Building2 className="w-5 h-5 mr-2" />
-            Firma Profili
-          </Button>
-          <Button
-            variant="outline"
-            className="h-20"
-            onClick={() => router.push('/company-dashboard/users')}
-          >
-            <Users className="w-5 h-5 mr-2" />
-            Kullanıcılar ({users.length})
-          </Button>
-          <Button
-            variant="outline"
-            className="h-20"
-            onClick={() => router.push('/company-dashboard/settings')}
-          >
-            <Activity className="w-5 h-5 mr-2" />
-            Ayarlar
-          </Button>
-        </CardContent>
-      </Card>
-
-      {/* Recent Activity */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Son Aktiviteler</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground text-center py-8">
-            Henüz aktivite bulunmuyor
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
+      <div className="container mx-auto p-6 space-y-8">
+        {/* Header */}
+        <div className="space-y-2">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            Firma Paneli
+          </h1>
+          <p className="text-muted-foreground text-lg">
+            {mockData.company.name} - {mockData.company.programName}
           </p>
-        </CardContent>
-      </Card>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <StatCard
+            title="Toplam Projeler"
+            value={mockData.stats.totalProjects.toString()}
+            description="Tüm projeler"
+            icon={FolderKanban}
+            color="blue"
+            trend={{
+              value: mockData.stats.activeProjects,
+              direction: 'up',
+              period: 'aktif',
+            }}
+          />
+          <StatCard
+            title="Tamamlanan Projeler"
+            value={mockData.stats.completedProjects.toString()}
+            description="Başarıyla tamamlandı"
+            icon={CheckCircle}
+            color="green"
+          />
+          <StatCard
+            title="Eğitimler"
+            value={`${mockData.stats.completedTrainings}/${mockData.stats.totalTrainings}`}
+            description="Tamamlanan eğitimler"
+            icon={GraduationCap}
+            color="purple"
+          />
+          <StatCard
+            title="Kullanıcılar"
+            value={mockData.stats.totalUsers.toString()}
+            description="Aktif kullanıcı"
+            icon={Users}
+            color="orange"
+          />
+        </div>
+
+        {/* Progress Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <MetricCard
+            title="Proje Tamamlanma"
+            value={mockData.stats.completionRate}
+            description="Genel ilerleme oranı"
+            icon={TrendingUp}
+            color="blue"
+            showProgress
+          />
+          <MetricCard
+            title="Eğitim Tamamlanma"
+            value={Math.round(
+              (mockData.stats.completedTrainings / mockData.stats.totalTrainings) * 100
+            )}
+            description="Eğitim ilerleme oranı"
+            icon={BookOpen}
+            color="green"
+            showProgress
+          />
+        </div>
+
+        {/* Quick Actions */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <Card className="hover-lift border-border/50 cursor-pointer transition-all">
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <div className="p-3 rounded-lg bg-blue-500/10">
+                  <FolderKanban className="w-6 h-6 text-blue-500" />
+                </div>
+                <div>
+                  <CardTitle className="text-lg">Projelerim</CardTitle>
+                  <CardDescription>Proje listesi ve detayları</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                {mockData.stats.activeProjects} aktif proje
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="hover-lift border-border/50 cursor-pointer transition-all">
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <div className="p-3 rounded-lg bg-green-500/10">
+                  <GraduationCap className="w-6 h-6 text-green-500" />
+                </div>
+                <div>
+                  <CardTitle className="text-lg">Eğitimlerim</CardTitle>
+                  <CardDescription>Eğitim materyalleri</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                {mockData.stats.totalTrainings - mockData.stats.completedTrainings} eğitim devam
+                ediyor
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="hover-lift border-border/50 cursor-pointer transition-all">
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <div className="p-3 rounded-lg bg-purple-500/10">
+                  <Users className="w-6 h-6 text-purple-500" />
+                </div>
+                <div>
+                  <CardTitle className="text-lg">Ekibim</CardTitle>
+                  <CardDescription>Firma kullanıcıları</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">{mockData.stats.totalUsers} kullanıcı</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Info Card */}
+        <Card className="border-blue-500/20 bg-blue-500/5">
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Building2 className="w-5 h-5 text-blue-500" />
+              Firma Bilgileri
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div>
+                <p className="text-muted-foreground">Firma Adı</p>
+                <p className="font-medium">{mockData.company.name}</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">Yasal Ünvan</p>
+                <p className="font-medium">{mockData.company.legalName}</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">Program</p>
+                <p className="font-medium">{mockData.company.programName}</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">Durum</p>
+                <p className="font-medium text-green-600">Aktif</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

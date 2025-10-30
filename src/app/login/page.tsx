@@ -26,15 +26,11 @@ function LoginForm() {
   const searchParams = useSearchParams();
   const redirect = searchParams.get('redirect');
 
-  // Debug: redirect parametresini konsola yazdır
-  console.log('🔍 Login Page - Redirect parameter:', redirect);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
-    console.log('🚀 Signing in with redirect:', redirect);
     const result = await signIn(email, password, redirect || undefined);
 
     if (!result.success) {

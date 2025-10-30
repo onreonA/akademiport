@@ -8,7 +8,9 @@ import { UserRole } from '@/domain/enums/UserRole';
 
 export interface CreateUserDto {
   email: string;
-  fullName: string;
+  firstName: string;
+  lastName: string;
+  fullName?: string;
   password: string;
   phone?: string;
   role?: UserRole;
@@ -22,7 +24,9 @@ export interface CreateUserDto {
 /**
  * Validation Rules:
  * - email: Required, valid email format
- * - fullName: Required, min 2 chars, max 100 chars
+ * - firstName: Required, min 2 chars, max 100 chars
+ * - lastName: Required, min 2 chars, max 100 chars
+ * - fullName: Optional, will be auto-generated from firstName + lastName
  * - password: Required, min 8 chars, must contain uppercase, lowercase, number
  * - phone: Optional, valid phone format
  * - role: Optional, defaults to COMPANY_USER
@@ -32,4 +36,3 @@ export interface CreateUserDto {
  * - socialLinks: Optional, object with social media links
  * - createdBy: Optional, user ID who created this user
  */
-

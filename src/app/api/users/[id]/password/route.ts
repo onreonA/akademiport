@@ -16,10 +16,7 @@ const changePasswordUseCase = new ChangePasswordUseCase(userRepository);
  * PATCH /api/users/[id]/password
  * Change user password
  */
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     const body = await request.json();
@@ -77,4 +74,3 @@ export async function PATCH(
     );
   }
 }
-

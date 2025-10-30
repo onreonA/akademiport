@@ -90,13 +90,36 @@ export class UserRepository implements IUserRepository {
     try {
       const supabase = await createClient();
 
-      // Note: Password hashing and Supabase Auth user creation
-      // should be handled by AuthService before calling this method
+      // 1. Create Supabase Auth user first
+      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+        email: dto.email,
+        password: dto.password,
+        email_confirm: true, // Auto-confirm email
+        user_metadata: {
+          first_name: dto.firstName,
+          last_name: dto.lastName,
+          full_name: dto.fullName || `${dto.firstName} ${dto.lastName}`,
+          role: dto.role || UserRole.COMPANY_USER,
+        },
+      });
+
+      if (authError) {
+        return Result.fail(authError.message);
+      }
+
+      if (!authData.user) {
+        return Result.fail('Supabase Auth kullanıcısı oluşturulamadı');
+      }
+
+      // 2. Insert into public.users table with the same ID
       const { data, error } = await supabase
         .from(this.tableName)
         .insert({
+          id: authData.user.id, // Use the same ID from Auth
           email: dto.email,
-          full_name: dto.fullName,
+          first_name: dto.firstName,
+          last_name: dto.lastName,
+          full_name: dto.fullName || `${dto.firstName} ${dto.lastName}`,
           phone: dto.phone,
           role: dto.role || UserRole.COMPANY_USER,
           company_id: dto.companyId,
@@ -104,7 +127,7 @@ export class UserRepository implements IUserRepository {
           expertise_areas: dto.expertiseAreas,
           social_links: dto.socialLinks,
           is_active: true,
-          is_email_verified: false,
+          is_email_verified: true, // Auto-confirmed
           created_by: dto.createdBy,
           updated_by: dto.createdBy,
         })
@@ -112,6 +135,8 @@ export class UserRepository implements IUserRepository {
         .single();
 
       if (error) {
+        // Rollback: Delete the auth user if public.users insert fails
+        await supabase.auth.admin.deleteUser(authData.user.id);
         return Result.fail(error.message);
       }
 
@@ -664,6 +689,8 @@ export class UserRepository implements IUserRepository {
     return {
       id: data.id as string,
       email: data.email as string,
+      firstName: data.first_name as string | undefined,
+      lastName: data.last_name as string | undefined,
       fullName: data.full_name as string,
       phone: data.phone as string | undefined,
       avatarUrl: data.avatar_url as string | undefined,

@@ -265,7 +265,9 @@ export class ProgramRepository implements IProgramRepository {
     }
   }
 
-  async getConsultants(programId: string): Promise<Result<import('@/domain/entities/User').User[]>> {
+  async getConsultants(
+    programId: string
+  ): Promise<Result<import('@/domain/entities/User').User[]>> {
     try {
       const supabase = await createClient();
 

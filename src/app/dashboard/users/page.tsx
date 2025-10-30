@@ -99,48 +99,73 @@ export default function UsersPage() {
   };
 
   return (
-    <div className="container mx-auto py-8 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Kullanıcılar</h1>
-          <p className="text-muted-foreground">Sistem kullanıcılarını yönetin</p>
-        </div>
-        <Button onClick={() => router.push('/dashboard/users/new')}>
-          <Plus className="h-4 w-4 mr-1" />
-          Yeni Kullanıcı
-        </Button>
-      </div>
-
-      {/* Filters */}
-      <UserFilters onFilterChange={handleFilterChange} initialFilters={filters} />
-
-      {/* Users Grid */}
-      {loading ? (
-        <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
-      ) : users.length === 0 ? (
-        <div className="text-center py-12 border rounded-lg bg-card">
-          <p className="text-muted-foreground mb-4">Kullanıcı bulunamadı</p>
-          <Button onClick={() => router.push('/dashboard/users/new')} variant="outline">
-            <Plus className="h-4 w-4 mr-1" />
-            İlk Kullanıcıyı Oluştur
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
+      <div className="max-w-7xl mx-auto p-6 space-y-8">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div className="space-y-1">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              Kullanıcılar
+            </h1>
+            <p className="text-muted-foreground text-lg">Sistem kullanıcılarını yönetin</p>
+            <div className="flex items-center gap-4 mt-2">
+              <div className="text-sm text-muted-foreground">{users.length} kullanıcı</div>
+            </div>
+          </div>
+          <Button
+            onClick={() => router.push('/dashboard/users/new')}
+            className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white shadow-lg hover:shadow-xl transition-all duration-300"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Yeni Kullanıcı
           </Button>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {users.map((user) => (
-            <UserCard
-              key={user.id}
-              user={user}
-              onView={handleView}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-            />
-          ))}
+
+        {/* Filters */}
+        <div className="bg-card/50 backdrop-blur-sm border border-primary/20 rounded-xl p-6 shadow-lg">
+          <UserFilters onFilterChange={handleFilterChange} initialFilters={filters} />
         </div>
-      )}
+
+        {/* Users Grid */}
+        {loading ? (
+          <div className="flex items-center justify-center py-16">
+            <div className="text-center space-y-4">
+              <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto" />
+              <div className="text-lg text-muted-foreground">Kullanıcılar yükleniyor...</div>
+            </div>
+          </div>
+        ) : users.length === 0 ? (
+          <div className="text-center py-16">
+            <div className="w-20 h-20 mx-auto rounded-full bg-muted flex items-center justify-center mb-6">
+              <Plus className="h-10 w-10 text-muted-foreground" />
+            </div>
+            <h3 className="text-xl font-semibold mb-2">Kullanıcı Bulunamadı</h3>
+            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+              Henüz hiç kullanıcı oluşturulmamış. İlk kullanıcınızı ekleyerek başlayın.
+            </p>
+            <Button
+              onClick={() => router.push('/dashboard/users/new')}
+              variant="outline"
+              className="hover:bg-primary hover:text-primary-foreground transition-colors"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              İlk Kullanıcıyı Oluştur
+            </Button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {users.map((user) => (
+              <UserCard
+                key={user.id}
+                user={user}
+                onView={handleView}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+              />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

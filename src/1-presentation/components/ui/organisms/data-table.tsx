@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { cn } from '@/presentation/lib/utils';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../atoms/table';
-import { Button } from '../atoms/button';
 import { SearchInput } from '../molecules/search-input';
 import { Pagination } from '../molecules/pagination';
 import { ChevronDown, ChevronUp, ChevronsUpDown } from 'lucide-react';
