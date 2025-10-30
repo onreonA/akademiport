@@ -5,10 +5,10 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { UserRepository } from '@/infrastructure/database/repositories/UserRepository';
+import { UserRepository } from '@/4-infrastructure/database/repositories/UserRepository';
 import { AssignRoleUseCase } from '@/application/use-cases/user';
 import { UserRole } from '@/domain/enums/UserRole';
-import { requireAuth } from '@/infrastructure/api/helpers/auth';
+import { requireAuth } from '@/4-infrastructure/api/helpers/auth';
 
 const userRepository = new UserRepository();
 const assignRoleUseCase = new AssignRoleUseCase(userRepository);

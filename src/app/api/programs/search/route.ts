@@ -5,7 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { ProgramRepository } from '@/infrastructure/database/repositories/ProgramRepository';
+import { ProgramRepository } from '@/4-infrastructure/database/repositories/ProgramRepository';
 
 const programRepository = new ProgramRepository();
 

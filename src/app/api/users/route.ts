@@ -6,10 +6,10 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { UserRepository } from '@/infrastructure/database/repositories/UserRepository';
+import { UserRepository } from '@/4-infrastructure/database/repositories/UserRepository';
 import { CreateUserUseCase, ListUsersUseCase } from '@/application/use-cases/user';
 import { UserRole } from '@/domain/enums/UserRole';
-import { requireAuth } from '@/infrastructure/api/helpers/auth';
+import { requireAuth } from '@/4-infrastructure/api/helpers/auth';
 import { createUserFilterFromQuery } from '@/application/dto/user';
 
 const userRepository = new UserRepository();

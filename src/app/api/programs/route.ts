@@ -6,12 +6,12 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { ProgramRepository } from '@/infrastructure/database/repositories/ProgramRepository';
+import { ProgramRepository } from '@/4-infrastructure/database/repositories/ProgramRepository';
 import { CreateProgramUseCase, ListProgramsUseCase } from '@/application/use-cases/program';
 import { UserRole } from '@/domain/enums/UserRole';
 import { ProgramStatus } from '@/domain/enums/ProgramStatus';
 import type { ProgramSortField } from '@/application/dto/program/ProgramFilterDto';
-import { requireAuth } from '@/infrastructure/api/helpers/auth';
+import { requireAuth } from '@/4-infrastructure/api/helpers/auth';
 
 const programRepository = new ProgramRepository();
 const createProgramUseCase = new CreateProgramUseCase(programRepository);

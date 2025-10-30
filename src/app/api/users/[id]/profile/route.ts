@@ -5,7 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { UserRepository } from '@/infrastructure/database/repositories/UserRepository';
+import { UserRepository } from '@/4-infrastructure/database/repositories/UserRepository';
 import { UpdateProfileUseCase } from '@/application/use-cases/user';
 
 const userRepository = new UserRepository();

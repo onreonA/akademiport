@@ -6,9 +6,9 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { CompanyRepository } from '@/infrastructure/database/repositories/CompanyRepository';
+import { CompanyRepository } from '@/4-infrastructure/database/repositories/CompanyRepository';
 import { RemoveCompanyUserUseCase } from '@/application/use-cases/company';
-import { requireAuth } from '@/infrastructure/api/helpers/auth';
+import { requireAuth } from '@/4-infrastructure/api/helpers/auth';
 import { UserRole } from '@/domain/enums/UserRole';
 
 const companyRepository = new CompanyRepository();

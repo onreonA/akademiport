@@ -7,12 +7,12 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { ProgramRepository } from '@/infrastructure/database/repositories/ProgramRepository';
-import { UserRepository } from '@/infrastructure/database/repositories/UserRepository';
-import { CompanyRepository } from '@/infrastructure/database/repositories/CompanyRepository';
+import { ProgramRepository } from '@/4-infrastructure/database/repositories/ProgramRepository';
+import { UserRepository } from '@/4-infrastructure/database/repositories/UserRepository';
+import { CompanyRepository } from '@/4-infrastructure/database/repositories/CompanyRepository';
 import { ListConsultantProgramsUseCase } from '@/application/use-cases/consultant';
 import { parseConsultantProgramFilterParams } from '@/application/dto/consultant';
-import { requireAuth } from '@/infrastructure/api/helpers/auth';
+import { requireAuth } from '@/4-infrastructure/api/helpers/auth';
 import { UserRole } from '@/domain/enums/UserRole';
 
 const programRepository = new ProgramRepository();
