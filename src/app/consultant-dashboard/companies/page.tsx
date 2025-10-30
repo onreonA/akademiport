@@ -1,7 +1,7 @@
 /**
  * Consultant Companies Page
  * Sprint 7: Consultant Management
- * 
+ *
  * Tüm programlardaki firmaları listeler
  */
 
@@ -17,9 +17,7 @@ export default function ConsultantCompaniesPage() {
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Firmalar</h1>
-          <p className="text-muted-foreground mt-2">
-            Atandığınız programlardaki tüm firmalar
-          </p>
+          <p className="text-muted-foreground mt-2">Atandığınız programlardaki tüm firmalar</p>
         </div>
 
         <ConsultantCompanyList />
@@ -27,4 +25,3 @@ export default function ConsultantCompaniesPage() {
     </ConsultantProgramProvider>
   );
 }
-

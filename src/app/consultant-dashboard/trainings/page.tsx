@@ -20,11 +20,8 @@ export default function ConsultantTrainingsPage() {
       <Card className="p-12 text-center">
         <GraduationCap className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
         <h3 className="text-lg font-semibold mb-2">Yakında</h3>
-        <p className="text-muted-foreground">
-          Eğitim yönetimi özelliği Sprint 9'da eklenecek.
-        </p>
+        <p className="text-muted-foreground">Eğitim yönetimi özelliği Sprint 9'da eklenecek.</p>
       </Card>
     </div>
   );
 }
-

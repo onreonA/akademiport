@@ -20,11 +20,8 @@ export default function ConsultantTasksPage() {
       <Card className="p-12 text-center">
         <ListTodo className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
         <h3 className="text-lg font-semibold mb-2">Yakında</h3>
-        <p className="text-muted-foreground">
-          Görev yönetimi özelliği Sprint 8'de eklenecek.
-        </p>
+        <p className="text-muted-foreground">Görev yönetimi özelliği Sprint 8'de eklenecek.</p>
       </Card>
     </div>
   );
 }
-

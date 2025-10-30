@@ -20,14 +20,14 @@ import {
 import { Badge } from '@/presentation/components/ui/atoms/badge';
 import { Button } from '@/presentation/components/ui/atoms/button';
 import { Skeleton } from '@/presentation/components/ui/atoms/skeleton';
-import { useConsultantProgram } from '@/shared/contexts/ConsultantProgramContext';
+import { ConsultantProgramProvider, useConsultantProgram } from '@/shared/contexts/ConsultantProgramContext';
 import type { ConsultantProgramDto } from '@/application/dto/consultant';
 import { ProgramStatus } from '@/domain/enums/ProgramStatus';
 
 // =====================================================
-// COMPONENT
+// INNER COMPONENT
 // =====================================================
-export default function ConsultantProgramsPage() {
+function ConsultantProgramsContent() {
   const router = useRouter();
   const { programs, setPrograms, setSelectedProgram, isLoading, setIsLoading } = useConsultantProgram();
   const [allPrograms, setAllPrograms] = useState<ConsultantProgramDto[]>([]);
@@ -218,3 +218,13 @@ export default function ConsultantProgramsPage() {
   );
 }
 
+// =====================================================
+// PAGE COMPONENT (with Provider)
+// =====================================================
+export default function ConsultantProgramsPage() {
+  return (
+    <ConsultantProgramProvider>
+      <ConsultantProgramsContent />
+    </ConsultantProgramProvider>
+  );
+}
