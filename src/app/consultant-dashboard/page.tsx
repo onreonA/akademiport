@@ -224,6 +224,60 @@ function ConsultantDashboardContent() {
               />
             </div>
 
+            {/* Quick Actions */}
+            <Card className="border-primary/20 shadow-lg">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Activity className="h-5 w-5" />
+                  Hızlı İşlemler
+                </CardTitle>
+                <CardDescription>Sık kullanılan işlemler için kısayollar</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <Button
+                    variant="outline"
+                    className="h-auto flex-col items-start p-4 hover:bg-primary/5 hover:border-primary transition-all"
+                    onClick={() => alert('Görev atama özelliği Sprint 8\'de eklenecek')}
+                  >
+                    <CheckCircle className="h-6 w-6 mb-2 text-primary" />
+                    <div className="text-left">
+                      <div className="font-semibold">Görev Ata</div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        Firmaya yeni görev oluştur
+                      </div>
+                    </div>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="h-auto flex-col items-start p-4 hover:bg-primary/5 hover:border-primary transition-all"
+                    onClick={() => alert('Randevu oluşturma özelliği Sprint 11\'de eklenecek')}
+                  >
+                    <Clock className="h-6 w-6 mb-2 text-primary" />
+                    <div className="text-left">
+                      <div className="font-semibold">Randevu Oluştur</div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        Firma ile görüşme planla
+                      </div>
+                    </div>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="h-auto flex-col items-start p-4 hover:bg-primary/5 hover:border-primary transition-all"
+                    onClick={() => alert('Eğitim atama özelliği Sprint 9\'da eklenecek')}
+                  >
+                    <Users className="h-6 w-6 mb-2 text-primary" />
+                    <div className="text-left">
+                      <div className="font-semibold">Eğitim Ata</div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        Firmaya eğitim içeriği paylaş
+                      </div>
+                    </div>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Companies List */}
             <ConsultantCompanyList onCompanyClick={handleCompanyClick} />
 
