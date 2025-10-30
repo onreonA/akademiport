@@ -32,7 +32,16 @@ export default function UsersPage() {
   // Fetch users
   useEffect(() => {
     fetchUsers();
-  }, [filters]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    filters.search,
+    filters.role,
+    filters.isActive,
+    filters.sortBy,
+    filters.sortOrder,
+    filters.page,
+    filters.limit,
+  ]);
 
   const fetchUsers = async () => {
     setLoading(true);

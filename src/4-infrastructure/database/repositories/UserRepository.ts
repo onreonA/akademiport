@@ -30,11 +30,7 @@ export class UserRepository implements IUserRepository {
   async findById(id: string): Promise<Result<User | null>> {
     try {
       const supabase = await createClient();
-      const { data, error } = await supabase
-        .from(this.tableName)
-        .select('*')
-        .eq('id', id)
-        .single();
+      const { data, error } = await supabase.from(this.tableName).select('*').eq('id', id).single();
 
       if (error) {
         if (error.code === 'PGRST116') {
@@ -217,7 +213,7 @@ export class UserRepository implements IUserRepository {
         .select('*')
         .eq('company_id', companyId)
         .eq('is_active', true)
-        .order('created_at', { ascending: false});
+        .order('created_at', { ascending: false });
 
       if (error) {
         return Result.fail(error.message);
@@ -452,6 +448,7 @@ export class UserRepository implements IUserRepository {
 
   async getPrograms(userId: string): Promise<Result<Program[]>> {
     try {
+      console.log('🔍 UserRepository.getPrograms - Start', { userId });
       const supabase = await createClient();
 
       // Join user_programs with programs
@@ -488,7 +485,10 @@ export class UserRepository implements IUserRepository {
         .eq('user_id', userId)
         .eq('is_active', true);
 
+      console.log('📊 Query result:', { error: error?.message, dataLength: data?.length });
+
       if (error) {
+        console.error('❌ Supabase error:', error);
         return Result.fail(error.message);
       }
 
@@ -500,8 +500,10 @@ export class UserRepository implements IUserRepository {
         })
         .filter((program): program is Program => program !== null);
 
+      console.log('✅ Programs mapped:', programs.length);
       return Result.ok(programs);
     } catch (error) {
+      console.error('💥 UserRepository.getPrograms - Exception:', error);
       return Result.fail(error instanceof Error ? error.message : 'Programlar alınamadı');
     }
   }
@@ -590,9 +592,7 @@ export class UserRepository implements IUserRepository {
 
       return Result.ok(undefined);
     } catch (error) {
-      return Result.fail(
-        error instanceof Error ? error.message : 'Kullanıcı deaktifleştirilemedi'
-      );
+      return Result.fail(error instanceof Error ? error.message : 'Kullanıcı deaktifleştirilemedi');
     }
   }
 
@@ -725,4 +725,3 @@ export class UserRepository implements IUserRepository {
     return fieldMap[sortBy] || 'created_at';
   }
 }
-
