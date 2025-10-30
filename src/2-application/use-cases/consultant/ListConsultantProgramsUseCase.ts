@@ -44,7 +44,7 @@ export class ListConsultantProgramsUseCase {
 
       // 2. Consultant'ın programlarını al
       const programsResult = await this.userRepository.getPrograms(userId);
-      
+
       if (programsResult.isFailure) {
         // Eğer programa atanmamışsa, boş liste döndür (hata değil)
         console.warn('⚠️ User programs fetch failed:', programsResult.error);

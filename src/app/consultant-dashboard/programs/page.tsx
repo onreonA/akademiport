@@ -24,7 +24,7 @@ import {
   ConsultantProgramProvider,
   useConsultantProgram,
 } from '@/shared/contexts/ConsultantProgramContext';
-import type { ConsultantProgramDto } from '@/application/dto/consultant';
+import type { ConsultantProgramWithStats } from '@/application/dto/consultant';
 import { ProgramStatus } from '@/domain/enums/ProgramStatus';
 
 // =====================================================
@@ -34,7 +34,7 @@ function ConsultantProgramsContent() {
   const router = useRouter();
   const { programs, setPrograms, setSelectedProgram, isLoading, setIsLoading } =
     useConsultantProgram();
-  const [allPrograms, setAllPrograms] = useState<ConsultantProgramDto[]>([]);
+  const [allPrograms, setAllPrograms] = useState<ConsultantProgramWithStats[]>([]);
 
   useEffect(() => {
     fetchAllPrograms();
@@ -57,8 +57,8 @@ function ConsultantProgramsContent() {
     }
   };
 
-  const handleProgramClick = (program: ConsultantProgramDto) => {
-    setSelectedProgram(program);
+  const handleProgramClick = (item: ConsultantProgramWithStats) => {
+    setSelectedProgram(item.program);
     router.push('/consultant-dashboard');
   };
 
@@ -150,43 +150,43 @@ function ConsultantProgramsContent() {
 
       {/* Programs Grid */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {allPrograms.map((program) => (
+        {allPrograms.map((item) => (
           <Card
-            key={program.id}
+            key={item.program.id}
             className="hover:shadow-lg transition-shadow cursor-pointer"
-            onClick={() => handleProgramClick(program)}
+            onClick={() => handleProgramClick(item)}
           >
             <CardHeader>
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <CardTitle className="text-lg">{program.name}</CardTitle>
-                  {program.city && (
+                  <CardTitle className="text-lg">{item.program.name}</CardTitle>
+                  {item.program.city && (
                     <CardDescription className="flex items-center gap-1 mt-1">
                       <MapPin className="h-3 w-3" />
-                      {program.city}
+                      {item.program.city}
                     </CardDescription>
                   )}
                 </div>
-                <Badge variant={getStatusVariant(program.status)}>
-                  {getStatusLabel(program.status)}
+                <Badge variant={getStatusVariant(item.program.status)}>
+                  {getStatusLabel(item.program.status)}
                 </Badge>
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Description */}
-              {program.description && (
-                <p className="text-sm text-muted-foreground line-clamp-2">{program.description}</p>
+              {item.program.description && (
+                <p className="text-sm text-muted-foreground line-clamp-2">{item.program.description}</p>
               )}
 
               {/* Stats */}
               <div className="flex items-center gap-4 text-sm">
                 <div className="flex items-center gap-1">
                   <Building2 className="h-4 w-4 text-muted-foreground" />
-                  <span className="font-medium">{program.totalCompanies}</span>
+                  <span className="font-medium">{item.companiesCount}</span>
                   <span className="text-muted-foreground">firma</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <span className="font-medium text-green-600">{program.activeCompanies}</span>
+                  <span className="font-medium text-green-600">{item.activeCompaniesCount}</span>
                   <span className="text-muted-foreground">aktif</span>
                 </div>
               </div>
@@ -195,7 +195,7 @@ function ConsultantProgramsContent() {
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <Calendar className="h-3 w-3" />
                 <span>
-                  {formatDate(program.startDate)} - {formatDate(program.endDate)}
+                  {formatDate(item.program.startDate)} - {formatDate(item.program.endDate)}
                 </span>
               </div>
 
@@ -205,7 +205,7 @@ function ConsultantProgramsContent() {
                 className="w-full"
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleProgramClick(program);
+                  handleProgramClick(item);
                 }}
               >
                 Firmaları Görüntüle
