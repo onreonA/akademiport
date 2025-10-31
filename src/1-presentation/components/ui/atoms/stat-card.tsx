@@ -8,7 +8,6 @@
 
 import * as React from 'react';
 import { Card, CardContent, CardHeader } from './card';
-import { Badge } from './badge';
 import { cn } from '@/presentation/lib/utils';
 import { TrendingUp, TrendingDown, Minus, LucideIcon } from 'lucide-react';
 

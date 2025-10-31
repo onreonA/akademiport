@@ -188,16 +188,12 @@ export default function ConsultantProjectDetailPage() {
             <div className="flex justify-between items-center">
               <div>
                 <h3 className="text-lg font-semibold">Alt Projeler</h3>
-                <p className="text-sm text-muted-foreground">
-                  {subProjects.length} alt proje
-                </p>
+                <p className="text-sm text-muted-foreground">{subProjects.length} alt proje</p>
               </div>
               <Button
                 size="sm"
                 onClick={() =>
-                  router.push(
-                    `/consultant-dashboard/projects/${projectId}/sub-projects/new`
-                  )
+                  router.push(`/consultant-dashboard/projects/${projectId}/sub-projects/new`)
                 }
               >
                 <Plus className="mr-2 h-4 w-4" />
@@ -215,9 +211,7 @@ export default function ConsultantProjectDetailPage() {
                 </p>
                 <Button
                   onClick={() =>
-                    router.push(
-                      `/consultant-dashboard/projects/${projectId}/sub-projects/new`
-                    )
+                    router.push(`/consultant-dashboard/projects/${projectId}/sub-projects/new`)
                   }
                 >
                   <Plus className="mr-2 h-4 w-4" />
@@ -241,13 +235,15 @@ export default function ConsultantProjectDetailPage() {
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
                           <h4 className="font-semibold">{subProject.name}</h4>
-                          <Badge variant={
-                            subProject.status === 'done'
-                              ? 'default'
-                              : subProject.status === 'in_progress'
-                              ? 'secondary'
-                              : 'outline'
-                          }>
+                          <Badge
+                            variant={
+                              subProject.status === 'done'
+                                ? 'default'
+                                : subProject.status === 'in_progress'
+                                  ? 'secondary'
+                                  : 'outline'
+                            }
+                          >
                             {subProject.status === 'todo' && 'Yapılacak'}
                             {subProject.status === 'in_progress' && 'Devam Ediyor'}
                             {subProject.status === 'review' && 'İncelemede'}

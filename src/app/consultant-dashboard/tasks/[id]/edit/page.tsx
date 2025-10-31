@@ -80,9 +80,7 @@ export default function EditTaskPage() {
         status: data.status,
         priority: data.priority,
         assignedTo: data.assignedTo || '',
-        dueDate: data.dueDate
-          ? new Date(data.dueDate).toISOString().split('T')[0]
-          : '',
+        dueDate: data.dueDate ? new Date(data.dueDate).toISOString().split('T')[0] : '',
         orderIndex: data.orderIndex,
       });
     } catch (error) {
@@ -129,20 +127,14 @@ export default function EditTaskPage() {
       router.push('/consultant-dashboard/tasks/review');
     } catch (error) {
       console.error('Error updating task:', error);
-      toast.error(
-        error instanceof Error ? error.message : 'Bir hata oluştu'
-      );
+      toast.error(error instanceof Error ? error.message : 'Bir hata oluştu');
     } finally {
       setSaving(false);
     }
   };
 
   const handleDelete = async () => {
-    if (
-      !confirm(
-        'Bu görevi silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.'
-      )
-    ) {
+    if (!confirm('Bu görevi silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.')) {
       return;
     }
 
@@ -162,9 +154,7 @@ export default function EditTaskPage() {
       router.push('/consultant-dashboard/tasks/review');
     } catch (error) {
       console.error('Error deleting task:', error);
-      toast.error(
-        error instanceof Error ? error.message : 'Bir hata oluştu'
-      );
+      toast.error(error instanceof Error ? error.message : 'Bir hata oluştu');
     } finally {
       setDeleting(false);
     }
@@ -260,9 +250,7 @@ export default function EditTaskPage() {
               <Input
                 id="title"
                 value={formData.title}
-                onChange={(e) =>
-                  setFormData({ ...formData, title: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 placeholder="Örn: Analiz raporunu hazırla"
                 required
                 disabled={saving || deleting}
@@ -275,9 +263,7 @@ export default function EditTaskPage() {
               <Textarea
                 id="description"
                 value={formData.description}
-                onChange={(e) =>
-                  setFormData({ ...formData, description: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 placeholder="Görev hakkında detaylı açıklama..."
                 rows={4}
                 disabled={saving || deleting}
@@ -290,9 +276,7 @@ export default function EditTaskPage() {
                 <Label htmlFor="status">Durum</Label>
                 <Select
                   value={formData.status}
-                  onValueChange={(value) =>
-                    setFormData({ ...formData, status: value })
-                  }
+                  onValueChange={(value) => setFormData({ ...formData, status: value })}
                   disabled={saving || deleting}
                 >
                   <SelectTrigger>
@@ -312,9 +296,7 @@ export default function EditTaskPage() {
                 <Label htmlFor="priority">Öncelik</Label>
                 <Select
                   value={formData.priority}
-                  onValueChange={(value) =>
-                    setFormData({ ...formData, priority: value })
-                  }
+                  onValueChange={(value) => setFormData({ ...formData, priority: value })}
                   disabled={saving || deleting}
                 >
                   <SelectTrigger>
@@ -336,9 +318,7 @@ export default function EditTaskPage() {
                 <Label htmlFor="assignedTo">Atanan Kişi</Label>
                 <Select
                   value={formData.assignedTo}
-                  onValueChange={(value) =>
-                    setFormData({ ...formData, assignedTo: value })
-                  }
+                  onValueChange={(value) => setFormData({ ...formData, assignedTo: value })}
                   disabled={saving || deleting}
                 >
                   <SelectTrigger>
@@ -361,9 +341,7 @@ export default function EditTaskPage() {
                   id="dueDate"
                   type="date"
                   value={formData.dueDate}
-                  onChange={(e) =>
-                    setFormData({ ...formData, dueDate: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
                   disabled={saving || deleting}
                 />
               </div>
@@ -409,9 +387,7 @@ export default function EditTaskPage() {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() =>
-                  router.push('/consultant-dashboard/tasks/review')
-                }
+                onClick={() => router.push('/consultant-dashboard/tasks/review')}
                 disabled={saving || deleting}
               >
                 İptal
@@ -426,9 +402,7 @@ export default function EditTaskPage() {
             <div className="flex items-center gap-3">
               <CheckCircle2 className="w-5 h-5 text-green-600" />
               <div>
-                <h3 className="font-semibold text-green-900">
-                  Görev Tamamlandı
-                </h3>
+                <h3 className="font-semibold text-green-900">Görev Tamamlandı</h3>
                 <p className="text-sm text-green-700">
                   {new Date(task.completedAt).toLocaleString('tr-TR')}
                 </p>
@@ -443,8 +417,7 @@ export default function EditTaskPage() {
             <div>
               <h3 className="font-semibold text-red-900">Tehlikeli Bölge</h3>
               <p className="text-sm text-red-700 mt-1">
-                Görevi silerseniz, bu işlem geri alınamaz. Tüm yorumlar da
-                silinecektir.
+                Görevi silerseniz, bu işlem geri alınamaz. Tüm yorumlar da silinecektir.
               </p>
             </div>
             <Button
@@ -471,4 +444,3 @@ export default function EditTaskPage() {
     </div>
   );
 }
-

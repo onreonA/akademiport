@@ -132,11 +132,7 @@ export function TaskComments({ taskId, currentUserId }: TaskCommentsProps) {
           <Textarea
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
-            placeholder={
-              isQuestion
-                ? 'Sorunuzu buraya yazın...'
-                : 'Yorumunuzu buraya yazın...'
-            }
+            placeholder={isQuestion ? 'Sorunuzu buraya yazın...' : 'Yorumunuzu buraya yazın...'}
             rows={3}
             disabled={submitting}
           />
@@ -176,18 +172,14 @@ export function TaskComments({ taskId, currentUserId }: TaskCommentsProps) {
       {/* Comments List */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="font-semibold">
-            Yorumlar ({comments.length})
-          </h3>
+          <h3 className="font-semibold">Yorumlar ({comments.length})</h3>
         </div>
 
         {comments.length === 0 ? (
           <EnhancedCard className="p-8 text-center">
             <MessageSquare className="w-12 h-12 mx-auto mb-3 text-muted-foreground opacity-50" />
             <p className="text-muted-foreground">Henüz yorum yok</p>
-            <p className="text-sm text-muted-foreground mt-1">
-              İlk yorumu siz ekleyin!
-            </p>
+            <p className="text-sm text-muted-foreground mt-1">İlk yorumu siz ekleyin!</p>
           </EnhancedCard>
         ) : (
           <div className="space-y-3">
@@ -195,9 +187,7 @@ export function TaskComments({ taskId, currentUserId }: TaskCommentsProps) {
               <EnhancedCard
                 key={comment.id}
                 className={`p-4 ${
-                  comment.isQuestion
-                    ? 'border-blue-200 bg-blue-50/50'
-                    : 'border-gray-200'
+                  comment.isQuestion ? 'border-blue-200 bg-blue-50/50' : 'border-gray-200'
                 }`}
               >
                 <div className="flex items-start justify-between gap-3">
@@ -238,4 +228,3 @@ export function TaskComments({ taskId, currentUserId }: TaskCommentsProps) {
     </div>
   );
 }
-

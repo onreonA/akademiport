@@ -112,8 +112,6 @@ export function ProgramForm({ program, onSubmit, onCancel }: ProgramFormProps) {
     setLoading(true);
     try {
       await onSubmit(formData);
-    } catch (error) {
-      // Error handling is done in parent component
     } finally {
       setLoading(false);
     }

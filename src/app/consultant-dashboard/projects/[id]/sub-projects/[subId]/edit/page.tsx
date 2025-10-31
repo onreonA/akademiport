@@ -93,20 +93,14 @@ export default function EditSubProjectPage() {
       router.push(`/consultant-dashboard/projects/${projectId}`);
     } catch (error) {
       console.error('Error updating sub-project:', error);
-      toast.error(
-        error instanceof Error ? error.message : 'Bir hata oluştu'
-      );
+      toast.error(error instanceof Error ? error.message : 'Bir hata oluştu');
     } finally {
       setSaving(false);
     }
   };
 
   const handleDelete = async () => {
-    if (
-      !confirm(
-        'Bu alt projeyi silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.'
-      )
-    ) {
+    if (!confirm('Bu alt projeyi silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.')) {
       return;
     }
 
@@ -126,9 +120,7 @@ export default function EditSubProjectPage() {
       router.push(`/consultant-dashboard/projects/${projectId}`);
     } catch (error) {
       console.error('Error deleting sub-project:', error);
-      toast.error(
-        error instanceof Error ? error.message : 'Bir hata oluştu'
-      );
+      toast.error(error instanceof Error ? error.message : 'Bir hata oluştu');
     } finally {
       setDeleting(false);
     }
@@ -181,9 +173,7 @@ export default function EditSubProjectPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-muted-foreground">İlerleme</p>
-              <p className="text-2xl font-bold text-blue-600">
-                %{subProject.progress}
-              </p>
+              <p className="text-2xl font-bold text-blue-600">%{subProject.progress}</p>
             </div>
             <div className="text-right">
               <p className="text-sm text-muted-foreground">Oluşturulma</p>
@@ -205,9 +195,7 @@ export default function EditSubProjectPage() {
               <Input
                 id="name"
                 value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="Örn: Analiz Aşaması"
                 required
                 disabled={saving || deleting}
@@ -220,9 +208,7 @@ export default function EditSubProjectPage() {
               <Textarea
                 id="description"
                 value={formData.description}
-                onChange={(e) =>
-                  setFormData({ ...formData, description: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 placeholder="Alt proje hakkında detaylı açıklama..."
                 rows={4}
                 disabled={saving || deleting}
@@ -234,9 +220,7 @@ export default function EditSubProjectPage() {
               <Label htmlFor="status">Durum</Label>
               <Select
                 value={formData.status}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, status: value })
-                }
+                onValueChange={(value) => setFormData({ ...formData, status: value })}
                 disabled={saving || deleting}
               >
                 <SelectTrigger>
@@ -292,9 +276,7 @@ export default function EditSubProjectPage() {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() =>
-                  router.push(`/consultant-dashboard/projects/${projectId}`)
-                }
+                onClick={() => router.push(`/consultant-dashboard/projects/${projectId}`)}
                 disabled={saving || deleting}
               >
                 İptal
@@ -309,8 +291,7 @@ export default function EditSubProjectPage() {
             <div>
               <h3 className="font-semibold text-red-900">Tehlikeli Bölge</h3>
               <p className="text-sm text-red-700 mt-1">
-                Alt projeyi silerseniz, bu işlem geri alınamaz. Tüm görevler de
-                silinecektir.
+                Alt projeyi silerseniz, bu işlem geri alınamaz. Tüm görevler de silinecektir.
               </p>
             </div>
             <Button
@@ -337,4 +318,3 @@ export default function EditSubProjectPage() {
     </div>
   );
 }
-

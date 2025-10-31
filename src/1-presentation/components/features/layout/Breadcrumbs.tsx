@@ -9,7 +9,6 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ChevronRight, Home } from 'lucide-react';
-import { cn } from '@/presentation/lib/utils';
 
 // =====================================================
 // TYPES

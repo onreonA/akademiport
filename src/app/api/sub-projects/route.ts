@@ -19,10 +19,7 @@ export async function GET(request: NextRequest) {
     const projectId = searchParams.get('projectId');
 
     if (!projectId) {
-      return NextResponse.json(
-        { error: 'Project ID is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Project ID is required' }, { status: 400 });
     }
 
     const repository = new SubProjectRepository();
@@ -40,10 +37,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(result.value);
   } catch (error) {
     console.error('❌ [Sub-Projects API] Error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -67,10 +61,7 @@ export async function POST(request: NextRequest) {
     const { projectId, name, description, status, orderIndex } = body;
 
     if (!projectId || !name) {
-      return NextResponse.json(
-        { error: 'Project ID and name are required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Project ID and name are required' }, { status: 400 });
     }
 
     const repository = new SubProjectRepository();
@@ -94,10 +85,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result.value, { status: 201 });
   } catch (error) {
     console.error('❌ [Sub-Projects API] Error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
-

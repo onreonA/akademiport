@@ -9,10 +9,7 @@ import { DeleteSubProjectUseCase } from '@/2-application/use-cases/sub-project/D
  * GET /api/sub-projects/[id]
  * Get a single sub-project
  */
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const user = await getAuthUser();
     if (!user) {
@@ -25,19 +22,13 @@ export async function GET(
     const result = await useCase.execute(params.id);
 
     if (!result.isSuccess) {
-      return NextResponse.json(
-        { error: result.error || 'Sub-project not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: result.error || 'Sub-project not found' }, { status: 404 });
     }
 
     return NextResponse.json(result.value);
   } catch (error) {
     console.error('❌ [Sub-Project API] Error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -45,10 +36,7 @@ export async function GET(
  * PUT /api/sub-projects/[id]
  * Update a sub-project
  */
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const user = await getAuthUser();
     if (!user) {
@@ -83,10 +71,7 @@ export async function PUT(
     return NextResponse.json(result.value);
   } catch (error) {
     console.error('❌ [Sub-Project API] Error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -94,10 +79,7 @@ export async function PUT(
  * DELETE /api/sub-projects/[id]
  * Delete a sub-project
  */
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const user = await getAuthUser();
     if (!user) {
@@ -124,10 +106,6 @@ export async function DELETE(
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('❌ [Sub-Project API] Error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
-

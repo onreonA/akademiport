@@ -7,7 +7,6 @@
 'use client';
 
 import * as React from 'react';
-import Link from 'next/link';
 import { Card, CardContent, CardFooter } from '@/presentation/components/ui/atoms/card';
 import { Button } from '@/presentation/components/ui/atoms/button';
 import { Badge } from '@/presentation/components/ui/atoms/badge';

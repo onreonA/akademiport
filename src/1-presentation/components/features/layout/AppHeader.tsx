@@ -14,7 +14,6 @@ import { Badge } from '@/presentation/components/ui/atoms/badge';
 import { useSidebar } from '@/shared/contexts/SidebarContext';
 import { Breadcrumbs } from './Breadcrumbs';
 import { UserMenu } from './UserMenu';
-import { cn } from '@/presentation/lib/utils';
 
 // =====================================================
 // TYPES

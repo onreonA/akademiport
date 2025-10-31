@@ -55,9 +55,7 @@ export default function NewSubProjectPage() {
       router.push(`/consultant-dashboard/projects/${projectId}`);
     } catch (error) {
       console.error('Error creating sub-project:', error);
-      toast.error(
-        error instanceof Error ? error.message : 'Bir hata oluştu'
-      );
+      toast.error(error instanceof Error ? error.message : 'Bir hata oluştu');
     } finally {
       setLoading(false);
     }
@@ -92,9 +90,7 @@ export default function NewSubProjectPage() {
               <Input
                 id="name"
                 value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="Örn: Analiz Aşaması"
                 required
                 disabled={loading}
@@ -107,9 +103,7 @@ export default function NewSubProjectPage() {
               <Textarea
                 id="description"
                 value={formData.description}
-                onChange={(e) =>
-                  setFormData({ ...formData, description: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 placeholder="Alt proje hakkında detaylı açıklama..."
                 rows={4}
                 disabled={loading}
@@ -121,9 +115,7 @@ export default function NewSubProjectPage() {
               <Label htmlFor="status">Durum</Label>
               <Select
                 value={formData.status}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, status: value })
-                }
+                onValueChange={(value) => setFormData({ ...formData, status: value })}
                 disabled={loading}
               >
                 <SelectTrigger>
@@ -162,11 +154,7 @@ export default function NewSubProjectPage() {
 
             {/* Actions */}
             <div className="flex gap-3 pt-4 border-t">
-              <Button
-                type="submit"
-                disabled={loading || !formData.name}
-                className="flex-1"
-              >
+              <Button type="submit" disabled={loading || !formData.name} className="flex-1">
                 {loading ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -182,9 +170,7 @@ export default function NewSubProjectPage() {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() =>
-                  router.push(`/consultant-dashboard/projects/${projectId}`)
-                }
+                onClick={() => router.push(`/consultant-dashboard/projects/${projectId}`)}
                 disabled={loading}
               >
                 İptal
@@ -200,13 +186,11 @@ export default function NewSubProjectPage() {
               <Plus className="w-5 h-5 text-blue-600" />
             </div>
             <div className="space-y-1">
-              <h3 className="font-semibold text-blue-900">
-                Alt Proje Hakkında
-              </h3>
+              <h3 className="font-semibold text-blue-900">Alt Proje Hakkında</h3>
               <p className="text-sm text-blue-700">
-                Alt projeler, ana projenizi daha küçük ve yönetilebilir
-                parçalara ayırmanıza yardımcı olur. Her alt proje kendi
-                görevlerine sahip olabilir ve bağımsız olarak takip edilebilir.
+                Alt projeler, ana projenizi daha küçük ve yönetilebilir parçalara ayırmanıza
+                yardımcı olur. Her alt proje kendi görevlerine sahip olabilir ve bağımsız olarak
+                takip edilebilir.
               </p>
             </div>
           </div>
@@ -215,4 +199,3 @@ export default function NewSubProjectPage() {
     </div>
   );
 }
-
