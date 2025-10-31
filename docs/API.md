@@ -1,71 +1,53 @@
 # API Documentation
 
-Akademi Port REST API dokümantasyonu.
+## Overview
 
-## 🔐 Authentication
+This document provides comprehensive documentation for all API endpoints in the Akademi Port application.
 
-Tüm API endpoint'leri (public olanlar hariç) authentication gerektirir.
+**Base URL:** `http://localhost:3000/api`
 
-### Headers
-
-```http
-Content-Type: application/json
-Cookie: sb-access-token=...
-```
+**Authentication:** All endpoints require authentication via session cookies (handled by Supabase Auth).
 
 ---
 
-## 📝 Authentication Endpoints
+## Table of Contents
 
-### Sign Up
+1. [Authentication](#authentication)
+2. [Projects](#projects)
+3. [Sub-Projects](#sub-projects)
+4. [Tasks](#tasks)
+5. [Task Comments](#task-comments)
+6. [Companies](#companies)
+7. [Programs](#programs)
+8. [Users](#users)
 
-Yeni kullanıcı kaydı.
+---
+
+## Authentication
+
+### Get Current User
 
 ```http
-POST /api/auth/signup
+GET /api/auth/me
 ```
 
-**Request Body:**
-
+**Response:**
 ```json
 {
+  "userId": "uuid",
   "email": "user@example.com",
-  "password": "password123",
-  "fullName": "John Doe",
-  "phone": "+90 555 123 4567",
-  "role": "company_user",
-  "companyId": "uuid"
+  "role": "admin" | "consultant" | "company",
+  "companyId": "uuid" | null
 }
 ```
-
-**Response (201):**
-
-```json
-{
-  "success": true,
-  "data": {
-    "id": "uuid",
-    "email": "user@example.com",
-    "fullName": "John Doe",
-    "role": "company_user",
-    "companyId": "uuid"
-  },
-  "message": "Kayıt başarılı! Email adresinizi doğrulayın."
-}
-```
-
----
 
 ### Sign In
-
-Kullanıcı girişi.
 
 ```http
 POST /api/auth/signin
 ```
 
 **Request Body:**
-
 ```json
 {
   "email": "user@example.com",
@@ -73,379 +55,587 @@ POST /api/auth/signin
 }
 ```
 
-**Response (200):**
-
+**Response:**
 ```json
 {
-  "success": true,
-  "data": {
+  "user": {
     "id": "uuid",
     "email": "user@example.com",
-    "fullName": "John Doe",
-    "role": "company_user",
-    "avatarUrl": "https://...",
-    "companyId": "uuid"
-  },
-  "message": "Giriş başarılı"
+    "role": "admin"
+  }
 }
 ```
 
----
-
 ### Sign Out
-
-Kullanıcı çıkışı.
 
 ```http
 POST /api/auth/signout
 ```
 
-**Response (200):**
-
+**Response:**
 ```json
 {
-  "success": true,
-  "message": "Çıkış başarılı"
+  "message": "Signed out successfully"
 }
 ```
 
 ---
 
-### Get Current User
+## Projects
 
-Mevcut kullanıcı bilgilerini al.
+### List Projects
 
 ```http
-GET /api/auth/me
+GET /api/projects
 ```
 
-**Response (200):**
+**Query Parameters:**
+- `companyId` (optional): Filter by company
+- `consultantId` (optional): Filter by consultant
+- `status` (optional): Filter by status
+- `isTemplate` (optional): Filter templates
 
+**Response:**
 ```json
-{
-  "success": true,
-  "data": {
+[
+  {
     "id": "uuid",
-    "email": "user@example.com",
-    "fullName": "John Doe",
-    "role": "company_user",
-    "avatarUrl": "https://...",
-    "companyId": "uuid"
+    "companyId": "uuid",
+    "consultantId": "uuid",
+    "name": "Project Name",
+    "description": "Project description",
+    "status": "planning" | "active" | "on_hold" | "completed" | "cancelled",
+    "priority": "low" | "medium" | "high" | "critical",
+    "startDate": "2025-01-01T00:00:00.000Z",
+    "endDate": "2025-12-31T00:00:00.000Z",
+    "progress": 50,
+    "isTemplate": false,
+    "templateId": "uuid" | null,
+    "createdAt": "2025-01-01T00:00:00.000Z",
+    "updatedAt": "2025-01-01T00:00:00.000Z"
   }
-}
+]
 ```
 
----
-
-## 🎯 Programs Endpoints
-
-### List Programs
-
-Tüm programları listele.
+### Get Project
 
 ```http
-GET /api/programs
-GET /api/programs?status=active
-GET /api/programs?city=Kayseri
+GET /api/projects/:id
 ```
 
-**Response (200):**
-
+**Response:**
 ```json
 {
-  "success": true,
-  "data": [
-    {
-      "id": "uuid",
-      "name": "Kayseri E-İhracat 2025",
-      "description": "...",
-      "slug": "kayseri-e-ihracat-2025",
-      "city": "Kayseri",
-      "region": "İç Anadolu",
-      "programType": "E-İhracat",
-      "startDate": "2025-01-01T00:00:00.000Z",
-      "endDate": "2025-12-31T00:00:00.000Z",
-      "durationMonths": 12,
-      "maxCompanies": 20,
-      "currentCompanies": 5,
-      "status": "active",
-      "sponsor": "Ticaret Bakanlığı",
-      "budget": 500000,
-      "programManagerId": "uuid",
-      "settings": {},
-      "createdAt": "2025-01-01T00:00:00.000Z",
-      "updatedAt": "2025-01-01T00:00:00.000Z"
-    }
-  ],
-  "count": 1
+  "id": "uuid",
+  "companyId": "uuid",
+  "consultantId": "uuid",
+  "name": "Project Name",
+  "description": "Project description",
+  "status": "active",
+  "priority": "high",
+  "startDate": "2025-01-01T00:00:00.000Z",
+  "endDate": "2025-12-31T00:00:00.000Z",
+  "progress": 50,
+  "isTemplate": false,
+  "templateId": null,
+  "createdAt": "2025-01-01T00:00:00.000Z",
+  "updatedAt": "2025-01-01T00:00:00.000Z"
 }
 ```
 
----
-
-### Get Program by ID
-
-Belirli bir programı getir.
+### Create Project
 
 ```http
-GET /api/programs/:id
-```
-
-**Response (200):**
-
-```json
-{
-  "success": true,
-  "data": {
-    "id": "uuid",
-    "name": "Kayseri E-İhracat 2025",
-    ...
-  }
-}
-```
-
----
-
-### Create Program
-
-Yeni program oluştur.
-
-```http
-POST /api/programs
+POST /api/projects
 ```
 
 **Request Body:**
-
 ```json
 {
-  "name": "Bursa E-İhracat 2025",
-  "description": "Bursa için e-ihracat programı",
-  "slug": "bursa-e-ihracat-2025",
-  "city": "Bursa",
-  "region": "Marmara",
-  "programType": "E-İhracat",
+  "companyId": "uuid",
+  "consultantId": "uuid",
+  "name": "New Project",
+  "description": "Project description",
+  "status": "planning",
+  "priority": "high",
   "startDate": "2025-01-01",
   "endDate": "2025-12-31",
-  "durationMonths": 12,
-  "maxCompanies": 15,
-  "sponsor": "KOSGEB",
-  "budget": 300000
+  "isTemplate": false
 }
 ```
 
-**Response (201):**
-
+**Response:**
 ```json
 {
-  "success": true,
-  "data": { ... },
-  "message": "Program başarıyla oluşturuldu"
+  "id": "uuid"
 }
 ```
 
----
-
-### Update Program
-
-Programı güncelle.
+### Update Project
 
 ```http
-PATCH /api/programs/:id
+PUT /api/projects/:id
 ```
 
 **Request Body:**
-
 ```json
 {
-  "status": "completed",
-  "maxCompanies": 25
+  "name": "Updated Project Name",
+  "description": "Updated description",
+  "status": "active",
+  "priority": "critical",
+  "startDate": "2025-01-01",
+  "endDate": "2025-12-31"
 }
 ```
 
-**Response (200):**
-
+**Response:**
 ```json
 {
-  "success": true,
-  "data": { ... },
-  "message": "Program başarıyla güncellendi"
+  "id": "uuid"
 }
 ```
 
----
-
-### Delete Program
-
-Programı sil.
+### Delete Project
 
 ```http
-DELETE /api/programs/:id
+DELETE /api/projects/:id
 ```
 
-**Response (200):**
-
+**Response:**
 ```json
 {
-  "success": true,
-  "message": "Program başarıyla silindi"
+  "message": "Project deleted successfully"
 }
 ```
 
----
-
-## 🏢 Companies Endpoints
-
-### List Companies
-
-Tüm firmaları listele.
+### Get Project Templates
 
 ```http
-GET /api/companies
-GET /api/companies?programId=uuid
-GET /api/companies?city=Kayseri
+GET /api/projects/templates
 ```
 
-**Response (200):**
-
+**Response:**
 ```json
-{
-  "success": true,
-  "data": [
-    {
-      "id": "uuid",
-      "programId": "uuid",
-      "name": "Örnek Tekstil A.Ş.",
-      "legalName": "Örnek Tekstil Anonim Şirketi",
-      "taxNumber": "1234567890",
-      "slug": "ornek-tekstil",
-      "email": "info@ornektekstil.com",
-      "phone": "+90 352 123 45 67",
-      "website": "https://ornektekstil.com",
-      "city": "Kayseri",
-      "sector": "Tekstil",
-      "employeeCount": 50,
-      "foundationYear": 2010,
-      "isActive": true,
-      "maxUsers": 2,
-      "currentUsers": 1,
-      "createdAt": "2025-01-01T00:00:00.000Z",
-      "updatedAt": "2025-01-01T00:00:00.000Z"
-    }
-  ],
-  "count": 1
-}
+[
+  {
+    "id": "uuid",
+    "name": "Template Name",
+    "description": "Template description",
+    "status": "planning",
+    "priority": "medium",
+    "isTemplate": true,
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  }
+]
 ```
 
----
-
-### Get Company by ID
-
-Belirli bir firmayı getir.
+### Create Project from Template
 
 ```http
-GET /api/companies/:id
-```
-
-**Response (200):**
-
-```json
-{
-  "success": true,
-  "data": { ... }
-}
-```
-
----
-
-### Create Company
-
-Yeni firma oluştur.
-
-```http
-POST /api/companies
+POST /api/projects/from-template
 ```
 
 **Request Body:**
-
 ```json
 {
-  "programId": "uuid",
-  "name": "Yeni Firma A.Ş.",
-  "legalName": "Yeni Firma Anonim Şirketi",
-  "taxNumber": "9876543210",
-  "email": "info@yenifirma.com",
-  "phone": "+90 555 987 65 43",
-  "city": "Kayseri",
-  "sector": "Teknoloji",
-  "employeeCount": 25,
-  "foundationYear": 2020
+  "templateId": "uuid",
+  "companyId": "uuid",
+  "consultantId": "uuid",
+  "name": "Project from Template",
+  "startDate": "2025-01-01",
+  "endDate": "2025-12-31"
 }
 ```
 
-**Response (201):**
-
+**Response:**
 ```json
 {
-  "success": true,
-  "data": { ... },
-  "message": "Firma başarıyla oluşturuldu"
+  "id": "uuid"
 }
+```
+
+### Get Project Sub-Projects
+
+```http
+GET /api/projects/:id/sub-projects
+```
+
+**Response:**
+```json
+[
+  {
+    "id": "uuid",
+    "projectId": "uuid",
+    "name": "Sub-Project Name",
+    "description": "Sub-project description",
+    "status": "in_progress",
+    "orderIndex": 1,
+    "progress": 30,
+    "createdAt": "2025-01-01T00:00:00.000Z",
+    "updatedAt": "2025-01-01T00:00:00.000Z"
+  }
+]
 ```
 
 ---
 
-### Update Company
+## Sub-Projects
 
-Firmayı güncelle.
+### List Sub-Projects
 
 ```http
-PATCH /api/companies/:id
+GET /api/sub-projects?projectId=uuid
+```
+
+**Query Parameters:**
+- `projectId` (required): Project ID
+
+**Response:**
+```json
+[
+  {
+    "id": "uuid",
+    "projectId": "uuid",
+    "name": "Sub-Project Name",
+    "description": "Description",
+    "status": "in_progress",
+    "orderIndex": 1,
+    "progress": 30,
+    "createdAt": "2025-01-01T00:00:00.000Z",
+    "updatedAt": "2025-01-01T00:00:00.000Z"
+  }
+]
+```
+
+### Get Sub-Project
+
+```http
+GET /api/sub-projects/:id
+```
+
+**Response:**
+```json
+{
+  "id": "uuid",
+  "projectId": "uuid",
+  "name": "Sub-Project Name",
+  "description": "Description",
+  "status": "in_progress",
+  "orderIndex": 1,
+  "progress": 30,
+  "createdAt": "2025-01-01T00:00:00.000Z",
+  "updatedAt": "2025-01-01T00:00:00.000Z"
+}
+```
+
+### Create Sub-Project
+
+```http
+POST /api/sub-projects
 ```
 
 **Request Body:**
-
 ```json
 {
-  "phone": "+90 555 111 22 33",
-  "employeeCount": 30
+  "projectId": "uuid",
+  "name": "New Sub-Project",
+  "description": "Description",
+  "status": "todo",
+  "orderIndex": 1
 }
 ```
 
-**Response (200):**
-
+**Response:**
 ```json
 {
-  "success": true,
-  "data": { ... },
-  "message": "Firma başarıyla güncellendi"
+  "id": "uuid"
 }
 ```
 
----
-
-### Delete Company
-
-Firmayı sil.
+### Update Sub-Project
 
 ```http
-DELETE /api/companies/:id
+PUT /api/sub-projects/:id
 ```
 
-**Response (200):**
-
+**Request Body:**
 ```json
 {
-  "success": true,
-  "message": "Firma başarıyla silindi"
+  "name": "Updated Name",
+  "description": "Updated description",
+  "status": "in_progress"
+}
+```
+
+**Response:**
+```json
+{
+  "id": "uuid"
+}
+```
+
+### Delete Sub-Project
+
+```http
+DELETE /api/sub-projects/:id
+```
+
+**Response:**
+```json
+{
+  "message": "Sub-project deleted successfully"
 }
 ```
 
 ---
 
-## 🔒 Error Responses
+## Tasks
+
+### List Tasks
+
+```http
+GET /api/tasks?subProjectId=uuid
+```
+
+**Query Parameters:**
+- `subProjectId` (optional): Filter by sub-project
+- `assignedTo` (optional): Filter by assigned user
+- `status` (optional): Filter by status
+
+**Response:**
+```json
+[
+  {
+    "id": "uuid",
+    "subProjectId": "uuid",
+    "assignedTo": "uuid",
+    "title": "Task Title",
+    "description": "Task description",
+    "status": "todo" | "in_progress" | "review" | "done" | "cancelled",
+    "priority": "low" | "medium" | "high" | "critical",
+    "dueDate": "2025-02-01T00:00:00.000Z",
+    "completedAt": null,
+    "approvedAt": null,
+    "approvedBy": null,
+    "orderIndex": 1,
+    "createdAt": "2025-01-01T00:00:00.000Z",
+    "updatedAt": "2025-01-01T00:00:00.000Z"
+  }
+]
+```
+
+### Get Task
+
+```http
+GET /api/tasks/:id
+```
+
+**Response:**
+```json
+{
+  "id": "uuid",
+  "subProjectId": "uuid",
+  "assignedTo": "uuid",
+  "title": "Task Title",
+  "description": "Task description",
+  "status": "in_progress",
+  "priority": "high",
+  "dueDate": "2025-02-01T00:00:00.000Z",
+  "completedAt": null,
+  "approvedAt": null,
+  "approvedBy": null,
+  "orderIndex": 1,
+  "createdAt": "2025-01-01T00:00:00.000Z",
+  "updatedAt": "2025-01-01T00:00:00.000Z"
+}
+```
+
+### Create Task
+
+```http
+POST /api/tasks
+```
+
+**Request Body:**
+```json
+{
+  "subProjectId": "uuid",
+  "assignedTo": "uuid",
+  "title": "New Task",
+  "description": "Task description",
+  "status": "todo",
+  "priority": "high",
+  "dueDate": "2025-02-01",
+  "orderIndex": 1
+}
+```
+
+**Response:**
+```json
+{
+  "id": "uuid"
+}
+```
+
+### Update Task
+
+```http
+PUT /api/tasks/:id
+```
+
+**Request Body:**
+```json
+{
+  "title": "Updated Task",
+  "description": "Updated description",
+  "status": "in_progress",
+  "priority": "critical",
+  "dueDate": "2025-02-15"
+}
+```
+
+**Response:**
+```json
+{
+  "id": "uuid"
+}
+```
+
+### Delete Task
+
+```http
+DELETE /api/tasks/:id
+```
+
+**Response:**
+```json
+{
+  "message": "Task deleted successfully"
+}
+```
+
+### Complete Task
+
+```http
+POST /api/tasks/:id/complete
+```
+
+**Response:**
+```json
+{
+  "message": "Task completed successfully"
+}
+```
+
+### Approve Task
+
+```http
+POST /api/tasks/:id/approve
+```
+
+**Request Body:**
+```json
+{
+  "approvedBy": "uuid"
+}
+```
+
+**Response:**
+```json
+{
+  "message": "Task approved successfully"
+}
+```
+
+### Reject Task
+
+```http
+POST /api/tasks/:id/reject
+```
+
+**Request Body:**
+```json
+{
+  "reason": "Needs more work"
+}
+```
+
+**Response:**
+```json
+{
+  "message": "Task rejected successfully"
+}
+```
+
+---
+
+## Task Comments
+
+### List Task Comments
+
+```http
+GET /api/tasks/:id/comments
+```
+
+**Response:**
+```json
+[
+  {
+    "id": "uuid",
+    "taskId": "uuid",
+    "userId": "uuid",
+    "userEmail": "user@example.com",
+    "comment": "This is a comment",
+    "isQuestion": false,
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  }
+]
+```
+
+### Create Task Comment
+
+```http
+POST /api/tasks/:id/comments
+```
+
+**Request Body:**
+```json
+{
+  "taskId": "uuid",
+  "userId": "uuid",
+  "comment": "This is a new comment",
+  "isQuestion": false
+}
+```
+
+**Response:**
+```json
+{
+  "id": "uuid"
+}
+```
+
+### Delete Task Comment
+
+```http
+DELETE /api/tasks/:id/comments/:commentId
+```
+
+**Response:**
+```json
+{
+  "message": "Task comment deleted successfully"
+}
+```
+
+---
+
+## Error Responses
+
+All endpoints may return the following error responses:
 
 ### 400 Bad Request
-
 ```json
 {
   "error": "Validation error message"
@@ -453,15 +643,20 @@ DELETE /api/companies/:id
 ```
 
 ### 401 Unauthorized
-
 ```json
 {
-  "error": "Unauthorized access"
+  "error": "Unauthorized"
+}
+```
+
+### 403 Forbidden
+```json
+{
+  "error": "Forbidden"
 }
 ```
 
 ### 404 Not Found
-
 ```json
 {
   "error": "Resource not found"
@@ -469,40 +664,30 @@ DELETE /api/companies/:id
 ```
 
 ### 500 Internal Server Error
-
 ```json
 {
-  "error": "Internal server error message"
+  "error": "Internal server error"
 }
 ```
 
 ---
 
-## 📊 User Roles
+## Rate Limiting
 
-- `master_admin` - Tüm sistemi yöneten
-- `program_manager` - Program yöneticisi
-- `consultant` - Danışman
-- `company_admin` - Firma yöneticisi
-- `company_user` - Firma kullanıcısı
-- `observer` - Gözlemci (sadece görüntüleme)
+Currently, there is no rate limiting implemented. This may be added in future versions.
 
 ---
 
-## 🔐 Row Level Security (RLS)
+## Versioning
 
-Tüm API endpoint'leri RLS politikalarına tabidir:
-
-- **Master Admin:** Tüm kaynaklara tam erişim
-- **Program Manager:** Kendi programlarına tam erişim
-- **Consultant:** Atandığı programları görüntüleme
-- **Company Admin:** Kendi firmasını yönetme
-- **Company User:** Kendi firmasını görüntüleme
+API Version: `v1` (implicit, no version prefix in URL)
 
 ---
 
-## 📝 Notes
+## Notes
 
-- Tüm tarihler ISO 8601 formatındadır
-- Pagination henüz implement edilmemiştir (yakında eklenecek)
-- Rate limiting henüz aktif değildir
+- All dates are in ISO 8601 format
+- All IDs are UUIDs
+- Timestamps are in UTC
+- Progress values are percentages (0-100)
+- Status and priority values are enums (see specific endpoint documentation)
