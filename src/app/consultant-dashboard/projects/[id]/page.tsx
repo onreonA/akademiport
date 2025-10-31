@@ -82,10 +82,10 @@ export default function ConsultantProjectDetailPage() {
 
   const fetchSubProjects = async () => {
     try {
-      const response = await fetch(`/api/projects/${projectId}/sub-projects`);
+      const response = await fetch(`/api/sub-projects?projectId=${projectId}`);
       if (!response.ok) throw new Error('Failed to fetch sub-projects');
       const data = await response.json();
-      setSubProjects(data.subProjects || []);
+      setSubProjects(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Error fetching sub-projects:', error);
     }
@@ -185,25 +185,109 @@ export default function ConsultantProjectDetailPage() {
           </TabsContent>
 
           <TabsContent value="subprojects" className="space-y-4">
-            <div className="flex justify-between">
-              <h3 className="text-lg font-semibold">Alt Projeler</h3>
-              <Button size="sm">
+            <div className="flex justify-between items-center">
+              <div>
+                <h3 className="text-lg font-semibold">Alt Projeler</h3>
+                <p className="text-sm text-muted-foreground">
+                  {subProjects.length} alt proje
+                </p>
+              </div>
+              <Button
+                size="sm"
+                onClick={() =>
+                  router.push(
+                    `/consultant-dashboard/projects/${projectId}/sub-projects/new`
+                  )
+                }
+              >
                 <Plus className="mr-2 h-4 w-4" />
                 Yeni Alt Proje
               </Button>
             </div>
             {subProjects.length === 0 ? (
               <EnhancedCard variant="glass" className="p-12 text-center">
-                <p className="text-muted-foreground">Henüz alt proje yok</p>
+                <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                  <FolderKanban className="w-6 h-6 text-primary" />
+                </div>
+                <h4 className="font-semibold mb-2">Henüz alt proje yok</h4>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Projenizi daha küçük parçalara ayırmak için alt projeler oluşturun
+                </p>
+                <Button
+                  onClick={() =>
+                    router.push(
+                      `/consultant-dashboard/projects/${projectId}/sub-projects/new`
+                    )
+                  }
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  İlk Alt Projeyi Oluştur
+                </Button>
               </EnhancedCard>
             ) : (
               <div className="grid gap-4">
                 {subProjects.map((subProject) => (
-                  <EnhancedCard key={subProject.id} variant="glass" className="p-4">
-                    <h4 className="font-semibold">{subProject.name}</h4>
-                    {subProject.description && (
-                      <p className="mt-1 text-sm text-muted-foreground">{subProject.description}</p>
-                    )}
+                  <EnhancedCard
+                    key={subProject.id}
+                    variant="glass"
+                    className="p-4 hover:shadow-lg transition-shadow cursor-pointer"
+                    onClick={() =>
+                      router.push(
+                        `/consultant-dashboard/projects/${projectId}/sub-projects/${subProject.id}/edit`
+                      )
+                    }
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <h4 className="font-semibold">{subProject.name}</h4>
+                          <Badge variant={
+                            subProject.status === 'done'
+                              ? 'default'
+                              : subProject.status === 'in_progress'
+                              ? 'secondary'
+                              : 'outline'
+                          }>
+                            {subProject.status === 'todo' && 'Yapılacak'}
+                            {subProject.status === 'in_progress' && 'Devam Ediyor'}
+                            {subProject.status === 'review' && 'İncelemede'}
+                            {subProject.status === 'done' && 'Tamamlandı'}
+                            {subProject.status === 'cancelled' && 'İptal'}
+                          </Badge>
+                        </div>
+                        {subProject.description && (
+                          <p className="text-sm text-muted-foreground mb-3">
+                            {subProject.description}
+                          </p>
+                        )}
+                        <div className="flex items-center gap-4">
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between text-xs mb-1">
+                              <span className="text-muted-foreground">İlerleme</span>
+                              <span className="font-medium">{subProject.progress}%</span>
+                            </div>
+                            <div className="h-2 bg-muted rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 transition-all"
+                                style={{ width: `${subProject.progress}%` }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          router.push(
+                            `/consultant-dashboard/projects/${projectId}/sub-projects/${subProject.id}/edit`
+                          );
+                        }}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </EnhancedCard>
                 ))}
               </div>
