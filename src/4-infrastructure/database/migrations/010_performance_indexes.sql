@@ -25,13 +25,11 @@ CREATE INDEX IF NOT EXISTS idx_users_role_active ON users(role, created_at DESC)
 -- PROGRAMS TABLE INDEXES
 -- =====================================================
 
--- Index for status-based filtering
-CREATE INDEX IF NOT EXISTS idx_programs_status ON programs(status);
+-- Note: idx_programs_status already exists in schema/02-programs.sql
+-- Note: idx_programs_manager already exists in schema/02-programs.sql (on program_manager_id)
+-- Note: idx_programs_dates already exists in schema/02-programs.sql
 
--- Index for manager lookups
-CREATE INDEX IF NOT EXISTS idx_programs_manager_id ON programs(manager_id) WHERE manager_id IS NOT NULL;
-
--- Composite index for active programs
+-- Composite index for active programs by status and dates
 CREATE INDEX IF NOT EXISTS idx_programs_status_dates ON programs(status, start_date, end_date);
 
 -- =====================================================
