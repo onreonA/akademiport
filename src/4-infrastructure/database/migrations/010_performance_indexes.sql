@@ -18,8 +18,8 @@ CREATE INDEX IF NOT EXISTS idx_users_role ON users(role);
 -- Index for company users lookup
 CREATE INDEX IF NOT EXISTS idx_users_company_id ON users(company_id) WHERE company_id IS NOT NULL;
 
--- Composite index for active users by role
-CREATE INDEX IF NOT EXISTS idx_users_role_active ON users(role, created_at DESC) WHERE deleted_at IS NULL;
+-- Composite index for users by role and creation date
+CREATE INDEX IF NOT EXISTS idx_users_role_active ON users(role, created_at DESC);
 
 -- =====================================================
 -- PROGRAMS TABLE INDEXES
@@ -41,8 +41,8 @@ CREATE INDEX IF NOT EXISTS idx_programs_status_dates ON programs(status, start_d
 -- Index for program assignments
 CREATE INDEX IF NOT EXISTS idx_companies_program_id ON companies(program_id) WHERE program_id IS NOT NULL;
 
--- Index for active companies
-CREATE INDEX IF NOT EXISTS idx_companies_active ON companies(created_at DESC) WHERE deleted_at IS NULL;
+-- Index for companies by creation date
+CREATE INDEX IF NOT EXISTS idx_companies_created ON companies(created_at DESC);
 
 -- =====================================================
 -- PROJECTS TABLE INDEXES
