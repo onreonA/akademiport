@@ -81,7 +81,7 @@ describe('Project Entity', () => {
   describe('Status', () => {
     it('should have valid status values', () => {
       const validStatuses = ['planning', 'active', 'on_hold', 'completed', 'cancelled'];
-      
+
       validStatuses.forEach((status) => {
         const project: Project = {
           id: 'project-1',
@@ -105,7 +105,7 @@ describe('Project Entity', () => {
   describe('Priority', () => {
     it('should have valid priority values', () => {
       const validPriorities = ['low', 'medium', 'high', 'critical'];
-      
+
       validPriorities.forEach((priority) => {
         const project: Project = {
           id: 'project-1',
@@ -147,4 +147,3 @@ describe('Project Entity', () => {
     });
   });
 });
-

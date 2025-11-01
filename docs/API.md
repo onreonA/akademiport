@@ -32,6 +32,7 @@ GET /api/auth/me
 ```
 
 **Response:**
+
 ```json
 {
   "userId": "uuid",
@@ -48,6 +49,7 @@ POST /api/auth/signin
 ```
 
 **Request Body:**
+
 ```json
 {
   "email": "user@example.com",
@@ -56,6 +58,7 @@ POST /api/auth/signin
 ```
 
 **Response:**
+
 ```json
 {
   "user": {
@@ -73,6 +76,7 @@ POST /api/auth/signout
 ```
 
 **Response:**
+
 ```json
 {
   "message": "Signed out successfully"
@@ -90,12 +94,14 @@ GET /api/projects
 ```
 
 **Query Parameters:**
+
 - `companyId` (optional): Filter by company
 - `consultantId` (optional): Filter by consultant
 - `status` (optional): Filter by status
 - `isTemplate` (optional): Filter templates
 
 **Response:**
+
 ```json
 [
   {
@@ -124,6 +130,7 @@ GET /api/projects/:id
 ```
 
 **Response:**
+
 ```json
 {
   "id": "uuid",
@@ -150,6 +157,7 @@ POST /api/projects
 ```
 
 **Request Body:**
+
 ```json
 {
   "companyId": "uuid",
@@ -165,6 +173,7 @@ POST /api/projects
 ```
 
 **Response:**
+
 ```json
 {
   "id": "uuid"
@@ -178,6 +187,7 @@ PUT /api/projects/:id
 ```
 
 **Request Body:**
+
 ```json
 {
   "name": "Updated Project Name",
@@ -190,6 +200,7 @@ PUT /api/projects/:id
 ```
 
 **Response:**
+
 ```json
 {
   "id": "uuid"
@@ -203,6 +214,7 @@ DELETE /api/projects/:id
 ```
 
 **Response:**
+
 ```json
 {
   "message": "Project deleted successfully"
@@ -216,6 +228,7 @@ GET /api/projects/templates
 ```
 
 **Response:**
+
 ```json
 [
   {
@@ -237,6 +250,7 @@ POST /api/projects/from-template
 ```
 
 **Request Body:**
+
 ```json
 {
   "templateId": "uuid",
@@ -249,6 +263,7 @@ POST /api/projects/from-template
 ```
 
 **Response:**
+
 ```json
 {
   "id": "uuid"
@@ -262,6 +277,7 @@ GET /api/projects/:id/sub-projects
 ```
 
 **Response:**
+
 ```json
 [
   {
@@ -289,9 +305,11 @@ GET /api/sub-projects?projectId=uuid
 ```
 
 **Query Parameters:**
+
 - `projectId` (required): Project ID
 
 **Response:**
+
 ```json
 [
   {
@@ -315,6 +333,7 @@ GET /api/sub-projects/:id
 ```
 
 **Response:**
+
 ```json
 {
   "id": "uuid",
@@ -336,6 +355,7 @@ POST /api/sub-projects
 ```
 
 **Request Body:**
+
 ```json
 {
   "projectId": "uuid",
@@ -347,6 +367,7 @@ POST /api/sub-projects
 ```
 
 **Response:**
+
 ```json
 {
   "id": "uuid"
@@ -360,6 +381,7 @@ PUT /api/sub-projects/:id
 ```
 
 **Request Body:**
+
 ```json
 {
   "name": "Updated Name",
@@ -369,6 +391,7 @@ PUT /api/sub-projects/:id
 ```
 
 **Response:**
+
 ```json
 {
   "id": "uuid"
@@ -382,6 +405,7 @@ DELETE /api/sub-projects/:id
 ```
 
 **Response:**
+
 ```json
 {
   "message": "Sub-project deleted successfully"
@@ -399,11 +423,13 @@ GET /api/tasks?subProjectId=uuid
 ```
 
 **Query Parameters:**
+
 - `subProjectId` (optional): Filter by sub-project
 - `assignedTo` (optional): Filter by assigned user
 - `status` (optional): Filter by status
 
 **Response:**
+
 ```json
 [
   {
@@ -432,6 +458,7 @@ GET /api/tasks/:id
 ```
 
 **Response:**
+
 ```json
 {
   "id": "uuid",
@@ -458,6 +485,7 @@ POST /api/tasks
 ```
 
 **Request Body:**
+
 ```json
 {
   "subProjectId": "uuid",
@@ -472,6 +500,7 @@ POST /api/tasks
 ```
 
 **Response:**
+
 ```json
 {
   "id": "uuid"
@@ -485,6 +514,7 @@ PUT /api/tasks/:id
 ```
 
 **Request Body:**
+
 ```json
 {
   "title": "Updated Task",
@@ -496,6 +526,7 @@ PUT /api/tasks/:id
 ```
 
 **Response:**
+
 ```json
 {
   "id": "uuid"
@@ -509,6 +540,7 @@ DELETE /api/tasks/:id
 ```
 
 **Response:**
+
 ```json
 {
   "message": "Task deleted successfully"
@@ -522,6 +554,7 @@ POST /api/tasks/:id/complete
 ```
 
 **Response:**
+
 ```json
 {
   "message": "Task completed successfully"
@@ -535,6 +568,7 @@ POST /api/tasks/:id/approve
 ```
 
 **Request Body:**
+
 ```json
 {
   "approvedBy": "uuid"
@@ -542,6 +576,7 @@ POST /api/tasks/:id/approve
 ```
 
 **Response:**
+
 ```json
 {
   "message": "Task approved successfully"
@@ -555,6 +590,7 @@ POST /api/tasks/:id/reject
 ```
 
 **Request Body:**
+
 ```json
 {
   "reason": "Needs more work"
@@ -562,6 +598,7 @@ POST /api/tasks/:id/reject
 ```
 
 **Response:**
+
 ```json
 {
   "message": "Task rejected successfully"
@@ -579,6 +616,7 @@ GET /api/tasks/:id/comments
 ```
 
 **Response:**
+
 ```json
 [
   {
@@ -600,6 +638,7 @@ POST /api/tasks/:id/comments
 ```
 
 **Request Body:**
+
 ```json
 {
   "taskId": "uuid",
@@ -610,6 +649,7 @@ POST /api/tasks/:id/comments
 ```
 
 **Response:**
+
 ```json
 {
   "id": "uuid"
@@ -623,6 +663,7 @@ DELETE /api/tasks/:id/comments/:commentId
 ```
 
 **Response:**
+
 ```json
 {
   "message": "Task comment deleted successfully"
@@ -636,6 +677,7 @@ DELETE /api/tasks/:id/comments/:commentId
 All endpoints may return the following error responses:
 
 ### 400 Bad Request
+
 ```json
 {
   "error": "Validation error message"
@@ -643,6 +685,7 @@ All endpoints may return the following error responses:
 ```
 
 ### 401 Unauthorized
+
 ```json
 {
   "error": "Unauthorized"
@@ -650,6 +693,7 @@ All endpoints may return the following error responses:
 ```
 
 ### 403 Forbidden
+
 ```json
 {
   "error": "Forbidden"
@@ -657,6 +701,7 @@ All endpoints may return the following error responses:
 ```
 
 ### 404 Not Found
+
 ```json
 {
   "error": "Resource not found"
@@ -664,6 +709,7 @@ All endpoints may return the following error responses:
 ```
 
 ### 500 Internal Server Error
+
 ```json
 {
   "error": "Internal server error"

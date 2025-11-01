@@ -45,6 +45,7 @@ As an **Admin**, you have full access to manage the entire platform, including p
 #### 1. Program Management
 
 **Creating a Program:**
+
 1. Go to **Dashboard** > **Programs**
 2. Click **"New Program"**
 3. Fill in program details:
@@ -56,6 +57,7 @@ As an **Admin**, you have full access to manage the entire platform, including p
 4. Click **"Create Program"**
 
 **Managing Programs:**
+
 - View all programs in a grid or list
 - Edit program details
 - Assign companies to programs
@@ -65,6 +67,7 @@ As an **Admin**, you have full access to manage the entire platform, including p
 #### 2. Company Management
 
 **Adding a Company:**
+
 1. Go to **Dashboard** > **Companies**
 2. Click **"New Company"**
 3. Enter company information:
@@ -76,6 +79,7 @@ As an **Admin**, you have full access to manage the entire platform, including p
 5. Click **"Create Company"**
 
 **Managing Companies:**
+
 - View all companies
 - Edit company details
 - Assign users to companies
@@ -85,6 +89,7 @@ As an **Admin**, you have full access to manage the entire platform, including p
 #### 3. User Management
 
 **Creating Users:**
+
 1. Go to **Dashboard** > **Users**
 2. Click **"New User"**
 3. Select user role:
@@ -95,6 +100,7 @@ As an **Admin**, you have full access to manage the entire platform, including p
 5. Click **"Create User"**
 
 **Managing Users:**
+
 - View all users by role
 - Edit user information
 - Assign roles and permissions
@@ -104,6 +110,7 @@ As an **Admin**, you have full access to manage the entire platform, including p
 #### 4. Project Templates
 
 **Creating Templates:**
+
 1. Go to **Dashboard** > **Project Templates**
 2. Click **"New Template"**
 3. Enter template details:
@@ -121,6 +128,7 @@ As an **Admin**, you have full access to manage the entire platform, including p
 6. Click **"Create Template"**
 
 **Using Templates:**
+
 - Templates are reusable project structures
 - Consultants can create projects from templates
 - Templates can be edited and versioned
@@ -138,6 +146,7 @@ As a **Consultant**, you manage programs, companies, and projects. You create pr
 #### 1. Program Overview
 
 **Viewing Programs:**
+
 1. Go to **Consultant Dashboard**
 2. View assigned programs
 3. See program statistics:
@@ -146,6 +155,7 @@ As a **Consultant**, you manage programs, companies, and projects. You create pr
    - Completion rate
 
 **Managing Program Companies:**
+
 1. Click on a program
 2. View enrolled companies
 3. See company progress
@@ -154,6 +164,7 @@ As a **Consultant**, you manage programs, companies, and projects. You create pr
 #### 2. Project Management
 
 **Creating Projects:**
+
 1. Go to **Projects** > **New Project**
 2. Choose:
    - **From Template:** Select a template and customize
@@ -167,6 +178,7 @@ As a **Consultant**, you manage programs, companies, and projects. You create pr
 4. Click **"Create Project"**
 
 **Managing Projects:**
+
 - View all projects (by company, status, priority)
 - Edit project details
 - Track project progress (auto-calculated)
@@ -176,6 +188,7 @@ As a **Consultant**, you manage programs, companies, and projects. You create pr
 #### 3. Sub-Project Management
 
 **Creating Sub-Projects:**
+
 1. Open a project
 2. Go to **Sub-Projects** tab
 3. Click **"New Sub-Project"**
@@ -186,6 +199,7 @@ As a **Consultant**, you manage programs, companies, and projects. You create pr
 5. Click **"Create Sub-Project"**
 
 **Managing Sub-Projects:**
+
 - Reorder sub-projects (drag & drop)
 - Edit sub-project details
 - Track sub-project progress
@@ -194,6 +208,7 @@ As a **Consultant**, you manage programs, companies, and projects. You create pr
 #### 4. Task Management
 
 **Creating Tasks:**
+
 1. Open a sub-project
 2. Click **"New Task"**
 3. Fill in task details:
@@ -205,6 +220,7 @@ As a **Consultant**, you manage programs, companies, and projects. You create pr
 4. Click **"Create Task"**
 
 **Managing Tasks:**
+
 - View all tasks (by status, assignee, due date)
 - Edit task details
 - Reassign tasks
@@ -214,6 +230,7 @@ As a **Consultant**, you manage programs, companies, and projects. You create pr
 #### 5. Task Review & Approval
 
 **Reviewing Tasks:**
+
 1. Go to **Tasks** > **Review**
 2. View tasks marked as complete by company users
 3. Click on a task to review:
@@ -222,6 +239,7 @@ As a **Consultant**, you manage programs, companies, and projects. You create pr
    - Check completion quality
 
 **Approving/Rejecting Tasks:**
+
 - **Approve:** Click **"Approve"** to mark task as done
 - **Reject:** Click **"Reject"** and provide feedback
 - Rejected tasks return to company user for revision
@@ -239,12 +257,14 @@ As a **Company User**, you view assigned projects, complete tasks, and communica
 #### 1. Dashboard Overview
 
 **What You See:**
+
 - Assigned projects
 - Pending tasks
 - Completed tasks
 - Recent activity
 
 **Quick Actions:**
+
 - View project details
 - Complete tasks
 - Add comments
@@ -252,6 +272,7 @@ As a **Company User**, you view assigned projects, complete tasks, and communica
 #### 2. Project View
 
 **Viewing Projects:**
+
 1. Go to **Company Dashboard**
 2. See all assigned projects
 3. Click on a project to view details:
@@ -262,6 +283,7 @@ As a **Company User**, you view assigned projects, complete tasks, and communica
    - Tasks
 
 **Project Progress:**
+
 - Overall project completion percentage
 - Sub-project breakdown
 - Task status overview
@@ -269,6 +291,7 @@ As a **Company User**, you view assigned projects, complete tasks, and communica
 #### 3. Task Completion
 
 **Completing Tasks:**
+
 1. Go to **Tasks** or open a project
 2. Click on a task
 3. Read task description and requirements
@@ -277,6 +300,7 @@ As a **Company User**, you view assigned projects, complete tasks, and communica
 6. Click **"Submit"**
 
 **Task Status:**
+
 - **Todo:** Not started
 - **In Progress:** Currently working on
 - **Review:** Submitted for consultant review
@@ -286,12 +310,14 @@ As a **Company User**, you view assigned projects, complete tasks, and communica
 #### 4. Communication
 
 **Adding Comments:**
+
 1. Open a task
 2. Scroll to **Comments** section
 3. Type your comment or question
 4. Click **"Add Comment"**
 
 **Asking Questions:**
+
 - Mark comment as a question
 - Consultant will be notified
 - Receive responses in the same thread
@@ -303,6 +329,7 @@ As a **Company User**, you view assigned projects, complete tasks, and communica
 ### Profile Management
 
 **Updating Profile:**
+
 1. Click on your avatar (top right)
 2. Select **"Profile"**
 3. Update your information:
@@ -315,6 +342,7 @@ As a **Company User**, you view assigned projects, complete tasks, and communica
 ### Notifications
 
 **Viewing Notifications:**
+
 - Click the bell icon (top right)
 - See recent activity:
   - Task assignments
@@ -323,6 +351,7 @@ As a **Company User**, you view assigned projects, complete tasks, and communica
   - Project updates
 
 **Notification Settings:**
+
 - Email notifications
 - In-app notifications
 - Notification frequency
@@ -330,6 +359,7 @@ As a **Company User**, you view assigned projects, complete tasks, and communica
 ### Search & Filters
 
 **Global Search:**
+
 - Click search icon or press `Cmd/Ctrl + K`
 - Search for:
   - Projects
@@ -338,6 +368,7 @@ As a **Company User**, you view assigned projects, complete tasks, and communica
   - Users
 
 **Filtering:**
+
 - Use filters on list pages:
   - Status
   - Priority
@@ -348,6 +379,7 @@ As a **Company User**, you view assigned projects, complete tasks, and communica
 ### Responsive Design
 
 **Mobile Access:**
+
 - Akademi Port is fully responsive
 - Access from any device:
   - Desktop
@@ -506,4 +538,3 @@ A: Yes, use the export feature on list pages to download CSV or Excel files.
 Thank you for using Akademi Port! 🚀
 
 For more information, visit [akademiport.com](https://akademiport.com)
-

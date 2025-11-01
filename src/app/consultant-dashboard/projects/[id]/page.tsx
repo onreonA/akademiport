@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { ArrowLeft, FolderKanban, Plus, Edit } from 'lucide-react';
+import { ArrowLeft, FolderKanban, Plus, Edit, Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
 import { GradientHeader } from '@/presentation/components/ui/molecules/gradient-header';
 import { EnhancedCard } from '@/presentation/components/ui/atoms/enhanced-card';
 import { Button } from '@/presentation/components/ui/atoms/button';
@@ -99,6 +100,32 @@ export default function ConsultantProjectDetailPage() {
       setTasks(data.tasks || []);
     } catch (error) {
       console.error('Error fetching tasks:', error);
+    }
+  };
+
+  const handleDeleteSubProject = async (subProjectId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (
+      !confirm('Bu alt projeyi silmek istediğinizden emin misiniz? Tüm görevler de silinecektir.')
+    ) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/sub-projects/${subProjectId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to delete sub-project');
+      }
+
+      toast.success('Alt proje başarıyla silindi!');
+      setSubProjects(subProjects.filter((sp) => sp.id !== subProjectId));
+    } catch (error) {
+      console.error('Error deleting sub-project:', error);
+      toast.error(error instanceof Error ? error.message : 'Bir hata oluştu');
     }
   };
 
@@ -264,25 +291,35 @@ export default function ConsultantProjectDetailPage() {
                             </div>
                             <div className="h-2 bg-muted rounded-full overflow-hidden">
                               <div
-                                className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 transition-all"
+                                className="h-full bg-linear-to-r from-blue-500 to-indigo-500 transition-all"
                                 style={{ width: `${subProject.progress}%` }}
                               />
                             </div>
                           </div>
                         </div>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          router.push(
-                            `/consultant-dashboard/projects/${projectId}/sub-projects/${subProject.id}/edit`
-                          );
-                        }}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            router.push(
+                              `/consultant-dashboard/projects/${projectId}/sub-projects/${subProject.id}/edit`
+                            );
+                          }}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => handleDeleteSubProject(subProject.id, e)}
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
                   </EnhancedCard>
                 ))}

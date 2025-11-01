@@ -19,10 +19,11 @@ export class CreateUserUseCase {
 
   async execute(request: CreateUserRequest): Promise<Result<User>> {
     try {
-      // 1. Authorization: Only MASTER_ADMIN and PROGRAM_MANAGER can create users
+      // 1. Authorization: MASTER_ADMIN, PROGRAM_MANAGER, and CONSULTANT can create users
       if (
         request.userRole !== UserRole.MASTER_ADMIN &&
-        request.userRole !== UserRole.PROGRAM_MANAGER
+        request.userRole !== UserRole.PROGRAM_MANAGER &&
+        request.userRole !== UserRole.CONSULTANT
       ) {
         return Result.fail('Bu işlem için yetkiniz yok');
       }
@@ -34,12 +35,20 @@ export class CreateUserUseCase {
         }
       }
 
-      // 3. Validation: Email is required
+      // 3. CONSULTANT can only create COMPANY_USER or COMPANY_ADMIN
+      if (request.userRole === UserRole.CONSULTANT) {
+        if (request.role !== UserRole.COMPANY_USER && request.role !== UserRole.COMPANY_ADMIN) {
+          return Result.fail('Danışman sadece firma kullanıcıları oluşturabilir');
+        }
+        // TODO: Check if company is in consultant's program
+      }
+
+      // 4. Validation: Email is required
       if (!request.email || !request.email.trim()) {
         return Result.fail('Email zorunludur');
       }
 
-      // 4. Validation: First name and last name are required
+      // 5. Validation: First name and last name are required
       if (!request.firstName || !request.firstName.trim()) {
         return Result.fail('Ad zorunludur');
       }

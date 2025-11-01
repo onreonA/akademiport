@@ -89,9 +89,7 @@ describe('TaskComment Entity', () => {
         },
       ];
 
-      const sorted = [...comments].sort(
-        (a, b) => a.createdAt.getTime() - b.createdAt.getTime()
-      );
+      const sorted = [...comments].sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
 
       expect(sorted[0].id).toBe('comment-1');
       expect(sorted[1].id).toBe('comment-2');
@@ -136,4 +134,3 @@ describe('TaskComment Entity', () => {
     });
   });
 });
-

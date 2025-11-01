@@ -44,7 +44,7 @@ describe('SubProject Entity', () => {
   describe('Status', () => {
     it('should have valid status values', () => {
       const validStatuses = ['todo', 'in_progress', 'review', 'done', 'cancelled'];
-      
+
       validStatuses.forEach((status) => {
         const subProject: SubProject = {
           id: 'subproject-1',
@@ -98,7 +98,7 @@ describe('SubProject Entity', () => {
       ];
 
       const sorted = [...subProjects].sort((a, b) => a.orderIndex - b.orderIndex);
-      
+
       expect(sorted[0].orderIndex).toBe(1);
       expect(sorted[1].orderIndex).toBe(2);
       expect(sorted[2].orderIndex).toBe(3);
@@ -123,4 +123,3 @@ describe('SubProject Entity', () => {
     });
   });
 });
-

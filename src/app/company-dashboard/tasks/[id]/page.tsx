@@ -2,21 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import {
-  ListTodo,
-  ArrowLeft,
-  CheckCircle2,
-  Clock,
-  AlertCircle,
-  MessageSquare,
-  Send,
-  User,
-} from 'lucide-react';
+import { ListTodo, ArrowLeft, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
+import { TaskComments } from '@/1-presentation/components/features/tasks/TaskComments';
+import { useAuth } from '@/5-shared/hooks/useAuth';
 import { GradientHeader } from '@/presentation/components/ui/molecules/gradient-header';
 import { EnhancedCard } from '@/presentation/components/ui/atoms/enhanced-card';
 import { Badge } from '@/presentation/components/ui/atoms/badge';
 import { Button } from '@/presentation/components/ui/atoms/button';
-import { Textarea } from '@/presentation/components/ui/atoms/textarea';
 
 interface Task {
   id: string;
@@ -34,18 +26,6 @@ interface Task {
       id: string;
       name: string;
     };
-  };
-}
-
-interface Comment {
-  id: string;
-  user_id: string;
-  comment: string;
-  is_question: boolean;
-  created_at: string;
-  user?: {
-    full_name: string;
-    role: string;
   };
 }
 
@@ -68,18 +48,15 @@ export default function CompanyTaskDetailPage() {
   const params = useParams();
   const router = useRouter();
   const taskId = params.id as string;
+  const { user } = useAuth();
 
   const [task, setTask] = useState<Task | null>(null);
-  const [comments, setComments] = useState<Comment[]>([]);
-  const [newComment, setNewComment] = useState('');
-  const [isQuestion, setIsQuestion] = useState(false);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchTask();
-    fetchComments();
   }, [taskId]);
 
   const fetchTask = async () => {
@@ -88,22 +65,11 @@ export default function CompanyTaskDetailPage() {
       const response = await fetch(`/api/tasks/${taskId}`);
       if (!response.ok) throw new Error('Failed to fetch task');
       const data = await response.json();
-      setTask(data.task);
+      setTask(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchComments = async () => {
-    try {
-      const response = await fetch(`/api/tasks/${taskId}/comments`);
-      if (!response.ok) throw new Error('Failed to fetch comments');
-      const data = await response.json();
-      setComments(data.comments || []);
-    } catch (err) {
-      console.error('Error fetching comments:', err);
     }
   };
 
@@ -123,36 +89,6 @@ export default function CompanyTaskDetailPage() {
 
       await fetchTask();
       alert('Görev başarıyla tamamlandı ve danışmanınıza gönderildi!');
-    } catch (err) {
-      alert(err instanceof Error ? err.message : 'An error occurred');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleAddComment = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newComment.trim()) return;
-
-    setSubmitting(true);
-    try {
-      const response = await fetch(`/api/tasks/${taskId}/comments`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          comment: newComment,
-          is_question: isQuestion,
-        }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to add comment');
-      }
-
-      setNewComment('');
-      setIsQuestion(false);
-      await fetchComments();
     } catch (err) {
       alert(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -301,73 +237,12 @@ export default function CompanyTaskDetailPage() {
         </EnhancedCard>
 
         {/* Comments Section */}
-        <EnhancedCard variant="glass" className="p-6 md:p-8">
-          <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
-            <MessageSquare className="w-5 h-5" />
-            Yorumlar & Sorular ({comments.length})
-          </h3>
-
-          {/* Comments List */}
-          <div className="space-y-4 mb-6">
-            {comments.length === 0 ? (
-              <p className="text-center text-muted-foreground py-8">Henüz yorum yok</p>
-            ) : (
-              comments.map((comment) => (
-                <div key={comment.id} className="p-4 rounded-lg bg-muted/50 border border-border">
-                  <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-full bg-linear-to-br from-primary to-secondary flex items-center justify-center text-white font-semibold shrink-0">
-                      {comment.user?.full_name?.charAt(0) || 'U'}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <p className="font-semibold">{comment.user?.full_name || 'Kullanıcı'}</p>
-                        {comment.is_question && (
-                          <Badge variant="outline" className="text-xs">
-                            Soru
-                          </Badge>
-                        )}
-                        <span className="text-xs text-muted-foreground">
-                          {new Date(comment.created_at).toLocaleDateString('tr-TR')}
-                        </span>
-                      </div>
-                      <p className="text-sm whitespace-pre-wrap">{comment.comment}</p>
-                    </div>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-
-          {/* Add Comment Form */}
-          <form onSubmit={handleAddComment} className="space-y-4">
-            <Textarea
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              placeholder="Yorum veya soru yazın..."
-              rows={3}
-              disabled={submitting}
-            />
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={isQuestion}
-                  onChange={(e) => setIsQuestion(e.target.checked)}
-                  className="w-4 h-4"
-                />
-                <span className="text-sm">Bu bir soru</span>
-              </label>
-              <Button
-                type="submit"
-                disabled={submitting || !newComment.trim()}
-                className="w-full sm:w-auto"
-              >
-                <Send className="w-4 h-4 mr-2" />
-                {submitting ? 'Gönderiliyor...' : 'Gönder'}
-              </Button>
-            </div>
-          </form>
-        </EnhancedCard>
+        {user && (
+          <EnhancedCard variant="glass" className="p-6 md:p-8">
+            <h3 className="text-xl font-bold mb-6">Yorumlar & Sorular</h3>
+            <TaskComments taskId={taskId} currentUserId={user.id} />
+          </EnhancedCard>
+        )}
       </div>
     </div>
   );

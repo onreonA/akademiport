@@ -22,6 +22,7 @@ Akademi Port is built using **Domain-Driven Design (DDD)** principles with a cle
 ## Technology Stack
 
 ### Frontend
+
 - **Framework:** Next.js 16.0.1 (App Router, Turbopack)
 - **Language:** TypeScript 5
 - **UI Library:** React 19.2.0
@@ -32,6 +33,7 @@ Akademi Port is built using **Domain-Driven Design (DDD)** principles with a cle
 - **Icons:** Lucide React
 
 ### Backend
+
 - **Runtime:** Node.js
 - **Framework:** Next.js API Routes
 - **Database:** PostgreSQL (via Supabase)
@@ -39,11 +41,13 @@ Akademi Port is built using **Domain-Driven Design (DDD)** principles with a cle
 - **Authentication:** Supabase Auth
 
 ### Testing
+
 - **Test Framework:** Vitest
 - **Testing Library:** @testing-library/react
 - **Coverage:** v8
 
 ### Development Tools
+
 - **Linter:** ESLint 9
 - **Formatter:** Prettier
 - **Type Checking:** TypeScript
@@ -117,12 +121,14 @@ akademi-port/
 **Responsibility:** User interface and user interaction
 
 **Components:**
+
 - **Atoms:** Basic UI components (Button, Input, Card, etc.)
 - **Molecules:** Composite components (GradientHeader, StatCard, etc.)
 - **Organisms:** Complex sections (Sidebar, Header, Forms, etc.)
 - **Features:** Feature-specific components (UserCard, ProgramForm, etc.)
 
 **Key Principles:**
+
 - Components are pure and reusable
 - No business logic in components
 - Props-driven design
@@ -133,16 +139,19 @@ akademi-port/
 **Responsibility:** Application-specific business logic
 
 **Use Cases:**
+
 - Each use case represents a single business operation
 - Use cases orchestrate domain entities and repositories
 - Return `Result<T>` for consistent error handling
 
 **Example Use Cases:**
+
 - `CreateProjectUseCase`
 - `CompleteTaskUseCase`
 - `ApproveTaskUseCase`
 
 **Pattern:**
+
 ```typescript
 export class CreateProjectUseCase {
   constructor(private projectRepository: IProjectRepository) {}
@@ -161,16 +170,19 @@ export class CreateProjectUseCase {
 **Responsibility:** Core business entities and rules
 
 **Entities:**
+
 - Pure TypeScript interfaces/types
 - No dependencies on external libraries
 - Represent core business concepts
 
 **Repository Interfaces:**
+
 - Define contracts for data access
 - Implementation-agnostic
 - Used by application layer
 
 **Example Entity:**
+
 ```typescript
 export interface Project {
   id: string;
@@ -192,11 +204,13 @@ export interface Project {
 **Responsibility:** External services and data persistence
 
 **Components:**
+
 - **Repositories:** Supabase database implementations
 - **API Helpers:** Authentication, validation, error handling
 - **Migrations:** SQL schema definitions
 
 **Key Features:**
+
 - Implements domain repository interfaces
 - Handles database connections
 - Manages external service integrations
@@ -206,6 +220,7 @@ export interface Project {
 **Responsibility:** Cross-cutting concerns and utilities
 
 **Contents:**
+
 - Constants (navigation, roles, etc.)
 - Shared hooks (useAuth, useSupabase, etc.)
 - Utility functions
@@ -217,11 +232,13 @@ export interface Project {
 **Responsibility:** Fundamental patterns and utilities
 
 **Components:**
+
 - **Result Pattern:** Type-safe error handling
 - **Error Classes:** Standardized error types
 - **Base Types:** Core type definitions
 
 **Result Pattern:**
+
 ```typescript
 type Result<T> = {
   isSuccess: boolean;
@@ -292,11 +309,13 @@ UI Update
 **Purpose:** Abstract data access logic
 
 **Implementation:**
+
 - Interface in domain layer
 - Implementation in infrastructure layer
 - Dependency injection in use cases
 
 **Benefits:**
+
 - Testable (easy to mock)
 - Swappable implementations
 - Clean separation of concerns
@@ -306,6 +325,7 @@ UI Update
 **Purpose:** Type-safe error handling without exceptions
 
 **Implementation:**
+
 ```typescript
 // Success
 return Result.ok(data);
@@ -325,6 +345,7 @@ if (result.isSuccess) {
 ```
 
 **Benefits:**
+
 - Explicit error handling
 - Type-safe
 - No try-catch boilerplate
@@ -334,6 +355,7 @@ if (result.isSuccess) {
 **Purpose:** Loose coupling and testability
 
 **Implementation:**
+
 ```typescript
 // Use case receives dependencies via constructor
 export class CreateProjectUseCase {
@@ -350,6 +372,7 @@ const useCase = new CreateProjectUseCase(repository);
 **Purpose:** Object creation abstraction
 
 **Usage:**
+
 - Entity validation and creation
 - Repository instantiation
 
@@ -358,6 +381,7 @@ const useCase = new CreateProjectUseCase(repository);
 **Purpose:** React state management
 
 **Implementation:**
+
 - React hooks (useState, useEffect)
 - Context API for global state
 
@@ -368,36 +392,43 @@ const useCase = new CreateProjectUseCase(repository);
 ### Core Tables
 
 #### `users`
+
 - User authentication and profile
 - Role-based access control
 - Company association
 
 #### `programs`
+
 - Training programs
 - Managed by consultants
 - Associated with multiple companies
 
 #### `companies`
+
 - Company profiles
 - Program enrollment
 - User management
 
 #### `projects`
+
 - Project management
 - Template support
 - Progress tracking
 
 #### `sub_projects`
+
 - Project breakdown
 - Ordered hierarchy
 - Status tracking
 
 #### `tasks`
+
 - Task assignment
 - Approval workflow
 - Due date tracking
 
 #### `task_comments`
+
 - Task discussions
 - Question/answer support
 - User attribution
@@ -419,6 +450,7 @@ const useCase = new CreateProjectUseCase(repository);
 **Provider:** Supabase Auth
 
 **Flow:**
+
 1. User submits credentials
 2. Supabase validates and creates session
 3. Session cookie stored in browser
@@ -434,11 +466,13 @@ const useCase = new CreateProjectUseCase(repository);
 - **Company:** View assigned projects, complete tasks
 
 **Implementation:**
+
 - Middleware checks user role
 - API routes validate permissions
 - RLS policies enforce database-level security
 
 **Example:**
+
 ```typescript
 const { user, error } = await auth(req);
 if (error) {
@@ -457,25 +491,30 @@ if (user.role !== 'admin') {
 ### Client-Side State
 
 **Local State:**
+
 - `useState` for component-specific state
 - `useReducer` for complex state logic
 
 **Server State:**
+
 - `fetch` for API calls
 - Manual cache invalidation
 - Loading and error states
 
 **Global State:**
+
 - Context API for auth state
 - Minimal global state (auth only)
 
 ### Server-Side State
 
 **Database:**
+
 - Single source of truth
 - Supabase real-time subscriptions (future)
 
 **Session:**
+
 - User authentication
 - Role and permissions
 
@@ -569,4 +608,3 @@ if (user.role !== 'admin') {
 ## Contributing
 
 See [DEVELOPER.md](./DEVELOPER.md) for development guidelines and contribution process.
-

@@ -86,25 +86,46 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+    console.log('🔵 [API] POST /api/users - Request body:', JSON.stringify(body, null, 2));
 
     // TODO: Get authenticated user from session (Sprint 5 - Faz H)
 
     const user = await requireAuth(request);
     const userId = user.id;
     const userRole = user.role as UserRole;
+    console.log('🔵 [API] Authenticated user:', { userId, userRole });
 
     // Execute use case
+    console.log('🔵 [API] Calling CreateUserUseCase with:', {
+      ...body,
+      createdBy: userId,
+      userRole,
+    });
     const result = await createUserUseCase.execute({
       ...body,
       createdBy: userId,
       userRole,
     });
+    console.log('🔵 [API] Use case result:', {
+      isSuccess: result.isSuccess,
+      isFailure: result.isFailure,
+      error: result.error?.message || result.error?.toString(),
+    });
 
     if (result.isFailure) {
+      console.error('🔴 Create user failed - Full error:', result.error);
+      console.error('🔴 Error type:', typeof result.error);
+      console.error('🔴 Error message:', result.error?.message);
+      console.error('🔴 Error toString:', result.error?.toString());
+      console.error('🔴 Error JSON:', JSON.stringify(result.error, null, 2));
+      const errorMessage =
+        result.error?.message || result.error?.toString() || 'Kullanıcı oluşturulamadı';
+      console.error('🔴 Returning error message:', errorMessage);
       return NextResponse.json(
         {
           success: false,
-          error: result.error,
+          error: errorMessage,
+          errorDetails: result.error, // Include full error details for debugging
         },
         { status: 400 }
       );

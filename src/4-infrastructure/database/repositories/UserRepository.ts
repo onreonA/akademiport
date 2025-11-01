@@ -4,7 +4,7 @@
  * Supabase implementation of IUserRepository
  */
 
-import { createClient } from '@/infrastructure/database/supabase-server';
+import { createClient, getSupabaseAdminClient } from '@/infrastructure/database/supabase-server';
 import { Result } from '@/core/result/Result';
 import { IUserRepository } from '@/domain/interfaces/IUserRepository';
 import { User } from '@/domain/entities/User';
@@ -87,62 +87,191 @@ export class UserRepository implements IUserRepository {
   }
 
   async create(dto: CreateUserDto): Promise<Result<User>> {
+    console.log('🟢 [UserRepository] create called with DTO:', {
+      email: dto.email,
+      firstName: dto.firstName,
+      lastName: dto.lastName,
+      role: dto.role,
+      companyId: dto.companyId,
+      createdBy: dto.createdBy,
+    });
     try {
-      const supabase = await createClient();
+      // Use admin client for auth.admin operations
+      const supabase = getSupabaseAdminClient();
+
+      // 0. Check if email already exists in public.users
+      console.log('🟢 [UserRepository] Checking if email exists in public.users...');
+      const { data: existingUser, error: checkError } = await supabase
+        .from('users')
+        .select('id, email')
+        .eq('email', dto.email)
+        .single();
+
+      if (existingUser && !checkError) {
+        console.error('🔴 [UserRepository] Email already exists in public.users:', dto.email);
+        return Result.fail('Bu email adresi zaten kullanılıyor');
+      }
+
+      // Also check auth.users via admin API (with pagination)
+      console.log('🟢 [UserRepository] Checking auth.users...');
+      try {
+        const { data: authUsers, error: listError } = await supabase.auth.admin.listUsers({
+          page: 1,
+          perPage: 1000, // Limit to avoid performance issues
+        });
+        if (listError) {
+          console.warn('⚠️ [UserRepository] Could not list auth users:', listError.message);
+        } else {
+          const existingAuthUser = authUsers?.users?.find(
+            (u: any) => u.email?.toLowerCase() === dto.email.toLowerCase()
+          );
+          if (existingAuthUser) {
+            console.error('🔴 [UserRepository] Email already exists in auth.users:', dto.email);
+            // Try to delete orphaned auth user (if not in public.users)
+            if (!existingUser) {
+              console.log('🟡 [UserRepository] Attempting to delete orphaned auth user...');
+              const { error: deleteError } = await supabase.auth.admin.deleteUser(
+                existingAuthUser.id
+              );
+              if (deleteError) {
+                console.error(
+                  '🔴 [UserRepository] Could not delete orphaned auth user:',
+                  deleteError
+                );
+                return Result.fail(
+                  'Bu email adresi zaten kullanılıyor. Lütfen farklı bir email deneyin.'
+                );
+              }
+              console.log('🟢 [UserRepository] Orphaned auth user deleted, continuing...');
+            } else {
+              return Result.fail('Bu email adresi zaten kullanılıyor');
+            }
+          }
+        }
+      } catch (listError) {
+        console.warn('⚠️ [UserRepository] Error checking auth.users:', listError);
+        // Continue anyway - will fail at createUser if email exists
+      }
 
       // 1. Create Supabase Auth user first
-      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+      // Simplify user_metadata to avoid potential conflicts
+      console.log('🟢 [UserRepository] Creating Supabase Auth user...');
+      const authUserPayload = {
         email: dto.email,
         password: dto.password,
         email_confirm: true, // Auto-confirm email
         user_metadata: {
-          first_name: dto.firstName,
-          last_name: dto.lastName,
           full_name: dto.fullName || `${dto.firstName} ${dto.lastName}`,
-          role: dto.role || UserRole.COMPANY_USER,
         },
+      };
+      console.log('🟢 [UserRepository] Auth user payload:', {
+        ...authUserPayload,
+        password: '***', // Don't log password
       });
+      const { data: authData, error: authError } =
+        await supabase.auth.admin.createUser(authUserPayload);
 
       if (authError) {
-        return Result.fail(authError.message);
+        console.error('🔴 [UserRepository] Auth error - Full details:', {
+          message: authError.message,
+          status: authError.status,
+          code: authError.code,
+          name: authError.name,
+          __isAuthError: (authError as any).__isAuthError,
+          fullError: JSON.stringify(authError, Object.getOwnPropertyNames(authError)),
+        });
+
+        // Provide more helpful error messages
+        let errorMessage =
+          authError.message || `Auth error: ${authError.status} ${authError.code || 'unknown'}`;
+
+        if (authError.code === 'unexpected_failure') {
+          errorMessage = `Kullanıcı oluşturulamadı: ${authError.message || 'Beklenmeyen bir hata oluştu'}. Lütfen Supabase Dashboard'daki Auth Logs'u kontrol edin veya farklı bir email deneyin.`;
+        } else if (authError.status === 400 && authError.message?.toLowerCase().includes('email')) {
+          errorMessage = 'Bu email adresi zaten kullanılıyor veya geçersiz.';
+        } else if (authError.status === 422) {
+          errorMessage = 'Email veya şifre formatı geçersiz.';
+        }
+
+        return Result.fail(errorMessage);
       }
 
       if (!authData.user) {
+        console.error('🔴 [UserRepository] Auth data missing user');
         return Result.fail('Supabase Auth kullanıcısı oluşturulamadı');
       }
 
+      console.log('🟢 [UserRepository] Auth user created:', authData.user.id);
+
       // 2. Insert into public.users table with the same ID
+      const insertData = {
+        id: authData.user.id, // Use the same ID from Auth
+        email: dto.email,
+        full_name: dto.fullName || `${dto.firstName} ${dto.lastName}`,
+        phone: dto.phone,
+        role: dto.role || UserRole.COMPANY_USER,
+        company_id: dto.companyId,
+        bio: dto.bio,
+        expertise_areas: dto.expertiseAreas,
+        social_links: dto.socialLinks,
+        is_active: true,
+        is_email_verified: true, // Auto-confirmed
+        created_by: dto.createdBy,
+        updated_by: dto.createdBy,
+      };
+      console.log(
+        '🟢 [UserRepository] Inserting into database:',
+        JSON.stringify(insertData, null, 2)
+      );
       const { data, error } = await supabase
         .from(this.tableName)
-        .insert({
-          id: authData.user.id, // Use the same ID from Auth
-          email: dto.email,
-          first_name: dto.firstName,
-          last_name: dto.lastName,
-          full_name: dto.fullName || `${dto.firstName} ${dto.lastName}`,
-          phone: dto.phone,
-          role: dto.role || UserRole.COMPANY_USER,
-          company_id: dto.companyId,
-          bio: dto.bio,
-          expertise_areas: dto.expertiseAreas,
-          social_links: dto.socialLinks,
-          is_active: true,
-          is_email_verified: true, // Auto-confirmed
-          created_by: dto.createdBy,
-          updated_by: dto.createdBy,
-        })
+        .insert(insertData)
         .select('*')
         .single();
+
+      console.log('🟢 [UserRepository] Database insert result:', {
+        hasData: !!data,
+        hasError: !!error,
+        error: error
+          ? {
+              message: error.message,
+              code: error.code,
+              details: error.details,
+              hint: error.hint,
+            }
+          : null,
+      });
 
       if (error) {
         // Rollback: Delete the auth user if public.users insert fails
         await supabase.auth.admin.deleteUser(authData.user.id);
-        return Result.fail(error.message);
+        console.error('🔴 Database insert error:', JSON.stringify(error, null, 2));
+        console.error('🔴 Error message:', error.message);
+        console.error('🔴 Error code:', error.code);
+        console.error('🔴 Error details:', error.details);
+        console.error('🔴 Insert data:', {
+          id: authData.user.id,
+          email: dto.email,
+          full_name: dto.fullName || `${dto.firstName} ${dto.lastName}`,
+          role: dto.role || UserRole.COMPANY_USER,
+          company_id: dto.companyId,
+        });
+        const errorMessage =
+          error.message ||
+          error.details ||
+          JSON.stringify(error) ||
+          'Database error creating new user';
+        return Result.fail(errorMessage);
       }
 
       return Result.ok(this.mapToEntity(data));
     } catch (error) {
-      return Result.fail(error instanceof Error ? error.message : 'Kullanıcı oluşturulamadı');
+      console.error('🔴 UserRepository.create catch error:', error);
+      console.error('🔴 Error type:', typeof error);
+      console.error('🔴 Error stringified:', JSON.stringify(error, null, 2));
+      const errorMessage =
+        error instanceof Error ? error.message : String(error) || 'Kullanıcı oluşturulamadı';
+      return Result.fail(errorMessage);
     }
   }
 

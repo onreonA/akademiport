@@ -75,6 +75,7 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
 **Get Supabase Credentials:**
+
 1. Create a project at [supabase.com](https://supabase.com)
 2. Go to Project Settings > API
 3. Copy the URL and anon key
@@ -125,6 +126,7 @@ npm run dev
 Visit [http://localhost:3000](http://localhost:3000)
 
 **Default Credentials:**
+
 - Email: `admin@akademiport.com`
 - Password: `password123`
 
@@ -188,7 +190,7 @@ export class SupabaseMyEntityRepository implements IMyEntityRepository {
     if (error) throw new Error(error.message);
     return entity;
   }
-  
+
   // ... other methods
 }
 ```
@@ -246,7 +248,10 @@ export async function POST(req: NextRequest) {
     if (result.isSuccess) {
       return NextResponse.json(result.value, { status: 201 });
     } else {
-      return NextResponse.json({ error: result.error?.message }, { status: result.error?.status || 500 });
+      return NextResponse.json(
+        { error: result.error?.message },
+        { status: result.error?.status || 500 }
+      );
     }
   } catch (error) {
     console.error('Error creating entity:', error);
@@ -514,6 +519,7 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/):
 ```
 
 **Types:**
+
 - `feat`: New feature
 - `fix`: Bug fix
 - `docs`: Documentation
@@ -523,6 +529,7 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/):
 - `chore`: Maintenance
 
 **Examples:**
+
 ```
 feat(projects): add project template creation
 
@@ -544,17 +551,20 @@ Fixes #456
 ### Pull Request Process
 
 1. **Create Branch:**
+
    ```bash
    git checkout -b feature/my-feature
    ```
 
 2. **Make Changes:**
+
    ```bash
    git add .
    git commit -m "feat(scope): description"
    ```
 
 3. **Push to Remote:**
+
    ```bash
    git push origin feature/my-feature
    ```
@@ -590,6 +600,7 @@ npm run dev -- --port 3001
 ### EMFILE: too many open files
 
 **macOS:**
+
 ```bash
 # Check current limit
 ulimit -n
@@ -712,4 +723,3 @@ We welcome contributions! Please read our [CONTRIBUTING.md](./CONTRIBUTING.md) f
 ---
 
 Happy coding! 🚀
-

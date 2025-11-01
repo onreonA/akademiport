@@ -2,36 +2,38 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { Button } from '@/1-presentation/components/ui/atoms/button';
-import { Input } from '@/1-presentation/components/ui/atoms/input';
-import { Label } from '@/1-presentation/components/ui/atoms/label';
-import { Textarea } from '@/1-presentation/components/ui/atoms/textarea';
+import { Briefcase, ArrowLeft, Save, Loader2, Trash2 } from 'lucide-react';
+import { GradientHeader } from '@/presentation/components/ui/molecules/gradient-header';
+import { EnhancedCard } from '@/presentation/components/ui/atoms/enhanced-card';
+import { Button } from '@/presentation/components/ui/atoms/button';
+import { Input } from '@/presentation/components/ui/atoms/input';
+import { Label } from '@/presentation/components/ui/atoms/label';
+import { Textarea } from '@/presentation/components/ui/atoms/textarea';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/1-presentation/components/ui/atoms/select';
-import { GradientHeader } from '@/1-presentation/components/ui/molecules/gradient-header';
-import { EnhancedCard } from '@/1-presentation/components/ui/atoms/enhanced-card';
-import { ArrowLeft, Save, Loader2 } from 'lucide-react';
-import Link from 'next/link';
+} from '@/presentation/components/ui/atoms/select';
 import { toast } from 'sonner';
+import Link from 'next/link';
 
 interface Project {
   id: string;
+  companyId: string;
   name: string;
-  description: string;
+  description?: string;
   status: string;
   priority: string;
-  startDate: string | null;
-  endDate: string | null;
+  startDate?: string;
+  endDate?: string;
   progress: number;
-  companyId: string;
-  consultantId: string;
-  isTemplate: boolean;
-  createdAt: string;
+}
+
+interface Company {
+  id: string;
+  name: string;
 }
 
 export default function EditProjectPage() {
@@ -41,8 +43,12 @@ export default function EditProjectPage() {
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [project, setProject] = useState<Project | null>(null);
+  const [companies, setCompanies] = useState<Company[]>([]);
+  const [companiesLoading, setCompaniesLoading] = useState(true);
   const [formData, setFormData] = useState({
+    companyId: '',
     name: '',
     description: '',
     status: 'planning',
@@ -52,29 +58,137 @@ export default function EditProjectPage() {
   });
 
   useEffect(() => {
-    fetchProject();
+    async function loadData() {
+      await Promise.all([fetchProject(), fetchCompanies()]);
+    }
+    loadData();
   }, [projectId]);
 
   const fetchProject = async () => {
     try {
+      setLoading(true);
       const response = await fetch(`/api/projects/${projectId}`);
       if (!response.ok) throw new Error('Failed to fetch project');
-
       const data = await response.json();
       setProject(data);
-      setFormData({
-        name: data.name,
-        description: data.description || '',
-        status: data.status,
-        priority: data.priority,
-        startDate: data.startDate ? new Date(data.startDate).toISOString().split('T')[0] : '',
-        endDate: data.endDate ? new Date(data.endDate).toISOString().split('T')[0] : '',
-      });
+
+      console.log('📦 [Edit Project] Project data:', data);
+      console.log('📦 [Edit Project] companyId:', data.companyId);
+
+      // Set form data with companyId - ensure it's set only if companyId exists
+      if (data.companyId) {
+        setFormData((prev) => {
+          const newData = {
+            ...prev,
+            companyId: data.companyId,
+            name: data.name,
+            description: data.description || '',
+            status: data.status,
+            priority: data.priority,
+            startDate: data.startDate ? new Date(data.startDate).toISOString().split('T')[0] : '',
+            endDate: data.endDate ? new Date(data.endDate).toISOString().split('T')[0] : '',
+          };
+          console.log('📦 [Edit Project] Setting formData with companyId:', newData.companyId);
+          return newData;
+        });
+      } else {
+        // If no companyId, set other fields but keep companyId empty
+        setFormData((prev) => ({
+          ...prev,
+          name: data.name,
+          description: data.description || '',
+          status: data.status,
+          priority: data.priority,
+          startDate: data.startDate ? new Date(data.startDate).toISOString().split('T')[0] : '',
+          endDate: data.endDate ? new Date(data.endDate).toISOString().split('T')[0] : '',
+        }));
+      }
     } catch (error) {
       console.error('Error fetching project:', error);
       toast.error('Proje yüklenemedi');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchCompanies = async () => {
+    try {
+      setCompaniesLoading(true);
+
+      // For consultants, we need to get companies from their programs
+      // First, get consultant's programs
+      const programsResponse = await fetch('/api/consultant/programs?limit=100');
+      if (!programsResponse.ok) {
+        throw new Error('Failed to fetch programs');
+      }
+      const programsData = await programsResponse.json();
+
+      console.log('📦 [Edit Project] Programs data:', programsData);
+      console.log('📦 [Edit Project] Programs:', programsData.data);
+
+      if (!programsData.success || !programsData.data || programsData.data.length === 0) {
+        console.log('📦 [Edit Project] No programs found for consultant');
+        setCompanies([]);
+        return;
+      }
+
+      // Get companies from all programs
+      const allCompanies: Company[] = [];
+      const companyIds = new Set<string>();
+
+      for (const programItem of programsData.data) {
+        // ConsultantProgramWithStats structure: { program: Program, companiesCount: number, ... }
+        // We need to access program.id from program.program.id
+        const program = programItem.program || programItem;
+        const programId = program.id;
+
+        if (!programId) {
+          console.warn('📦 [Edit Project] Program missing ID:', programItem);
+          continue;
+        }
+
+        try {
+          console.log(`📦 [Edit Project] Fetching companies for program: ${programId}`);
+          const companiesResponse = await fetch(
+            `/api/consultant/programs/${programId}/companies?limit=100`
+          );
+          if (companiesResponse.ok) {
+            const companiesData = await companiesResponse.json();
+            if (companiesData.success && companiesData.data) {
+              // API returns ConsultantCompanyWithStats[] which has { company, programId, ... }
+              // We need to extract the company object from each item
+              for (const companyWithStats of companiesData.data) {
+                // Handle both formats: { company: Company } or direct Company object
+                const company = companyWithStats.company || companyWithStats;
+                if (company && company.id && !companyIds.has(company.id)) {
+                  companyIds.add(company.id);
+                  allCompanies.push(company);
+                }
+              }
+            }
+          }
+        } catch (err) {
+          console.error(`Error fetching companies for program ${programId}:`, err);
+        }
+      }
+
+      // Ensure unique companies by id
+      const uniqueCompanies = Array.from(new Map(allCompanies.map((c) => [c.id, c])).values());
+
+      setCompanies(uniqueCompanies);
+
+      console.log('📦 [Edit Project] Companies loaded:', uniqueCompanies.length);
+      console.log(
+        '📦 [Edit Project] Companies:',
+        uniqueCompanies.map((c) => ({ id: c.id, name: c.name }))
+      );
+      console.log('📦 [Edit Project] Current formData.companyId:', formData.companyId);
+    } catch (error) {
+      console.error('Error fetching companies:', error);
+      toast.error(error instanceof Error ? error.message : 'Firmalar yüklenemedi');
+      setCompanies([]); // Fallback to empty array
+    } finally {
+      setCompaniesLoading(false);
     }
   };
 
@@ -87,9 +201,13 @@ export default function EditProjectPage() {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ...formData,
-          startDate: formData.startDate || null,
-          endDate: formData.endDate || null,
+          companyId: formData.companyId,
+          name: formData.name,
+          description: formData.description,
+          status: formData.status,
+          priority: formData.priority,
+          startDate: formData.startDate || undefined,
+          endDate: formData.endDate || undefined,
         }),
       });
 
@@ -108,11 +226,42 @@ export default function EditProjectPage() {
     }
   };
 
+  const handleDelete = async () => {
+    if (
+      !confirm(
+        'Bu projeyi silmek istediğinizden emin misiniz? Tüm alt projeler ve görevler de silinecektir.'
+      )
+    ) {
+      return;
+    }
+
+    setDeleting(true);
+
+    try {
+      const response = await fetch(`/api/projects/${projectId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to delete project');
+      }
+
+      toast.success('Proje başarıyla silindi!');
+      router.push('/consultant-dashboard/projects');
+    } catch (error) {
+      console.error('Error deleting project:', error);
+      toast.error(error instanceof Error ? error.message : 'Bir hata oluştu');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-background via-background to-primary/5 flex items-center justify-center">
         <div className="text-center space-y-4">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto text-blue-600" />
+          <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary" />
           <p className="text-muted-foreground">Proje yükleniyor...</p>
         </div>
       </div>
@@ -121,7 +270,7 @@ export default function EditProjectPage() {
 
   if (!project) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-background via-background to-primary/5 flex items-center justify-center">
         <div className="text-center space-y-4">
           <p className="text-muted-foreground">Proje bulunamadı</p>
           <Link href="/consultant-dashboard/projects">
@@ -133,13 +282,13 @@ export default function EditProjectPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-      <div className="p-4 md:p-6 lg:p-8 max-w-4xl mx-auto space-y-6">
-        {/* Header */}
+    <div className="min-h-screen bg-linear-to-br from-background via-background to-primary/5 p-4 md:p-6">
+      <div className="mx-auto max-w-4xl space-y-6">
         <GradientHeader
+          icon={Briefcase}
           title="Proje Düzenle"
           subtitle={project.name}
-          icon={Save}
+          progress={project.progress}
           actions={
             <Link href={`/consultant-dashboard/projects/${projectId}`}>
               <Button variant="outline" size="sm">
@@ -150,37 +299,64 @@ export default function EditProjectPage() {
           }
         />
 
-        {/* Progress Info */}
-        <EnhancedCard className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">İlerleme</p>
-              <p className="text-2xl font-bold text-blue-600">%{project.progress}</p>
-            </div>
-            <div className="text-right">
-              <p className="text-sm text-muted-foreground">Oluşturulma</p>
-              <p className="text-sm font-medium">
-                {new Date(project.createdAt).toLocaleDateString('tr-TR')}
-              </p>
-            </div>
-          </div>
-        </EnhancedCard>
-
-        {/* Form */}
-        <EnhancedCard>
+        <EnhancedCard variant="glass" className="p-6">
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Company */}
+            <div className="space-y-2">
+              <Label htmlFor="companyId">
+                Firma <span className="text-destructive">*</span>
+              </Label>
+              {loading || companiesLoading ? (
+                <Input id="companyId" value="Yükleniyor..." disabled className="bg-muted" />
+              ) : companies.length === 0 ? (
+                <Input id="companyId" value="Firma bulunamadı" disabled className="bg-muted" />
+              ) : (
+                <Select
+                  value={
+                    formData.companyId && formData.companyId !== '' ? formData.companyId : undefined
+                  }
+                  onValueChange={(value) => setFormData({ ...formData, companyId: value })}
+                  disabled={saving || deleting}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Firma seçin" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {companies
+                      .filter((company) => company?.id && company?.name)
+                      .filter(
+                        (company, index, self) =>
+                          self.findIndex((c) => c.id === company.id) === index
+                      )
+                      .map((company) => (
+                        <SelectItem key={`company-${company.id}`} value={company.id}>
+                          {company.name}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+              )}
+              {formData.companyId &&
+                companies.length > 0 &&
+                !companies.find((c) => c.id === formData.companyId) && (
+                  <p className="text-sm text-muted-foreground">
+                    Seçili firma listede bulunamadı. Lütfen başka bir firma seçin.
+                  </p>
+                )}
+            </div>
+
             {/* Name */}
             <div className="space-y-2">
               <Label htmlFor="name">
-                Proje Adı <span className="text-red-500">*</span>
+                Proje Adı <span className="text-destructive">*</span>
               </Label>
               <Input
                 id="name"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="Örn: Dijital Dönüşüm Projesi"
+                placeholder="Örn: E-İhracat Dönüşüm Projesi"
                 required
-                disabled={saving}
+                disabled={saving || deleting}
               />
             </div>
 
@@ -193,7 +369,7 @@ export default function EditProjectPage() {
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 placeholder="Proje hakkında detaylı açıklama..."
                 rows={4}
-                disabled={saving}
+                disabled={saving || deleting}
               />
             </div>
 
@@ -204,13 +380,13 @@ export default function EditProjectPage() {
                 <Select
                   value={formData.status}
                   onValueChange={(value) => setFormData({ ...formData, status: value })}
-                  disabled={saving}
+                  disabled={saving || deleting}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Durum seçin" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="planning">Planlanıyor</SelectItem>
+                    <SelectItem value="planning">Planlama</SelectItem>
                     <SelectItem value="active">Aktif</SelectItem>
                     <SelectItem value="on_hold">Beklemede</SelectItem>
                     <SelectItem value="completed">Tamamlandı</SelectItem>
@@ -224,7 +400,7 @@ export default function EditProjectPage() {
                 <Select
                   value={formData.priority}
                   onValueChange={(value) => setFormData({ ...formData, priority: value })}
-                  disabled={saving}
+                  disabled={saving || deleting}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Öncelik seçin" />
@@ -239,7 +415,7 @@ export default function EditProjectPage() {
               </div>
             </div>
 
-            {/* Start & End Date */}
+            {/* Dates */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="startDate">Başlangıç Tarihi</Label>
@@ -248,7 +424,7 @@ export default function EditProjectPage() {
                   type="date"
                   value={formData.startDate}
                   onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                  disabled={saving}
+                  disabled={saving || deleting}
                 />
               </div>
 
@@ -259,14 +435,25 @@ export default function EditProjectPage() {
                   type="date"
                   value={formData.endDate}
                   onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                  disabled={saving}
+                  disabled={saving || deleting}
                 />
               </div>
             </div>
 
+            {/* Progress Info */}
+            <EnhancedCard className="bg-blue-50/50 border-blue-200 p-4">
+              <p className="text-sm text-blue-700">
+                <strong>İlerleme:</strong> {project.progress}% (Otomatik hesaplanır)
+              </p>
+            </EnhancedCard>
+
             {/* Actions */}
             <div className="flex gap-3 pt-4 border-t">
-              <Button type="submit" disabled={saving || !formData.name} className="flex-1">
+              <Button
+                type="submit"
+                disabled={saving || deleting || !formData.name}
+                className="flex-1"
+              >
                 {saving ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -283,7 +470,7 @@ export default function EditProjectPage() {
                 type="button"
                 variant="outline"
                 onClick={() => router.push(`/consultant-dashboard/projects/${projectId}`)}
-                disabled={saving}
+                disabled={saving || deleting}
               >
                 İptal
               </Button>
@@ -291,14 +478,34 @@ export default function EditProjectPage() {
           </form>
         </EnhancedCard>
 
-        {/* Info Card */}
-        <EnhancedCard className="bg-blue-50/50 border-blue-200">
-          <div className="space-y-2">
-            <h3 className="font-semibold text-blue-900">Proje Hakkında Bilgi</h3>
-            <p className="text-sm text-blue-700">
-              Projenin temel bilgilerini buradan düzenleyebilirsiniz. İlerleme otomatik olarak alt
-              projeler ve görevler üzerinden hesaplanır.
-            </p>
+        {/* Delete Section */}
+        <EnhancedCard variant="glass" className="border-red-200 bg-red-50/50 p-6">
+          <div className="space-y-4">
+            <div>
+              <h3 className="font-semibold text-red-900">Tehlikeli Bölge</h3>
+              <p className="text-sm text-red-700 mt-1">
+                Projeyi silerseniz, bu işlem geri alınamaz. Tüm alt projeler, görevler ve yorumlar
+                da silinecektir.
+              </p>
+            </div>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={saving || deleting}
+            >
+              {deleting ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Siliniyor...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Projeyi Sil
+                </>
+              )}
+            </Button>
           </div>
         </EnhancedCard>
       </div>

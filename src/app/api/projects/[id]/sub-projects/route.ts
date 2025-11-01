@@ -51,7 +51,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     }
 
     // Only master_admin and consultant can create sub-projects
-    if (user.userRole !== 'master_admin' && user.userRole !== 'consultant') {
+    if (user.role !== 'master_admin' && user.role !== 'consultant') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 

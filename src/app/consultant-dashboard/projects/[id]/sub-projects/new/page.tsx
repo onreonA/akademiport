@@ -62,7 +62,7 @@ export default function NewSubProjectPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-indigo-50">
       <div className="p-4 md:p-6 lg:p-8 max-w-4xl mx-auto space-y-6">
         {/* Header */}
         <GradientHeader

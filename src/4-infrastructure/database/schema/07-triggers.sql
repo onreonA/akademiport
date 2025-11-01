@@ -158,23 +158,29 @@ CREATE TRIGGER generate_company_slug BEFORE INSERT OR UPDATE ON companies
 -- =====================================================
 -- User Email Verification Trigger
 -- =====================================================
--- Supabase auth ile senkronize eder
-
-CREATE OR REPLACE FUNCTION sync_user_email_verification()
-RETURNS TRIGGER AS $$
-BEGIN
-  IF NEW.email_confirmed_at IS NOT NULL AND OLD.email_confirmed_at IS NULL THEN
-    UPDATE users 
-    SET is_email_verified = true 
-    WHERE id = NEW.id;
-  END IF;
-  
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER sync_user_email_verification_trigger
-  AFTER UPDATE ON auth.users
-  FOR EACH ROW 
-  EXECUTE FUNCTION sync_user_email_verification();
+-- NOT: Bu trigger kaldırıldı çünkü auth.users INSERT sırasında hata veriyordu
+-- Email verification zaten UserRepository'de direkt set ediliyor (is_email_verified: true)
+-- 
+-- Eğer gelecekte email verification senkronizasyonu gerekirse:
+-- 1. Supabase Webhook kullanılabilir (auth.users UPDATE event'inde)
+-- 2. Ya da API endpoint ile manuel senkronize edilebilir
+--
+-- CREATE OR REPLACE FUNCTION sync_user_email_verification()
+-- RETURNS TRIGGER AS $$
+-- BEGIN
+--   IF TG_OP = 'UPDATE' THEN
+--     IF NEW.email_confirmed_at IS NOT NULL AND OLD.email_confirmed_at IS NULL THEN
+--       UPDATE public.users 
+--       SET is_email_verified = true 
+--       WHERE id = NEW.id;
+--     END IF;
+--   END IF;
+--   RETURN NEW;
+-- END;
+-- $$ LANGUAGE plpgsql;
+--
+-- CREATE TRIGGER sync_user_email_verification_trigger
+--   AFTER UPDATE ON auth.users
+--   FOR EACH ROW 
+--   EXECUTE FUNCTION sync_user_email_verification();
 

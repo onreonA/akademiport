@@ -59,7 +59,7 @@ describe('Task Entity', () => {
       };
 
       const updatedTask: Task = { ...task, status: 'in_progress' };
-      
+
       expect(updatedTask.status).toBe('in_progress');
     });
 
@@ -80,7 +80,7 @@ describe('Task Entity', () => {
         status: 'completed',
         completedAt: new Date(),
       };
-      
+
       expect(completedTask.status).toBe('completed');
       expect(completedTask.completedAt).toBeDefined();
     });
@@ -104,7 +104,7 @@ describe('Task Entity', () => {
         approvedAt: new Date(),
         approvedBy: 'consultant-1',
       };
-      
+
       expect(approvedTask.status).toBe('approved');
       expect(approvedTask.approvedAt).toBeDefined();
       expect(approvedTask.approvedBy).toBe('consultant-1');
@@ -128,7 +128,7 @@ describe('Task Entity', () => {
         status: 'in_progress',
         completedAt: null,
       };
-      
+
       expect(rejectedTask.status).toBe('in_progress');
       expect(rejectedTask.completedAt).toBeNull();
     });
@@ -137,7 +137,7 @@ describe('Task Entity', () => {
   describe('Priority', () => {
     it('should have valid priority values', () => {
       const validPriorities = ['low', 'medium', 'high', 'critical'];
-      
+
       validPriorities.forEach((priority) => {
         const task: Task = {
           id: 'task-1',
@@ -187,10 +187,13 @@ describe('Task Entity', () => {
         updatedAt: new Date(),
       };
 
-      const isOverdue = task.dueDate && task.dueDate < new Date() && task.status !== 'completed' && task.status !== 'approved';
-      
+      const isOverdue =
+        task.dueDate &&
+        task.dueDate < new Date() &&
+        task.status !== 'completed' &&
+        task.status !== 'approved';
+
       expect(isOverdue).toBe(true);
     });
   });
 });
-

@@ -50,7 +50,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     }
 
     // Only master_admin and consultant can update projects
-    if (user.userRole !== 'master_admin' && user.userRole !== 'consultant') {
+    if (user.role !== 'master_admin' && user.role !== 'consultant') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -59,14 +59,15 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
     const updateProjectUseCase = new UpdateProjectUseCase(projectRepository);
     const result = await updateProjectUseCase.execute(id, {
-      companyId: body.companyId,
-      consultantId: body.consultantId,
+      companyId: body.companyId || body.company_id,
+      consultantId: body.consultantId || body.consultant_id,
       name: body.name,
       description: body.description,
       status: body.status,
       priority: body.priority,
-      startDate: body.startDate ? new Date(body.startDate) : undefined,
-      endDate: body.endDate ? new Date(body.endDate) : undefined,
+      startDate:
+        body.startDate || body.start_date ? new Date(body.startDate || body.start_date) : undefined,
+      endDate: body.endDate || body.end_date ? new Date(body.endDate || body.end_date) : undefined,
       progress: body.progress,
     });
 
@@ -99,7 +100,7 @@ export async function DELETE(
     }
 
     // Only master_admin can delete projects
-    if (user.userRole !== 'master_admin') {
+    if (user.role !== 'master_admin') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 

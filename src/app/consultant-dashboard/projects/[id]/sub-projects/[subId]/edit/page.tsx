@@ -128,7 +128,7 @@ export default function EditSubProjectPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
         <div className="text-center space-y-4">
           <Loader2 className="w-8 h-8 animate-spin mx-auto text-blue-600" />
           <p className="text-muted-foreground">Alt proje yükleniyor...</p>
@@ -139,7 +139,7 @@ export default function EditSubProjectPage() {
 
   if (!subProject) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
         <div className="text-center space-y-4">
           <p className="text-muted-foreground">Alt proje bulunamadı</p>
           <Link href={`/consultant-dashboard/projects/${projectId}`}>
@@ -151,7 +151,7 @@ export default function EditSubProjectPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-indigo-50">
       <div className="p-4 md:p-6 lg:p-8 max-w-4xl mx-auto space-y-6">
         {/* Header */}
         <GradientHeader
@@ -169,7 +169,7 @@ export default function EditSubProjectPage() {
         />
 
         {/* Progress Info */}
-        <EnhancedCard className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
+        <EnhancedCard className="bg-linear-to-br from-blue-50 to-indigo-50 border-blue-200">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-muted-foreground">İlerleme</p>

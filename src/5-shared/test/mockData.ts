@@ -140,4 +140,3 @@ export const mockErrorResponse = {
   data: null,
   error: { message: 'Test error', status: 400 },
 };
-

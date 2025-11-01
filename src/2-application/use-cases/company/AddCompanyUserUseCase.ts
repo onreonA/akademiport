@@ -31,6 +31,9 @@ export class AddCompanyUserUseCase {
     // Authorization
     if (userRole === UserRole.MASTER_ADMIN) {
       // MASTER_ADMIN can add users to any company
+    } else if (userRole === UserRole.CONSULTANT) {
+      // CONSULTANT can add users to companies in their programs
+      // TODO: Check if company is in consultant's program
     } else if (userRole === UserRole.PROGRAM_MANAGER) {
       // PROGRAM_MANAGER can add users to companies in their program
       // TODO: Check if user is manager of company's program

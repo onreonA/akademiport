@@ -88,7 +88,7 @@ export async function DELETE(
     }
 
     // Only master_admin and consultant can delete tasks
-    if (user.userRole !== 'master_admin' && user.userRole !== 'consultant') {
+    if (user.role !== 'master_admin' && user.role !== 'consultant') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 

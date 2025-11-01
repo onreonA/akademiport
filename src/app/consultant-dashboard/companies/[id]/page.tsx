@@ -9,7 +9,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Building2, MapPin, Users, Mail, Phone, Globe, ArrowLeft } from 'lucide-react';
+import { Building2, MapPin, Users, Mail, Phone, Globe, ArrowLeft, UserPlus } from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -20,6 +20,18 @@ import {
 import { Button } from '@/presentation/components/ui/atoms/button';
 import { Badge } from '@/presentation/components/ui/atoms/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/presentation/components/ui/atoms/tabs';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/presentation/components/ui/atoms/dialog';
+import { UserForm, type UserFormData } from '@/presentation/components/features/users/UserForm';
+import { UserRole } from '@/domain/enums/UserRole';
+import { toast } from 'sonner';
 import type { Company } from '@/domain/entities/Company';
 import type { User } from '@/domain/entities/User';
 
@@ -34,6 +46,7 @@ export default function CompanyDetailPage({ params }: CompanyDetailPageProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [companyId, setCompanyId] = useState<string>('');
+  const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false);
 
   useEffect(() => {
     params.then((p) => {
@@ -62,14 +75,114 @@ export default function CompanyDetailPage({ params }: CompanyDetailPageProps) {
       const usersResponse = await fetch(`/api/companies/${id}/users`);
       const usersData = await usersResponse.json();
 
-      if (usersData.success) {
-        setUsers(usersData.data);
+      if (usersData.success && usersData.users) {
+        setUsers(usersData.users);
+      } else {
+        setUsers([]); // Fallback to empty array if no users or error
       }
     } catch (err) {
       setError('Firma bilgileri yüklenirken bir hata oluştu');
       console.error('Failed to fetch company:', err);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleAddUser = async (userData: UserFormData) => {
+    try {
+      // Create user first
+      const createResponse = await fetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...userData,
+          companyId: companyId,
+          role: UserRole.COMPANY_USER, // Force company_user role
+        }),
+      });
+
+      const createData = await createResponse.json();
+
+      // Log the full response for debugging
+      console.error('Create user response:', {
+        ok: createResponse.ok,
+        status: createResponse.status,
+        data: createData,
+      });
+
+      if (!createResponse.ok || !createData.success) {
+        // Handle error message properly (could be string or object)
+        let errorMessage = 'Kullanıcı oluşturulamadı';
+
+        // Check for error in different possible locations
+        const error = createData.error || createData.message || createData.details;
+
+        if (error) {
+          if (typeof error === 'string') {
+            errorMessage = error;
+          } else if (Array.isArray(error)) {
+            // Handle Zod validation errors array
+            errorMessage = error
+              .map(
+                (e: any) => e.message || e.path?.join('.') + ': ' + e.message || JSON.stringify(e)
+              )
+              .join(', ');
+          } else if (typeof error === 'object' && error !== null) {
+            // Handle validation errors with details
+            if (error.message) {
+              errorMessage = error.message;
+            } else if (error.issues && Array.isArray(error.issues)) {
+              // Zod error format
+              errorMessage = error.issues
+                .map((issue: any) => {
+                  const path = issue.path?.join('.') || '';
+                  return path ? `${path}: ${issue.message}` : issue.message;
+                })
+                .join(', ');
+            } else if (Object.keys(error).length > 0) {
+              // Try to extract meaningful error from object
+              errorMessage = Object.entries(error)
+                .map(
+                  ([key, value]) =>
+                    `${key}: ${typeof value === 'string' ? value : JSON.stringify(value)}`
+                )
+                .join(', ');
+            }
+          }
+        }
+
+        console.error('Parsed error message:', errorMessage);
+        throw new Error(errorMessage);
+      }
+
+      const newUserId = createData.data?.id;
+
+      // Add user to company (if not already added via CreateUserUseCase)
+      if (newUserId) {
+        const addResponse = await fetch(`/api/companies/${companyId}/users`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: newUserId,
+            role: UserRole.COMPANY_USER,
+          }),
+        });
+
+        if (!addResponse.ok) {
+          // If add fails but user was created, log warning but don't fail
+          console.warn('User created but failed to add to company');
+        }
+      }
+
+      toast.success('Kullanıcı başarıyla eklendi');
+      setIsAddUserDialogOpen(false);
+      // Refresh users list
+      fetchCompanyData(companyId);
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : 'Kullanıcı eklenirken bir hata oluştu';
+      toast.error(errorMessage);
+      console.error('Failed to add user:', err);
     }
   };
 
@@ -169,7 +282,7 @@ export default function CompanyDetailPage({ params }: CompanyDetailPageProps) {
       <Tabs defaultValue="overview" className="space-y-4">
         <TabsList>
           <TabsTrigger value="overview">Genel Bakış</TabsTrigger>
-          <TabsTrigger value="users">Kullanıcılar ({users.length})</TabsTrigger>
+          <TabsTrigger value="users">Kullanıcılar ({users?.length || 0})</TabsTrigger>
           <TabsTrigger value="projects">Projeler (Sprint 8)</TabsTrigger>
         </TabsList>
 
@@ -204,16 +317,61 @@ export default function CompanyDetailPage({ params }: CompanyDetailPageProps) {
         <TabsContent value="users" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Kullanıcılar</CardTitle>
-              <CardDescription>
-                {users.length} / {company.maxUsers} kullanıcı
-              </CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Kullanıcılar</CardTitle>
+                  <CardDescription>
+                    {users?.length || 0} / {company?.maxUsers || 0} kullanıcı
+                  </CardDescription>
+                </div>
+                {company && (users?.length || 0) < (company?.maxUsers || 0) && (
+                  <Dialog open={isAddUserDialogOpen} onOpenChange={setIsAddUserDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button size="sm">
+                        <UserPlus className="h-4 w-4 mr-2" />
+                        Kullanıcı Ekle
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                      <DialogHeader>
+                        <DialogTitle>Yeni Kullanıcı Ekle</DialogTitle>
+                        <DialogDescription>
+                          {company.name} firmasına yeni bir kullanıcı ekleyin
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="py-4">
+                        <UserForm
+                          initialData={{
+                            companyId: companyId,
+                            role: UserRole.COMPANY_USER,
+                          }}
+                          hideCompanySelection={true}
+                          hideRoleSelection={true}
+                          onSubmit={handleAddUser}
+                          onCancel={() => setIsAddUserDialogOpen(false)}
+                        />
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                )}
+              </div>
             </CardHeader>
             <CardContent>
-              {users.length === 0 ? (
+              {!users || users.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
                   <Users className="h-12 w-12 mx-auto mb-4" />
                   <p>Henüz kullanıcı eklenmemiş</p>
+                  {company && (users?.length || 0) < (company?.maxUsers || 0) && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="mt-4"
+                      onClick={() => setIsAddUserDialogOpen(true)}
+                    >
+                      <UserPlus className="h-4 w-4 mr-2" />
+                      İlk Kullanıcıyı Ekle
+                    </Button>
+                  )}
                 </div>
               ) : (
                 <div className="space-y-4">

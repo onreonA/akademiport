@@ -1,25 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuthUser } from '@/4-infrastructure/api/helpers/auth';
-import { SubProjectRepository } from '@/4-infrastructure/database/repositories/SubProjectRepository';
-import { GetSubProjectUseCase } from '@/2-application/use-cases/sub-project/GetSubProjectUseCase';
-import { UpdateSubProjectUseCase } from '@/2-application/use-cases/sub-project/UpdateSubProjectUseCase';
-import { DeleteSubProjectUseCase } from '@/2-application/use-cases/sub-project/DeleteSubProjectUseCase';
+import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
+import { SubProjectRepository } from '@/infrastructure/database/repositories/SubProjectRepository';
+import { GetSubProjectUseCase } from '@/application/use-cases/sub-project/GetSubProjectUseCase';
+import { UpdateSubProjectUseCase } from '@/application/use-cases/sub-project/UpdateSubProjectUseCase';
+import { DeleteSubProjectUseCase } from '@/application/use-cases/sub-project/DeleteSubProjectUseCase';
 
 /**
  * GET /api/sub-projects/[id]
  * Get a single sub-project
  */
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const user = await getAuthUser();
+    const user = await getAuthenticatedUser(request);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const { id } = await params;
     const repository = new SubProjectRepository();
     const useCase = new GetSubProjectUseCase(repository);
 
-    const result = await useCase.execute(params.id);
+    const result = await useCase.execute(id);
 
     if (!result.isSuccess) {
       return NextResponse.json({ error: result.error || 'Sub-project not found' }, { status: 404 });
@@ -36,9 +37,9 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
  * PUT /api/sub-projects/[id]
  * Update a sub-project
  */
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const user = await getAuthUser();
+    const user = await getAuthenticatedUser(request);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -48,13 +49,14 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
+    const { id } = await params;
     const body = await request.json();
     const { name, description, status, orderIndex } = body;
 
     const repository = new SubProjectRepository();
     const useCase = new UpdateSubProjectUseCase(repository);
 
-    const result = await useCase.execute(params.id, {
+    const result = await useCase.execute(id, {
       name,
       description,
       status,
@@ -79,9 +81,12 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
  * DELETE /api/sub-projects/[id]
  * Delete a sub-project
  */
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
-    const user = await getAuthUser();
+    const user = await getAuthenticatedUser(request);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -91,10 +96,11 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
+    const { id } = await params;
     const repository = new SubProjectRepository();
     const useCase = new DeleteSubProjectUseCase(repository);
 
-    const result = await useCase.execute(params.id);
+    const result = await useCase.execute(id);
 
     if (!result.isSuccess) {
       return NextResponse.json(

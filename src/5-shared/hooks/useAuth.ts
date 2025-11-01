@@ -7,17 +7,23 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import type { AuthUser } from '@/domain/entities/User';
 
 export function useAuth() {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
+    // Skip auth check on login page to avoid 401 console errors
+    if (pathname === '/login') {
+      setLoading(false);
+      return;
+    }
     checkUser();
-  }, []);
+  }, [pathname]);
 
   const checkUser = async () => {
     try {
@@ -26,6 +32,7 @@ export function useAuth() {
         const data = await response.json();
         setUser(data.data);
       } else {
+        // 401 is expected when not authenticated, don't log as error
         setUser(null);
       }
     } catch {

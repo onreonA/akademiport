@@ -5,6 +5,7 @@ Multi-program e-ihracat dönüşüm platformu - Şirketlerin dijital dönüşüm
 ## 🚀 Teknoloji Stack
 
 ### Frontend
+
 - **Framework:** Next.js 16.0.1 (App Router, Turbopack)
 - **Language:** TypeScript 5
 - **UI Library:** React 19.2.0
@@ -15,18 +16,21 @@ Multi-program e-ihracat dönüşüm platformu - Şirketlerin dijital dönüşüm
 - **Icons:** Lucide React
 
 ### Backend
+
 - **Database:** PostgreSQL (Supabase)
 - **ORM:** Supabase Client
 - **Authentication:** Supabase Auth (JWT)
 - **API:** Next.js API Routes
 
 ### Testing
+
 - **Test Framework:** Vitest
 - **Testing Library:** @testing-library/react
 - **Coverage:** v8
 - **Test Count:** 37 tests passing
 
 ### Development Tools
+
 - **Linter:** ESLint 9
 - **Formatter:** Prettier
 - **Type Checking:** TypeScript
@@ -189,17 +193,20 @@ npm run build-storybook  # Build Storybook
 ## 📚 Dokümantasyon
 
 ### Core Documentation
+
 - **[API Documentation](./docs/API.md)** - Complete API reference
 - **[Architecture Guide](./docs/ARCHITECTURE.md)** - System architecture and design patterns
 - **[Developer Guide](./docs/DEVELOPER.md)** - Development setup and guidelines
 - **[User Guide](./docs/USER_GUIDE.md)** - End-user documentation
 
 ### Sprint Documentation
+
 - [Sprint 1 - Proje Kurulumu](./sprint-detaylari/sprint-01-proje-kurulumu.md)
 - [Sprint 4 - Program Yönetimi](./sprint-detaylari/sprint-04-program-yonetimi.md)
 - [Sprint 8 - Proje Yönetimi](./sprint-detaylari/sprint-08-proje-yonetimi.md)
 
 ### Component Documentation
+
 - [Storybook](http://localhost:6006) - Component library (run `npm run storybook`)
 
 ---
@@ -263,6 +270,7 @@ User → Component → API Route → Use Case → Repository → Database
 ### Role-Based Dashboards
 
 #### Admin Dashboard
+
 - ✅ Program management
 - ✅ Company management
 - ✅ User management
@@ -270,6 +278,7 @@ User → Component → API Route → Use Case → Repository → Database
 - ✅ System-wide analytics
 
 #### Consultant Dashboard
+
 - ✅ Program overview
 - ✅ Project creation (from templates or scratch)
 - ✅ Sub-project management
@@ -278,6 +287,7 @@ User → Component → API Route → Use Case → Repository → Database
 - ✅ Company progress tracking
 
 #### Company Dashboard
+
 - ✅ Assigned projects view
 - ✅ Task completion
 - ✅ Progress tracking
@@ -336,6 +346,7 @@ npm run test:coverage
 ### ✅ Tamamlanan Sprintler
 
 #### Sprint 1: Proje Kurulumu
+
 - Next.js 16 + TypeScript
 - Tailwind CSS 4 + Shadcn/ui
 - 6 katmanlı Clean Architecture
@@ -343,12 +354,14 @@ npm run test:coverage
 - Result Pattern & Error Classes
 
 #### Sprint 4: Program Yönetimi
+
 - Program CRUD operations
 - Company management
 - User management
 - Role-based dashboards
 
 #### Sprint 8: Proje Yönetimi Sistemi
+
 - **Backend (%100):**
   - 4 Domain entities
   - 4 Repository interfaces & implementations
@@ -411,11 +424,13 @@ npm run test:coverage
 ## 📈 Performance
 
 ### Database
+
 - 35+ performance indexes
 - Efficient query optimization
 - Connection pooling (Supabase)
 
 ### Frontend
+
 - Code splitting (Next.js automatic)
 - Image optimization (Next.js Image)
 - Lazy loading (dynamic imports)

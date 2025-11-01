@@ -18,6 +18,8 @@ import { EnhancedCard } from '@/1-presentation/components/ui/atoms/enhanced-card
 import { ArrowLeft, Save, Loader2, Trash2, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
+import { TaskComments } from '@/1-presentation/components/features/tasks/TaskComments';
+import { useAuth } from '@/5-shared/hooks/useAuth';
 
 interface Task {
   id: string;
@@ -34,6 +36,12 @@ interface Task {
   orderIndex: number;
   createdAt: string;
   updatedAt: string;
+  subProject?: {
+    projectId: string;
+    project?: {
+      companyId: string;
+    };
+  };
 }
 
 interface User {
@@ -46,6 +54,7 @@ export default function EditTaskPage() {
   const router = useRouter();
   const params = useParams();
   const taskId = params.id as string;
+  const { user } = useAuth();
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -64,7 +73,6 @@ export default function EditTaskPage() {
 
   useEffect(() => {
     fetchTask();
-    fetchUsers();
   }, [taskId]);
 
   const fetchTask = async () => {
@@ -83,6 +91,11 @@ export default function EditTaskPage() {
         dueDate: data.dueDate ? new Date(data.dueDate).toISOString().split('T')[0] : '',
         orderIndex: data.orderIndex,
       });
+
+      // Fetch company users after getting task
+      if (data.subProjectId) {
+        await fetchCompanyUsers(data.subProjectId);
+      }
     } catch (error) {
       console.error('Error fetching task:', error);
       toast.error('Görev yüklenemedi');
@@ -91,9 +104,35 @@ export default function EditTaskPage() {
     }
   };
 
-  const fetchUsers = async () => {
+  const fetchCompanyUsers = async (subProjectId: string) => {
     try {
-      // Fetch company users for assignment
+      // Get sub-project to find project
+      const subProjectResponse = await fetch(`/api/sub-projects/${subProjectId}`);
+      if (!subProjectResponse.ok) throw new Error('Failed to fetch sub-project');
+      const subProjectData = await subProjectResponse.json();
+
+      // Get project to find company
+      const projectResponse = await fetch(`/api/projects/${subProjectData.projectId}`);
+      if (!projectResponse.ok) throw new Error('Failed to fetch project');
+      const projectData = await projectResponse.json();
+
+      // Fetch company users
+      if (projectData.companyId) {
+        const usersResponse = await fetch(`/api/companies/${projectData.companyId}/users`);
+        if (usersResponse.ok) {
+          const usersData = await usersResponse.json();
+          setUsers(usersData.users || []);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching company users:', error);
+      // Fallback to all users if company users fetch fails
+      fetchAllUsers();
+    }
+  };
+
+  const fetchAllUsers = async () => {
+    try {
       const response = await fetch('/api/users');
       if (!response.ok) throw new Error('Failed to fetch users');
       const data = await response.json();
@@ -162,7 +201,7 @@ export default function EditTaskPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
         <div className="text-center space-y-4">
           <Loader2 className="w-8 h-8 animate-spin mx-auto text-blue-600" />
           <p className="text-muted-foreground">Görev yükleniyor...</p>
@@ -173,7 +212,7 @@ export default function EditTaskPage() {
 
   if (!task) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
         <div className="text-center space-y-4">
           <p className="text-muted-foreground">Görev bulunamadı</p>
           <Link href="/consultant-dashboard/tasks/review">
@@ -185,7 +224,7 @@ export default function EditTaskPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-indigo-50">
       <div className="p-4 md:p-6 lg:p-8 max-w-4xl mx-auto space-y-6">
         {/* Header */}
         <GradientHeader
@@ -204,7 +243,7 @@ export default function EditTaskPage() {
 
         {/* Status Info */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <EnhancedCard className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
+          <EnhancedCard className="bg-linear-to-br from-blue-50 to-indigo-50 border-blue-200">
             <div className="text-center">
               <p className="text-sm text-muted-foreground mb-1">Durum</p>
               <p className="text-lg font-bold text-blue-600">
@@ -217,7 +256,7 @@ export default function EditTaskPage() {
             </div>
           </EnhancedCard>
 
-          <EnhancedCard className="bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200">
+          <EnhancedCard className="bg-linear-to-br from-purple-50 to-pink-50 border-purple-200">
             <div className="text-center">
               <p className="text-sm text-muted-foreground mb-1">Öncelik</p>
               <p className="text-lg font-bold text-purple-600">
@@ -229,7 +268,7 @@ export default function EditTaskPage() {
             </div>
           </EnhancedCard>
 
-          <EnhancedCard className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
+          <EnhancedCard className="bg-linear-to-br from-green-50 to-emerald-50 border-green-200">
             <div className="text-center">
               <p className="text-sm text-muted-foreground mb-1">Oluşturulma</p>
               <p className="text-lg font-bold text-green-600">
@@ -407,6 +446,16 @@ export default function EditTaskPage() {
                   {new Date(task.completedAt).toLocaleString('tr-TR')}
                 </p>
               </div>
+            </div>
+          </EnhancedCard>
+        )}
+
+        {/* Comments Section */}
+        {user && (
+          <EnhancedCard className="border-blue-200 bg-blue-50/50">
+            <div className="space-y-4">
+              <h3 className="font-semibold text-lg">Yorumlar ve Sorular</h3>
+              <TaskComments taskId={taskId} currentUserId={user.id} />
             </div>
           </EnhancedCard>
         )}

@@ -45,19 +45,14 @@ export const resetSupabaseMocks = () => {
 
 // Helper to mock successful response
 export const mockSupabaseSuccess = (data: any) => {
-  mockSupabaseQuery.then.mockImplementation((resolve) =>
-    resolve({ data, error: null })
-  );
+  mockSupabaseQuery.then.mockImplementation((resolve) => resolve({ data, error: null }));
   mockSupabaseQuery.single.mockResolvedValue({ data, error: null });
   mockSupabaseQuery.maybeSingle.mockResolvedValue({ data, error: null });
 };
 
 // Helper to mock error response
 export const mockSupabaseError = (error: any) => {
-  mockSupabaseQuery.then.mockImplementation((resolve) =>
-    resolve({ data: null, error })
-  );
+  mockSupabaseQuery.then.mockImplementation((resolve) => resolve({ data: null, error }));
   mockSupabaseQuery.single.mockResolvedValue({ data: null, error });
   mockSupabaseQuery.maybeSingle.mockResolvedValue({ data: null, error });
 };
-

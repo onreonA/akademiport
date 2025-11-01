@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Sparkles, Plus, Copy, Trash2, AlertCircle, FolderOpen } from 'lucide-react';
+import { Sparkles, Plus, Copy, Trash2, AlertCircle, FolderOpen, Edit } from 'lucide-react';
 import { GradientHeader } from '@/presentation/components/ui/molecules/gradient-header';
 import { EnhancedCard } from '@/presentation/components/ui/atoms/enhanced-card';
 import { ModernStatCard } from '@/presentation/components/ui/atoms/modern-stat-card';
@@ -248,6 +248,15 @@ export default function ProjectTemplatesPage() {
                     variant="outline"
                     size="sm"
                     className="w-full sm:flex-1"
+                    onClick={() => router.push(`/dashboard/project-templates/${template.id}/edit`)}
+                  >
+                    <Edit className="w-4 h-4 mr-2" />
+                    Düzenle
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full sm:w-auto"
                     onClick={() => handleDuplicate(template.id)}
                   >
                     <Copy className="w-4 h-4 mr-2" />

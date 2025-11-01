@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuthUser } from '@/4-infrastructure/api/helpers/auth';
-import { SubProjectRepository } from '@/4-infrastructure/database/repositories/SubProjectRepository';
-import { CreateSubProjectUseCase } from '@/2-application/use-cases/sub-project/CreateSubProjectUseCase';
-import { ListSubProjectsUseCase } from '@/2-application/use-cases/sub-project/ListSubProjectsUseCase';
+import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
+import { SubProjectRepository } from '@/infrastructure/database/repositories/SubProjectRepository';
+import { CreateSubProjectUseCase } from '@/application/use-cases/sub-project/CreateSubProjectUseCase';
+import { ListSubProjectsUseCase } from '@/application/use-cases/sub-project/ListSubProjectsUseCase';
 
 /**
  * GET /api/sub-projects?projectId=xxx
@@ -10,7 +10,7 @@ import { ListSubProjectsUseCase } from '@/2-application/use-cases/sub-project/Li
  */
 export async function GET(request: NextRequest) {
   try {
-    const user = await getAuthUser();
+    const user = await getAuthenticatedUser();
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -27,10 +27,10 @@ export async function GET(request: NextRequest) {
 
     const result = await useCase.execute(projectId);
 
-    if (!result.isSuccess) {
+    if (result.isFailure) {
       return NextResponse.json(
-        { error: result.error || 'Failed to list sub-projects' },
-        { status: 400 }
+        { error: result.error?.message || 'Failed to list sub-projects' },
+        { status: result.error?.statusCode || 400 }
       );
     }
 
@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    const user = await getAuthUser();
+    const user = await getAuthenticatedUser();
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -75,10 +75,10 @@ export async function POST(request: NextRequest) {
       orderIndex: orderIndex || 0,
     });
 
-    if (!result.isSuccess) {
+    if (result.isFailure) {
       return NextResponse.json(
-        { error: result.error || 'Failed to create sub-project' },
-        { status: 400 }
+        { error: result.error?.message || 'Failed to create sub-project' },
+        { status: result.error?.statusCode || 400 }
       );
     }
 
