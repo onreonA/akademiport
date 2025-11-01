@@ -75,9 +75,13 @@ export default function CompanyDetailPage({ params }: CompanyDetailPageProps) {
       const usersResponse = await fetch(`/api/companies/${id}/users`);
       const usersData = await usersResponse.json();
 
-      if (usersData.success && usersData.users) {
+      // Users fetched successfully
+      // console.log for debugging removed
+
+      if (usersData.success && Array.isArray(usersData.users)) {
         setUsers(usersData.users);
       } else {
+        console.warn('Users data is invalid:', usersData);
         setUsers([]); // Fallback to empty array if no users or error
       }
     } catch (err) {
@@ -104,7 +108,7 @@ export default function CompanyDetailPage({ params }: CompanyDetailPageProps) {
       const createData = await createResponse.json();
 
       // Log the full response for debugging
-      console.error('Create user response:', {
+      console.log('Create user response:', {
         ok: createResponse.ok,
         status: createResponse.status,
         data: createData,
@@ -176,8 +180,32 @@ export default function CompanyDetailPage({ params }: CompanyDetailPageProps) {
 
       toast.success('Kullanıcı başarıyla eklendi');
       setIsAddUserDialogOpen(false);
-      // Refresh users list
-      fetchCompanyData(companyId);
+
+      // Refresh users list immediately
+      try {
+        const usersResponse = await fetch(`/api/companies/${companyId}/users`);
+        const usersData = await usersResponse.json();
+
+        console.log('Refresh users response:', {
+          success: usersData.success,
+          users: usersData.users,
+          usersLength: usersData.users?.length,
+          responseStatus: usersResponse.status,
+        });
+
+        if (usersData.success && Array.isArray(usersData.users)) {
+          setUsers(usersData.users);
+          console.log('Users state updated:', usersData.users.length);
+        } else {
+          console.warn('Refresh users data invalid, fetching all data');
+          // Fallback: fetch all company data
+          await fetchCompanyData(companyId);
+        }
+      } catch (refreshError) {
+        console.error('Failed to refresh users list:', refreshError);
+        // Fallback: fetch all company data
+        await fetchCompanyData(companyId);
+      }
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : 'Kullanıcı eklenirken bir hata oluştu';

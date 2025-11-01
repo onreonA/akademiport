@@ -362,19 +362,25 @@ export class UserRepository implements IUserRepository {
   async findByCompanyId(companyId: string): Promise<Result<User[]>> {
     try {
       const supabase = await createClient();
+
       const { data, error } = await supabase
         .from(this.tableName)
         .select('*')
         .eq('company_id', companyId)
-        .eq('is_active', true)
         .order('created_at', { ascending: false });
 
       if (error) {
+        console.error('🔴 [UserRepository] Error fetching users:', error);
         return Result.fail(error.message);
       }
 
-      return Result.ok(data.map((item) => this.mapToEntity(item)));
+      // Filter active users in memory (temporary workaround)
+      // Also check for null/undefined - treat as active if not explicitly false
+      const activeUsers = data?.filter((u) => u.is_active !== false) || [];
+
+      return Result.ok(activeUsers.map((item) => this.mapToEntity(item)));
     } catch (error) {
+      console.error('🔴 [UserRepository] Exception in findByCompanyId:', error);
       return Result.fail(error instanceof Error ? error.message : 'Kullanıcılar alınamadı');
     }
   }

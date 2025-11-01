@@ -37,14 +37,16 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const result = await userRepository.findByCompanyId(companyId);
 
     if (result.isFailure) {
+      console.error('Failed to fetch users:', result.error);
       return NextResponse.json(
         { error: result.error?.message || 'Failed to fetch users' },
         { status: 400 }
       );
     }
 
-    // Filter by role if needed (company_user)
-    const users = result.value?.filter((u) => u.role === 'company_user') || [];
+    // Filter by role - include both company_user and company_admin
+    const users =
+      result.value?.filter((u) => u.role === 'company_user' || u.role === 'company_admin') || [];
 
     return NextResponse.json({
       success: true,
