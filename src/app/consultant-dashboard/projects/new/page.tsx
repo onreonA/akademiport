@@ -54,7 +54,8 @@ export default function NewProjectPage() {
       const response = await fetch('/api/companies');
       if (!response.ok) throw new Error('Failed to fetch companies');
       const data = await response.json();
-      setCompanies(data.companies || []);
+      // API returns { success: true, data: [...] }
+      setCompanies(data.data || data.companies || []);
     } catch (err) {
       console.error('Error fetching companies:', err);
     }
@@ -76,18 +77,23 @@ export default function NewProjectPage() {
     setLoading(true);
 
     try {
-      // If template is selected, use template endpoint
-      const endpoint = formData.template_id ? '/api/projects/from-template' : '/api/projects';
+      const endpoint = '/api/projects';
 
-      const payload = formData.template_id
-        ? {
-            template_id: formData.template_id,
-            company_id: formData.company_id,
-            name: formData.name,
-            start_date: formData.start_date || undefined,
-            end_date: formData.end_date || undefined,
-          }
-        : formData;
+      // Map formData to API expected format
+      const payload: any = {
+        companyId: formData.company_id,
+        name: formData.name,
+        description: formData.description || undefined,
+        status: formData.status || 'todo',
+        priority: formData.priority || 'medium',
+        startDate: formData.start_date || undefined,
+        endDate: formData.end_date || undefined,
+      };
+
+      // Add templateId if template is selected
+      if (formData.template_id && formData.template_id !== 'none') {
+        payload.templateId = formData.template_id;
+      }
 
       const response = await fetch(endpoint, {
         method: 'POST',
@@ -97,11 +103,16 @@ export default function NewProjectPage() {
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || 'Failed to create project');
+        throw new Error(error.error || error.message || 'Failed to create project');
       }
 
       const data = await response.json();
-      router.push(`/consultant-dashboard/projects/${data.project.id}`);
+      // API returns project directly, not wrapped in { project: {...} }
+      const projectId = data.id || data.project?.id;
+      if (!projectId) {
+        throw new Error('Project ID not found in response');
+      }
+      router.push(`/consultant-dashboard/projects/${projectId}`);
     } catch (err) {
       alert(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -143,14 +154,16 @@ export default function NewProjectPage() {
                 Şablondan Oluştur (Opsiyonel)
               </Label>
               <Select
-                value={formData.template_id}
-                onValueChange={(value) => handleChange('template_id', value)}
+                value={formData.template_id || undefined}
+                onValueChange={(value) =>
+                  handleChange('template_id', value === 'none' ? '' : value)
+                }
               >
                 <SelectTrigger id="template_id">
                   <SelectValue placeholder="Şablon seçin (boş bırakabilirsiniz)" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Şablon kullanma</SelectItem>
+                  <SelectItem value="none">Şablon kullanma</SelectItem>
                   {templates.map((template) => (
                     <SelectItem key={template.id} value={template.id}>
                       {template.name}

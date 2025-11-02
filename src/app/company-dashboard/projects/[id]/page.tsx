@@ -13,6 +13,8 @@ import {
   ArrowLeft,
   FolderOpen,
   ListTodo,
+  Plus,
+  Edit,
 } from 'lucide-react';
 import { GradientHeader } from '@/presentation/components/ui/molecules/gradient-header';
 import { EnhancedCard } from '@/presentation/components/ui/atoms/enhanced-card';
@@ -20,6 +22,7 @@ import { ModernStatCard } from '@/presentation/components/ui/atoms/modern-stat-c
 import { Badge } from '@/presentation/components/ui/atoms/badge';
 import { Button } from '@/presentation/components/ui/atoms/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/presentation/components/ui/atoms/tabs';
+import { SubProjectModal } from '@/presentation/components/features/sub-projects/SubProjectModal';
 
 interface Project {
   id: string;
@@ -75,12 +78,23 @@ export default function CompanyProjectDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('overview');
+  const [subProjectModalOpen, setSubProjectModalOpen] = useState(false);
+  const [editingSubProject, setEditingSubProject] = useState<SubProject | null>(null);
 
   useEffect(() => {
     fetchProject();
   }, [projectId]);
 
   useEffect(() => {
+    // Fetch sub-projects and tasks when project is loaded
+    if (project && !loading) {
+      fetchSubProjects();
+      fetchTasks();
+    }
+  }, [project, loading]);
+
+  useEffect(() => {
+    // Also fetch when tab changes (for refresh)
     if (activeTab === 'subprojects' && subProjects.length === 0) {
       fetchSubProjects();
     } else if (activeTab === 'tasks' && tasks.length === 0) {
@@ -92,9 +106,25 @@ export default function CompanyProjectDetailPage() {
     try {
       setLoading(true);
       const response = await fetch(`/api/projects/${projectId}`);
-      if (!response.ok) throw new Error('Failed to fetch project');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Failed to fetch project' }));
+        throw new Error(errorData.error || 'Failed to fetch project');
+      }
       const data = await response.json();
-      setProject(data.project);
+      // API returns project directly, not wrapped in { project: ... }
+      const projectData = data.project || data;
+
+      // Normalize project data to match frontend interface
+      const normalizedProject = {
+        ...projectData,
+        status: (projectData.status || 'todo') as Project['status'],
+        priority: (projectData.priority || 'medium') as Project['priority'],
+        progress: projectData.progress ?? 0,
+        start_date: projectData.startDate || projectData.start_date,
+        end_date: projectData.endDate || projectData.end_date,
+      };
+
+      setProject(normalizedProject);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -104,10 +134,11 @@ export default function CompanyProjectDetailPage() {
 
   const fetchSubProjects = async () => {
     try {
-      const response = await fetch(`/api/sub-projects?project_id=${projectId}`);
+      const response = await fetch(`/api/sub-projects?projectId=${projectId}`);
       if (!response.ok) throw new Error('Failed to fetch sub-projects');
       const data = await response.json();
-      setSubProjects(data.subProjects || []);
+      // API returns array directly or wrapped in data
+      setSubProjects(Array.isArray(data) ? data : data.subProjects || data.data || []);
     } catch (err) {
       console.error('Error fetching sub-projects:', err);
     }
@@ -115,10 +146,10 @@ export default function CompanyProjectDetailPage() {
 
   const fetchTasks = async () => {
     try {
-      const response = await fetch(`/api/tasks?project_id=${projectId}`);
+      const response = await fetch(`/api/projects/${projectId}/tasks`);
       if (!response.ok) throw new Error('Failed to fetch tasks');
       const data = await response.json();
-      setTasks(data.tasks || []);
+      setTasks(data.tasks || data.data || []);
     } catch (err) {
       console.error('Error fetching tasks:', err);
     }
@@ -190,7 +221,7 @@ export default function CompanyProjectDetailPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
           <ModernStatCard
             title="Durum"
-            value={statusConfig[project.status].label}
+            value={statusConfig[project.status as keyof typeof statusConfig]?.label || 'Bilinmiyor'}
             icon={CheckCircle2}
             color="blue"
             showGlow
@@ -232,8 +263,15 @@ export default function CompanyProjectDetailPage() {
                 <div className="space-y-4">
                   <div>
                     <p className="text-sm text-muted-foreground mb-1">Durum</p>
-                    <Badge className={statusConfig[project.status].color}>
-                      {statusConfig[project.status].label}
+                    <Badge
+                      className={
+                        statusConfig[project.status as keyof typeof statusConfig]?.color ||
+                        'bg-gray-500'
+                      }
+                    >
+                      {statusConfig[project.status as keyof typeof statusConfig]?.label ||
+                        project.status ||
+                        'Bilinmiyor'}
                     </Badge>
                   </div>
                   {project.start_date && (
@@ -310,22 +348,62 @@ export default function CompanyProjectDetailPage() {
 
           {/* Sub-Projects Tab */}
           <TabsContent value="subprojects" className="space-y-4">
+            <div className="flex justify-end mb-4">
+              <SubProjectModal
+                projectId={projectId}
+                open={subProjectModalOpen}
+                onOpenChange={(open) => {
+                  setSubProjectModalOpen(open);
+                  if (!open) setEditingSubProject(null);
+                }}
+                subProject={editingSubProject}
+                onSuccess={() => {
+                  fetchSubProjects();
+                }}
+                trigger={
+                  <Button onClick={() => setSubProjectModalOpen(true)}>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Yeni Alt Proje
+                  </Button>
+                }
+              />
+            </div>
             {subProjects.length === 0 ? (
               <EnhancedCard variant="glass" className="p-8 text-center">
                 <FolderOpen className="w-16 h-16 text-muted-foreground mx-auto mb-4 opacity-50" />
                 <h3 className="text-xl font-bold mb-2">Henüz Alt Proje Yok</h3>
-                <p className="text-muted-foreground">
+                <p className="text-muted-foreground mb-4">
                   Danışmanınız alt proje eklediğinde burada görünecektir.
                 </p>
+                <Button onClick={() => setSubProjectModalOpen(true)}>
+                  <Plus className="w-4 h-4 mr-2" />
+                  İlk Alt Projeyi Oluştur
+                </Button>
               </EnhancedCard>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {subProjects.map((subProject) => (
                   <EnhancedCard key={subProject.id} variant="glass" hover className="p-6">
-                    <h4 className="text-lg font-bold mb-2">{subProject.name}</h4>
-                    {subProject.description && (
-                      <p className="text-sm text-muted-foreground mb-4">{subProject.description}</p>
-                    )}
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex-1">
+                        <h4 className="text-lg font-bold mb-2">{subProject.name}</h4>
+                        {subProject.description && (
+                          <p className="text-sm text-muted-foreground mb-4">
+                            {subProject.description}
+                          </p>
+                        )}
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setEditingSubProject(subProject);
+                          setSubProjectModalOpen(true);
+                        }}
+                      >
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                    </div>
                     <div className="space-y-2">
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-muted-foreground">İlerleme</span>

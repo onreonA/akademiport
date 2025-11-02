@@ -9,7 +9,10 @@ import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
  */
 export async function POST(request: NextRequest) {
   try {
-    const user = await getAuthenticatedUser();
+    const user = await getAuthenticatedUser(request);
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
     // Only consultants and admins can create projects
     if (

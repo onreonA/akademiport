@@ -2,7 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Sparkles, Plus, Copy, Trash2, AlertCircle, FolderOpen, Edit } from 'lucide-react';
+import { Sparkles, Plus, Copy, Trash2, AlertCircle, FolderOpen, Edit, Eye } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/presentation/components/ui/atoms/dialog';
 import { GradientHeader } from '@/presentation/components/ui/molecules/gradient-header';
 import { EnhancedCard } from '@/presentation/components/ui/atoms/enhanced-card';
 import { ModernStatCard } from '@/presentation/components/ui/atoms/modern-stat-card';
@@ -33,6 +41,9 @@ export default function ProjectTemplatesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [previewTemplate, setPreviewTemplate] = useState<ProjectTemplate | null>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const [templateDetails, setTemplateDetails] = useState<any>(null);
 
   useEffect(() => {
     fetchTemplates();
@@ -72,6 +83,21 @@ export default function ProjectTemplatesPage() {
       alert(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setDeletingId(null);
+    }
+  };
+
+  const handlePreview = async (templateId: string) => {
+    setPreviewLoading(true);
+    try {
+      const response = await fetch(`/api/projects/templates/${templateId}`);
+      if (!response.ok) throw new Error('Failed to fetch template details');
+      const data = await response.json();
+      setTemplateDetails(data.template);
+      setPreviewTemplate(templates.find((t) => t.id === templateId) || null);
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setPreviewLoading(false);
     }
   };
 
@@ -244,6 +270,64 @@ export default function ProjectTemplatesPage() {
 
                 {/* Actions */}
                 <div className="flex flex-col sm:flex-row gap-2">
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full sm:flex-1"
+                        onClick={() => handlePreview(template.id)}
+                      >
+                        <Eye className="w-4 h-4 mr-2" />
+                        Önizle
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                      <DialogHeader>
+                        <DialogTitle>{previewTemplate?.name || 'Şablon Önizleme'}</DialogTitle>
+                        <DialogDescription>
+                          {previewTemplate?.description || 'Şablon detayları'}
+                        </DialogDescription>
+                      </DialogHeader>
+                      {previewLoading ? (
+                        <div className="p-8 text-center">
+                          <p className="text-muted-foreground">Yükleniyor...</p>
+                        </div>
+                      ) : templateDetails ? (
+                        <div className="space-y-4">
+                          <div>
+                            <h3 className="font-semibold mb-2">Açıklama</h3>
+                            <p className="text-sm text-muted-foreground">
+                              {templateDetails.description || 'Açıklama yok'}
+                            </p>
+                          </div>
+                          <div>
+                            <h3 className="font-semibold mb-2">Öncelik</h3>
+                            <Badge className={priorityConfig[templateDetails.priority]?.color}>
+                              {priorityConfig[templateDetails.priority]?.label}
+                            </Badge>
+                          </div>
+                          {templateDetails.subProjects && (
+                            <div>
+                              <h3 className="font-semibold mb-2">Alt Projeler</h3>
+                              <div className="space-y-2">
+                                {templateDetails.subProjects.map((sp: any) => (
+                                  <div key={sp.id} className="p-3 border rounded-lg">
+                                    <p className="font-medium">{sp.name}</p>
+                                    {sp.description && (
+                                      <p className="text-sm text-muted-foreground">
+                                        {sp.description}
+                                      </p>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ) : null}
+                    </DialogContent>
+                  </Dialog>
                   <Button
                     variant="outline"
                     size="sm"

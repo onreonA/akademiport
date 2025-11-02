@@ -25,14 +25,17 @@ export class SubProjectRepository implements ISubProjectRepository {
     return this.mapToEntity(subProject);
   }
 
-  async findById(id: string): Promise<SubProject | null> {
+  async findById(id: string, includeDeleted: boolean = false): Promise<SubProject | null> {
     const supabase = await createClient();
 
-    const { data: subProject, error } = await supabase
-      .from('sub_projects')
-      .select('*')
-      .eq('id', id)
-      .single();
+    let query = supabase.from('sub_projects').select('*').eq('id', id);
+
+    // Soft delete kontrolü
+    if (!includeDeleted) {
+      query = query.is('deleted_at', null);
+    }
+
+    const { data: subProject, error } = await query.single();
 
     if (error) {
       if (error.code === 'PGRST116') {
@@ -44,14 +47,17 @@ export class SubProjectRepository implements ISubProjectRepository {
     return this.mapToEntity(subProject);
   }
 
-  async findByProjectId(projectId: string): Promise<SubProject[]> {
+  async findByProjectId(projectId: string, includeDeleted: boolean = false): Promise<SubProject[]> {
     const supabase = await createClient();
 
-    const { data: subProjects, error } = await supabase
-      .from('sub_projects')
-      .select('*')
-      .eq('project_id', projectId)
-      .order('order_index', { ascending: true });
+    let query = supabase.from('sub_projects').select('*').eq('project_id', projectId);
+
+    // Soft delete kontrolü
+    if (!includeDeleted) {
+      query = query.is('deleted_at', null);
+    }
+
+    const { data: subProjects, error } = await query.order('order_index', { ascending: true });
 
     if (error) {
       throw new Error(`Failed to find sub-projects: ${error.message}`);
@@ -88,17 +94,60 @@ export class SubProjectRepository implements ISubProjectRepository {
   async delete(id: string): Promise<void> {
     const supabase = await createClient();
 
-    const { error } = await supabase.from('sub_projects').delete().eq('id', id);
+    // Soft delete: deleted_at set et
+    const { error } = await supabase
+      .from('sub_projects')
+      .update({ deleted_at: new Date().toISOString() })
+      .eq('id', id)
+      .is('deleted_at', null);
 
     if (error) {
       throw new Error(`Failed to delete sub-project: ${error.message}`);
     }
   }
 
-  async exists(id: string): Promise<boolean> {
+  async restore(id: string): Promise<void> {
     const supabase = await createClient();
 
-    const { data, error } = await supabase.from('sub_projects').select('id').eq('id', id).single();
+    // Soft delete geri al
+    const { error } = await supabase
+      .from('sub_projects')
+      .update({ deleted_at: null })
+      .eq('id', id)
+      .not('deleted_at', 'is', null);
+
+    if (error) {
+      throw new Error(`Failed to restore sub-project: ${error.message}`);
+    }
+  }
+
+  async findDeleted(): Promise<SubProject[]> {
+    const supabase = await createClient();
+
+    const { data: subProjects, error } = await supabase
+      .from('sub_projects')
+      .select('*')
+      .not('deleted_at', 'is', null)
+      .order('deleted_at', { ascending: false });
+
+    if (error) {
+      throw new Error(`Failed to find deleted sub-projects: ${error.message}`);
+    }
+
+    return subProjects?.map((sp) => this.mapToEntity(sp)) || [];
+  }
+
+  async exists(id: string, includeDeleted: boolean = false): Promise<boolean> {
+    const supabase = await createClient();
+
+    let query = supabase.from('sub_projects').select('id').eq('id', id);
+
+    // Soft delete kontrolü
+    if (!includeDeleted) {
+      query = query.is('deleted_at', null);
+    }
+
+    const { data, error } = await query.single();
 
     if (error && error.code !== 'PGRST116') {
       throw new Error(`Failed to check sub-project existence: ${error.message}`);

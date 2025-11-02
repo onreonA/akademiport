@@ -22,6 +22,7 @@ export interface ModernStatCardProps {
   progress?: number;
   showGlow?: boolean;
   className?: string;
+  onClick?: () => void;
 }
 
 const colorSchemes = {
@@ -78,6 +79,7 @@ export function ModernStatCard({
   progress,
   showGlow = false,
   className,
+  onClick,
 }: ModernStatCardProps) {
   const colorScheme = colorSchemes[color];
 
@@ -86,11 +88,13 @@ export function ModernStatCard({
       variant="glass"
       hover
       glow={showGlow}
+      onClick={onClick}
       className={cn(
         'p-6 bg-linear-to-br',
         colorScheme.bg,
         colorScheme.border,
         showGlow && colorScheme.glow,
+        onClick && 'cursor-pointer',
         className
       )}
     >

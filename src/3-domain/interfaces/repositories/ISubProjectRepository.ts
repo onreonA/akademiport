@@ -22,14 +22,24 @@ export interface ISubProjectRepository {
   update(id: string, data: UpdateSubProjectDto): Promise<SubProject>;
 
   /**
-   * Alt proje sil
+   * Alt proje sil (soft delete)
    */
   delete(id: string): Promise<void>;
 
   /**
+   * Silinen alt projeyi geri yükle
+   */
+  restore(id: string): Promise<void>;
+
+  /**
+   * Silinen alt projeleri getir
+   */
+  findDeleted(): Promise<SubProject[]>;
+
+  /**
    * Alt proje var mı kontrol et
    */
-  exists(id: string): Promise<boolean>;
+  exists(id: string, includeDeleted?: boolean): Promise<boolean>;
 
   /**
    * Alt proje ilerlemesini güncelle

@@ -2,7 +2,7 @@
  * Program Repository Implementation
  */
 
-import { createClient } from '@/infrastructure/database/supabase-server';
+import { createClient, getSupabaseAdminClient } from '@/infrastructure/database/supabase-server';
 import { Result } from '@/core/result/Result';
 import { IProgramRepository } from '@/domain/interfaces/IProgramRepository';
 import { Program } from '@/domain/entities/Program';
@@ -269,54 +269,54 @@ export class ProgramRepository implements IProgramRepository {
     programId: string
   ): Promise<Result<import('@/domain/entities/User').User[]>> {
     try {
-      const supabase = await createClient();
+      // Use admin client to bypass RLS policies
+      // This is needed because we need to read users table which has strict RLS policies
+      const supabase = getSupabaseAdminClient();
 
-      // Join user_programs with users table
-      const { data, error } = await supabase
+      // Step 1: Get user_programs records for this program
+      const { data: userPrograms, error: userProgramsError } = await supabase
         .from('user_programs')
-        .select(
-          `
-          user_id,
-          users (
-            id,
-            email,
-            full_name,
-            phone,
-            avatar_url,
-            role,
-            company_id,
-            is_active,
-            is_email_verified,
-            last_login_at,
-            bio,
-            expertise_areas,
-            social_links,
-            settings,
-            created_at,
-            updated_at,
-            created_by,
-            updated_by
-          )
-        `
-        )
+        .select('user_id')
         .eq('program_id', programId)
         .eq('role_in_program', 'consultant')
         .eq('is_active', true);
 
-      if (error) {
-        return Result.fail(error.message);
+      if (userProgramsError) {
+        console.error(
+          '🔴 [ProgramRepository] getConsultants error (user_programs):',
+          userProgramsError
+        );
+        return Result.fail(userProgramsError.message);
       }
 
-      // Map to User entities
-      const users = data
-        .map((item: any) => {
-          if (!item.users) return null;
-          return this.mapToUserEntity(item.users);
-        })
+      if (!userPrograms || userPrograms.length === 0) {
+        console.log('🟢 [ProgramRepository] getConsultants: No consultants found');
+        return Result.ok([]);
+      }
+
+      // Step 2: Get user IDs
+      const userIds = userPrograms.map((up) => up.user_id);
+
+      // Step 3: Fetch users by IDs
+      const { data: usersData, error: usersError } = await supabase
+        .from('users')
+        .select('*')
+        .in('id', userIds);
+
+      if (usersError) {
+        console.error('🔴 [ProgramRepository] getConsultants error (users):', usersError);
+        return Result.fail(usersError.message);
+      }
+
+      // Step 4: Map to User entities
+      const users = (usersData || [])
+        .map((userData) => this.mapToUserEntity(userData))
         .filter((user): user is import('@/domain/entities/User').User => user !== null);
 
+      console.log('🟢 [ProgramRepository] getConsultants success, found:', users.length);
       return Result.ok(users);
     } catch (error) {
+      console.error('🔴 [ProgramRepository] getConsultants exception:', error);
       return Result.fail(error instanceof Error ? error.message : 'Danışmanlar alınamadı');
     }
   }

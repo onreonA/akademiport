@@ -38,6 +38,7 @@ import {
   Clock,
   BarChart3,
   Activity,
+  HelpCircle,
 } from 'lucide-react';
 
 // =====================================================
@@ -61,9 +62,18 @@ function ConsultantDashboardContent() {
   const [dashboardData, setDashboardData] = useState<ConsultantDashboardData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [pendingQuestionsCount, setPendingQuestionsCount] = useState<number>(0);
 
   useEffect(() => {
     fetchDashboardData();
+    fetchPendingQuestionsCount();
+
+    // Polling: Her 30 saniyede bir soru sayısını güncelle
+    const interval = setInterval(() => {
+      fetchPendingQuestionsCount();
+    }, 30000); // 30 saniye
+
+    return () => clearInterval(interval);
   }, []);
 
   const fetchDashboardData = async () => {
@@ -84,6 +94,19 @@ function ConsultantDashboardContent() {
       console.error('Failed to fetch dashboard:', err);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchPendingQuestionsCount = async () => {
+    try {
+      const response = await fetch('/api/consultant/tasks/questions/pending');
+      if (response.ok) {
+        const data = await response.json();
+        setPendingQuestionsCount(data.questions?.length || 0);
+      }
+    } catch (err) {
+      // Silently fail - don't show error for background polling
+      console.error('Failed to fetch pending questions count:', err);
     }
   };
 
@@ -156,7 +179,7 @@ function ConsultantDashboardContent() {
         ) : dashboardData ? (
           <>
             {/* Modern Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
               <ModernStatCard
                 title="Toplam Program"
                 value={dashboardData.stats.totalPrograms}
@@ -192,6 +215,15 @@ function ConsultantDashboardContent() {
                 trend={{ value: -2.1, direction: 'down' }}
                 progress={45}
                 showGlow
+              />
+              <ModernStatCard
+                title="Cevap Bekleyen Sorular"
+                value={pendingQuestionsCount}
+                icon={HelpCircle}
+                color="cyan"
+                showGlow={pendingQuestionsCount > 0}
+                onClick={() => router.push('/consultant-dashboard/tasks/questions')}
+                className="cursor-pointer hover:scale-105 transition-transform"
               />
             </div>
 

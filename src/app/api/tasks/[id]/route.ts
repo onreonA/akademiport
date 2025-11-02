@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { TaskRepository } from '@/infrastructure/database/repositories/TaskRepository';
+import { TaskDependencyRepository } from '@/infrastructure/database/repositories/TaskDependencyRepository';
 import { GetTaskUseCase, UpdateTaskUseCase, DeleteTaskUseCase } from '@/application/use-cases/task';
 import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
 
 const taskRepository = new TaskRepository();
+const taskDependencyRepository = new TaskDependencyRepository();
 
 /**
  * GET /api/tasks/[id]
@@ -11,7 +13,7 @@ const taskRepository = new TaskRepository();
  */
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const user = await getAuthenticatedUser();
+    const user = await getAuthenticatedUser(request);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -40,7 +42,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
  */
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const user = await getAuthenticatedUser();
+    const user = await getAuthenticatedUser(request);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -48,7 +50,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     const { id } = await params;
     const body = await request.json();
 
-    const updateTaskUseCase = new UpdateTaskUseCase(taskRepository);
+    const updateTaskUseCase = new UpdateTaskUseCase(taskRepository, taskDependencyRepository);
     const result = await updateTaskUseCase.execute(id, {
       assignedTo: body.assignedTo,
       title: body.title,
@@ -82,7 +84,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = await getAuthenticatedUser();
+    const user = await getAuthenticatedUser(request);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

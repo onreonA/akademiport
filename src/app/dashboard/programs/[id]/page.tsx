@@ -98,10 +98,14 @@ export default function ProgramDetailPage({ params }: { params: Promise<{ id: st
       const data = await response.json();
 
       if (data.success) {
-        setConsultants(data.data);
+        setConsultants(data.data || []);
+      } else {
+        console.error('Failed to fetch consultants:', data.error);
+        setConsultants([]); // Set empty array on error
       }
     } catch (err) {
       console.error('Failed to fetch consultants:', err);
+      setConsultants([]); // Set empty array on error
     } finally {
       setLoadingConsultants(false);
     }

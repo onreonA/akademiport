@@ -61,10 +61,11 @@ export default function CompanyDetailPage() {
       const data = await response.json();
 
       if (data.success) {
-        setUsers(data.data);
+        setUsers(data.users || []);
       }
     } catch (error) {
       console.error('Failed to fetch users:', error);
+      setUsers([]); // Set empty array on error to prevent undefined
     }
   };
 
@@ -139,7 +140,7 @@ export default function CompanyDetailPage() {
       <Tabs defaultValue="overview" className="space-y-4">
         <TabsList>
           <TabsTrigger value="overview">Genel Bakış</TabsTrigger>
-          <TabsTrigger value="users">Kullanıcılar ({users.length})</TabsTrigger>
+          <TabsTrigger value="users">Kullanıcılar ({users?.length || 0})</TabsTrigger>
           <TabsTrigger value="program">Program</TabsTrigger>
         </TabsList>
 

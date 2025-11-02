@@ -49,14 +49,24 @@ export interface IProjectRepository {
   update(id: string, data: UpdateProjectDto): Promise<Project>;
 
   /**
-   * Proje sil
+   * Proje sil (soft delete)
    */
   delete(id: string): Promise<void>;
 
   /**
+   * Silinen projeyi geri yükle
+   */
+  restore(id: string): Promise<void>;
+
+  /**
+   * Silinen projeleri getir
+   */
+  findDeleted(): Promise<Project[]>;
+
+  /**
    * Proje var mı kontrol et
    */
-  exists(id: string): Promise<boolean>;
+  exists(id: string, includeDeleted?: boolean): Promise<boolean>;
 
   /**
    * Proje ilerlemesini güncelle

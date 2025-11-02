@@ -56,8 +56,8 @@ export default function ConsultantTaskReviewPage() {
   const fetchTasks = async () => {
     try {
       setLoading(true);
-      // Fetch tasks with status 'review'
-      const response = await fetch('/api/tasks?status=review');
+      // Fetch tasks pending review in consultant's projects
+      const response = await fetch('/api/consultant/tasks/pending-review');
       if (!response.ok) throw new Error('Failed to fetch tasks');
       const data = await response.json();
       setTasks(data.tasks || []);
@@ -83,7 +83,8 @@ export default function ConsultantTaskReviewPage() {
       }
 
       await fetchTasks();
-      alert('Görev başarıyla onaylandı!');
+      // Ana tasks sayfasına yönlendir ki tamamlanan görevleri görsün
+      router.push('/consultant-dashboard/tasks?tab=completed');
     } catch (err) {
       alert(err instanceof Error ? err.message : 'An error occurred');
     } finally {

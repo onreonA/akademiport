@@ -153,7 +153,10 @@ export default function EditTaskPage() {
         body: JSON.stringify({
           ...formData,
           dueDate: formData.dueDate || null,
-          assignedTo: formData.assignedTo || null,
+          assignedTo:
+            formData.assignedTo === 'none' || formData.assignedTo === ''
+              ? null
+              : formData.assignedTo,
         }),
       });
 
@@ -356,15 +359,17 @@ export default function EditTaskPage() {
               <div className="space-y-2">
                 <Label htmlFor="assignedTo">Atanan Kişi</Label>
                 <Select
-                  value={formData.assignedTo}
-                  onValueChange={(value) => setFormData({ ...formData, assignedTo: value })}
+                  value={formData.assignedTo || 'none'}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, assignedTo: value === 'none' ? '' : value })
+                  }
                   disabled={saving || deleting}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Kullanıcı seçin" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Atanmamış</SelectItem>
+                    <SelectItem value="none">Atanmamış</SelectItem>
                     {users.map((user) => (
                       <SelectItem key={user.id} value={user.id}>
                         {user.fullName || user.email}

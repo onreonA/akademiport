@@ -20,18 +20,33 @@ const taskRepository = new TaskRepository();
  */
 export async function GET(request: NextRequest) {
   try {
-    const user = await getAuthenticatedUser();
+    const user = await getAuthenticatedUser(request);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
-    const companyId = searchParams.get('companyId') || undefined;
-    const consultantId = searchParams.get('consultantId') || undefined;
+    let companyId = searchParams.get('companyId') || undefined;
+    let consultantId = searchParams.get('consultantId') || undefined;
     const status = searchParams.get('status') || undefined;
     const isTemplate = searchParams.get('isTemplate') === 'true' ? true : undefined;
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
+
+    // Authorization: Company users can only see their own company's projects
+    if (user.role === 'company_user' || user.role === 'company_admin') {
+      if (!user.companyId) {
+        return NextResponse.json({ error: 'Firma bilgisi bulunamadı' }, { status: 403 });
+      }
+      // Force filter by user's company ID
+      companyId = user.companyId;
+    }
+
+    // Authorization: Consultants can only see their own projects
+    if (user.role === 'consultant') {
+      // Force filter by consultant's user ID
+      consultantId = user.id;
+    }
 
     // Get templates
     if (isTemplate === true) {
@@ -66,7 +81,13 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    return NextResponse.json(result.value);
+    // Return projects in format expected by frontend
+    return NextResponse.json({
+      projects: result.value.data,
+      total: result.value.total,
+      page: result.value.page,
+      limit: result.value.limit,
+    });
   } catch (error) {
     console.error('Error in GET /api/projects:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -79,7 +100,7 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    const user = await getAuthenticatedUser();
+    const user = await getAuthenticatedUser(request);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

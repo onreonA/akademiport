@@ -15,7 +15,7 @@ const projectRepository = new ProjectRepository();
  */
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const user = await getAuthenticatedUser();
+    const user = await getAuthenticatedUser(request);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -44,7 +44,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
  */
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const user = await getAuthenticatedUser();
+    const user = await getAuthenticatedUser(request);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -94,17 +94,37 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = await getAuthenticatedUser();
+    const user = await getAuthenticatedUser(request);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Only master_admin can delete projects
-    if (user.role !== 'master_admin') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
-
     const { id } = await params;
+
+    // Check if user has permission to delete this project
+    if (user.role !== 'master_admin') {
+      // Consultants can only delete their own projects
+      if (user.role === 'consultant') {
+        // First, verify the project belongs to this consultant
+        const getProjectUseCase = new GetProjectUseCase(projectRepository);
+        const projectResult = await getProjectUseCase.execute(id);
+
+        if (projectResult.isFailure) {
+          return NextResponse.json(
+            { error: projectResult.error.message },
+            { status: projectResult.error.statusCode }
+          );
+        }
+
+        const project = projectResult.value;
+        if (project.consultantId !== user.id) {
+          return NextResponse.json({ error: 'Bu projeyi silme yetkiniz yok' }, { status: 403 });
+        }
+      } else {
+        // Other roles cannot delete projects
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      }
+    }
 
     const deleteProjectUseCase = new DeleteProjectUseCase(projectRepository);
     const result = await deleteProjectUseCase.execute(id);

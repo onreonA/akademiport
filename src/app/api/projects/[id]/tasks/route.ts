@@ -3,7 +3,7 @@ import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const user = await getAuthenticatedUser();
+    const user = await getAuthenticatedUser(req);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

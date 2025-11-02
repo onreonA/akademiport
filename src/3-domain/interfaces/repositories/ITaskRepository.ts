@@ -24,7 +24,8 @@ export interface ITaskRepository {
     filters?: {
       status?: string;
       priority?: string;
-    }
+    },
+    includeDeleted?: boolean
   ): Promise<Task[]>;
 
   /**
@@ -33,14 +34,24 @@ export interface ITaskRepository {
   update(id: string, data: UpdateTaskDto): Promise<Task>;
 
   /**
-   * Görev sil
+   * Görev sil (soft delete)
    */
   delete(id: string): Promise<void>;
 
   /**
+   * Silinen görevi geri yükle
+   */
+  restore(id: string): Promise<void>;
+
+  /**
+   * Silinen görevleri getir
+   */
+  findDeleted(): Promise<Task[]>;
+
+  /**
    * Görev var mı kontrol et
    */
-  exists(id: string): Promise<boolean>;
+  exists(id: string, includeDeleted?: boolean): Promise<boolean>;
 
   /**
    * Görev durumunu güncelle

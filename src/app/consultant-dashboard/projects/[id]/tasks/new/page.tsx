@@ -53,10 +53,11 @@ export default function NewTaskPage() {
 
   const fetchSubProjects = async () => {
     try {
-      const response = await fetch(`/api/sub-projects?project_id=${projectId}`);
+      const response = await fetch(`/api/sub-projects?projectId=${projectId}`);
       if (!response.ok) throw new Error('Failed to fetch sub-projects');
       const data = await response.json();
-      setSubProjects(data.subProjects || []);
+      // API returns array directly or wrapped in data
+      setSubProjects(Array.isArray(data) ? data : data.data || data.subProjects || []);
     } catch (err) {
       console.error('Error fetching sub-projects:', err);
     }
@@ -68,13 +69,20 @@ export default function NewTaskPage() {
       const projectResponse = await fetch(`/api/projects/${projectId}`);
       if (!projectResponse.ok) throw new Error('Failed to fetch project');
       const projectData = await projectResponse.json();
-      const companyId = projectData.project.company_id;
+      // API returns project directly, not wrapped in { project: {...} }
+      const companyId =
+        projectData.companyId || projectData.company_id || projectData.project?.company_id;
+
+      if (!companyId) {
+        console.error('Company ID not found in project data');
+        return;
+      }
 
       // Then get company users
       const usersResponse = await fetch(`/api/companies/${companyId}/users`);
       if (!usersResponse.ok) throw new Error('Failed to fetch company users');
       const usersData = await usersResponse.json();
-      setCompanyUsers(usersData.users || []);
+      setCompanyUsers(usersData.users || usersData.data || []);
     } catch (err) {
       console.error('Error fetching company users:', err);
     }
@@ -85,19 +93,27 @@ export default function NewTaskPage() {
     setLoading(true);
 
     try {
+      // Map formData to API expected format
+      const payload = {
+        subProjectId: formData.sub_project_id,
+        assignedTo: formData.assigned_to || undefined,
+        title: formData.title,
+        description: formData.description || undefined,
+        status: formData.status || 'todo',
+        priority: formData.priority || 'medium',
+        dueDate: formData.due_date || undefined,
+        orderIndex: 0,
+      };
+
       const response = await fetch('/api/tasks', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formData,
-          assigned_to: formData.assigned_to || undefined,
-          due_date: formData.due_date || undefined,
-        }),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to create task');
+        const errorData = await response.json().catch(() => ({ error: 'Failed to create task' }));
+        throw new Error(errorData.error || errorData.message || 'Failed to create task');
       }
 
       const data = await response.json();
@@ -151,7 +167,7 @@ export default function NewTaskPage() {
                 </SelectTrigger>
                 <SelectContent>
                   {subProjects.length === 0 ? (
-                    <SelectItem value="" disabled>
+                    <SelectItem value="no-subproject" disabled>
                       Henüz alt proje yok
                     </SelectItem>
                   ) : (
@@ -198,14 +214,16 @@ export default function NewTaskPage() {
             <div className="space-y-2">
               <Label htmlFor="assigned_to">Atanan Kişi (Opsiyonel)</Label>
               <Select
-                value={formData.assigned_to}
-                onValueChange={(value) => handleChange('assigned_to', value)}
+                value={formData.assigned_to || undefined}
+                onValueChange={(value) =>
+                  handleChange('assigned_to', value === 'none' ? '' : value)
+                }
               >
                 <SelectTrigger id="assigned_to">
                   <SelectValue placeholder="Firma kullanıcısı seçin" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Atama yapma</SelectItem>
+                  <SelectItem value="none">Atama yapma</SelectItem>
                   {companyUsers.map((user) => (
                     <SelectItem key={user.id} value={user.id}>
                       {user.full_name} ({user.email})

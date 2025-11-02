@@ -30,14 +30,17 @@ export class ProjectRepository implements IProjectRepository {
     return this.mapToEntity(project);
   }
 
-  async findById(id: string): Promise<Project | null> {
+  async findById(id: string, includeDeleted: boolean = false): Promise<Project | null> {
     const supabase = await createClient();
 
-    const { data: project, error } = await supabase
-      .from('projects')
-      .select('*')
-      .eq('id', id)
-      .single();
+    let query = supabase.from('projects').select('*').eq('id', id);
+
+    // Soft delete kontrolü: includeDeleted true değilse sadece silinmemişleri getir
+    if (!includeDeleted) {
+      query = query.is('deleted_at', null);
+    }
+
+    const { data: project, error } = await query.single();
 
     if (error) {
       if (error.code === 'PGRST116') {
@@ -56,6 +59,7 @@ export class ProjectRepository implements IProjectRepository {
     isTemplate?: boolean;
     page?: number;
     limit?: number;
+    includeDeleted?: boolean;
   }): Promise<{ data: Project[]; total: number }> {
     const supabase = await createClient();
     const page = filters?.page || 1;
@@ -63,6 +67,11 @@ export class ProjectRepository implements IProjectRepository {
     const offset = (page - 1) * limit;
 
     let query = supabase.from('projects').select('*', { count: 'exact' });
+
+    // Soft delete kontrolü: includeDeleted true değilse sadece silinmemişleri getir
+    if (!filters?.includeDeleted) {
+      query = query.is('deleted_at', null);
+    }
 
     if (filters?.companyId) {
       query = query.eq('company_id', filters.companyId);
@@ -94,14 +103,17 @@ export class ProjectRepository implements IProjectRepository {
     };
   }
 
-  async findByCompanyId(companyId: string): Promise<Project[]> {
+  async findByCompanyId(companyId: string, includeDeleted: boolean = false): Promise<Project[]> {
     const supabase = await createClient();
 
-    const { data: projects, error } = await supabase
-      .from('projects')
-      .select('*')
-      .eq('company_id', companyId)
-      .order('created_at', { ascending: false });
+    let query = supabase.from('projects').select('*').eq('company_id', companyId);
+
+    // Soft delete kontrolü
+    if (!includeDeleted) {
+      query = query.is('deleted_at', null);
+    }
+
+    const { data: projects, error } = await query.order('created_at', { ascending: false });
 
     if (error) {
       throw new Error(`Failed to find projects by company: ${error.message}`);
@@ -110,14 +122,20 @@ export class ProjectRepository implements IProjectRepository {
     return projects?.map((p) => this.mapToEntity(p)) || [];
   }
 
-  async findByConsultantId(consultantId: string): Promise<Project[]> {
+  async findByConsultantId(
+    consultantId: string,
+    includeDeleted: boolean = false
+  ): Promise<Project[]> {
     const supabase = await createClient();
 
-    const { data: projects, error } = await supabase
-      .from('projects')
-      .select('*')
-      .eq('consultant_id', consultantId)
-      .order('created_at', { ascending: false });
+    let query = supabase.from('projects').select('*').eq('consultant_id', consultantId);
+
+    // Soft delete kontrolü
+    if (!includeDeleted) {
+      query = query.is('deleted_at', null);
+    }
+
+    const { data: projects, error } = await query.order('created_at', { ascending: false });
 
     if (error) {
       throw new Error(`Failed to find projects by consultant: ${error.message}`);
@@ -135,6 +153,7 @@ export class ProjectRepository implements IProjectRepository {
       .from('projects')
       .select('*')
       .eq('is_template', true)
+      .is('deleted_at', null) // Şablonlar silinemez ama yine de kontrol edelim
       .order('name', { ascending: true });
 
     console.log('📊 [ProjectRepository] Query result:', {
@@ -203,17 +222,60 @@ export class ProjectRepository implements IProjectRepository {
   async delete(id: string): Promise<void> {
     const supabase = await createClient();
 
-    const { error } = await supabase.from('projects').delete().eq('id', id);
+    // Soft delete: deleted_at set et
+    const { error } = await supabase
+      .from('projects')
+      .update({ deleted_at: new Date().toISOString() })
+      .eq('id', id)
+      .is('deleted_at', null); // Sadece silinmemiş olanları sil
 
     if (error) {
       throw new Error(`Failed to delete project: ${error.message}`);
     }
   }
 
-  async exists(id: string): Promise<boolean> {
+  async restore(id: string): Promise<void> {
     const supabase = await createClient();
 
-    const { data, error } = await supabase.from('projects').select('id').eq('id', id).single();
+    // Soft delete geri al: deleted_at'i NULL yap
+    const { error } = await supabase
+      .from('projects')
+      .update({ deleted_at: null })
+      .eq('id', id)
+      .not('deleted_at', 'is', null); // Sadece silinmiş olanları geri yükle
+
+    if (error) {
+      throw new Error(`Failed to restore project: ${error.message}`);
+    }
+  }
+
+  async findDeleted(): Promise<Project[]> {
+    const supabase = await createClient();
+
+    const { data: projects, error } = await supabase
+      .from('projects')
+      .select('*')
+      .not('deleted_at', 'is', null)
+      .order('deleted_at', { ascending: false });
+
+    if (error) {
+      throw new Error(`Failed to find deleted projects: ${error.message}`);
+    }
+
+    return projects?.map((p) => this.mapToEntity(p)) || [];
+  }
+
+  async exists(id: string, includeDeleted: boolean = false): Promise<boolean> {
+    const supabase = await createClient();
+
+    let query = supabase.from('projects').select('id').eq('id', id);
+
+    // Soft delete kontrolü
+    if (!includeDeleted) {
+      query = query.is('deleted_at', null);
+    }
+
+    const { data, error } = await query.single();
 
     if (error && error.code !== 'PGRST116') {
       throw new Error(`Failed to check project existence: ${error.message}`);

@@ -84,30 +84,44 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   try {
     const { id: programId } = await params;
 
+    console.log(
+      '🔍 [GET /api/programs/[id]/consultants] Fetching consultants for program:',
+      programId
+    );
+
     // Execute use case
     const result = await manageConsultantsUseCase.getConsultants({
       programId,
     });
 
     if (result.isFailure) {
+      const errorMessage =
+        result.error instanceof Error ? result.error.message : result.error || 'Bilinmeyen hata';
+      console.error('🔴 [GET /api/programs/[id]/consultants] Error:', errorMessage);
+      console.error('🔴 [GET /api/programs/[id]/consultants] Full error object:', result.error);
       return NextResponse.json(
         {
           success: false,
-          error: result.error,
+          error: errorMessage,
         },
         { status: 400 }
       );
     }
 
+    console.log(
+      '🟢 [GET /api/programs/[id]/consultants] Success, found consultants:',
+      result.value?.length || 0
+    );
+
     return NextResponse.json(
       {
         success: true,
-        data: result.value,
+        data: result.value || [],
       },
       { status: 200 }
     );
   } catch (error) {
-    console.error('Get consultants error:', error);
+    console.error('🔴 [GET /api/programs/[id]/consultants] Exception:', error);
     return NextResponse.json(
       {
         success: false,

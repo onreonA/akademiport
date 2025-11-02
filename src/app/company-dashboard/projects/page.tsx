@@ -54,7 +54,14 @@ export default function CompanyProjectsPage() {
       const response = await fetch('/api/projects');
       if (!response.ok) throw new Error('Failed to fetch projects');
       const data = await response.json();
-      setProjects(data.projects || []);
+      // Ensure projects have default values for status, priority, and progress
+      const projectsWithDefaults = (data.projects || []).map((project: any) => ({
+        ...project,
+        status: project.status || 'todo',
+        priority: project.priority || 'medium',
+        progress: project.progress ?? 0,
+      }));
+      setProjects(projectsWithDefaults);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -194,24 +201,28 @@ export default function CompanyProjectsPage() {
 
                 {/* Badges */}
                 <div className="flex flex-wrap gap-2 mb-4">
-                  <Badge className={statusConfig[project.status].color}>
-                    {statusConfig[project.status].label}
-                  </Badge>
-                  <Badge className={priorityConfig[project.priority].color}>
-                    {priorityConfig[project.priority].label}
-                  </Badge>
+                  {project.status && statusConfig[project.status] && (
+                    <Badge className={statusConfig[project.status].color}>
+                      {statusConfig[project.status].label}
+                    </Badge>
+                  )}
+                  {project.priority && priorityConfig[project.priority] && (
+                    <Badge className={priorityConfig[project.priority].color}>
+                      {priorityConfig[project.priority].label}
+                    </Badge>
+                  )}
                 </div>
 
                 {/* Progress */}
                 <div className="mb-4">
                   <div className="flex items-center justify-between text-sm mb-2">
                     <span className="text-muted-foreground">İlerleme</span>
-                    <span className="font-semibold">{project.progress}%</span>
+                    <span className="font-semibold">{project.progress ?? 0}%</span>
                   </div>
                   <div className="h-2 bg-muted rounded-full overflow-hidden">
                     <div
                       className="h-full bg-linear-to-r from-primary to-secondary transition-all duration-1000"
-                      style={{ width: `${project.progress}%` }}
+                      style={{ width: `${project.progress ?? 0}%` }}
                     />
                   </div>
                 </div>

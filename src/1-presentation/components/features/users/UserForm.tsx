@@ -63,6 +63,7 @@ export const UserForm: React.FC<UserFormProps> = ({
     formState: { errors },
     setValue,
     watch,
+    reset,
   } = useForm<UserFormData>({
     resolver: zodResolver(userFormSchema),
     defaultValues: {
@@ -76,6 +77,22 @@ export const UserForm: React.FC<UserFormProps> = ({
       bio: initialData?.bio || '',
     },
   });
+
+  // Update form when initialData changes (for edit mode)
+  React.useEffect(() => {
+    if (initialData && isEdit) {
+      reset({
+        email: initialData.email || '',
+        firstName: initialData.firstName || '',
+        lastName: initialData.lastName || '',
+        password: '',
+        phone: initialData.phone || '',
+        role: initialData.role || UserRole.COMPANY_USER,
+        companyId: initialData.companyId || '',
+        bio: initialData.bio || '',
+      });
+    }
+  }, [initialData, isEdit, reset]);
 
   const selectedRole = watch('role');
 

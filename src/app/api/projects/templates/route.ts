@@ -11,11 +11,15 @@ export async function GET(request: NextRequest) {
   try {
     console.log('🔍 [Templates API] Starting...');
 
-    const user = await getAuthenticatedUser();
+    const user = await getAuthenticatedUser(request);
     console.log('👤 [Templates API] User:', { id: user.id, role: user.role, email: user.email });
 
-    // Only master_admin and program_manager can access templates
-    if (user.role !== 'master_admin' && user.role !== 'program_manager') {
+    // Only master_admin, program_manager, and consultant can access templates
+    if (
+      user.role !== 'master_admin' &&
+      user.role !== 'program_manager' &&
+      user.role !== 'consultant'
+    ) {
       console.error('❌ [Templates API] Unauthorized role:', user.role);
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }

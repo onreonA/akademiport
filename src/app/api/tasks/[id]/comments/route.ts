@@ -8,23 +8,26 @@ import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
  */
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const user = await getAuthenticatedUser();
+    const user = await getAuthenticatedUser(request);
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { id: taskId } = await params;
 
     const commentRepository = new TaskCommentRepository();
-    const result = await commentRepository.findByTaskId(taskId);
-
-    if (!result.success) {
-      return NextResponse.json({ error: result.error }, { status: 400 });
-    }
+    const comments = await commentRepository.findByTaskId(taskId);
 
     return NextResponse.json({
       success: true,
-      comments: result.data,
+      comments: comments || [],
     });
   } catch (error) {
     console.error('Error in GET /api/tasks/[id]/comments:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Internal server error' },
+      { status: 500 }
+    );
   }
 }
 
@@ -34,34 +37,53 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
  */
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const user = await getAuthenticatedUser();
+    const user = await getAuthenticatedUser(request);
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { id: taskId } = await params;
     const body = await request.json();
 
-    const { comment, is_question } = body;
+    const { comment, is_question, isQuestion } = body;
 
     if (!comment) {
       return NextResponse.json({ error: 'Missing required field: comment' }, { status: 400 });
     }
 
-    const commentRepository = new TaskCommentRepository();
-    const result = await commentRepository.create({
-      task_id: taskId,
-      user_id: user.id,
-      comment,
-      is_question: is_question || false,
+    // isQuestion değerini doğru al (hem is_question hem isQuestion destekleniyor)
+    const isQuestionValue =
+      is_question !== undefined ? is_question : isQuestion !== undefined ? isQuestion : false;
+
+    console.log('[POST /api/tasks/[id]/comments] Received:', {
+      comment: comment?.substring(0, 50),
+      is_question,
+      isQuestion,
+      isQuestionValue,
     });
 
-    if (!result.success) {
-      return NextResponse.json({ error: result.error }, { status: 400 });
-    }
+    const commentRepository = new TaskCommentRepository();
+    const newComment = await commentRepository.create({
+      taskId: taskId,
+      userId: user.id,
+      comment,
+      isQuestion: isQuestionValue,
+    });
+
+    console.log('[POST /api/tasks/[id]/comments] Created comment:', {
+      id: newComment.id,
+      isQuestion: newComment.isQuestion,
+    });
 
     return NextResponse.json({
       success: true,
-      comment: result.data,
+      comment: newComment,
     });
   } catch (error) {
     console.error('Error in POST /api/tasks/[id]/comments:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Internal server error' },
+      { status: 500 }
+    );
   }
 }

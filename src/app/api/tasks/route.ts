@@ -13,7 +13,7 @@ const subProjectRepository = new SubProjectRepository();
  */
 export async function GET(request: NextRequest) {
   try {
-    const user = await getAuthenticatedUser();
+    const user = await getAuthenticatedUser(request);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
     const priority = searchParams.get('priority') || undefined;
 
     const listUserTasksUseCase = new ListUserTasksUseCase(taskRepository);
-    const result = await listUserTasksUseCase.execute(user.userId, { status, priority });
+    const result = await listUserTasksUseCase.execute(user.id, { status, priority });
 
     if (result.isFailure) {
       return NextResponse.json(
@@ -45,13 +45,13 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    const user = await getAuthenticatedUser();
+    const user = await getAuthenticatedUser(request);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // Only master_admin and consultant can create tasks
-    if (user.userRole !== 'master_admin' && user.userRole !== 'consultant') {
+    if (user.role !== 'master_admin' && user.role !== 'consultant') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 

@@ -11,13 +11,13 @@ const taskRepository = new TaskRepository();
  */
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const user = await getAuthenticatedUser();
+    const user = await getAuthenticatedUser(request);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // Only consultant and master_admin can reject tasks
-    if (user.userRole !== 'consultant' && user.userRole !== 'master_admin') {
+    if (user.role !== 'consultant' && user.role !== 'master_admin') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 

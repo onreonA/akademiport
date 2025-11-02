@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ListTodo, ArrowLeft, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
 import { TaskComments } from '@/1-presentation/components/features/tasks/TaskComments';
+import { TaskDependencies } from '@/1-presentation/components/features/tasks/TaskDependencies';
 import { useAuth } from '@/5-shared/hooks/useAuth';
 import { GradientHeader } from '@/presentation/components/ui/molecules/gradient-header';
 import { EnhancedCard } from '@/presentation/components/ui/atoms/enhanced-card';
@@ -235,6 +236,14 @@ export default function CompanyTaskDetailPage() {
             </div>
           </div>
         </EnhancedCard>
+
+        {/* Dependencies Section */}
+        {task.sub_project?.project?.id && (
+          <EnhancedCard variant="glass" className="p-6 md:p-8">
+            <h3 className="text-xl font-bold mb-6">Bağımlılıklar</h3>
+            <TaskDependencies taskId={taskId} projectId={task.sub_project.project.id} />
+          </EnhancedCard>
+        )}
 
         {/* Comments Section */}
         {user && (

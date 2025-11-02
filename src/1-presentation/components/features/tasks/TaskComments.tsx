@@ -43,7 +43,8 @@ export function TaskComments({ taskId, currentUserId }: TaskCommentsProps) {
       if (!response.ok) throw new Error('Failed to fetch comments');
 
       const data = await response.json();
-      setComments(Array.isArray(data) ? data : []);
+      // API returns { success: true, comments: [...] }
+      setComments(data.comments || (Array.isArray(data) ? data : []));
     } catch (error) {
       console.error('Error fetching comments:', error);
       toast.error('Yorumlar yüklenemedi');
@@ -58,14 +59,25 @@ export function TaskComments({ taskId, currentUserId }: TaskCommentsProps) {
 
     setSubmitting(true);
 
+    // Debug: isQuestion değerini kontrol et
+    console.log('[TaskComments.handleSubmit] Submitting comment:', {
+      comment: newComment.trim().substring(0, 50),
+      isQuestion,
+      isQuestionType: typeof isQuestion,
+    });
+
     try {
+      const payload = {
+        comment: newComment.trim(),
+        isQuestion,
+      };
+
+      console.log('[TaskComments.handleSubmit] Payload:', payload);
+
       const response = await fetch(`/api/tasks/${taskId}/comments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          comment: newComment.trim(),
-          isQuestion,
-        }),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
@@ -74,7 +86,9 @@ export function TaskComments({ taskId, currentUserId }: TaskCommentsProps) {
       }
 
       const data = await response.json();
-      setComments([data, ...comments]);
+      // API returns { success: true, comment: {...} }
+      const newCommentData = data.comment || data;
+      setComments([newCommentData, ...comments]);
       setNewComment('');
       setIsQuestion(false);
       toast.success(isQuestion ? 'Soru eklendi!' : 'Yorum eklendi!');
@@ -172,7 +186,15 @@ export function TaskComments({ taskId, currentUserId }: TaskCommentsProps) {
       {/* Comments List */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="font-semibold">Yorumlar ({comments.length})</h3>
+          <div className="flex items-center gap-3">
+            <h3 className="font-semibold">Yorumlar ({comments.length})</h3>
+            {comments.some((c) => c.isQuestion) && (
+              <Badge variant="secondary" className="bg-blue-100 text-blue-700">
+                <HelpCircle className="w-3 h-3 mr-1" />
+                {comments.filter((c) => c.isQuestion).length} Soru
+              </Badge>
+            )}
+          </div>
         </div>
 
         {comments.length === 0 ? (

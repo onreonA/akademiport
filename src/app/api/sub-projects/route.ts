@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
 import { SubProjectRepository } from '@/infrastructure/database/repositories/SubProjectRepository';
+import { ProjectRepository } from '@/infrastructure/database/repositories/ProjectRepository';
 import { CreateSubProjectUseCase } from '@/application/use-cases/sub-project/CreateSubProjectUseCase';
 import { ListSubProjectsUseCase } from '@/application/use-cases/sub-project/ListSubProjectsUseCase';
 
@@ -10,7 +11,7 @@ import { ListSubProjectsUseCase } from '@/application/use-cases/sub-project/List
  */
 export async function GET(request: NextRequest) {
   try {
-    const user = await getAuthenticatedUser();
+    const user = await getAuthenticatedUser(request);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -47,7 +48,7 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    const user = await getAuthenticatedUser();
+    const user = await getAuthenticatedUser(request);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -64,8 +65,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Project ID and name are required' }, { status: 400 });
     }
 
-    const repository = new SubProjectRepository();
-    const useCase = new CreateSubProjectUseCase(repository);
+    const subProjectRepository = new SubProjectRepository();
+    const projectRepository = new ProjectRepository();
+    const useCase = new CreateSubProjectUseCase(subProjectRepository, projectRepository);
 
     const result = await useCase.execute({
       projectId,

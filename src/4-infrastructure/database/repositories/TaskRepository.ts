@@ -28,10 +28,17 @@ export class TaskRepository implements ITaskRepository {
     return this.mapToEntity(task);
   }
 
-  async findById(id: string): Promise<Task | null> {
+  async findById(id: string, includeDeleted: boolean = false): Promise<Task | null> {
     const supabase = await createClient();
 
-    const { data: task, error } = await supabase.from('tasks').select('*').eq('id', id).single();
+    let query = supabase.from('tasks').select('*').eq('id', id);
+
+    // Soft delete kontrolü
+    if (!includeDeleted) {
+      query = query.is('deleted_at', null);
+    }
+
+    const { data: task, error } = await query.single();
 
     if (error) {
       if (error.code === 'PGRST116') {
@@ -43,14 +50,17 @@ export class TaskRepository implements ITaskRepository {
     return this.mapToEntity(task);
   }
 
-  async findBySubProjectId(subProjectId: string): Promise<Task[]> {
+  async findBySubProjectId(subProjectId: string, includeDeleted: boolean = false): Promise<Task[]> {
     const supabase = await createClient();
 
-    const { data: tasks, error } = await supabase
-      .from('tasks')
-      .select('*')
-      .eq('sub_project_id', subProjectId)
-      .order('order_index', { ascending: true });
+    let query = supabase.from('tasks').select('*').eq('sub_project_id', subProjectId);
+
+    // Soft delete kontrolü
+    if (!includeDeleted) {
+      query = query.is('deleted_at', null);
+    }
+
+    const { data: tasks, error } = await query.order('order_index', { ascending: true });
 
     if (error) {
       throw new Error(`Failed to find tasks: ${error.message}`);
@@ -61,11 +71,17 @@ export class TaskRepository implements ITaskRepository {
 
   async findByAssignedUserId(
     userId: string,
-    filters?: { status?: string; priority?: string }
+    filters?: { status?: string; priority?: string },
+    includeDeleted: boolean = false
   ): Promise<Task[]> {
     const supabase = await createClient();
 
     let query = supabase.from('tasks').select('*').eq('assigned_to', userId);
+
+    // Soft delete kontrolü
+    if (!includeDeleted) {
+      query = query.is('deleted_at', null);
+    }
 
     if (filters?.status) {
       query = query.eq('status', filters.status);
@@ -116,17 +132,60 @@ export class TaskRepository implements ITaskRepository {
   async delete(id: string): Promise<void> {
     const supabase = await createClient();
 
-    const { error } = await supabase.from('tasks').delete().eq('id', id);
+    // Soft delete: deleted_at set et
+    const { error } = await supabase
+      .from('tasks')
+      .update({ deleted_at: new Date().toISOString() })
+      .eq('id', id)
+      .is('deleted_at', null);
 
     if (error) {
       throw new Error(`Failed to delete task: ${error.message}`);
     }
   }
 
-  async exists(id: string): Promise<boolean> {
+  async restore(id: string): Promise<void> {
     const supabase = await createClient();
 
-    const { data, error } = await supabase.from('tasks').select('id').eq('id', id).single();
+    // Soft delete geri al
+    const { error } = await supabase
+      .from('tasks')
+      .update({ deleted_at: null })
+      .eq('id', id)
+      .not('deleted_at', 'is', null);
+
+    if (error) {
+      throw new Error(`Failed to restore task: ${error.message}`);
+    }
+  }
+
+  async findDeleted(): Promise<Task[]> {
+    const supabase = await createClient();
+
+    const { data: tasks, error } = await supabase
+      .from('tasks')
+      .select('*')
+      .not('deleted_at', 'is', null)
+      .order('deleted_at', { ascending: false });
+
+    if (error) {
+      throw new Error(`Failed to find deleted tasks: ${error.message}`);
+    }
+
+    return tasks?.map((t) => this.mapToEntity(t)) || [];
+  }
+
+  async exists(id: string, includeDeleted: boolean = false): Promise<boolean> {
+    const supabase = await createClient();
+
+    let query = supabase.from('tasks').select('id').eq('id', id);
+
+    // Soft delete kontrolü
+    if (!includeDeleted) {
+      query = query.is('deleted_at', null);
+    }
+
+    const { data, error } = await query.single();
 
     if (error && error.code !== 'PGRST116') {
       throw new Error(`Failed to check task existence: ${error.message}`);

@@ -38,10 +38,14 @@ export default function EditUserPage({ params }: { params: Promise<{ id: string 
       const result = await response.json();
 
       if (result.success) {
+        console.log('🔍 [EditUserPage] User data from API:', result.data);
         setUser(result.data);
+      } else {
+        console.error('🔴 [EditUserPage] Failed to fetch user:', result.error);
+        toast.error(result.error || 'Kullanıcı bilgileri alınamadı');
       }
     } catch (error) {
-      console.error('Failed to fetch user:', error);
+      console.error('🔴 [EditUserPage] Exception:', error);
       toast.error('Kullanıcı bilgileri alınamadı');
     } finally {
       setLoading(false);
@@ -132,12 +136,17 @@ export default function EditUserPage({ params }: { params: Promise<{ id: string 
           <CardContent className="p-8">
             <UserForm
               initialData={{
-                email: user.email,
-                fullName: user.fullName,
-                phone: user.phone,
+                email: user.email || '',
+                firstName:
+                  user.firstName ||
+                  (user.fullName ? user.fullName.split(' ')[0]?.trim() || '' : ''),
+                lastName:
+                  user.lastName ||
+                  (user.fullName ? user.fullName.split(' ').slice(1).join(' ')?.trim() || '' : ''),
+                phone: user.phone || '',
                 role: user.role,
-                companyId: user.companyId,
-                bio: user.bio,
+                companyId: user.companyId || '',
+                bio: user.bio || '',
               }}
               onSubmit={handleSubmit}
               onCancel={() => router.back()}

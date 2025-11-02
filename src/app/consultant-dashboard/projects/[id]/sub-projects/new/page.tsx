@@ -47,8 +47,10 @@ export default function NewSubProjectPage() {
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to create sub-project');
+        const errorData = await response
+          .json()
+          .catch(() => ({ error: 'Failed to create sub-project' }));
+        throw new Error(errorData.error || errorData.message || 'Failed to create sub-project');
       }
 
       toast.success('Alt proje başarıyla oluşturuldu!');

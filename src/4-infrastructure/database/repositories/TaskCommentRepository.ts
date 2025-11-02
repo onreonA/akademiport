@@ -6,13 +6,24 @@ export class TaskCommentRepository implements ITaskCommentRepository {
   async create(data: CreateTaskCommentDto): Promise<TaskComment> {
     const supabase = await createClient();
 
+    // isQuestion değerini açıkça boolean'a çevir
+    const isQuestionValue = Boolean(data.isQuestion);
+
+    console.log('[TaskCommentRepository.create] Creating comment:', {
+      taskId: data.taskId,
+      userId: data.userId,
+      comment: data.comment?.substring(0, 50),
+      isQuestion: data.isQuestion,
+      isQuestionValue,
+    });
+
     const { data: comment, error } = await supabase
       .from('task_comments')
       .insert({
         task_id: data.taskId,
         user_id: data.userId,
         comment: data.comment,
-        is_question: data.isQuestion || false,
+        is_question: isQuestionValue,
       })
       .select()
       .single();

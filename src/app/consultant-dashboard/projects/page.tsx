@@ -48,7 +48,8 @@ export default function ConsultantProjectsPage() {
       if (!response.ok) throw new Error('Failed to fetch projects');
 
       const data = await response.json();
-      setProjects(data.data || []);
+      // API returns { projects: [...], total, page, limit }
+      setProjects(data.projects || data.data || []);
     } catch (error) {
       console.error('Error fetching projects:', error);
     } finally {
