@@ -63,6 +63,12 @@ export async function GET(
       const result = await calculateProgressUseCase.execute(id, trainingId);
 
       if (result.isFailure) {
+        console.error('❌ CalculateTrainingProgressUseCase failed:', {
+          companyId: id,
+          trainingId,
+          error: result.error.message,
+          statusCode: result.error.statusCode,
+        });
         return NextResponse.json(
           { error: result.error.message },
           { status: result.error.statusCode }
@@ -89,8 +95,11 @@ export async function GET(
 
     return NextResponse.json({ progress: result.value });
   } catch (error) {
-    console.error('Error in GET /api/companies/[id]/trainings/[trainingId]/progress:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error('❌ Error in GET /api/companies/[id]/trainings/[trainingId]/progress:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Internal server error';
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    console.error('Error details:', { errorMessage, errorStack });
+    return NextResponse.json({ error: errorMessage, details: errorStack }, { status: 500 });
   }
 }
 

@@ -27,6 +27,8 @@ interface CompanyTrainingWithTraining {
   updatedAt: Date;
   training: Training;
   progress?: number; // 0-100 (calculated separately)
+  videosCount?: number;
+  documentsCount?: number;
 }
 
 export default function CompanyTrainingsPage() {
@@ -82,6 +84,8 @@ export default function CompanyTrainingsPage() {
           updatedAt: new Date(ct.updatedAt),
           training: ct.training, // Training object is already included
           progress: 0, // Will be calculated from progress API
+          videosCount: ct.videosCount || 0,
+          documentsCount: ct.documentsCount || 0,
         })
       );
 
@@ -327,6 +331,8 @@ export default function CompanyTrainingsPage() {
                     training={companyTraining.training}
                     onClick={(t) => router.push(`/company-dashboard/trainings/${t.id}`)}
                     progress={companyTraining.progress}
+                    videosCount={companyTraining.videosCount}
+                    documentsCount={companyTraining.documentsCount}
                   />
                   {companyTraining.progress !== undefined && (
                     <div className="bg-card/50 backdrop-blur-sm border border-primary/20 rounded-lg p-3">

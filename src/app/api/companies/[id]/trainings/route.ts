@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { CompanyTrainingRepository } from '@/infrastructure/database/repositories/CompanyTrainingRepository';
 import { CompanyRepository } from '@/infrastructure/database/repositories/CompanyRepository';
 import { TrainingRepository } from '@/infrastructure/database/repositories/TrainingRepository';
+import { TrainingVideoRepository } from '@/infrastructure/database/repositories/TrainingVideoRepository';
+import { TrainingDocumentRepository } from '@/infrastructure/database/repositories/TrainingDocumentRepository';
 import {
   AssignTrainingToCompanyUseCase,
   ListCompanyTrainingsUseCase,
@@ -11,6 +13,8 @@ import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
 const companyTrainingRepository = new CompanyTrainingRepository();
 const companyRepository = new CompanyRepository();
 const trainingRepository = new TrainingRepository();
+const trainingVideoRepository = new TrainingVideoRepository();
+const trainingDocumentRepository = new TrainingDocumentRepository();
 
 /**
  * GET /api/companies/[id]/trainings
@@ -35,7 +39,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const listCompanyTrainingsUseCase = new ListCompanyTrainingsUseCase(
       companyTrainingRepository,
       companyRepository,
-      trainingRepository
+      trainingRepository,
+      trainingVideoRepository,
+      trainingDocumentRepository
     );
     const result = await listCompanyTrainingsUseCase.execute(id);
 

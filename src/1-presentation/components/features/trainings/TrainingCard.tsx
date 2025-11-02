@@ -72,22 +72,24 @@ export function TrainingCard({
     });
   };
 
+  const handleCardClick = () => {
+    if (onClick) {
+      onClick(training);
+    }
+  };
+
   return (
-    <Card className="group hover:shadow-xl hover:scale-[1.02] transition-all duration-300 border-0 shadow-md bg-gradient-to-br from-card to-card/50">
+    <Card
+      className={`group hover:shadow-xl hover:scale-[1.02] transition-all duration-300 border-0 shadow-md bg-gradient-to-br from-card to-card/50 ${
+        onClick ? 'cursor-pointer' : ''
+      }`}
+      onClick={onClick ? handleCardClick : undefined}
+    >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
             <CardTitle className="text-xl mb-2 group-hover:text-primary transition-colors line-clamp-2">
-              {onClick ? (
-                <button
-                  onClick={() => onClick(training)}
-                  className="text-left hover:text-primary transition-colors"
-                >
-                  {training.name}
-                </button>
-              ) : (
-                training.name
-              )}
+              {training.name}
             </CardTitle>
             {training.description && (
               <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
@@ -95,7 +97,7 @@ export function TrainingCard({
               </p>
             )}
           </div>
-          <div className="flex flex-col items-end gap-2 flex-shrink-0">
+          <div className="flex flex-col items-end gap-2 shrink-0">
             <Badge className={statusColors[training.status]}>{statusLabels[training.status]}</Badge>
             {training.priority && (
               <Badge className={priorityColors[training.priority]} variant="outline">
@@ -159,7 +161,10 @@ export function TrainingCard({
       </CardContent>
 
       {(onEdit || onDelete) && (
-        <CardFooter className="flex gap-2 pt-3">
+        <CardFooter
+          className="flex gap-2 pt-3"
+          onClick={(e) => e.stopPropagation()} // Prevent card click when clicking buttons
+        >
           {onEdit && (
             <Button variant="outline" size="sm" onClick={() => onEdit(training)}>
               Düzenle

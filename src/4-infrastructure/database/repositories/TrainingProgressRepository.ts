@@ -66,6 +66,14 @@ export class TrainingProgressRepository implements ITrainingProgressRepository {
       .order('created_at', { ascending: false });
 
     if (error) {
+      console.error('❌ TrainingProgressRepository.findByCompanyAndTraining error:', {
+        companyId,
+        trainingId,
+        errorCode: error.code,
+        errorMessage: error.message,
+        errorDetails: error.details,
+        errorHint: error.hint,
+      });
       throw new Error(`Failed to find training progress: ${error.message}`);
     }
 

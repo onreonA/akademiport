@@ -25,17 +25,28 @@ export class CalculateTrainingProgressUseCase {
   ): Promise<Result<TrainingProgressCalculation>> {
     try {
       // Get all videos and documents
-      const videosResult = await this.trainingVideoRepository.findByTrainingId(trainingId);
-      const documentsResult = await this.trainingDocumentRepository.findByTrainingId(trainingId);
+      const videos = await this.trainingVideoRepository.findByTrainingId(trainingId);
+      const documents = await this.trainingDocumentRepository.findByTrainingId(trainingId);
 
-      const videos = videosResult.data;
-      const documents = documentsResult.data;
+      // Ensure videos and documents are arrays (fallback to empty array if undefined)
+      const videosArray = videos || [];
+      const documentsArray = documents || [];
 
       // Get all progress records
-      const progressList = await this.trainingProgressRepository.findByCompanyAndTraining(
-        companyId,
-        trainingId
-      );
+      let progressList: TrainingProgress[] = [];
+      try {
+        progressList = await this.trainingProgressRepository.findByCompanyAndTraining(
+          companyId,
+          trainingId
+        );
+      } catch (error) {
+        console.error('❌ TrainingProgressRepository.findByCompanyAndTraining failed:', {
+          companyId,
+          trainingId,
+          error: error instanceof Error ? error.message : String(error),
+        });
+        throw error;
+      }
 
       // Count completed videos (progress_percentage = 100 or completed_at is not null)
       const completedVideos = progressList.filter(
@@ -47,8 +58,8 @@ export class CalculateTrainingProgressUseCase {
         (p) => p.documentId && (p.progressPercentage === 100 || p.completedAt !== null)
       ).length;
 
-      const totalVideos = videos.length;
-      const totalDocuments = documents.length;
+      const totalVideos = videosArray.length;
+      const totalDocuments = documentsArray.length;
       const totalContent = totalVideos + totalDocuments;
       const completedContent = completedVideos + completedDocuments;
 
@@ -64,12 +75,16 @@ export class CalculateTrainingProgressUseCase {
         overallProgress,
       });
     } catch (error) {
-      return Result.fail(
-        new AppError(
-          error instanceof Error ? error.message : 'Failed to calculate training progress',
-          500
-        )
-      );
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to calculate training progress';
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      console.error('❌ CalculateTrainingProgressUseCase.execute error:', {
+        companyId,
+        trainingId,
+        errorMessage,
+        errorStack,
+      });
+      return Result.fail(new AppError(errorMessage, 500));
     }
   }
 }

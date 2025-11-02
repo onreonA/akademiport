@@ -145,10 +145,23 @@ export default function CompanyTrainingDetailPage() {
       const response = await fetch(
         `/api/companies/${user.companyId}/trainings/${id}/progress?calculate=true`
       );
-      const data = await response.json();
+
+      let data: any;
+      try {
+        data = await response.json();
+      } catch (jsonError) {
+        console.error('Failed to parse response JSON:', jsonError);
+        throw new Error('İlerleme bilgisi alınamadı: Geçersiz yanıt');
+      }
 
       if (!response.ok) {
-        throw new Error(data.error || 'İlerleme bilgisi alınamadı');
+        const errorMessage = data?.error || data?.message || 'İlerleme bilgisi alınamadı';
+        throw new Error(errorMessage);
+      }
+
+      // Ensure data exists
+      if (!data) {
+        throw new Error('İlerleme bilgisi alınamadı: Boş yanıt');
       }
 
       // Map progress data

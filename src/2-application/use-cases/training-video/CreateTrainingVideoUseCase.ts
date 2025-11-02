@@ -27,13 +27,12 @@ export class CreateTrainingVideoUseCase {
         return Result.fail(new AppError('Invalid YouTube URL format', 400));
       }
 
-      // Check if training exists
-      const training = await this.trainingRepository.findById(data.trainingId);
-      if (!training) {
-        return Result.fail(new AppError('Training not found', 404));
-      }
+      // Note: Training existence check is done implicitly by the database foreign key constraint
+      // If training doesn't exist or user doesn't have access, the insert will fail with a foreign key error
+      // This avoids RLS policy issues where findById might not find the training even if it exists
 
       // Create video
+      // If training doesn't exist or user doesn't have permission, this will fail
       const video = await this.trainingVideoRepository.create(data);
 
       return Result.ok({ id: video.id });

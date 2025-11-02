@@ -10,10 +10,18 @@ import * as React from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { Button } from '@/presentation/components/ui/atoms/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/presentation/components/ui/atoms/card';
-import { TrainingForm, type TrainingFormData } from '@/presentation/components/features/trainings';
-import { ArrowLeft } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/presentation/components/ui/atoms/tabs';
+import {
+  TrainingForm,
+  type TrainingFormData,
+  TrainingVideoManager,
+  TrainingDocumentManager,
+} from '@/presentation/components/features/trainings';
+import { ArrowLeft, FileText, Video, Settings } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Training } from '@/domain/entities/Training';
+import type { TrainingVideo } from '@/domain/entities/TrainingVideo';
+import type { TrainingDocument } from '@/domain/entities/TrainingDocument';
 
 export default function EditTrainingPage() {
   const router = useRouter();
@@ -22,13 +30,26 @@ export default function EditTrainingPage() {
 
   const [training, setTraining] = React.useState<Training | null>(null);
   const [programs, setPrograms] = React.useState<Array<{ id: string; name: string }>>([]);
+  const [videos, setVideos] = React.useState<TrainingVideo[]>([]);
+  const [documents, setDocuments] = React.useState<TrainingDocument[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [loadingPrograms, setLoadingPrograms] = React.useState(true);
+  const [activeTab, setActiveTab] = React.useState('general');
 
   React.useEffect(() => {
     fetchTraining();
     fetchPrograms();
   }, [id]);
+
+  React.useEffect(() => {
+    if (id) {
+      if (activeTab === 'videos') {
+        fetchVideos();
+      } else if (activeTab === 'documents') {
+        fetchDocuments();
+      }
+    }
+  }, [id, activeTab]);
 
   const fetchTraining = async () => {
     try {
@@ -65,6 +86,32 @@ export default function EditTrainingPage() {
       console.error('Failed to fetch programs:', error);
     } finally {
       setLoadingPrograms(false);
+    }
+  };
+
+  const fetchVideos = async () => {
+    try {
+      const response = await fetch(`/api/trainings/${id}/videos`);
+      const data = await response.json();
+
+      if (response.ok) {
+        setVideos(data.videos || []);
+      }
+    } catch (error) {
+      console.error('Failed to fetch videos:', error);
+    }
+  };
+
+  const fetchDocuments = async () => {
+    try {
+      const response = await fetch(`/api/trainings/${id}/documents`);
+      const data = await response.json();
+
+      if (response.ok) {
+        setDocuments(data.documents || []);
+      }
+    } catch (error) {
+      console.error('Failed to fetch documents:', error);
     }
   };
 
@@ -136,26 +183,79 @@ export default function EditTrainingPage() {
         </div>
       </div>
 
-      {/* Form Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Eğitim Bilgileri</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {loadingPrograms ? (
-            <div className="flex items-center justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            </div>
-          ) : (
-            <TrainingForm
-              training={training}
-              programs={programs}
-              onSubmit={handleSubmit}
-              onCancel={handleCancel}
-            />
-          )}
-        </CardContent>
-      </Card>
+      {/* Tabs */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="general">
+            <Settings className="mr-2 h-4 w-4" />
+            Genel Bilgiler
+          </TabsTrigger>
+          <TabsTrigger value="videos">
+            <Video className="mr-2 h-4 w-4" />
+            Videolar ({videos.length})
+          </TabsTrigger>
+          <TabsTrigger value="documents">
+            <FileText className="mr-2 h-4 w-4" />
+            Dökümanlar ({documents.length})
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="general">
+          <Card>
+            <CardHeader>
+              <CardTitle>Eğitim Bilgileri</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {loadingPrograms ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                </div>
+              ) : (
+                <TrainingForm
+                  training={training}
+                  programs={programs}
+                  onSubmit={handleSubmit}
+                  onCancel={handleCancel}
+                />
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="videos">
+          <Card>
+            <CardHeader>
+              <CardTitle>Video Yönetimi</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <TrainingVideoManager
+                trainingId={id}
+                videos={videos}
+                onRefresh={() => {
+                  fetchVideos();
+                }}
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="documents">
+          <Card>
+            <CardHeader>
+              <CardTitle>Döküman Yönetimi</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <TrainingDocumentManager
+                trainingId={id}
+                documents={documents}
+                onRefresh={() => {
+                  fetchDocuments();
+                }}
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
