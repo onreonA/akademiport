@@ -24,6 +24,7 @@ export class TaskCommentRepository implements ITaskCommentRepository {
         user_id: data.userId,
         comment: data.comment,
         is_question: isQuestionValue,
+        parent_comment_id: data.parentCommentId || null,
       })
       .select()
       .single();
@@ -115,6 +116,7 @@ export class TaskCommentRepository implements ITaskCommentRepository {
       userId: data.user_id,
       comment: data.comment,
       isQuestion: data.is_question,
+      parentCommentId: data.parent_comment_id || null,
       createdAt: new Date(data.created_at),
     };
   }

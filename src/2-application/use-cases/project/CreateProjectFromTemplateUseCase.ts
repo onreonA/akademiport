@@ -6,7 +6,7 @@ import { AppError } from '@/core/errors';
 
 export interface CreateProjectFromTemplateDto {
   templateId: string;
-  companyId: string;
+  companyId?: string; // Optional for template duplication
   consultantId?: string;
   name: string;
   description?: string;
@@ -34,8 +34,10 @@ export class CreateProjectFromTemplateUseCase {
       }
 
       // Create new project from template
+      // If companyId is not provided, it's a template duplication (is_template should be true)
+      const isTemplate = !data.companyId;
       const newProject = await this.projectRepository.create({
-        companyId: data.companyId,
+        companyId: data.companyId || undefined,
         consultantId: data.consultantId,
         name: data.name,
         description: data.description || template.description,
@@ -43,7 +45,7 @@ export class CreateProjectFromTemplateUseCase {
         priority: template.priority,
         startDate: data.startDate,
         endDate: data.endDate,
-        isTemplate: false,
+        isTemplate: isTemplate, // If companyId is missing, it's a template duplicate
         templateId: template.id,
       });
 

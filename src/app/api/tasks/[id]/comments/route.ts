@@ -45,7 +45,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const { id: taskId } = await params;
     const body = await request.json();
 
-    const { comment, is_question, isQuestion } = body;
+    const { comment, is_question, isQuestion, parentCommentId } = body;
 
     if (!comment) {
       return NextResponse.json({ error: 'Missing required field: comment' }, { status: 400 });
@@ -55,11 +55,16 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const isQuestionValue =
       is_question !== undefined ? is_question : isQuestion !== undefined ? isQuestion : false;
 
+    // Eğer parentCommentId varsa, bu bir cevaptır ve isQuestion false olmalı
+    const finalIsQuestion = parentCommentId ? false : isQuestionValue;
+
     console.log('[POST /api/tasks/[id]/comments] Received:', {
       comment: comment?.substring(0, 50),
       is_question,
       isQuestion,
       isQuestionValue,
+      parentCommentId,
+      finalIsQuestion,
     });
 
     const commentRepository = new TaskCommentRepository();
@@ -67,7 +72,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       taskId: taskId,
       userId: user.id,
       comment,
-      isQuestion: isQuestionValue,
+      isQuestion: finalIsQuestion,
+      parentCommentId: parentCommentId || null,
     });
 
     console.log('[POST /api/tasks/[id]/comments] Created comment:', {

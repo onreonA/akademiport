@@ -9,6 +9,7 @@ export interface TaskComment {
   userId: string;
   comment: string;
   isQuestion: boolean;
+  parentCommentId?: string | null;
   createdAt: Date;
 }
 
@@ -17,6 +18,7 @@ export interface CreateTaskCommentDto {
   userId: string;
   comment: string;
   isQuestion?: boolean;
+  parentCommentId?: string | null;
 }
 
 /**
@@ -28,6 +30,7 @@ export class TaskCommentEntity implements TaskComment {
   userId: string;
   comment: string;
   isQuestion: boolean;
+  parentCommentId?: string | null;
   createdAt: Date;
 
   constructor(data: TaskComment) {
@@ -36,6 +39,7 @@ export class TaskCommentEntity implements TaskComment {
     this.userId = data.userId;
     this.comment = data.comment;
     this.isQuestion = data.isQuestion;
+    this.parentCommentId = data.parentCommentId;
     this.createdAt = data.createdAt;
   }
 

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuthUser } from '@/4-infrastructure/api/helpers/auth';
+import { getAuthenticatedUser } from '@/4-infrastructure/api/helpers/auth';
 import { TaskCommentRepository } from '@/4-infrastructure/database/repositories/TaskCommentRepository';
 import { DeleteTaskCommentUseCase } from '@/2-application/use-cases/task-comment/DeleteTaskCommentUseCase';
 
@@ -9,10 +9,11 @@ import { DeleteTaskCommentUseCase } from '@/2-application/use-cases/task-comment
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string; commentId: string } }
+  { params }: { params: Promise<{ id: string; commentId: string }> }
 ) {
   try {
-    const user = await getAuthUser();
+    const { commentId } = await params;
+    const user = await getAuthenticatedUser(request);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -20,7 +21,7 @@ export async function DELETE(
     const repository = new TaskCommentRepository();
     const useCase = new DeleteTaskCommentUseCase(repository);
 
-    const result = await useCase.execute(params.commentId);
+    const result = await useCase.execute(commentId);
 
     if (!result.isSuccess) {
       return NextResponse.json(

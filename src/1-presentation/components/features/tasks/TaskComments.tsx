@@ -5,7 +5,7 @@ import { Button } from '@/1-presentation/components/ui/atoms/button';
 import { Textarea } from '@/1-presentation/components/ui/atoms/textarea';
 import { EnhancedCard } from '@/1-presentation/components/ui/atoms/enhanced-card';
 import { Badge } from '@/1-presentation/components/ui/atoms/badge';
-import { MessageSquare, Send, Loader2, Trash2, HelpCircle } from 'lucide-react';
+import { MessageSquare, Send, Loader2, Trash2, HelpCircle, Reply } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Comment {
@@ -14,6 +14,7 @@ interface Comment {
   userId: string;
   comment: string;
   isQuestion: boolean;
+  parentCommentId?: string | null;
   createdAt: string;
   user?: {
     fullName: string;
@@ -32,6 +33,8 @@ export function TaskComments({ taskId, currentUserId }: TaskCommentsProps) {
   const [submitting, setSubmitting] = useState(false);
   const [newComment, setNewComment] = useState('');
   const [isQuestion, setIsQuestion] = useState(false);
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState('');
 
   useEffect(() => {
     fetchComments();
@@ -53,26 +56,24 @@ export function TaskComments({ taskId, currentUserId }: TaskCommentsProps) {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent, parentCommentId?: string | null) => {
     e.preventDefault();
-    if (!newComment.trim()) return;
+    const commentText = parentCommentId ? replyText : newComment;
+    if (!commentText.trim()) return;
 
     setSubmitting(true);
 
-    // Debug: isQuestion değerini kontrol et
-    console.log('[TaskComments.handleSubmit] Submitting comment:', {
-      comment: newComment.trim().substring(0, 50),
-      isQuestion,
-      isQuestionType: typeof isQuestion,
-    });
+    // Form'dan checkbox değerini direkt oku (sadece ana form için)
+    const form = e.currentTarget;
+    const checkboxElement = form.querySelector('input[type="checkbox"]') as HTMLInputElement;
+    const isQuestionChecked = parentCommentId ? false : (checkboxElement?.checked ?? isQuestion);
 
     try {
       const payload = {
-        comment: newComment.trim(),
-        isQuestion,
+        comment: commentText.trim(),
+        isQuestion: isQuestionChecked,
+        parentCommentId: parentCommentId || null,
       };
-
-      console.log('[TaskComments.handleSubmit] Payload:', payload);
 
       const response = await fetch(`/api/tasks/${taskId}/comments`, {
         method: 'POST',
@@ -88,10 +89,26 @@ export function TaskComments({ taskId, currentUserId }: TaskCommentsProps) {
       const data = await response.json();
       // API returns { success: true, comment: {...} }
       const newCommentData = data.comment || data;
-      setComments([newCommentData, ...comments]);
-      setNewComment('');
-      setIsQuestion(false);
-      toast.success(isQuestion ? 'Soru eklendi!' : 'Yorum eklendi!');
+
+      if (parentCommentId) {
+        // Cevap ekleniyor - cevapları parent'ın altına ekle
+        setComments([...comments, newCommentData]);
+        setReplyText('');
+        setReplyingTo(null);
+        toast.success('Cevap eklendi!');
+      } else {
+        // Yeni yorum/soru ekleniyor - başa ekle
+        setComments([newCommentData, ...comments]);
+        setNewComment('');
+        setIsQuestion(false);
+        if (checkboxElement) {
+          checkboxElement.checked = false;
+        }
+        toast.success(isQuestionChecked ? 'Soru eklendi!' : 'Yorum eklendi!');
+      }
+
+      // Yorumları yeniden yükle (parent-child ilişkilerini doğru göstermek için)
+      await fetchComments();
     } catch (error) {
       console.error('Error adding comment:', error);
       toast.error(error instanceof Error ? error.message : 'Bir hata oluştu');
@@ -116,6 +133,8 @@ export function TaskComments({ taskId, currentUserId }: TaskCommentsProps) {
       }
 
       setComments(comments.filter((c) => c.id !== commentId));
+      // Yorumları yeniden yükle (silme sonrası parent-child ilişkilerini doğru göstermek için)
+      await fetchComments();
       toast.success('Yorum silindi');
     } catch (error) {
       console.error('Error deleting comment:', error);
@@ -155,8 +174,13 @@ export function TaskComments({ taskId, currentUserId }: TaskCommentsProps) {
             <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
+                name="isQuestion"
                 checked={isQuestion}
-                onChange={(e) => setIsQuestion(e.target.checked)}
+                onChange={(e) => {
+                  const checked = e.target.checked;
+                  console.log('[TaskComments] Checkbox changed:', checked);
+                  setIsQuestion(checked);
+                }}
                 disabled={submitting}
                 className="rounded border-gray-300"
               />
@@ -205,45 +229,186 @@ export function TaskComments({ taskId, currentUserId }: TaskCommentsProps) {
           </EnhancedCard>
         ) : (
           <div className="space-y-3">
-            {comments.map((comment) => (
-              <EnhancedCard
-                key={comment.id}
-                className={`p-4 ${
-                  comment.isQuestion ? 'border-blue-200 bg-blue-50/50' : 'border-gray-200'
-                }`}
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex-1 space-y-2">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-medium text-sm">
-                        {comment.user?.fullName || comment.user?.email || 'Kullanıcı'}
-                      </span>
-                      {comment.isQuestion && (
-                        <Badge variant="secondary" className="text-xs">
-                          <HelpCircle className="w-3 h-3 mr-1" />
-                          Soru
-                        </Badge>
-                      )}
-                      <span className="text-xs text-muted-foreground">
-                        {new Date(comment.createdAt).toLocaleString('tr-TR')}
-                      </span>
-                    </div>
-                    <p className="text-sm whitespace-pre-wrap">{comment.comment}</p>
-                  </div>
+            {comments
+              .filter((c) => !c.parentCommentId) // Sadece ana yorumlar/sorular
+              .map((comment) => {
+                // Bu yorumun cevaplarını bul
+                const replies = comments
+                  .filter((c) => c.parentCommentId === comment.id)
+                  .sort(
+                    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+                  );
+                const isReplying = replyingTo === comment.id;
 
-                  {comment.userId === currentUserId && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDelete(comment.id)}
-                      className="shrink-0"
+                return (
+                  <div key={comment.id} className="space-y-2">
+                    <EnhancedCard
+                      className={`p-4 ${
+                        comment.isQuestion
+                          ? 'border-blue-200 bg-blue-50/50'
+                          : comment.parentCommentId
+                            ? 'border-l-4 border-l-green-300 bg-green-50/30 ml-4'
+                            : 'border-gray-200'
+                      }`}
                     >
-                      <Trash2 className="w-4 h-4 text-red-500" />
-                    </Button>
-                  )}
-                </div>
-              </EnhancedCard>
-            ))}
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1 space-y-2">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-medium text-sm">
+                              {comment.user?.fullName || comment.user?.email || 'Kullanıcı'}
+                            </span>
+                            {comment.isQuestion && (
+                              <Badge
+                                variant="secondary"
+                                className="text-xs bg-blue-100 text-blue-700"
+                              >
+                                <HelpCircle className="w-3 h-3 mr-1" />
+                                Soru
+                              </Badge>
+                            )}
+                            {comment.parentCommentId && (
+                              <Badge
+                                variant="secondary"
+                                className="text-xs bg-green-100 text-green-700"
+                              >
+                                <Reply className="w-3 h-3 mr-1" />
+                                Cevap
+                              </Badge>
+                            )}
+                            <span className="text-xs text-muted-foreground">
+                              {new Date(comment.createdAt).toLocaleString('tr-TR')}
+                            </span>
+                          </div>
+                          <p className="text-sm whitespace-pre-wrap">{comment.comment}</p>
+
+                          {/* Sorulara "Cevap Ver" butonu */}
+                          {comment.isQuestion && !comment.parentCommentId && (
+                            <div className="flex items-center gap-2 pt-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() =>
+                                  setReplyingTo(replyingTo === comment.id ? null : comment.id)
+                                }
+                                className="text-xs"
+                              >
+                                <Reply className="w-3 h-3 mr-1" />
+                                {isReplying ? 'İptal' : 'Cevap Ver'}
+                              </Button>
+                              {replies.length > 0 && (
+                                <span className="text-xs text-muted-foreground">
+                                  {replies.length} cevap
+                                </span>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Cevap input alanı */}
+                          {isReplying && comment.isQuestion && (
+                            <form
+                              onSubmit={(e) => handleSubmit(e, comment.id)}
+                              className="mt-3 pt-3 border-t border-gray-200"
+                            >
+                              <Textarea
+                                value={replyText}
+                                onChange={(e) => setReplyText(e.target.value)}
+                                placeholder="Cevabınızı buraya yazın..."
+                                rows={2}
+                                disabled={submitting}
+                                className="mb-2"
+                              />
+                              <div className="flex items-center gap-2">
+                                <Button
+                                  type="submit"
+                                  size="sm"
+                                  disabled={submitting || !replyText.trim()}
+                                >
+                                  {submitting ? (
+                                    <>
+                                      <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                                      Gönderiliyor...
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Send className="w-3 h-3 mr-1" />
+                                      Cevap Gönder
+                                    </>
+                                  )}
+                                </Button>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => {
+                                    setReplyingTo(null);
+                                    setReplyText('');
+                                  }}
+                                >
+                                  İptal
+                                </Button>
+                              </div>
+                            </form>
+                          )}
+                        </div>
+
+                        <div className="flex items-center gap-2 shrink-0">
+                          {comment.userId === currentUserId && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDelete(comment.id)}
+                            >
+                              <Trash2 className="w-4 h-4 text-red-500" />
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </EnhancedCard>
+
+                    {/* Cevap listesi */}
+                    {replies.length > 0 && (
+                      <div className="ml-4 space-y-2">
+                        {replies.map((reply) => (
+                          <EnhancedCard
+                            key={reply.id}
+                            className="p-3 border-l-4 border-l-green-300 bg-green-50/30"
+                          >
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="flex-1 space-y-1">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <span className="font-medium text-xs">
+                                    {reply.user?.fullName || reply.user?.email || 'Kullanıcı'}
+                                  </span>
+                                  <Badge
+                                    variant="secondary"
+                                    className="text-xs bg-green-100 text-green-700"
+                                  >
+                                    <Reply className="w-3 h-3 mr-1" />
+                                    Cevap
+                                  </Badge>
+                                  <span className="text-xs text-muted-foreground">
+                                    {new Date(reply.createdAt).toLocaleString('tr-TR')}
+                                  </span>
+                                </div>
+                                <p className="text-xs whitespace-pre-wrap">{reply.comment}</p>
+                              </div>
+                              {reply.userId === currentUserId && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleDelete(reply.id)}
+                                >
+                                  <Trash2 className="w-3 h-3 text-red-500" />
+                                </Button>
+                              )}
+                            </div>
+                          </EnhancedCard>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
           </div>
         )}
       </div>

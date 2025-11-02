@@ -78,13 +78,13 @@ export function QuickActionsFAB() {
       {/* Backdrop */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm"
+          className="fixed inset-0 z-20 bg-background/80 backdrop-blur-sm"
           onClick={() => setIsOpen(false)}
         />
       )}
 
       {/* FAB Container */}
-      <div className="fixed bottom-20 right-6 z-50 md:bottom-6">
+      <div className="fixed bottom-20 right-6 z-30 md:bottom-6">
         {/* Action Buttons */}
         <div
           className={cn(

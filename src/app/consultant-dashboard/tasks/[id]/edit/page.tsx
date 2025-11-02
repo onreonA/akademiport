@@ -19,6 +19,13 @@ import { ArrowLeft, Save, Loader2, Trash2, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { TaskComments } from '@/1-presentation/components/features/tasks/TaskComments';
+import { TaskDependencies } from '@/1-presentation/components/features/tasks/TaskDependencies';
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@/1-presentation/components/ui/atoms/tabs';
 import { useAuth } from '@/5-shared/hooks/useAuth';
 
 interface Task {
@@ -61,6 +68,7 @@ export default function EditTaskPage() {
   const [deleting, setDeleting] = useState(false);
   const [task, setTask] = useState<Task | null>(null);
   const [users, setUsers] = useState<User[]>([]);
+  const [projectId, setProjectId] = useState<string>('');
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -115,6 +123,9 @@ export default function EditTaskPage() {
       const projectResponse = await fetch(`/api/projects/${subProjectData.projectId}`);
       if (!projectResponse.ok) throw new Error('Failed to fetch project');
       const projectData = await projectResponse.json();
+
+      // Set projectId for dependencies
+      setProjectId(subProjectData.projectId);
 
       // Fetch company users
       if (projectData.companyId) {
@@ -281,189 +292,211 @@ export default function EditTaskPage() {
           </EnhancedCard>
         </div>
 
-        {/* Form */}
-        <EnhancedCard>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Title */}
-            <div className="space-y-2">
-              <Label htmlFor="title">
-                Görev Başlığı <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="title"
-                value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                placeholder="Örn: Analiz raporunu hazırla"
-                required
-                disabled={saving || deleting}
-              />
-            </div>
+        {/* Tabs */}
+        <Tabs defaultValue="details" className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="details">Genel Bilgiler</TabsTrigger>
+            <TabsTrigger value="dependencies">Bağımlılıklar</TabsTrigger>
+            <TabsTrigger value="comments">Yorumlar</TabsTrigger>
+          </TabsList>
 
-            {/* Description */}
-            <div className="space-y-2">
-              <Label htmlFor="description">Açıklama</Label>
-              <Textarea
-                id="description"
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Görev hakkında detaylı açıklama..."
-                rows={4}
-                disabled={saving || deleting}
-              />
-            </div>
+          <TabsContent value="details" className="space-y-6">
+            {/* Form */}
+            <EnhancedCard>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Title */}
+                <div className="space-y-2">
+                  <Label htmlFor="title">
+                    Görev Başlığı <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="title"
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    placeholder="Örn: Analiz raporunu hazırla"
+                    required
+                    disabled={saving || deleting}
+                  />
+                </div>
 
-            {/* Status & Priority */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="status">Durum</Label>
-                <Select
-                  value={formData.status}
-                  onValueChange={(value) => setFormData({ ...formData, status: value })}
-                  disabled={saving || deleting}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Durum seçin" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="todo">Yapılacak</SelectItem>
-                    <SelectItem value="in_progress">Devam Ediyor</SelectItem>
-                    <SelectItem value="review">İncelemede</SelectItem>
-                    <SelectItem value="done">Tamamlandı</SelectItem>
-                    <SelectItem value="cancelled">İptal Edildi</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+                {/* Description */}
+                <div className="space-y-2">
+                  <Label htmlFor="description">Açıklama</Label>
+                  <Textarea
+                    id="description"
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    placeholder="Görev hakkında detaylı açıklama..."
+                    rows={4}
+                    disabled={saving || deleting}
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="priority">Öncelik</Label>
-                <Select
-                  value={formData.priority}
-                  onValueChange={(value) => setFormData({ ...formData, priority: value })}
-                  disabled={saving || deleting}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Öncelik seçin" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="low">Düşük</SelectItem>
-                    <SelectItem value="medium">Orta</SelectItem>
-                    <SelectItem value="high">Yüksek</SelectItem>
-                    <SelectItem value="critical">Kritik</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
+                {/* Status & Priority */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="status">Durum</Label>
+                    <Select
+                      value={formData.status}
+                      onValueChange={(value) => setFormData({ ...formData, status: value })}
+                      disabled={saving || deleting}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Durum seçin" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="todo">Yapılacak</SelectItem>
+                        <SelectItem value="in_progress">Devam Ediyor</SelectItem>
+                        <SelectItem value="review">İncelemede</SelectItem>
+                        <SelectItem value="done">Tamamlandı</SelectItem>
+                        <SelectItem value="cancelled">İptal Edildi</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-            {/* Assigned To & Due Date */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="assignedTo">Atanan Kişi</Label>
-                <Select
-                  value={formData.assignedTo || 'none'}
-                  onValueChange={(value) =>
-                    setFormData({ ...formData, assignedTo: value === 'none' ? '' : value })
-                  }
-                  disabled={saving || deleting}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Kullanıcı seçin" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">Atanmamış</SelectItem>
-                    {users.map((user) => (
-                      <SelectItem key={user.id} value={user.id}>
-                        {user.fullName || user.email}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="priority">Öncelik</Label>
+                    <Select
+                      value={formData.priority}
+                      onValueChange={(value) => setFormData({ ...formData, priority: value })}
+                      disabled={saving || deleting}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Öncelik seçin" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="low">Düşük</SelectItem>
+                        <SelectItem value="medium">Orta</SelectItem>
+                        <SelectItem value="high">Yüksek</SelectItem>
+                        <SelectItem value="critical">Kritik</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="dueDate">Bitiş Tarihi</Label>
-                <Input
-                  id="dueDate"
-                  type="date"
-                  value={formData.dueDate}
-                  onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
-                  disabled={saving || deleting}
-                />
-              </div>
-            </div>
+                {/* Assigned To & Due Date */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="assignedTo">Atanan Kişi</Label>
+                    <Select
+                      value={formData.assignedTo || 'none'}
+                      onValueChange={(value) =>
+                        setFormData({ ...formData, assignedTo: value === 'none' ? '' : value })
+                      }
+                      disabled={saving || deleting}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Kullanıcı seçin" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Atanmamış</SelectItem>
+                        {users.map((user) => (
+                          <SelectItem key={user.id} value={user.id}>
+                            {user.fullName || user.email}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-            {/* Order Index */}
-            <div className="space-y-2">
-              <Label htmlFor="orderIndex">Sıra</Label>
-              <Input
-                id="orderIndex"
-                type="number"
-                value={formData.orderIndex}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    orderIndex: parseInt(e.target.value) || 0,
-                  })
-                }
-                min="0"
-                disabled={saving || deleting}
-              />
-            </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="dueDate">Bitiş Tarihi</Label>
+                    <Input
+                      id="dueDate"
+                      type="date"
+                      value={formData.dueDate}
+                      onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
+                      disabled={saving || deleting}
+                    />
+                  </div>
+                </div>
 
-            {/* Actions */}
-            <div className="flex gap-3 pt-4 border-t">
-              <Button
-                type="submit"
-                disabled={saving || deleting || !formData.title}
-                className="flex-1"
-              >
-                {saving ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Kaydediliyor...
-                  </>
-                ) : (
-                  <>
-                    <Save className="w-4 h-4 mr-2" />
-                    Değişiklikleri Kaydet
-                  </>
-                )}
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => router.push('/consultant-dashboard/tasks/review')}
-                disabled={saving || deleting}
-              >
-                İptal
-              </Button>
-            </div>
-          </form>
-        </EnhancedCard>
+                {/* Order Index */}
+                <div className="space-y-2">
+                  <Label htmlFor="orderIndex">Sıra</Label>
+                  <Input
+                    id="orderIndex"
+                    type="number"
+                    value={formData.orderIndex}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        orderIndex: parseInt(e.target.value) || 0,
+                      })
+                    }
+                    min="0"
+                    disabled={saving || deleting}
+                  />
+                </div>
 
-        {/* Approval Status */}
-        {task.completedAt && (
-          <EnhancedCard className="bg-green-50/50 border-green-200">
-            <div className="flex items-center gap-3">
-              <CheckCircle2 className="w-5 h-5 text-green-600" />
-              <div>
-                <h3 className="font-semibold text-green-900">Görev Tamamlandı</h3>
-                <p className="text-sm text-green-700">
-                  {new Date(task.completedAt).toLocaleString('tr-TR')}
-                </p>
-              </div>
-            </div>
-          </EnhancedCard>
-        )}
+                {/* Actions */}
+                <div className="flex gap-3 pt-4 border-t">
+                  <Button
+                    type="submit"
+                    disabled={saving || deleting || !formData.title}
+                    className="flex-1"
+                  >
+                    {saving ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Kaydediliyor...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="w-4 h-4 mr-2" />
+                        Değişiklikleri Kaydet
+                      </>
+                    )}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => router.push('/consultant-dashboard/tasks/review')}
+                    disabled={saving || deleting}
+                  >
+                    İptal
+                  </Button>
+                </div>
+              </form>
+            </EnhancedCard>
 
-        {/* Comments Section */}
-        {user && (
-          <EnhancedCard className="border-blue-200 bg-blue-50/50">
-            <div className="space-y-4">
-              <h3 className="font-semibold text-lg">Yorumlar ve Sorular</h3>
-              <TaskComments taskId={taskId} currentUserId={user.id} />
-            </div>
-          </EnhancedCard>
-        )}
+            {/* Approval Status */}
+            {task.completedAt && (
+              <EnhancedCard className="bg-green-50/50 border-green-200">
+                <div className="flex items-center gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-green-600" />
+                  <div>
+                    <h3 className="font-semibold text-green-900">Görev Tamamlandı</h3>
+                    <p className="text-sm text-green-700">
+                      {new Date(task.completedAt).toLocaleString('tr-TR')}
+                    </p>
+                  </div>
+                </div>
+              </EnhancedCard>
+            )}
+          </TabsContent>
+
+          <TabsContent value="dependencies" className="space-y-6">
+            {projectId ? (
+              <TaskDependencies taskId={taskId} projectId={projectId} />
+            ) : (
+              <EnhancedCard variant="glass" className="p-6">
+                <p className="text-muted-foreground">Proje bilgisi yükleniyor...</p>
+              </EnhancedCard>
+            )}
+          </TabsContent>
+
+          <TabsContent value="comments" className="space-y-6">
+            {user && (
+              <EnhancedCard className="border-blue-200 bg-blue-50/50">
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-lg">Yorumlar ve Sorular</h3>
+                  <TaskComments taskId={taskId} currentUserId={user.id} />
+                </div>
+              </EnhancedCard>
+            )}
+          </TabsContent>
+        </Tabs>
 
         {/* Delete Section */}
         <EnhancedCard className="border-red-200 bg-red-50/50">

@@ -75,12 +75,13 @@ export class ListConsultantPendingQuestionsUseCase {
       const taskIds = tasks.map((t) => t.id);
       console.log('[ListConsultantPendingQuestionsUseCase] Task IDs:', taskIds);
 
-      // 4. Bu görevlerdeki soruları bul (is_question = true)
+      // 4. Bu görevlerdeki soruları bul (is_question = true ve parent_comment_id NULL olanlar)
       const { data: comments, error: commentsError } = await supabase
         .from('task_comments')
         .select('*')
         .in('task_id', taskIds)
         .eq('is_question', true)
+        .is('parent_comment_id', null) // Sadece ana sorular (cevap olmayanlar)
         .order('created_at', { ascending: false });
 
       if (commentsError) {
@@ -97,11 +98,65 @@ export class ListConsultantPendingQuestionsUseCase {
           id: comments[0].id,
           task_id: comments[0].task_id,
           is_question: comments[0].is_question,
+          parent_comment_id: comments[0].parent_comment_id,
           comment: comments[0].comment?.substring(0, 50),
         });
       }
 
-      if (!comments || comments.length === 0) {
+      // 4.5. Cevaplanmış soruları işaretle (parent_comment_id'si bu sorunun id'si olan yorumlar varsa)
+      let allQuestions = comments || [];
+      const answeredQuestionIds = new Set<string>();
+
+      if (allQuestions.length > 0) {
+        const questionIds = allQuestions.map((c: any) => c.id);
+
+        // Bu sorulara verilen cevapları bul
+        const { data: replies, error: repliesError } = await supabase
+          .from('task_comments')
+          .select('parent_comment_id, id, comment, created_at, user_id')
+          .in('parent_comment_id', questionIds)
+          .not('parent_comment_id', 'is', null)
+          .order('created_at', { ascending: true });
+
+        if (repliesError) {
+          console.error(
+            '[ListConsultantPendingQuestionsUseCase] Replies query error:',
+            repliesError
+          );
+        } else {
+          // Cevabı olan soruların ID'lerini bul
+          (replies || []).forEach((r: any) => {
+            if (r.parent_comment_id) {
+              answeredQuestionIds.add(r.parent_comment_id);
+            }
+          });
+
+          console.log(
+            '[ListConsultantPendingQuestionsUseCase] Answered question IDs:',
+            Array.from(answeredQuestionIds)
+          );
+
+          // Her soruya cevaplarını ekle
+          const repliesMap = new Map<string, any[]>();
+          (replies || []).forEach((r: any) => {
+            if (r.parent_comment_id) {
+              if (!repliesMap.has(r.parent_comment_id)) {
+                repliesMap.set(r.parent_comment_id, []);
+              }
+              repliesMap.get(r.parent_comment_id)!.push(r);
+            }
+          });
+
+          // Sorulara cevapları ekle
+          allQuestions = allQuestions.map((q: any) => ({
+            ...q,
+            hasReply: answeredQuestionIds.has(q.id),
+            replies: repliesMap.get(q.id) || [],
+          }));
+        }
+      }
+
+      if (!allQuestions || allQuestions.length === 0) {
         console.log('[ListConsultantPendingQuestionsUseCase] No questions found in tasks');
 
         // Debug: Tüm soruları kontrol et (RLS olmadan)
@@ -180,7 +235,7 @@ export class ListConsultantPendingQuestionsUseCase {
       }
 
       // 5. Görev bilgilerini toplu olarak al (performans için)
-      const uniqueTaskIds = [...new Set(comments.map((c: any) => c.task_id))];
+      const uniqueTaskIds = [...new Set(allQuestions.map((c: any) => c.task_id))];
       const { data: tasksData } = await supabase
         .from('tasks')
         .select('id, title, status, sub_project_id')
@@ -213,12 +268,19 @@ export class ListConsultantPendingQuestionsUseCase {
         .select('id, name')
         .in('id', uniqueCompanyIds);
 
-      // 9. User bilgilerini toplu olarak al
-      const uniqueUserIds = [...new Set(comments.map((c: any) => c.user_id).filter(Boolean))];
+      // 9. User bilgilerini toplu olarak al (sorular ve cevaplar için)
+      const allUserIds = [
+        ...new Set([
+          ...allQuestions.map((c: any) => c.user_id).filter(Boolean),
+          ...allQuestions
+            .flatMap((q: any) => (q.replies || []).map((r: any) => r.user_id))
+            .filter(Boolean),
+        ]),
+      ];
       const { data: usersData } = await supabase
         .from('users')
         .select('id, full_name, email')
-        .in('id', uniqueUserIds);
+        .in('id', allUserIds);
 
       // 10. Verileri map'le (lookup için)
       const tasksMap = new Map((tasksData || []).map((t: any) => [t.id, t]));
@@ -227,18 +289,37 @@ export class ListConsultantPendingQuestionsUseCase {
       const companiesMap = new Map((companiesData || []).map((c: any) => [c.id, c]));
       const usersMap = new Map((usersData || []).map((u: any) => [u.id, u]));
 
-      // 11. Soruları ve görev bilgilerini formatla
-      const questionsWithTasks = comments.map((comment: any) => {
+      // 11. Soruları ve görev bilgilerini formatla (tüm sorular, cevaplanmış olanlar dahil)
+      const questionsWithTasks = allQuestions.map((comment: any) => {
         const task = tasksMap.get(comment.task_id);
         const subProject = task?.sub_project_id ? subProjectsMap.get(task.sub_project_id) : null;
         const project = subProject?.project_id ? projectsMap.get(subProject.project_id) : null;
         const company = project?.company_id ? companiesMap.get(project.company_id) : null;
         const user = comment.user_id ? usersMap.get(comment.user_id) : null;
 
+        // Cevapları formatla
+        const formattedReplies = (comment.replies || []).map((reply: any) => {
+          const replyUser = reply.user_id ? usersMap.get(reply.user_id) : null;
+          return {
+            id: reply.id,
+            comment: reply.comment,
+            createdAt: reply.created_at,
+            user: replyUser
+              ? {
+                  id: replyUser.id,
+                  fullName: replyUser.full_name,
+                  email: replyUser.email,
+                }
+              : null,
+          };
+        });
+
         return {
           id: comment.id,
           comment: comment.comment,
           isQuestion: comment.is_question,
+          hasReply: comment.hasReply || false,
+          replies: formattedReplies,
           createdAt: comment.created_at,
           task: task
             ? {

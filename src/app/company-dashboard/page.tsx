@@ -6,6 +6,7 @@
 'use client';
 
 import * as React from 'react';
+import Link from 'next/link';
 import {
   Card,
   CardContent,
@@ -29,6 +30,7 @@ import {
   FolderKanban,
   GraduationCap,
 } from 'lucide-react';
+import { useAuth } from '@/5-shared/hooks/useAuth';
 
 interface CompanyDashboardData {
   company: {
@@ -49,6 +51,7 @@ interface CompanyDashboardData {
 }
 
 export default function CompanyDashboardPage() {
+  const { user } = useAuth();
   const [data, setData] = React.useState<CompanyDashboardData | null>(null);
   const [loading, setLoading] = React.useState(true);
 
@@ -230,23 +233,25 @@ export default function CompanyDashboardPage() {
             </div>
           </EnhancedCard>
 
-          <EnhancedCard variant="gradient" hover className="cursor-pointer">
-            <div className="p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-3 rounded-lg bg-green-500/20 text-green-600 dark:text-green-400">
-                  <GraduationCap className="w-6 h-6" />
+          <Link href="/company-dashboard/trainings">
+            <EnhancedCard variant="gradient" hover className="cursor-pointer">
+              <div className="p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-3 rounded-lg bg-green-500/20 text-green-600 dark:text-green-400">
+                    <GraduationCap className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold">Eğitimlerim</h3>
+                    <p className="text-sm text-muted-foreground">Eğitim materyalleri</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-lg font-semibold">Eğitimlerim</h3>
-                  <p className="text-sm text-muted-foreground">Eğitim materyalleri</p>
-                </div>
+                <p className="text-sm text-muted-foreground">
+                  {mockData.stats.totalTrainings - mockData.stats.completedTrainings} eğitim devam
+                  ediyor
+                </p>
               </div>
-              <p className="text-sm text-muted-foreground">
-                {mockData.stats.totalTrainings - mockData.stats.completedTrainings} eğitim devam
-                ediyor
-              </p>
-            </div>
-          </EnhancedCard>
+            </EnhancedCard>
+          </Link>
 
           <EnhancedCard variant="neon" hover glow className="cursor-pointer">
             <div className="p-6">

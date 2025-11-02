@@ -9,7 +9,17 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Building2, MapPin, Users, Mail, Phone, Globe, ArrowLeft, UserPlus } from 'lucide-react';
+import {
+  Building2,
+  MapPin,
+  Users,
+  Mail,
+  Phone,
+  Globe,
+  ArrowLeft,
+  UserPlus,
+  GraduationCap,
+} from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -30,10 +40,12 @@ import {
   DialogTrigger,
 } from '@/presentation/components/ui/atoms/dialog';
 import { UserForm, type UserFormData } from '@/presentation/components/features/users/UserForm';
+import { AssignTrainingModal, TrainingCard } from '@/presentation/components/features/trainings';
 import { UserRole } from '@/domain/enums/UserRole';
 import { toast } from 'sonner';
 import type { Company } from '@/domain/entities/Company';
 import type { User } from '@/domain/entities/User';
+import type { Training } from '@/domain/entities/Training';
 
 interface CompanyDetailPageProps {
   params: Promise<{ id: string }>;
@@ -43,10 +55,12 @@ export default function CompanyDetailPage({ params }: CompanyDetailPageProps) {
   const router = useRouter();
   const [company, setCompany] = useState<Company | null>(null);
   const [users, setUsers] = useState<User[]>([]);
+  const [trainings, setTrainings] = useState<Training[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [companyId, setCompanyId] = useState<string>('');
   const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false);
+  const [isAssignTrainingModalOpen, setIsAssignTrainingModalOpen] = useState(false);
 
   useEffect(() => {
     params.then((p) => {
@@ -84,11 +98,38 @@ export default function CompanyDetailPage({ params }: CompanyDetailPageProps) {
         console.warn('Users data is invalid:', usersData);
         setUsers([]); // Fallback to empty array if no users or error
       }
+
+      // Fetch trainings
+      fetchTrainings(id);
     } catch (err) {
       setError('Firma bilgileri yüklenirken bir hata oluştu');
       console.error('Failed to fetch company:', err);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchTrainings = async (id: string) => {
+    try {
+      const response = await fetch(`/api/companies/${id}/trainings`);
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error('Failed to fetch trainings:', data.error);
+        setTrainings([]);
+        return;
+      }
+
+      setTrainings(data.trainings || []);
+    } catch (err) {
+      console.error('Failed to fetch trainings:', err);
+      setTrainings([]);
+    }
+  };
+
+  const handleTrainingAssignSuccess = () => {
+    if (companyId) {
+      fetchTrainings(companyId);
     }
   };
 
@@ -311,6 +352,7 @@ export default function CompanyDetailPage({ params }: CompanyDetailPageProps) {
         <TabsList>
           <TabsTrigger value="overview">Genel Bakış</TabsTrigger>
           <TabsTrigger value="users">Kullanıcılar ({users?.length || 0})</TabsTrigger>
+          <TabsTrigger value="trainings">Eğitimler ({trainings?.length || 0})</TabsTrigger>
           <TabsTrigger value="projects">Projeler (Sprint 8)</TabsTrigger>
         </TabsList>
 
@@ -416,6 +458,55 @@ export default function CompanyDetailPage({ params }: CompanyDetailPageProps) {
                         {user.isActive ? 'Aktif' : 'Pasif'}
                       </Badge>
                     </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="trainings" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Eğitimler</CardTitle>
+                  <CardDescription>{company.name} firmasına atanmış eğitimler</CardDescription>
+                </div>
+                <AssignTrainingModal
+                  companyId={companyId}
+                  companyName={company.name}
+                  open={isAssignTrainingModalOpen}
+                  onOpenChange={setIsAssignTrainingModalOpen}
+                  onSuccess={handleTrainingAssignSuccess}
+                  trigger={
+                    <Button size="sm">
+                      <GraduationCap className="h-4 w-4 mr-2" />
+                      Eğitim Ata
+                    </Button>
+                  }
+                />
+              </div>
+            </CardHeader>
+            <CardContent>
+              {!trainings || trainings.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <GraduationCap className="h-12 w-12 mx-auto mb-4" />
+                  <p>Henüz eğitim atanmamış</p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="mt-4"
+                    onClick={() => setIsAssignTrainingModalOpen(true)}
+                  >
+                    <GraduationCap className="h-4 w-4 mr-2" />
+                    İlk Eğitimi Ata
+                  </Button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {trainings.map((training) => (
+                    <TrainingCard key={training.id} training={training} onClick={() => {}} />
                   ))}
                 </div>
               )}

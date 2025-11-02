@@ -9,6 +9,7 @@ import { EnhancedCard } from '@/presentation/components/ui/atoms/enhanced-card';
 import { Button } from '@/presentation/components/ui/atoms/button';
 import { Badge } from '@/presentation/components/ui/atoms/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/presentation/components/ui/atoms/tabs';
+import { SubProjectModal } from '@/presentation/components/features/sub-projects/SubProjectModal';
 
 interface Project {
   id: string;
@@ -52,6 +53,8 @@ export default function ConsultantProjectDetailPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
+  const [subProjectModalOpen, setSubProjectModalOpen] = useState(false);
+  const [editingSubProject, setEditingSubProject] = useState<SubProject | null>(null);
 
   useEffect(() => {
     if (projectId) {
@@ -127,6 +130,23 @@ export default function ConsultantProjectDetailPage() {
       console.error('Error deleting sub-project:', error);
       toast.error(error instanceof Error ? error.message : 'Bir hata oluştu');
     }
+  };
+
+  const handleSubProjectModalSuccess = () => {
+    fetchSubProjects();
+    setSubProjectModalOpen(false);
+    setEditingSubProject(null);
+  };
+
+  const handleEditSubProject = (subProject: SubProject, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditingSubProject(subProject);
+    setSubProjectModalOpen(true);
+  };
+
+  const handleCreateSubProject = () => {
+    setEditingSubProject(null);
+    setSubProjectModalOpen(true);
   };
 
   if (loading) {
@@ -217,12 +237,7 @@ export default function ConsultantProjectDetailPage() {
                 <h3 className="text-lg font-semibold">Alt Projeler</h3>
                 <p className="text-sm text-muted-foreground">{subProjects.length} alt proje</p>
               </div>
-              <Button
-                size="sm"
-                onClick={() =>
-                  router.push(`/consultant-dashboard/projects/${projectId}/sub-projects/new`)
-                }
-              >
+              <Button size="sm" onClick={handleCreateSubProject}>
                 <Plus className="mr-2 h-4 w-4" />
                 Yeni Alt Proje
               </Button>
@@ -236,11 +251,7 @@ export default function ConsultantProjectDetailPage() {
                 <p className="text-sm text-muted-foreground mb-4">
                   Projenizi daha küçük parçalara ayırmak için alt projeler oluşturun
                 </p>
-                <Button
-                  onClick={() =>
-                    router.push(`/consultant-dashboard/projects/${projectId}/sub-projects/new`)
-                  }
-                >
+                <Button onClick={handleCreateSubProject}>
                   <Plus className="mr-2 h-4 w-4" />
                   İlk Alt Projeyi Oluştur
                 </Button>
@@ -252,11 +263,7 @@ export default function ConsultantProjectDetailPage() {
                     key={subProject.id}
                     variant="glass"
                     className="p-4 hover:shadow-lg transition-shadow cursor-pointer"
-                    onClick={() =>
-                      router.push(
-                        `/consultant-dashboard/projects/${projectId}/sub-projects/${subProject.id}/edit`
-                      )
-                    }
+                    onClick={(e) => handleEditSubProject(subProject, e)}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
@@ -302,12 +309,7 @@ export default function ConsultantProjectDetailPage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            router.push(
-                              `/consultant-dashboard/projects/${projectId}/sub-projects/${subProject.id}/edit`
-                            );
-                          }}
+                          onClick={(e) => handleEditSubProject(subProject, e)}
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
@@ -356,6 +358,20 @@ export default function ConsultantProjectDetailPage() {
             )}
           </TabsContent>
         </Tabs>
+
+        {/* SubProject Modal */}
+        <SubProjectModal
+          projectId={projectId}
+          subProject={editingSubProject}
+          open={subProjectModalOpen}
+          onOpenChange={(open) => {
+            setSubProjectModalOpen(open);
+            if (!open) {
+              setEditingSubProject(null);
+            }
+          }}
+          onSuccess={handleSubProjectModalSuccess}
+        />
       </div>
     </div>
   );

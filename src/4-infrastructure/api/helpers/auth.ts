@@ -19,7 +19,7 @@ export interface AuthenticatedUser {
  * Get authenticated user from request
  */
 export async function getAuthenticatedUser(
-  request: NextRequest
+  _request: NextRequest
 ): Promise<AuthenticatedUser | null> {
   try {
     const cookieStore = await cookies();

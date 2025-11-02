@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Sparkles, Plus, Copy, Trash2, AlertCircle, FolderOpen, Edit, Eye } from 'lucide-react';
+import { toast } from 'sonner';
 import {
   Dialog,
   DialogContent,
@@ -28,11 +29,12 @@ interface ProjectTemplate {
   };
 }
 
-const priorityConfig = {
+const priorityConfig: Record<string, { label: string; color: string }> = {
   low: { label: 'Düşük', color: 'bg-gray-400' },
   medium: { label: 'Orta', color: 'bg-blue-400' },
   high: { label: 'Yüksek', color: 'bg-orange-400' },
   urgent: { label: 'Acil', color: 'bg-red-500' },
+  critical: { label: 'Kritik', color: 'bg-red-600' },
 };
 
 export default function ProjectTemplatesPage() {
@@ -89,10 +91,37 @@ export default function ProjectTemplatesPage() {
   const handlePreview = async (templateId: string) => {
     setPreviewLoading(true);
     try {
-      const response = await fetch(`/api/projects/templates/${templateId}`);
-      if (!response.ok) throw new Error('Failed to fetch template details');
-      const data = await response.json();
-      setTemplateDetails(data.template);
+      // Fetch template details
+      const templateResponse = await fetch(`/api/projects/templates/${templateId}`);
+      if (!templateResponse.ok) throw new Error('Failed to fetch template details');
+      const templateData = await templateResponse.json();
+      const template = templateData.template;
+
+      // Fetch sub-projects
+      const subProjectsResponse = await fetch(`/api/sub-projects?projectId=${templateId}`);
+      let subProjects: any[] = [];
+      if (subProjectsResponse.ok) {
+        const subProjectsData = await subProjectsResponse.json();
+        subProjects = Array.isArray(subProjectsData) ? subProjectsData : [];
+      }
+
+      // Fetch tasks for each sub-project
+      const subProjectsWithTasks = await Promise.all(
+        subProjects.map(async (subProject) => {
+          const tasksResponse = await fetch(`/api/tasks?subProjectId=${subProject.id}`);
+          let tasks: any[] = [];
+          if (tasksResponse.ok) {
+            const tasksData = await tasksResponse.json();
+            tasks = Array.isArray(tasksData) ? tasksData : tasksData.tasks || [];
+          }
+          return { ...subProject, tasks };
+        })
+      );
+
+      setTemplateDetails({
+        ...template,
+        subProjects: subProjectsWithTasks,
+      });
       setPreviewTemplate(templates.find((t) => t.id === templateId) || null);
     } catch (err) {
       alert(err instanceof Error ? err.message : 'An error occurred');
@@ -107,27 +136,27 @@ export default function ProjectTemplatesPage() {
       if (!template) return;
 
       const newName = prompt('Yeni şablon adı:', `${template.name} (Kopya)`);
-      if (!newName) return;
+      if (!newName || !newName.trim()) return;
 
       const response = await fetch('/api/projects/from-template', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           template_id: templateId,
-          name: newName,
+          name: newName.trim(),
           is_template: true,
         }),
       });
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || 'Failed to duplicate template');
+        throw new Error(error.error || error.message || 'Failed to duplicate template');
       }
 
       await fetchTemplates();
-      alert('Şablon başarıyla kopyalandı!');
+      toast.success('Şablon başarıyla kopyalandı!');
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'An error occurred');
+      toast.error(err instanceof Error ? err.message : 'Bir hata oluştu');
     }
   };
 
@@ -250,9 +279,13 @@ export default function ProjectTemplatesPage() {
                 {/* Badges */}
                 <div className="flex flex-wrap gap-2 mb-4">
                   <Badge className="bg-purple-500">Şablon</Badge>
-                  <Badge className={priorityConfig[template.priority].color}>
-                    {priorityConfig[template.priority].label}
-                  </Badge>
+                  {priorityConfig[template.priority] ? (
+                    <Badge className={priorityConfig[template.priority].color}>
+                      {priorityConfig[template.priority].label}
+                    </Badge>
+                  ) : (
+                    <Badge className="bg-gray-400">{template.priority || 'Orta'}</Badge>
+                  )}
                 </div>
 
                 {/* Info */}
@@ -294,34 +327,94 @@ export default function ProjectTemplatesPage() {
                           <p className="text-muted-foreground">Yükleniyor...</p>
                         </div>
                       ) : templateDetails ? (
-                        <div className="space-y-4">
-                          <div>
-                            <h3 className="font-semibold mb-2">Açıklama</h3>
-                            <p className="text-sm text-muted-foreground">
-                              {templateDetails.description || 'Açıklama yok'}
-                            </p>
-                          </div>
-                          <div>
-                            <h3 className="font-semibold mb-2">Öncelik</h3>
-                            <Badge className={priorityConfig[templateDetails.priority]?.color}>
-                              {priorityConfig[templateDetails.priority]?.label}
-                            </Badge>
-                          </div>
-                          {templateDetails.subProjects && (
+                        <div className="space-y-6">
+                          {/* Template Info */}
+                          <div className="grid grid-cols-2 gap-4">
                             <div>
-                              <h3 className="font-semibold mb-2">Alt Projeler</h3>
-                              <div className="space-y-2">
+                              <h3 className="font-semibold mb-2 text-sm text-muted-foreground">
+                                Öncelik
+                              </h3>
+                              <Badge className={priorityConfig[templateDetails.priority]?.color}>
+                                {priorityConfig[templateDetails.priority]?.label}
+                              </Badge>
+                            </div>
+                            <div>
+                              <h3 className="font-semibold mb-2 text-sm text-muted-foreground">
+                                Durum
+                              </h3>
+                              <Badge>{templateDetails.status || 'planning'}</Badge>
+                            </div>
+                          </div>
+
+                          {templateDetails.description && (
+                            <div>
+                              <h3 className="font-semibold mb-2">Açıklama</h3>
+                              <p className="text-sm text-muted-foreground">
+                                {templateDetails.description}
+                              </p>
+                            </div>
+                          )}
+
+                          {/* Sub-Projects with Tasks */}
+                          {templateDetails.subProjects && templateDetails.subProjects.length > 0 ? (
+                            <div>
+                              <h3 className="font-semibold mb-3">
+                                Alt Projeler ({templateDetails.subProjects.length})
+                              </h3>
+                              <div className="space-y-4 max-h-96 overflow-y-auto">
                                 {templateDetails.subProjects.map((sp: any) => (
-                                  <div key={sp.id} className="p-3 border rounded-lg">
-                                    <p className="font-medium">{sp.name}</p>
-                                    {sp.description && (
-                                      <p className="text-sm text-muted-foreground">
-                                        {sp.description}
-                                      </p>
+                                  <div
+                                    key={sp.id}
+                                    className="p-4 border rounded-lg bg-muted/50 space-y-3"
+                                  >
+                                    <div>
+                                      <div className="flex items-center gap-2 mb-1">
+                                        <FolderOpen className="w-4 h-4 text-muted-foreground" />
+                                        <p className="font-medium">{sp.name}</p>
+                                        <Badge variant="outline" className="text-xs">
+                                          {sp.status || 'todo'}
+                                        </Badge>
+                                      </div>
+                                      {sp.description && (
+                                        <p className="text-sm text-muted-foreground ml-6">
+                                          {sp.description}
+                                        </p>
+                                      )}
+                                    </div>
+                                    {sp.tasks && sp.tasks.length > 0 && (
+                                      <div className="ml-6 space-y-2">
+                                        <p className="text-xs font-medium text-muted-foreground">
+                                          Görevler ({sp.tasks.length}):
+                                        </p>
+                                        {sp.tasks.map((task: any) => (
+                                          <div
+                                            key={task.id}
+                                            className="pl-3 border-l-2 border-primary/20 text-sm"
+                                          >
+                                            <div className="flex items-center gap-2">
+                                              <span className="font-medium">{task.title}</span>
+                                              <Badge variant="outline" className="text-xs">
+                                                {task.status || 'todo'}
+                                              </Badge>
+                                            </div>
+                                            {task.description && (
+                                              <p className="text-xs text-muted-foreground mt-1">
+                                                {task.description}
+                                              </p>
+                                            )}
+                                          </div>
+                                        ))}
+                                      </div>
                                     )}
                                   </div>
                                 ))}
                               </div>
+                            </div>
+                          ) : (
+                            <div className="p-4 border rounded-lg bg-muted/50 text-center">
+                              <p className="text-sm text-muted-foreground">
+                                Bu şablonda henüz alt proje veya görev yok.
+                              </p>
                             </div>
                           )}
                         </div>

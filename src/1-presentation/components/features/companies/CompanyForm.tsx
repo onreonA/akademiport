@@ -46,7 +46,6 @@ export function CompanyForm({
     resolver: zodResolver(CreateCompanySchema),
     defaultValues: {
       country: 'Türkiye',
-      maxUsers: 2,
       ...initialData,
       // Convert numeric strings to numbers
       employeeCount: initialData?.employeeCount ? Number(initialData.employeeCount) : undefined,
