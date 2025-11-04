@@ -22,6 +22,7 @@ interface DashboardLayoutProps {
   children: React.ReactNode;
   showBreadcrumbs?: boolean;
   showNotifications?: boolean;
+  variant?: 'default' | 'company-dashboard';
 }
 
 // =====================================================
@@ -31,11 +32,17 @@ function DashboardLayoutInner({
   children,
   showBreadcrumbs = true,
   showNotifications = true,
+  variant = 'default',
 }: DashboardLayoutProps) {
   const { isCollapsed } = useSidebar();
 
+  const mainBackgroundClass =
+    variant === 'company-dashboard'
+      ? 'bg-linear-to-br from-background via-background to-primary/5 dark:from-gray-950 dark:via-gray-950 dark:to-primary/20'
+      : 'bg-gray-50 dark:bg-gray-900';
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className={cn('min-h-screen', mainBackgroundClass)}>
       {/* Header */}
       <AppHeader showBreadcrumbs={showBreadcrumbs} showNotifications={showNotifications} />
 
@@ -52,10 +59,18 @@ function DashboardLayoutInner({
         className={cn(
           'min-h-[calc(100vh-3.5rem)] transition-all duration-300',
           'md:pt-0 pt-0 pb-20 md:pb-6',
-          isCollapsed ? 'md:pl-16' : 'md:pl-64'
+          isCollapsed ? 'md:pl-16' : 'md:pl-64',
+          variant === 'company-dashboard' && mainBackgroundClass
         )}
       >
-        <div className="container mx-auto p-6">{children}</div>
+        <div
+          className={cn(
+            variant === 'company-dashboard' ? 'w-full' : 'container mx-auto',
+            variant === 'company-dashboard' ? 'p-0' : 'p-6'
+          )}
+        >
+          {children}
+        </div>
       </main>
 
       {/* Bottom Navigation - Mobile Only */}

@@ -54,9 +54,12 @@ export function UserMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-9 w-9 rounded-full">
-          <Avatar className="h-9 w-9">
-            <AvatarFallback className="bg-primary text-primary-foreground">
+        <Button
+          variant="ghost"
+          className="relative h-9 w-9 rounded-full transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+        >
+          <Avatar className="h-9 w-9 border-2 border-gray-200 dark:border-gray-700 transition-all duration-200">
+            <AvatarFallback className="bg-primary text-white">
               {getInitials(user.fullName)}
             </AvatarFallback>
           </Avatar>

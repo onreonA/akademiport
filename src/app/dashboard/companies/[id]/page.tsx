@@ -7,8 +7,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, AlertCircle, Edit, Trash2, Briefcase, Users, Building2 } from 'lucide-react';
 import { Button } from '@/presentation/components/ui/atoms/button';
+import { Badge } from '@/presentation/components/ui/atoms/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/presentation/components/ui/atoms/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/presentation/components/ui/atoms/tabs';
 import {
   CompanyProfileCard,
@@ -106,70 +108,135 @@ export default function CompanyDetailPage() {
 
   if (loading) {
     return (
-      <div className="container mx-auto py-8">
-        <p className="text-center text-muted-foreground">Yükleniyor...</p>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="container mx-auto py-8 px-4">
+          <div className="flex items-center justify-center py-16">
+            <div className="text-center space-y-4">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+              <p className="text-lg text-gray-600 dark:text-gray-400">Yükleniyor...</p>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
 
   if (!company) {
     return (
-      <div className="container mx-auto py-8">
-        <p className="text-center text-muted-foreground">Firma bulunamadı</p>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="container mx-auto py-8 px-4">
+          <div className="flex items-center justify-center py-16">
+            <div className="text-center space-y-4">
+              <div className="w-16 h-16 mx-auto rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-6">
+                <AlertCircle className="h-8 w-8 text-gray-400 dark:text-gray-500" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                Firma Bulunamadı
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400">Firma bilgileri yüklenemedi</p>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto py-8 space-y-6">
-      {/* Header */}
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={() => router.back()}>
-          <ArrowLeft className="w-4 h-4" />
-        </Button>
-        <div>
-          <h1 className="text-3xl font-bold">{company.name}</h1>
-          <p className="text-muted-foreground">Firma Detayları</p>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="container mx-auto py-8 px-4 space-y-6 max-w-7xl">
+        {/* Header */}
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex items-start gap-4 flex-1 min-w-0">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => router.back()}
+              className="hover:bg-gray-100 dark:hover:bg-gray-800 shrink-0"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <div className="space-y-2 flex-1 min-w-0">
+              <div className="flex items-center gap-3 flex-wrap">
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{company.name}</h1>
+                <Badge
+                  className={`${
+                    company.isActive
+                      ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 border-green-200 dark:border-green-800'
+                      : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700'
+                  } border font-medium px-2.5 py-1`}
+                >
+                  {company.isActive ? 'Aktif' : 'Pasif'}
+                </Badge>
+              </div>
+              <p className="text-gray-600 dark:text-gray-400 text-base">Firma Detayları</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => router.push(`/dashboard/companies/${id}/edit`)}
+              className="shadow-sm"
+            >
+              <Edit className="mr-2 h-4 w-4" />
+              Düzenle
+            </Button>
+          </div>
         </div>
+
+        {/* Stats */}
+        <CompanyStatsCard company={company} />
+
+        {/* Tabs */}
+        <Card className="border border-gray-200 dark:border-gray-800 shadow-sm">
+          <Tabs defaultValue="overview" className="space-y-6">
+            <CardHeader className="border-b border-gray-200 dark:border-gray-800">
+              <TabsList className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
+                <TabsTrigger value="overview" className="data-[state=active]:bg-primary/10">
+                  <Briefcase className="w-4 h-4 mr-2" />
+                  Genel Bakış
+                </TabsTrigger>
+                <TabsTrigger value="users" className="data-[state=active]:bg-primary/10">
+                  <Users className="w-4 h-4 mr-2" />
+                  Kullanıcılar ({users?.length || 0})
+                </TabsTrigger>
+                <TabsTrigger value="program" className="data-[state=active]:bg-primary/10">
+                  <Building2 className="w-4 h-4 mr-2" />
+                  Program
+                </TabsTrigger>
+              </TabsList>
+            </CardHeader>
+
+            <CardContent className="p-6">
+              <TabsContent value="overview" className="space-y-6 mt-0">
+                <CompanyProfileCard
+                  company={company}
+                  onEdit={() => router.push(`/dashboard/companies/${id}/edit`)}
+                  canEdit
+                />
+              </TabsContent>
+
+              <TabsContent value="users" className="space-y-4 mt-0">
+                <CompanyUsersList
+                  users={users}
+                  maxUsers={company.maxUsers}
+                  onAddUser={() => router.push(`/dashboard/companies/${id}/users`)}
+                  onRemoveUser={handleRemoveUser}
+                  canManage
+                />
+              </TabsContent>
+
+              <TabsContent value="program" className="space-y-4 mt-0">
+                <CompanyProgramsList
+                  program={program || undefined}
+                  onAssignProgram={() => alert('Program atama özelliği yakında eklenecek')}
+                  canManage
+                />
+              </TabsContent>
+            </CardContent>
+          </Tabs>
+        </Card>
       </div>
-
-      {/* Stats */}
-      <CompanyStatsCard company={company} />
-
-      {/* Tabs */}
-      <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="overview">Genel Bakış</TabsTrigger>
-          <TabsTrigger value="users">Kullanıcılar ({users?.length || 0})</TabsTrigger>
-          <TabsTrigger value="program">Program</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="overview" className="space-y-4">
-          <CompanyProfileCard
-            company={company}
-            onEdit={() => router.push(`/dashboard/companies/${id}/edit`)}
-            canEdit
-          />
-        </TabsContent>
-
-        <TabsContent value="users" className="space-y-4">
-          <CompanyUsersList
-            users={users}
-            maxUsers={company.maxUsers}
-            onAddUser={() => router.push(`/dashboard/companies/${id}/users`)}
-            onRemoveUser={handleRemoveUser}
-            canManage
-          />
-        </TabsContent>
-
-        <TabsContent value="program" className="space-y-4">
-          <CompanyProgramsList
-            program={program || undefined}
-            onAssignProgram={() => alert('Program atama özelliği yakında eklenecek')}
-            canManage
-          />
-        </TabsContent>
-      </Tabs>
     </div>
   );
 }

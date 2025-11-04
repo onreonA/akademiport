@@ -52,7 +52,7 @@ export function TrainingDocumentManager({
   const [formData, setFormData] = React.useState({
     title: '',
     description: '',
-    orderIndex: documents.length,
+    orderIndex: 0,
     isLocked: false,
   });
 
@@ -61,10 +61,15 @@ export function TrainingDocumentManager({
   }, [initialDocuments]);
 
   const handleOpenAddModal = () => {
+    // Calculate next orderIndex: max existing orderIndex + 1, or 0 if no documents
+    const maxOrderIndex =
+      documents.length > 0 ? Math.max(...documents.map((d) => d.orderIndex ?? 0)) : -1;
+    const nextOrderIndex = maxOrderIndex + 1;
+
     setFormData({
       title: '',
       description: '',
-      orderIndex: documents.length,
+      orderIndex: nextOrderIndex,
       isLocked: false,
     });
     setUploadedFile(null);
@@ -93,10 +98,16 @@ export function TrainingDocumentManager({
     setIsAddModalOpen(false);
     setEditingDocument(null);
     setUploadedFile(null);
+
+    // Calculate next orderIndex: max existing orderIndex + 1, or 0 if no documents
+    const maxOrderIndex =
+      documents.length > 0 ? Math.max(...documents.map((d) => d.orderIndex ?? 0)) : -1;
+    const nextOrderIndex = maxOrderIndex + 1;
+
     setFormData({
       title: '',
       description: '',
-      orderIndex: documents.length,
+      orderIndex: nextOrderIndex,
       isLocked: false,
     });
   };

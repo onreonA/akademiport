@@ -49,17 +49,23 @@ export function TrainingVideoManager({
     orderIndex: videos.length,
     isLocked: false,
   });
+  const [isFetchingMetadata, setIsFetchingMetadata] = React.useState(false);
 
   React.useEffect(() => {
     setVideos(initialVideos);
   }, [initialVideos]);
 
   const handleOpenAddModal = () => {
+    // Calculate next orderIndex: max existing orderIndex + 1, or 0 if no videos
+    const maxOrderIndex =
+      videos.length > 0 ? Math.max(...videos.map((v) => v.orderIndex ?? 0)) : -1;
+    const nextOrderIndex = maxOrderIndex + 1;
+
     setFormData({
       title: '',
       description: '',
       youtubeUrl: '',
-      orderIndex: videos.length,
+      orderIndex: nextOrderIndex,
       isLocked: false,
     });
     setEditingVideo(null);
@@ -81,13 +87,75 @@ export function TrainingVideoManager({
   const handleCloseModal = () => {
     setIsAddModalOpen(false);
     setEditingVideo(null);
+    setIsFetchingMetadata(false);
+
+    // Calculate next orderIndex: max existing orderIndex + 1, or 0 if no videos
+    const maxOrderIndex =
+      videos.length > 0 ? Math.max(...videos.map((v) => v.orderIndex ?? 0)) : -1;
+    const nextOrderIndex = maxOrderIndex + 1;
+
     setFormData({
       title: '',
       description: '',
       youtubeUrl: '',
-      orderIndex: videos.length,
+      orderIndex: nextOrderIndex,
       isLocked: false,
     });
+  };
+
+  const handleFetchMetadata = async () => {
+    if (!formData.youtubeUrl || editingVideo) return; // Don't fetch if editing or URL is empty
+
+    const youtubeUrlPattern = /^https?:\/\/(www\.)?(youtube\.com|youtu\.be)/;
+    if (!youtubeUrlPattern.test(formData.youtubeUrl)) {
+      return; // Invalid URL, don't fetch
+    }
+
+    setIsFetchingMetadata(true);
+    try {
+      // Extract YouTube ID
+      const patterns = [
+        /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
+        /youtube\.com\/watch\?.*v=([^&\n?#]+)/,
+      ];
+
+      let youtubeId: string | null = null;
+      for (const pattern of patterns) {
+        const match = formData.youtubeUrl.match(pattern);
+        if (match && match[1]) {
+          youtubeId = match[1];
+          break;
+        }
+      }
+
+      if (!youtubeId) {
+        setIsFetchingMetadata(false);
+        return;
+      }
+
+      // Fetch metadata from our API (which will use YouTube API)
+      // We'll create a test endpoint or use the existing create endpoint logic
+      // For now, let's create a simple metadata fetch endpoint
+      const response = await fetch(
+        `/api/trainings/${trainingId}/videos/metadata?youtubeId=${youtubeId}`
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.title || data.description) {
+          setFormData((prev) => ({
+            ...prev,
+            title: prev.title || data.title || '',
+            description: prev.description || data.description || '',
+          }));
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch YouTube metadata:', error);
+      // Silently fail - user can still enter manually
+    } finally {
+      setIsFetchingMetadata(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -186,37 +254,53 @@ export function TrainingVideoManager({
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="title">Başlık *</Label>
+                <Label htmlFor="title">
+                  Başlık *{' '}
+                  <span className="text-xs text-muted-foreground">(YouTube'dan otomatik)</span>
+                </Label>
                 <Input
                   id="title"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   required
-                  placeholder="Video başlığı"
+                  placeholder="Video başlığı (YouTube URL girildiğinde otomatik doldurulur)"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="description">Açıklama</Label>
+                <Label htmlFor="description">
+                  Açıklama{' '}
+                  <span className="text-xs text-muted-foreground">(YouTube'dan otomatik)</span>
+                </Label>
                 <Textarea
                   id="description"
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Video açıklaması (opsiyonel)"
+                  placeholder="Video açıklaması (YouTube URL girildiğinde otomatik doldurulur)"
                   rows={3}
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="youtubeUrl">YouTube URL *</Label>
-                <Input
-                  id="youtubeUrl"
-                  type="url"
-                  value={formData.youtubeUrl}
-                  onChange={(e) => setFormData({ ...formData, youtubeUrl: e.target.value })}
-                  required
-                  placeholder="https://www.youtube.com/watch?v=..."
-                />
+                <div className="flex gap-2">
+                  <Input
+                    id="youtubeUrl"
+                    type="url"
+                    value={formData.youtubeUrl}
+                    onChange={(e) => setFormData({ ...formData, youtubeUrl: e.target.value })}
+                    onBlur={handleFetchMetadata}
+                    required
+                    placeholder="https://www.youtube.com/watch?v=..."
+                    className="flex-1"
+                  />
+                  {isFetchingMetadata && (
+                    <div className="flex items-center justify-center px-3">
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                    </div>
+                  )}
+                </div>
                 <p className="text-xs text-muted-foreground">
-                  YouTube video URL'si (watch, embed veya youtu.be formatı)
+                  YouTube video URL'si (watch, embed veya youtu.be formatı). URL girildiğinde başlık
+                  ve açıklama otomatik doldurulur.
                 </p>
               </div>
               <div className="space-y-2">

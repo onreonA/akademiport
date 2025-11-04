@@ -144,14 +144,10 @@ export default function CompanyTrainingsPage() {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
-        <div className="max-w-7xl mx-auto p-4 md:p-6">
-          <div className="flex items-center justify-center py-16">
-            <div className="text-center space-y-4">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-              <div className="text-lg text-muted-foreground">Eğitimler yükleniyor...</div>
-            </div>
-          </div>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <div className="text-lg text-gray-600 dark:text-gray-400">Eğitimler yükleniyor...</div>
         </div>
       </div>
     );
@@ -159,16 +155,14 @@ export default function CompanyTrainingsPage() {
 
   if (!user?.companyId) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
-        <div className="max-w-7xl mx-auto p-4 md:p-6">
-          <div className="flex items-center justify-center py-16">
-            <div className="text-center space-y-4">
-              <div className="w-16 h-16 mx-auto rounded-full bg-destructive/10 flex items-center justify-center">
-                <AlertCircle className="h-8 w-8 text-destructive" />
-              </div>
-              <h3 className="text-lg font-semibold">Erişim Hatası</h3>
-              <p className="text-muted-foreground">Firma bilgisi bulunamadı</p>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4 md:p-6">
+        <div className="max-w-7xl mx-auto w-full">
+          <div className="text-center space-y-4">
+            <div className="w-16 h-16 mx-auto rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+              <AlertCircle className="h-8 w-8 text-red-600 dark:text-red-400" />
             </div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Erişim Hatası</h3>
+            <p className="text-gray-600 dark:text-gray-400">Firma bilgisi bulunamadı</p>
           </div>
         </div>
       </div>
@@ -176,19 +170,19 @@ export default function CompanyTrainingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto p-4 md:p-6 space-y-6 md:space-y-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="space-y-1 w-full sm:w-auto">
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">
               Eğitimlerim
             </h1>
-            <p className="text-muted-foreground text-sm md:text-base lg:text-lg">
+            <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base lg:text-lg">
               Size atanan eğitimleri görüntüleyin ve takip edin
             </p>
             <div className="flex items-center gap-4 mt-2">
-              <div className="text-xs md:text-sm text-muted-foreground">
+              <div className="text-xs md:text-sm text-gray-600 dark:text-gray-400">
                 {stats.total} eğitim • {stats.completed} tamamlandı • {stats.inProgress} devam
                 ediyor
               </div>
@@ -197,48 +191,56 @@ export default function CompanyTrainingsPage() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-card/50 backdrop-blur-sm border border-primary/20 rounded-xl p-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6">
+          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-4 shadow-sm">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-500/20 text-blue-600 rounded-lg">
+              <div className="p-2 bg-blue-50 dark:bg-blue-950/20 text-blue-600 dark:text-blue-400 rounded-lg">
                 <GraduationCap className="h-5 w-5" />
               </div>
               <div>
-                <div className="text-sm text-muted-foreground">Toplam Eğitim</div>
-                <div className="text-2xl font-bold">{stats.total}</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">Toplam Eğitim</div>
+                <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {stats.total}
+                </div>
               </div>
             </div>
           </div>
-          <div className="bg-card/50 backdrop-blur-sm border border-primary/20 rounded-xl p-4">
+          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-4 shadow-sm">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-green-500/20 text-green-600 rounded-lg">
+              <div className="p-2 bg-green-50 dark:bg-green-950/20 text-green-600 dark:text-green-400 rounded-lg">
                 <GraduationCap className="h-5 w-5" />
               </div>
               <div>
-                <div className="text-sm text-muted-foreground">Tamamlanan</div>
-                <div className="text-2xl font-bold">{stats.completed}</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">Tamamlanan</div>
+                <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {stats.completed}
+                </div>
               </div>
             </div>
           </div>
-          <div className="bg-card/50 backdrop-blur-sm border border-primary/20 rounded-xl p-4">
+          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-4 shadow-sm">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-orange-500/20 text-orange-600 rounded-lg">
+              <div className="p-2 bg-orange-50 dark:bg-orange-950/20 text-orange-600 dark:text-orange-400 rounded-lg">
                 <GraduationCap className="h-5 w-5" />
               </div>
               <div>
-                <div className="text-sm text-muted-foreground">Devam Eden</div>
-                <div className="text-2xl font-bold">{stats.inProgress}</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">Devam Eden</div>
+                <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {stats.inProgress}
+                </div>
               </div>
             </div>
           </div>
-          <div className="bg-card/50 backdrop-blur-sm border border-primary/20 rounded-xl p-4">
+          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-4 shadow-sm">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-purple-500/20 text-purple-600 rounded-lg">
+              <div className="p-2 bg-purple-50 dark:bg-purple-950/20 text-purple-600 dark:text-purple-400 rounded-lg">
                 <GraduationCap className="h-5 w-5" />
               </div>
               <div>
-                <div className="text-sm text-muted-foreground">Ortalama İlerleme</div>
-                <div className="text-2xl font-bold">{Math.round(stats.averageProgress)}%</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">Ortalama İlerleme</div>
+                <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {Math.round(stats.averageProgress)}%
+                </div>
               </div>
             </div>
           </div>
@@ -246,11 +248,15 @@ export default function CompanyTrainingsPage() {
 
         {/* Overall Progress */}
         {stats.total > 0 && (
-          <div className="bg-card/50 backdrop-blur-sm border border-primary/20 rounded-xl p-6">
+          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-6 shadow-sm">
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Genel İlerleme</span>
-                <span className="text-sm font-bold">{Math.round(stats.averageProgress)}%</span>
+                <span className="text-sm font-medium text-gray-900 dark:text-white">
+                  Genel İlerleme
+                </span>
+                <span className="text-sm font-bold text-gray-900 dark:text-white">
+                  {Math.round(stats.averageProgress)}%
+                </span>
               </div>
               <TrainingProgressBar progress={stats.averageProgress} size="lg" />
             </div>
@@ -258,10 +264,10 @@ export default function CompanyTrainingsPage() {
         )}
 
         {/* Filters */}
-        <div className="bg-card/50 backdrop-blur-sm border border-primary/20 rounded-xl p-6 shadow-lg">
+        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-6 shadow-sm">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium flex items-center gap-2">
+              <label className="text-sm font-medium flex items-center gap-2 text-gray-900 dark:text-white">
                 <Filter className="h-4 w-4" />
                 Arama
               </label>
@@ -270,15 +276,15 @@ export default function CompanyTrainingsPage() {
                 placeholder="Eğitim ara..."
                 value={filters.search}
                 onChange={(e) => handleFilterChange('search', e.target.value)}
-                className="w-full px-3 py-2 border rounded-md bg-background"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Durum</label>
+              <label className="text-sm font-medium text-gray-900 dark:text-white">Durum</label>
               <select
                 value={filters.status}
                 onChange={(e) => handleFilterChange('status', e.target.value)}
-                className="w-full px-3 py-2 border rounded-md bg-background"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white"
               >
                 <option value="">Tümü</option>
                 <option value="assigned">Atanmış</option>
@@ -294,15 +300,17 @@ export default function CompanyTrainingsPage() {
         {error ? (
           <div className="flex items-center justify-center py-16">
             <div className="text-center space-y-4">
-              <div className="w-16 h-16 mx-auto rounded-full bg-destructive/10 flex items-center justify-center">
-                <AlertCircle className="h-8 w-8 text-destructive" />
+              <div className="w-16 h-16 mx-auto rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                <AlertCircle className="h-8 w-8 text-red-600 dark:text-red-400" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold mb-2">Hata Oluştu</h3>
-                <p className="text-muted-foreground mb-4">{error}</p>
+                <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-white">
+                  Hata Oluştu
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">{error}</p>
                 <button
                   onClick={() => fetchTrainings()}
-                  className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+                  className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 shadow-sm"
                 >
                   Tekrar Dene
                 </button>
@@ -311,11 +319,13 @@ export default function CompanyTrainingsPage() {
           </div>
         ) : paginatedTrainings.length === 0 ? (
           <div className="text-center py-16">
-            <div className="w-20 h-20 mx-auto rounded-full bg-muted flex items-center justify-center mb-6">
-              <AlertCircle className="h-10 w-10 text-muted-foreground" />
+            <div className="w-20 h-20 mx-auto rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-6">
+              <AlertCircle className="h-10 w-10 text-gray-400 dark:text-gray-500" />
             </div>
-            <h3 className="text-xl font-semibold mb-2">Eğitim Bulunamadı</h3>
-            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+            <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">
+              Eğitim Bulunamadı
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
               {filters.search || filters.status
                 ? 'Arama kriterlerinize uygun eğitim bulunamadı.'
                 : 'Henüz size atanmış bir eğitim bulunmuyor.'}
@@ -335,7 +345,7 @@ export default function CompanyTrainingsPage() {
                     documentsCount={companyTraining.documentsCount}
                   />
                   {companyTraining.progress !== undefined && (
-                    <div className="bg-card/50 backdrop-blur-sm border border-primary/20 rounded-lg p-3">
+                    <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-3 shadow-sm">
                       <TrainingProgressBar
                         progress={companyTraining.progress}
                         label="İlerleme"
@@ -353,7 +363,7 @@ export default function CompanyTrainingsPage() {
                 <button
                   onClick={() => setPagination((prev) => ({ ...prev, page: prev.page - 1 }))}
                   disabled={pagination.page === 1}
-                  className="px-4 py-2 border rounded-md hover:bg-primary hover:text-primary-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-white hover:bg-primary hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                 >
                   Önceki
                 </button>
@@ -364,11 +374,11 @@ export default function CompanyTrainingsPage() {
                       <button
                         key={pageNum}
                         onClick={() => setPagination((prev) => ({ ...prev, page: pageNum }))}
-                        className={`w-10 h-10 rounded-md ${
+                        className={`w-10 h-10 rounded-md transition-colors shadow-sm ${
                           pagination.page === pageNum
-                            ? 'bg-primary text-primary-foreground'
-                            : 'border hover:bg-primary hover:text-primary-foreground'
-                        } transition-colors`}
+                            ? 'bg-primary text-white'
+                            : 'border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white hover:bg-primary hover:text-white'
+                        }`}
                       >
                         {pageNum}
                       </button>
@@ -378,7 +388,7 @@ export default function CompanyTrainingsPage() {
                 <button
                   onClick={() => setPagination((prev) => ({ ...prev, page: prev.page + 1 }))}
                   disabled={pagination.page >= totalPages}
-                  className="px-4 py-2 border rounded-md hover:bg-primary hover:text-primary-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-white hover:bg-primary hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                 >
                   Sonraki
                 </button>

@@ -9,6 +9,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { Button } from '@/presentation/components/ui/atoms/button';
+import { Input } from '@/presentation/components/ui/atoms/input';
 import { TrainingCard } from '@/presentation/components/features/trainings';
 import { Plus, AlertCircle, Filter } from 'lucide-react';
 import type { Training } from '@/domain/entities/Training';
@@ -102,28 +103,24 @@ export default function TrainingsPage() {
   const totalPages = Math.ceil(pagination.total / pagination.limit);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto p-4 md:p-6 space-y-6 md:space-y-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="space-y-1 w-full sm:w-auto">
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">
               Eğitimler
             </h1>
-            <p className="text-muted-foreground text-sm md:text-base lg:text-lg">
+            <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base lg:text-lg">
               Tüm eğitimleri yönetin
             </p>
             <div className="flex items-center gap-4 mt-2">
-              <div className="text-xs md:text-sm text-muted-foreground">
+              <div className="text-xs md:text-sm text-gray-600 dark:text-gray-400">
                 {pagination.total} eğitim • Sayfa {pagination.page} / {totalPages || 1}
               </div>
             </div>
           </div>
-          <Button
-            asChild
-            size="sm"
-            className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white shadow-lg hover:shadow-xl transition-all duration-300"
-          >
+          <Button asChild size="sm" className="shadow-sm">
             <Link href="/dashboard/trainings/new">
               <Plus className="mr-2 h-4 w-4" />
               Yeni Eğitim
@@ -132,27 +129,26 @@ export default function TrainingsPage() {
         </div>
 
         {/* Filters */}
-        <div className="bg-card/50 backdrop-blur-sm border border-primary/20 rounded-xl p-6 shadow-lg">
+        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-6 shadow-sm">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium flex items-center gap-2">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
                 <Filter className="h-4 w-4" />
                 Arama
               </label>
-              <input
+              <Input
                 type="text"
                 placeholder="Eğitim ara..."
                 value={filters.search}
                 onChange={(e) => handleFilterChange('search', e.target.value)}
-                className="w-full px-3 py-2 border rounded-md bg-background"
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Durum</label>
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Durum</label>
               <select
                 value={filters.status}
                 onChange={(e) => handleFilterChange('status', e.target.value)}
-                className="w-full px-3 py-2 border rounded-md bg-background"
+                className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
               >
                 <option value="">Tümü</option>
                 <option value="draft">Taslak</option>
@@ -161,11 +157,13 @@ export default function TrainingsPage() {
               </select>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Öncelik</label>
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Öncelik
+              </label>
               <select
                 value={filters.priority}
                 onChange={(e) => handleFilterChange('priority', e.target.value)}
-                className="w-full px-3 py-2 border rounded-md bg-background"
+                className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
               >
                 <option value="">Tümü</option>
                 <option value="low">Düşük</option>
@@ -175,11 +173,11 @@ export default function TrainingsPage() {
               </select>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Tip</label>
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Tip</label>
               <select
                 value={filters.isGlobal}
                 onChange={(e) => handleFilterChange('isGlobal', e.target.value)}
-                className="w-full px-3 py-2 border rounded-md bg-background"
+                className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
               >
                 <option value="">Tümü</option>
                 <option value="true">Global</option>
@@ -194,18 +192,22 @@ export default function TrainingsPage() {
           <div className="flex items-center justify-center py-16">
             <div className="text-center space-y-4">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-              <div className="text-lg text-muted-foreground">Eğitimler yükleniyor...</div>
+              <div className="text-lg text-gray-600 dark:text-gray-400">
+                Eğitimler yükleniyor...
+              </div>
             </div>
           </div>
         ) : error ? (
           <div className="flex items-center justify-center py-16">
             <div className="text-center space-y-4">
-              <div className="w-16 h-16 mx-auto rounded-full bg-destructive/10 flex items-center justify-center">
-                <AlertCircle className="h-8 w-8 text-destructive" />
+              <div className="w-16 h-16 mx-auto rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                <AlertCircle className="h-8 w-8 text-red-600 dark:text-red-400" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold mb-2">Hata Oluştu</h3>
-                <p className="text-muted-foreground mb-4">{error}</p>
+                <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-white">
+                  Hata Oluştu
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">{error}</p>
                 <Button onClick={fetchTrainings} variant="outline">
                   Tekrar Dene
                 </Button>
@@ -214,18 +216,16 @@ export default function TrainingsPage() {
           </div>
         ) : trainings.length === 0 ? (
           <div className="text-center py-16">
-            <div className="w-20 h-20 mx-auto rounded-full bg-muted flex items-center justify-center mb-6">
-              <Plus className="h-10 w-10 text-muted-foreground" />
+            <div className="w-20 h-20 mx-auto rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-6">
+              <Plus className="h-10 w-10 text-gray-400 dark:text-gray-500" />
             </div>
-            <h3 className="text-xl font-semibold mb-2">Eğitim Bulunamadı</h3>
-            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+            <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">
+              Eğitim Bulunamadı
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
               Henüz hiç eğitim oluşturulmamış. İlk eğitiminizi oluşturarak başlayın.
             </p>
-            <Button
-              asChild
-              variant="outline"
-              className="hover:bg-primary hover:text-primary-foreground transition-colors"
-            >
+            <Button asChild variant="outline">
               <Link href="/dashboard/trainings/new">
                 <Plus className="mr-2 h-4 w-4" />
                 İlk Eğitimi Oluştur
@@ -236,11 +236,12 @@ export default function TrainingsPage() {
           <>
             {/* Trainings Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {trainings.map((training) => (
+              {trainings.map((training: any) => (
                 <TrainingCard
                   key={training.id}
                   training={training}
-                  onClick={(t) => (window.location.href = `/dashboard/trainings/${t.id}/edit`)}
+                  videosCount={training.videosCount || 0}
+                  documentsCount={training.documentsCount || 0}
                   onEdit={(t) => (window.location.href = `/dashboard/trainings/${t.id}/edit`)}
                   onDelete={handleDelete}
                 />
@@ -254,7 +255,6 @@ export default function TrainingsPage() {
                   variant="outline"
                   onClick={() => setPagination((prev) => ({ ...prev, page: prev.page - 1 }))}
                   disabled={pagination.page === 1}
-                  className="hover:bg-primary hover:text-primary-foreground transition-colors"
                 >
                   Önceki
                 </Button>
@@ -278,7 +278,6 @@ export default function TrainingsPage() {
                   variant="outline"
                   onClick={() => setPagination((prev) => ({ ...prev, page: prev.page + 1 }))}
                   disabled={pagination.page >= totalPages}
-                  className="hover:bg-primary hover:text-primary-foreground transition-colors"
                 >
                   Sonraki
                 </Button>

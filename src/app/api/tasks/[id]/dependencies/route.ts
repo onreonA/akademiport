@@ -3,10 +3,7 @@ import { TaskDependencyRepository } from '@/infrastructure/database/repositories
 import { TaskRepository } from '@/infrastructure/database/repositories/TaskRepository';
 import {
   CreateTaskDependencyUseCase,
-  DeleteTaskDependencyUseCase,
   GetTaskDependenciesUseCase,
-  ValidateTaskDependencyUseCase,
-  CheckTaskDependenciesCompleteUseCase,
 } from '@/application/use-cases/task';
 import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
 

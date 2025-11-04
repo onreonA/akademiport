@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Sparkles, Plus, Copy, Trash2, AlertCircle, FolderOpen, Edit, Eye } from 'lucide-react';
 import { toast } from 'sonner';
 import {
@@ -12,11 +13,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/presentation/components/ui/atoms/dialog';
-import { GradientHeader } from '@/presentation/components/ui/molecules/gradient-header';
-import { EnhancedCard } from '@/presentation/components/ui/atoms/enhanced-card';
-import { ModernStatCard } from '@/presentation/components/ui/atoms/modern-stat-card';
-import { Badge } from '@/presentation/components/ui/atoms/badge';
+import { TemplateCard } from '@/presentation/components/features/projects/TemplateCard';
 import { Button } from '@/presentation/components/ui/atoms/button';
+import { Badge } from '@/presentation/components/ui/atoms/badge';
 
 interface ProjectTemplate {
   id: string;
@@ -28,14 +27,6 @@ interface ProjectTemplate {
     sub_projects: number;
   };
 }
-
-const priorityConfig: Record<string, { label: string; color: string }> = {
-  low: { label: 'Düşük', color: 'bg-gray-400' },
-  medium: { label: 'Orta', color: 'bg-blue-400' },
-  high: { label: 'Yüksek', color: 'bg-orange-400' },
-  urgent: { label: 'Acil', color: 'bg-red-500' },
-  critical: { label: 'Kritik', color: 'bg-red-600' },
-};
 
 export default function ProjectTemplatesPage() {
   const router = useRouter();
@@ -162,13 +153,15 @@ export default function ProjectTemplatesPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-linear-to-br from-background via-background to-primary/5 p-4 md:p-6">
-        <div className="max-w-7xl mx-auto space-y-6">
-          <div className="h-32 bg-muted animate-pulse rounded-2xl" />
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-64 bg-muted animate-pulse rounded-xl" />
-            ))}
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="max-w-7xl mx-auto p-4 md:p-6 space-y-6 md:space-y-8">
+          <div className="flex items-center justify-center py-16">
+            <div className="text-center space-y-4">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+              <div className="text-lg text-gray-600 dark:text-gray-400">
+                Şablonlar yükleniyor...
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -177,281 +170,236 @@ export default function ProjectTemplatesPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-linear-to-br from-background via-background to-primary/5 p-4 md:p-6">
-        <div className="max-w-7xl mx-auto">
-          <EnhancedCard variant="neon" className="p-8 text-center">
-            <AlertCircle className="w-16 h-16 text-destructive mx-auto mb-4" />
-            <h2 className="text-2xl font-bold mb-2">Hata Oluştu</h2>
-            <p className="text-muted-foreground mb-4">{error}</p>
-            <Button onClick={fetchTemplates}>Tekrar Dene</Button>
-          </EnhancedCard>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="max-w-7xl mx-auto p-4 md:p-6 space-y-6 md:space-y-8">
+          <div className="flex items-center justify-center py-16">
+            <div className="text-center space-y-4">
+              <div className="w-16 h-16 mx-auto rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                <AlertCircle className="h-8 w-8 text-red-600 dark:text-red-400" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-white">
+                  Hata Oluştu
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">{error}</p>
+                <Button onClick={fetchTemplates}>Tekrar Dene</Button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-background via-background to-primary/5 p-4 md:p-6">
-      <div className="max-w-7xl mx-auto space-y-6 md:space-y-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="max-w-7xl mx-auto p-4 md:p-6 space-y-6 md:space-y-8">
         {/* Header */}
-        <GradientHeader
-          title="Proje Şablonları"
-          subtitle={`${templates.length} şablon • Yeni projeler için hazır şablonlar oluşturun`}
-          icon={Sparkles}
-          actions={
-            <Button
-              className="bg-white/10 hover:bg-white/20 border-white/20 text-white"
-              onClick={() => router.push('/dashboard/project-templates/new')}
-            >
-              <Plus className="w-4 h-4 mr-2" />
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="space-y-1 w-full sm:w-auto">
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">
+              Proje Şablonları
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base lg:text-lg">
+              Yeni projeler için tekrar kullanılabilir şablonlar oluşturun
+            </p>
+            <div className="flex items-center gap-4 mt-2">
+              <div className="text-xs md:text-sm text-gray-600 dark:text-gray-400">
+                {templates.length} şablon
+              </div>
+            </div>
+          </div>
+          <Button asChild size="sm" className="shadow-sm">
+            <Link href="/dashboard/project-templates/new">
+              <Plus className="mr-2 h-4 w-4" />
               Yeni Şablon
-            </Button>
-          }
-        />
-
-        {/* Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6">
-          <ModernStatCard
-            title="Toplam Şablon"
-            value={templates.length}
-            icon={Sparkles}
-            color="purple"
-            showGlow
-          />
-          <ModernStatCard
-            title="Bu Ay Oluşturulan"
-            value={
-              templates.filter(
-                (t) =>
-                  new Date(t.created_at).getMonth() === new Date().getMonth() &&
-                  new Date(t.created_at).getFullYear() === new Date().getFullYear()
-              ).length
-            }
-            icon={Plus}
-            color="blue"
-          />
-          <ModernStatCard
-            title="Yüksek Öncelik"
-            value={templates.filter((t) => t.priority === 'high' || t.priority === 'urgent').length}
-            icon={AlertCircle}
-            color="orange"
-          />
+            </Link>
+          </Button>
         </div>
 
-        {/* Templates Grid */}
+        {/* Content */}
         {templates.length === 0 ? (
-          <EnhancedCard variant="glass" className="p-8 md:p-12 text-center">
-            <Sparkles className="w-16 h-16 md:w-20 md:h-20 text-muted-foreground mx-auto mb-4 opacity-50" />
-            <h3 className="text-xl md:text-2xl font-bold mb-2">Henüz Şablon Yok</h3>
-            <p className="text-muted-foreground mb-6">
-              Yeni projeler için tekrar kullanılabilir şablonlar oluşturun.
-            </p>
-            <Button onClick={() => router.push('/dashboard/project-templates/new')}>
-              <Plus className="w-4 h-4 mr-2" />
-              İlk Şablonu Oluştur
-            </Button>
-          </EnhancedCard>
+          <div className="flex items-center justify-center py-16">
+            <div className="text-center space-y-4">
+              <div className="w-16 h-16 mx-auto rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                <Sparkles className="h-8 w-8 text-gray-400 dark:text-gray-500" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-white">
+                  Henüz Şablon Yok
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                  Yeni projeler için tekrar kullanılabilir şablonlar oluşturun.
+                </p>
+                <Button asChild onClick={() => router.push('/dashboard/project-templates/new')}>
+                  <Link href="/dashboard/project-templates/new">
+                    <Plus className="w-4 h-4 mr-2" />
+                    İlk Şablonu Oluştur
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-            {templates.map((template) => (
-              <EnhancedCard
-                key={template.id}
-                variant="glass"
-                hover
-                glow
-                className="p-6 transition-all duration-300"
-              >
-                {/* Header */}
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Sparkles className="w-5 h-5 text-primary shrink-0" />
-                      <h3 className="text-lg md:text-xl font-bold truncate">{template.name}</h3>
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+              {templates.map((template) => (
+                <TemplateCard
+                  key={template.id}
+                  template={template}
+                  onEdit={(id) => router.push(`/dashboard/project-templates/${id}/edit`)}
+                  onDelete={handleDelete}
+                  onDuplicate={handleDuplicate}
+                  onPreview={handlePreview}
+                />
+              ))}
+            </div>
+
+            {/* Preview Dialog */}
+            <Dialog
+              open={!!previewTemplate}
+              onOpenChange={(open) => !open && setPreviewTemplate(null)}
+            >
+              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle className="text-gray-900 dark:text-white">
+                    {previewTemplate?.name || 'Şablon Önizleme'}
+                  </DialogTitle>
+                  <DialogDescription className="text-gray-600 dark:text-gray-400">
+                    {previewTemplate?.description || 'Şablon detayları'}
+                  </DialogDescription>
+                </DialogHeader>
+                {previewLoading ? (
+                  <div className="p-8 text-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+                    <p className="text-gray-600 dark:text-gray-400">Yükleniyor...</p>
+                  </div>
+                ) : templateDetails ? (
+                  <div className="space-y-6">
+                    {/* Template Info */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <h3 className="font-semibold mb-2 text-sm text-gray-700 dark:text-gray-300">
+                          Öncelik
+                        </h3>
+                        <Badge
+                          className={
+                            templateDetails.priority === 'low'
+                              ? 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700'
+                              : templateDetails.priority === 'medium'
+                                ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800'
+                                : templateDetails.priority === 'high'
+                                  ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 border-orange-200 dark:border-orange-800'
+                                  : 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800'
+                          }
+                        >
+                          {templateDetails.priority === 'low'
+                            ? 'Düşük'
+                            : templateDetails.priority === 'medium'
+                              ? 'Orta'
+                              : templateDetails.priority === 'high'
+                                ? 'Yüksek'
+                                : 'Acil'}
+                        </Badge>
+                      </div>
+                      <div>
+                        <h3 className="font-semibold mb-2 text-sm text-gray-700 dark:text-gray-300">
+                          Durum
+                        </h3>
+                        <Badge className="bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700">
+                          {templateDetails.status || 'planning'}
+                        </Badge>
+                      </div>
                     </div>
-                    {template.description && (
-                      <p className="text-sm text-muted-foreground line-clamp-2">
-                        {template.description}
-                      </p>
+
+                    {templateDetails.description && (
+                      <div>
+                        <h3 className="font-semibold mb-2 text-gray-900 dark:text-white">
+                          Açıklama
+                        </h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          {templateDetails.description}
+                        </p>
+                      </div>
                     )}
-                  </div>
-                </div>
 
-                {/* Badges */}
-                <div className="flex flex-wrap gap-2 mb-4">
-                  <Badge className="bg-purple-500">Şablon</Badge>
-                  {priorityConfig[template.priority] ? (
-                    <Badge className={priorityConfig[template.priority].color}>
-                      {priorityConfig[template.priority].label}
-                    </Badge>
-                  ) : (
-                    <Badge className="bg-gray-400">{template.priority || 'Orta'}</Badge>
-                  )}
-                </div>
-
-                {/* Info */}
-                <div className="mb-4 pb-4 border-b border-border">
-                  <div className="flex items-center justify-between text-sm text-muted-foreground">
-                    <span className="flex items-center gap-2">
-                      <FolderOpen className="w-4 h-4" />
-                      {template._count?.sub_projects || 0} Alt Proje
-                    </span>
-                    <span className="text-xs">
-                      {new Date(template.created_at).toLocaleDateString('tr-TR')}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Actions */}
-                <div className="flex flex-col sm:flex-row gap-2">
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-full sm:flex-1"
-                        onClick={() => handlePreview(template.id)}
-                      >
-                        <Eye className="w-4 h-4 mr-2" />
-                        Önizle
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-                      <DialogHeader>
-                        <DialogTitle>{previewTemplate?.name || 'Şablon Önizleme'}</DialogTitle>
-                        <DialogDescription>
-                          {previewTemplate?.description || 'Şablon detayları'}
-                        </DialogDescription>
-                      </DialogHeader>
-                      {previewLoading ? (
-                        <div className="p-8 text-center">
-                          <p className="text-muted-foreground">Yükleniyor...</p>
-                        </div>
-                      ) : templateDetails ? (
-                        <div className="space-y-6">
-                          {/* Template Info */}
-                          <div className="grid grid-cols-2 gap-4">
-                            <div>
-                              <h3 className="font-semibold mb-2 text-sm text-muted-foreground">
-                                Öncelik
-                              </h3>
-                              <Badge className={priorityConfig[templateDetails.priority]?.color}>
-                                {priorityConfig[templateDetails.priority]?.label}
-                              </Badge>
-                            </div>
-                            <div>
-                              <h3 className="font-semibold mb-2 text-sm text-muted-foreground">
-                                Durum
-                              </h3>
-                              <Badge>{templateDetails.status || 'planning'}</Badge>
-                            </div>
-                          </div>
-
-                          {templateDetails.description && (
-                            <div>
-                              <h3 className="font-semibold mb-2">Açıklama</h3>
-                              <p className="text-sm text-muted-foreground">
-                                {templateDetails.description}
-                              </p>
-                            </div>
-                          )}
-
-                          {/* Sub-Projects with Tasks */}
-                          {templateDetails.subProjects && templateDetails.subProjects.length > 0 ? (
-                            <div>
-                              <h3 className="font-semibold mb-3">
-                                Alt Projeler ({templateDetails.subProjects.length})
-                              </h3>
-                              <div className="space-y-4 max-h-96 overflow-y-auto">
-                                {templateDetails.subProjects.map((sp: any) => (
-                                  <div
-                                    key={sp.id}
-                                    className="p-4 border rounded-lg bg-muted/50 space-y-3"
+                    {/* Sub-Projects with Tasks */}
+                    {templateDetails.subProjects && templateDetails.subProjects.length > 0 ? (
+                      <div>
+                        <h3 className="font-semibold mb-3 text-gray-900 dark:text-white">
+                          Alt Projeler ({templateDetails.subProjects.length})
+                        </h3>
+                        <div className="space-y-4 max-h-96 overflow-y-auto">
+                          {templateDetails.subProjects.map((sp: any) => (
+                            <div
+                              key={sp.id}
+                              className="p-4 border border-gray-200 dark:border-gray-800 rounded-lg bg-gray-50 dark:bg-gray-800/50 space-y-3"
+                            >
+                              <div>
+                                <div className="flex items-center gap-2 mb-1">
+                                  <FolderOpen className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                                  <p className="font-medium text-gray-900 dark:text-white">
+                                    {sp.name}
+                                  </p>
+                                  <Badge
+                                    variant="outline"
+                                    className="text-xs border-gray-200 dark:border-gray-800"
                                   >
-                                    <div>
-                                      <div className="flex items-center gap-2 mb-1">
-                                        <FolderOpen className="w-4 h-4 text-muted-foreground" />
-                                        <p className="font-medium">{sp.name}</p>
-                                        <Badge variant="outline" className="text-xs">
-                                          {sp.status || 'todo'}
+                                    {sp.status || 'todo'}
+                                  </Badge>
+                                </div>
+                                {sp.description && (
+                                  <p className="text-sm text-gray-600 dark:text-gray-400 ml-6">
+                                    {sp.description}
+                                  </p>
+                                )}
+                              </div>
+                              {sp.tasks && sp.tasks.length > 0 && (
+                                <div className="ml-6 space-y-2">
+                                  <p className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                                    Görevler ({sp.tasks.length}):
+                                  </p>
+                                  {sp.tasks.map((task: any) => (
+                                    <div
+                                      key={task.id}
+                                      className="pl-3 border-l-2 border-primary/20 text-sm"
+                                    >
+                                      <div className="flex items-center gap-2">
+                                        <span className="font-medium text-gray-900 dark:text-white">
+                                          {task.title}
+                                        </span>
+                                        <Badge
+                                          variant="outline"
+                                          className="text-xs border-gray-200 dark:border-gray-800"
+                                        >
+                                          {task.status || 'todo'}
                                         </Badge>
                                       </div>
-                                      {sp.description && (
-                                        <p className="text-sm text-muted-foreground ml-6">
-                                          {sp.description}
+                                      {task.description && (
+                                        <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                                          {task.description}
                                         </p>
                                       )}
                                     </div>
-                                    {sp.tasks && sp.tasks.length > 0 && (
-                                      <div className="ml-6 space-y-2">
-                                        <p className="text-xs font-medium text-muted-foreground">
-                                          Görevler ({sp.tasks.length}):
-                                        </p>
-                                        {sp.tasks.map((task: any) => (
-                                          <div
-                                            key={task.id}
-                                            className="pl-3 border-l-2 border-primary/20 text-sm"
-                                          >
-                                            <div className="flex items-center gap-2">
-                                              <span className="font-medium">{task.title}</span>
-                                              <Badge variant="outline" className="text-xs">
-                                                {task.status || 'todo'}
-                                              </Badge>
-                                            </div>
-                                            {task.description && (
-                                              <p className="text-xs text-muted-foreground mt-1">
-                                                {task.description}
-                                              </p>
-                                            )}
-                                          </div>
-                                        ))}
-                                      </div>
-                                    )}
-                                  </div>
-                                ))}
-                              </div>
+                                  ))}
+                                </div>
+                              )}
                             </div>
-                          ) : (
-                            <div className="p-4 border rounded-lg bg-muted/50 text-center">
-                              <p className="text-sm text-muted-foreground">
-                                Bu şablonda henüz alt proje veya görev yok.
-                              </p>
-                            </div>
-                          )}
+                          ))}
                         </div>
-                      ) : null}
-                    </DialogContent>
-                  </Dialog>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full sm:flex-1"
-                    onClick={() => router.push(`/dashboard/project-templates/${template.id}/edit`)}
-                  >
-                    <Edit className="w-4 h-4 mr-2" />
-                    Düzenle
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full sm:w-auto"
-                    onClick={() => handleDuplicate(template.id)}
-                  >
-                    <Copy className="w-4 h-4 mr-2" />
-                    Kopyala
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full sm:w-auto border-red-500/50 text-red-600 hover:bg-red-500/10"
-                    onClick={() => handleDelete(template.id)}
-                    disabled={deletingId === template.id}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
-              </EnhancedCard>
-            ))}
-          </div>
+                      </div>
+                    ) : (
+                      <div className="p-4 border border-gray-200 dark:border-gray-800 rounded-lg bg-gray-50 dark:bg-gray-800/50 text-center">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          Bu şablonda henüz alt proje veya görev yok.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                ) : null}
+              </DialogContent>
+            </Dialog>
+          </>
         )}
       </div>
     </div>

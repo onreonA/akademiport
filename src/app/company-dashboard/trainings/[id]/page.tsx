@@ -354,14 +354,10 @@ export default function CompanyTrainingDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
-        <div className="max-w-7xl mx-auto p-4 md:p-6">
-          <div className="flex items-center justify-center py-16">
-            <div className="text-center space-y-4">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-              <div className="text-lg text-muted-foreground">Eğitim yükleniyor...</div>
-            </div>
-          </div>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <div className="text-lg text-gray-600 dark:text-gray-400">Eğitim yükleniyor...</div>
         </div>
       </div>
     );
@@ -369,26 +365,25 @@ export default function CompanyTrainingDetailPage() {
 
   if (error || !training) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
-        <div className="max-w-7xl mx-auto p-4 md:p-6">
-          <div className="flex items-center justify-center py-16">
-            <div className="text-center space-y-4">
-              <div className="w-16 h-16 mx-auto rounded-full bg-destructive/10 flex items-center justify-center">
-                <AlertCircle className="h-8 w-8 text-destructive" />
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold mb-2">Hata Oluştu</h3>
-                <p className="text-muted-foreground mb-4">{error || 'Eğitim bulunamadı'}</p>
-                <Button
-                  onClick={() => router.push('/company-dashboard/trainings')}
-                  variant="outline"
-                >
-                  <ArrowLeft className="mr-2 h-4 w-4" />
-                  Eğitimlere Dön
-                </Button>
-              </div>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4 md:p-6">
+        <div className="max-w-7xl mx-auto w-full">
+          <Card className="border border-gray-200 dark:border-gray-800 shadow-sm p-8 text-center">
+            <div className="w-16 h-16 mx-auto rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-4">
+              <AlertCircle className="h-8 w-8 text-red-600 dark:text-red-400" />
             </div>
-          </div>
+            <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-white">
+              Hata Oluştu
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">{error || 'Eğitim bulunamadı'}</p>
+            <Button
+              onClick={() => router.push('/company-dashboard/trainings')}
+              variant="outline"
+              className="shadow-sm"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Eğitimlere Dön
+            </Button>
+          </Card>
         </div>
       </div>
     );
@@ -407,17 +402,24 @@ export default function CompanyTrainingDetailPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto p-4 md:p-6 space-y-6">
         {/* Header */}
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => router.back()}>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => router.back()}
+            className="hover:bg-gray-100 dark:hover:bg-gray-800"
+          >
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-2">
               <GraduationCap className="h-6 w-6 text-primary" />
-              <h1 className="text-2xl md:text-3xl font-bold">{training.name}</h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
+                {training.name}
+              </h1>
             </div>
             <div className="flex items-center gap-2 flex-wrap">
               <Badge className={statusColors[training.status]}>
@@ -443,9 +445,9 @@ export default function CompanyTrainingDetailPage() {
 
         {/* Overall Progress */}
         {progress && (
-          <Card className="bg-gradient-to-r from-primary/10 to-secondary/10 border-primary/20">
+          <Card className="border border-gray-200 dark:border-gray-800 shadow-sm">
             <CardHeader>
-              <CardTitle className="flex items-center justify-between">
+              <CardTitle className="flex items-center justify-between text-gray-900 dark:text-white">
                 <span>Genel İlerleme</span>
                 <span className="text-2xl font-bold">{Math.round(progress.overallProgress)}%</span>
               </CardTitle>
@@ -458,186 +460,242 @@ export default function CompanyTrainingDetailPage() {
 
         {/* Description */}
         {training.description && (
-          <Card>
+          <Card className="border border-gray-200 dark:border-gray-800 shadow-sm">
             <CardHeader>
-              <CardTitle>Açıklama</CardTitle>
+              <CardTitle className="text-gray-900 dark:text-white">Açıklama</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground whitespace-pre-wrap">{training.description}</p>
+              <p className="text-gray-600 dark:text-gray-400 whitespace-pre-wrap">
+                {training.description}
+              </p>
             </CardContent>
           </Card>
         )}
 
         {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="overview">Genel Bakış</TabsTrigger>
-            <TabsTrigger value="videos">
-              <Video className="mr-2 h-4 w-4" />
-              Videolar ({videos.length})
-            </TabsTrigger>
-            <TabsTrigger value="documents">
-              <FileText className="mr-2 h-4 w-4" />
-              Dökümanlar ({documents.length})
-            </TabsTrigger>
-          </TabsList>
+        <Card className="border border-gray-200 dark:border-gray-800 shadow-sm">
+          <CardHeader className="border-b border-gray-200 dark:border-gray-800">
+            <Tabs
+              value={activeTab}
+              onValueChange={(v) => setActiveTab(v as any)}
+              className="w-full"
+            >
+              <TabsList className="bg-white dark:bg-gray-900">
+                <TabsTrigger
+                  value="overview"
+                  className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary"
+                >
+                  Genel Bakış
+                </TabsTrigger>
+                <TabsTrigger
+                  value="videos"
+                  className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary"
+                >
+                  <Video className="mr-2 h-4 w-4" />
+                  Videolar ({videos.length})
+                </TabsTrigger>
+                <TabsTrigger
+                  value="documents"
+                  className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary"
+                >
+                  <FileText className="mr-2 h-4 w-4" />
+                  Dökümanlar ({documents.length})
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </CardHeader>
+          <CardContent className="p-0">
+            <Tabs
+              value={activeTab}
+              onValueChange={(v) => setActiveTab(v as any)}
+              className="w-full"
+            >
+              <TabsContent value="overview" className="mt-0 p-6 space-y-4">
+                <Card className="border border-gray-200 dark:border-gray-800 shadow-sm">
+                  <CardHeader>
+                    <CardTitle className="text-gray-900 dark:text-white">
+                      Eğitim Bilgileri
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
+                          Durum
+                        </p>
+                        <Badge className={statusColors[training.status]}>
+                          {statusLabels[training.status]}
+                        </Badge>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
+                          Tip
+                        </p>
+                        <p className="text-sm text-gray-900 dark:text-white">
+                          {training.isGlobal ? 'Global Eğitim' : 'Program Bazlı Eğitim'}
+                        </p>
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
+                        Oluşturulma
+                      </p>
+                      <p className="text-sm text-gray-900 dark:text-white">
+                        {new Date(training.createdAt).toLocaleDateString('tr-TR', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                        })}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
 
-          <TabsContent value="overview" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Eğitim Bilgileri</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground mb-1">Durum</p>
-                    <Badge className={statusColors[training.status]}>
-                      {statusLabels[training.status]}
-                    </Badge>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground mb-1">Tip</p>
-                    <p className="text-sm">
-                      {training.isGlobal ? 'Global Eğitim' : 'Program Bazlı Eğitim'}
-                    </p>
-                  </div>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground mb-1">Oluşturulma</p>
-                  <p className="text-sm">
-                    {new Date(training.createdAt).toLocaleDateString('tr-TR', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Video className="h-5 w-5" />
-                    Videolar
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-2xl font-bold">{videos.length}</p>
-                  <p className="text-sm text-muted-foreground">Toplam video sayısı</p>
-                  {progress && (
-                    <div className="mt-4">
-                      <p className="text-sm text-muted-foreground mb-1">
-                        Tamamlanan: {progress.videos.filter((v) => v.progress >= 100).length} /{' '}
+                  <Card className="border border-gray-200 dark:border-gray-800 shadow-sm">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
+                        <Video className="h-5 w-5" />
+                        Videolar
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-white">
                         {videos.length}
                       </p>
-                      <TrainingProgressBar
-                        progress={
-                          videos.length > 0
-                            ? (progress.videos.filter((v) => v.progress >= 100).length /
-                                videos.length) *
-                              100
-                            : 0
-                        }
-                        size="sm"
-                      />
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        Toplam video sayısı
+                      </p>
+                      {progress && (
+                        <div className="mt-4">
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                            Tamamlanan: {progress.videos.filter((v) => v.progress >= 100).length} /{' '}
+                            {videos.length}
+                          </p>
+                          <TrainingProgressBar
+                            progress={
+                              videos.length > 0
+                                ? (progress.videos.filter((v) => v.progress >= 100).length /
+                                    videos.length) *
+                                  100
+                                : 0
+                            }
+                            size="sm"
+                          />
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <FileText className="h-5 w-5" />
-                    Dökümanlar
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-2xl font-bold">{documents.length}</p>
-                  <p className="text-sm text-muted-foreground">Toplam döküman sayısı</p>
-                  {progress && (
-                    <div className="mt-4">
-                      <p className="text-sm text-muted-foreground mb-1">
-                        Tamamlanan: {progress.documents.filter((d) => d.progress >= 100).length} /{' '}
+                  <Card className="border border-gray-200 dark:border-gray-800 shadow-sm">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
+                        <FileText className="h-5 w-5" />
+                        Dökümanlar
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-white">
                         {documents.length}
                       </p>
-                      <TrainingProgressBar
-                        progress={
-                          documents.length > 0
-                            ? (progress.documents.filter((d) => d.progress >= 100).length /
-                                documents.length) *
-                              100
-                            : 0
-                        }
-                        size="sm"
-                      />
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        Toplam döküman sayısı
+                      </p>
+                      {progress && (
+                        <div className="mt-4">
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                            Tamamlanan: {progress.documents.filter((d) => d.progress >= 100).length}{' '}
+                            / {documents.length}
+                          </p>
+                          <TrainingProgressBar
+                            progress={
+                              documents.length > 0
+                                ? (progress.documents.filter((d) => d.progress >= 100).length /
+                                    documents.length) *
+                                  100
+                                : 0
+                            }
+                            size="sm"
+                          />
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
 
-          <TabsContent value="videos" className="space-y-4">
-            {videos.length === 0 ? (
-              <Card>
-                <CardContent className="py-12 text-center">
-                  <Video className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">Video Bulunamadı</h3>
-                  <p className="text-muted-foreground">Bu eğitime henüz video eklenmemiş.</p>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="space-y-4">
-                {videos.map((video, index) => {
-                  const videoProgress = getVideoProgress(video.id);
-                  return (
-                    <TrainingVideoPlayer
-                      key={video.id}
-                      video={video}
-                      isLocked={videoProgress?.isLocked || false}
-                      progress={videoProgress?.progress || 0}
-                      watchedAt={videoProgress?.watchedAt || null}
-                      onWatchComplete={handleVideoWatchComplete}
-                      className="w-full"
-                    />
-                  );
-                })}
-              </div>
-            )}
-          </TabsContent>
+              <TabsContent value="videos" className="mt-0 p-6 space-y-4">
+                {videos.length === 0 ? (
+                  <Card className="border border-gray-200 dark:border-gray-800 shadow-sm">
+                    <CardContent className="py-12 text-center">
+                      <div className="w-12 h-12 mx-auto rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4">
+                        <Video className="h-6 w-6 text-gray-400 dark:text-gray-500" />
+                      </div>
+                      <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-white">
+                        Video Bulunamadı
+                      </h3>
+                      <p className="text-gray-600 dark:text-gray-400">
+                        Bu eğitime henüz video eklenmemiş.
+                      </p>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <div className="space-y-4">
+                    {videos.map((video) => {
+                      const videoProgress = getVideoProgress(video.id);
+                      return (
+                        <TrainingVideoPlayer
+                          key={video.id}
+                          video={video}
+                          isLocked={videoProgress?.isLocked || false}
+                          progress={videoProgress?.progress || 0}
+                          watchedAt={videoProgress?.watchedAt || null}
+                          onWatchComplete={handleVideoWatchComplete}
+                          className="w-full"
+                        />
+                      );
+                    })}
+                  </div>
+                )}
+              </TabsContent>
 
-          <TabsContent value="documents" className="space-y-4">
-            {documents.length === 0 ? (
-              <Card>
-                <CardContent className="py-12 text-center">
-                  <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">Döküman Bulunamadı</h3>
-                  <p className="text-muted-foreground">Bu eğitime henüz döküman eklenmemiş.</p>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="space-y-4">
-                {documents.map((document, index) => {
-                  const documentProgress = getDocumentProgress(document.id);
-                  return (
-                    <TrainingDocumentViewer
-                      key={document.id}
-                      document={document}
-                      isLocked={documentProgress?.isLocked || false}
-                      progress={documentProgress?.progress || 0}
-                      readAt={documentProgress?.readAt || null}
-                      onReadComplete={handleDocumentReadComplete}
-                      className="w-full"
-                    />
-                  );
-                })}
-              </div>
-            )}
-          </TabsContent>
-        </Tabs>
+              <TabsContent value="documents" className="mt-0 p-6 space-y-4">
+                {documents.length === 0 ? (
+                  <Card className="border border-gray-200 dark:border-gray-800 shadow-sm">
+                    <CardContent className="py-12 text-center">
+                      <div className="w-12 h-12 mx-auto rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4">
+                        <FileText className="h-6 w-6 text-gray-400 dark:text-gray-500" />
+                      </div>
+                      <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-white">
+                        Döküman Bulunamadı
+                      </h3>
+                      <p className="text-gray-600 dark:text-gray-400">
+                        Bu eğitime henüz döküman eklenmemiş.
+                      </p>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <div className="space-y-4">
+                    {documents.map((document) => {
+                      const documentProgress = getDocumentProgress(document.id);
+                      return (
+                        <TrainingDocumentViewer
+                          key={document.id}
+                          document={document}
+                          isLocked={documentProgress?.isLocked || false}
+                          progress={documentProgress?.progress || 0}
+                          readAt={documentProgress?.readAt || null}
+                          onReadComplete={handleDocumentReadComplete}
+                          className="w-full"
+                        />
+                      );
+                    })}
+                  </div>
+                )}
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

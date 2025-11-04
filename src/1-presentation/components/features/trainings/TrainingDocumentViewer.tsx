@@ -7,13 +7,14 @@
  */
 
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/presentation/components/ui/atoms/card';
 import { Badge } from '@/presentation/components/ui/atoms/badge';
 import { Button } from '@/presentation/components/ui/atoms/button';
 import { Lock, FileText, Download, CheckCircle2, Eye } from 'lucide-react';
 import type { TrainingDocument } from '@/domain/entities/TrainingDocument';
 import { cn } from '@/presentation/lib/utils';
+import { DocumentViewerService } from '@/infrastructure/external/document-viewer.service';
 
 export interface TrainingDocumentViewerProps {
   document: TrainingDocument;
@@ -34,11 +35,6 @@ export function TrainingDocumentViewer({
 }: TrainingDocumentViewerProps) {
   const [currentProgress, setCurrentProgress] = useState(progress);
 
-  const getFileExtension = (fileName: string): string => {
-    const parts = fileName.split('.');
-    return parts.length > 1 ? parts.pop()!.toLowerCase() : '';
-  };
-
   const formatFileSize = (bytes: number | null): string => {
     if (!bytes) return 'Boyut bilinmiyor';
     const mb = bytes / (1024 * 1024);
@@ -49,16 +45,20 @@ export function TrainingDocumentViewer({
     return `${kb.toFixed(2)} KB`;
   };
 
-  const getFileTypeLabel = (fileType: string | null, fileName: string): string => {
-    if (fileType) {
-      if (fileType.includes('pdf')) return 'PDF';
-      if (fileType.includes('word')) return 'Word';
-      if (fileType.includes('excel') || fileType.includes('spreadsheet')) return 'Excel';
-      if (fileType.includes('image')) return 'Resim';
-    }
-    const ext = getFileExtension(fileName).toUpperCase();
-    return ext || 'Dosya';
-  };
+  // Get viewer configuration using DocumentViewerService
+  const viewerConfig = useMemo(() => {
+    return DocumentViewerService.getViewer({
+      fileUrl: document.fileUrl,
+      fileType: document.fileType,
+      fileName: document.fileName,
+      fileSize: document.fileSize,
+    });
+  }, [document.fileUrl, document.fileType, document.fileName, document.fileSize]);
+
+  const fileTypeLabel = DocumentViewerService.getFileTypeLabel(
+    document.fileType,
+    document.fileName
+  );
 
   const handleDownload = () => {
     window.open(document.fileUrl, '_blank');
@@ -66,7 +66,6 @@ export function TrainingDocumentViewer({
 
   const handleView = () => {
     if (isLocked) return;
-    setIsViewing(true);
     window.open(document.fileUrl, '_blank');
     // Simulate reading progress
     setTimeout(() => {
@@ -85,9 +84,6 @@ export function TrainingDocumentViewer({
     }
   };
 
-  const ext = getFileExtension(document.fileName);
-  const isPdf = ext === 'pdf';
-
   return (
     <Card className={cn('w-full', className)}>
       <CardHeader>
@@ -98,7 +94,7 @@ export function TrainingDocumentViewer({
               <p className="text-sm text-muted-foreground line-clamp-2">{document.description}</p>
             )}
           </div>
-          <div className="flex flex-col items-end gap-2 flex-shrink-0">
+          <div className="flex flex-col items-end gap-2 shrink-0">
             {isLocked && (
               <Badge variant="outline" className="border-yellow-500/20 text-yellow-600">
                 <Lock className="h-3 w-3 mr-1" />
@@ -111,9 +107,7 @@ export function TrainingDocumentViewer({
                 Okundu
               </Badge>
             )}
-            <Badge variant="outline">
-              {getFileTypeLabel(document.fileType, document.fileName)}
-            </Badge>
+            <Badge variant="outline">{fileTypeLabel}</Badge>
           </div>
         </div>
       </CardHeader>
@@ -137,21 +131,24 @@ export function TrainingDocumentViewer({
           </div>
         ) : (
           <div className="space-y-3">
-            {isPdf ? (
+            {viewerConfig.canPreview && viewerConfig.viewerUrl ? (
               <div className="aspect-video bg-secondary rounded-lg overflow-hidden border">
                 <iframe
-                  src={`${document.fileUrl}#toolbar=1`}
+                  src={viewerConfig.viewerUrl}
                   title={document.title}
                   className="w-full h-full"
+                  allow="fullscreen"
                 />
               </div>
             ) : (
               <div className="aspect-video bg-secondary rounded-lg flex items-center justify-center border-2 border-dashed">
                 <div className="text-center space-y-2">
                   <FileText className="h-12 w-12 mx-auto text-muted-foreground" />
-                  <p className="text-sm font-medium text-muted-foreground">Önizleme mevcut değil</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    {viewerConfig.message || 'Önizleme mevcut değil'}
+                  </p>
                   <p className="text-xs text-muted-foreground">
-                    Bu dosya tipi için önizleme desteklenmiyor
+                    Bu dosya tipi için önizleme desteklenmiyor. Lütfen indirerek görüntüleyin.
                   </p>
                 </div>
               </div>

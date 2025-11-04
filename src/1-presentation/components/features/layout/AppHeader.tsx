@@ -32,25 +32,27 @@ export function AppHeader({ showBreadcrumbs = true, showNotifications = true }: 
   const [notificationCount] = React.useState(3); // TODO: Connect to real notification system
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm">
       <div className="flex h-14 items-center px-4 gap-4">
         {/* Mobile Menu Button */}
         <Button
           variant="ghost"
           size="icon"
           onClick={toggleMobileSidebar}
-          className="md:hidden"
+          className="md:hidden h-9 w-9 rounded-lg transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-800"
           title="Menüyü Aç"
         >
-          <Menu className="h-5 w-5" />
+          <Menu className="h-5 w-5 text-gray-600 dark:text-gray-400" />
         </Button>
 
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 font-semibold">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+        <Link href="/" className="flex items-center gap-2 font-semibold group transition-colors">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-white">
             <span className="text-lg font-bold">AP</span>
           </div>
-          <span className="hidden sm:inline-block">Akademi Port</span>
+          <span className="hidden sm:inline-block text-gray-900 dark:text-white font-bold">
+            AKADEMİ PORT
+          </span>
         </Link>
 
         {/* Breadcrumbs */}
@@ -69,7 +71,7 @@ export function AppHeader({ showBreadcrumbs = true, showNotifications = true }: 
           <Button
             variant="ghost"
             size="icon"
-            className="hidden md:flex"
+            className="hidden md:flex h-9 w-9 rounded-lg transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-800"
             title="Ara (Cmd+K)"
             onClick={() => {
               // Will be connected to Command Palette
@@ -81,13 +83,18 @@ export function AppHeader({ showBreadcrumbs = true, showNotifications = true }: 
               document.dispatchEvent(event);
             }}
           >
-            <Search className="h-5 w-5" />
+            <Search className="h-5 w-5 text-gray-600 dark:text-gray-400" />
           </Button>
 
           {/* Notifications */}
           {showNotifications && (
-            <Button variant="ghost" size="icon" className="relative" title="Bildirimler">
-              <Bell className="h-5 w-5" />
+            <Button
+              variant="ghost"
+              size="icon"
+              className="relative h-9 w-9 rounded-lg transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+              title="Bildirimler"
+            >
+              <Bell className="h-5 w-5 text-gray-600 dark:text-gray-400" />
               {notificationCount > 0 && (
                 <Badge
                   variant="destructive"
@@ -104,10 +111,11 @@ export function AppHeader({ showBreadcrumbs = true, showNotifications = true }: 
             variant="ghost"
             size="icon"
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            className="h-9 w-9 rounded-lg transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-800"
             title={theme === 'dark' ? 'Açık Tema' : 'Koyu Tema'}
           >
-            <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-            <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+            <Sun className="h-5 w-5 text-gray-600 dark:text-gray-400 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+            <Moon className="absolute h-5 w-5 text-gray-600 dark:text-gray-400 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
             <span className="sr-only">Toggle theme</span>
           </Button>
 

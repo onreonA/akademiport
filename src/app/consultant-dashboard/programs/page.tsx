@@ -9,31 +9,22 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { FolderKanban, MapPin, Building2, Calendar } from 'lucide-react';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/presentation/components/ui/atoms/card';
-import { Badge } from '@/presentation/components/ui/atoms/badge';
+import { FolderKanban, AlertCircle } from 'lucide-react';
 import { Button } from '@/presentation/components/ui/atoms/button';
-import { Skeleton } from '@/presentation/components/ui/atoms/skeleton';
+import { ProgramCard } from '@/presentation/components/features/programs/ProgramCard';
 import {
   ConsultantProgramProvider,
   useConsultantProgram,
 } from '@/shared/contexts/ConsultantProgramContext';
 import type { ConsultantProgramWithStats } from '@/application/dto/consultant';
-import { ProgramStatus } from '@/domain/enums/ProgramStatus';
+import type { Program } from '@/domain/entities/Program';
 
 // =====================================================
 // INNER COMPONENT
 // =====================================================
 function ConsultantProgramsContent() {
   const router = useRouter();
-  const { programs, setPrograms, setSelectedProgram, isLoading, setIsLoading } =
-    useConsultantProgram();
+  const { setPrograms, setSelectedProgram, isLoading, setIsLoading } = useConsultantProgram();
   const [allPrograms, setAllPrograms] = useState<ConsultantProgramWithStats[]>([]);
 
   useEffect(() => {
@@ -57,65 +48,31 @@ function ConsultantProgramsContent() {
     }
   };
 
-  const handleProgramClick = (item: ConsultantProgramWithStats) => {
-    setSelectedProgram(item.program);
-    router.push('/consultant-dashboard');
-  };
-
-  const getStatusLabel = (status: ProgramStatus): string => {
-    const labels: Record<ProgramStatus, string> = {
-      [ProgramStatus.ACTIVE]: 'Aktif',
-      [ProgramStatus.PLANNED]: 'Planlandı',
-      [ProgramStatus.COMPLETED]: 'Tamamlandı',
-      [ProgramStatus.CANCELLED]: 'İptal',
-    };
-    return labels[status];
-  };
-
-  const getStatusVariant = (status: ProgramStatus) => {
-    switch (status) {
-      case ProgramStatus.ACTIVE:
-        return 'default';
-      case ProgramStatus.PLANNED:
-        return 'secondary';
-      case ProgramStatus.COMPLETED:
-        return 'outline';
-      case ProgramStatus.CANCELLED:
-        return 'destructive';
-      default:
-        return 'outline';
+  const handleProgramClick = (program: Program) => {
+    const item = allPrograms.find((p) => p.program.id === program.id);
+    if (item) {
+      setSelectedProgram(item.program);
+      router.push('/consultant-dashboard');
     }
   };
 
-  const formatDate = (date: Date): string => {
-    return new Date(date).toLocaleDateString('tr-TR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
+  const handleDetailClick = (program: Program) => {
+    // Navigate to consultant program detail page
+    router.push(`/consultant-dashboard/programs/${program.id}`);
   };
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Programlarım</h1>
-          <p className="text-muted-foreground mt-2">Atandığınız programların listesi</p>
-        </div>
-
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {[...Array(6)].map((_, i) => (
-            <Card key={i}>
-              <CardHeader>
-                <Skeleton className="h-6 w-3/4 mb-2" />
-                <Skeleton className="h-4 w-1/2" />
-              </CardHeader>
-              <CardContent>
-                <Skeleton className="h-4 w-full mb-2" />
-                <Skeleton className="h-4 w-2/3" />
-              </CardContent>
-            </Card>
-          ))}
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="max-w-7xl mx-auto p-4 md:p-6 space-y-6 md:space-y-8">
+          <div className="flex items-center justify-center py-16">
+            <div className="text-center space-y-4">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+              <div className="text-lg text-gray-600 dark:text-gray-400">
+                Programlar yükleniyor...
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -123,98 +80,64 @@ function ConsultantProgramsContent() {
 
   if (allPrograms.length === 0) {
     return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Programlarım</h1>
-          <p className="text-muted-foreground mt-2">Atandığınız programların listesi</p>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="max-w-7xl mx-auto p-4 md:p-6 space-y-6 md:space-y-8">
+          <div className="text-center py-16">
+            <div className="w-20 h-20 mx-auto rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-6">
+              <FolderKanban className="h-10 w-10 text-gray-400 dark:text-gray-500" />
+            </div>
+            <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">
+              Henüz Programa Atanmadınız
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
+              Sistem yöneticisi tarafından bir programa atandığınızda burada görünecektir.
+            </p>
+          </div>
         </div>
-
-        <Card className="p-12 text-center">
-          <FolderKanban className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-          <h3 className="text-lg font-semibold mb-2">Henüz Programa Atanmadınız</h3>
-          <p className="text-muted-foreground">
-            Sistem yöneticisi tarafından bir programa atandığınızda burada görünecektir.
-          </p>
-        </Card>
       </div>
     );
   }
 
+  // Convert ConsultantProgramWithStats to Program for ProgramCard
+  const programList: Program[] = allPrograms.map((item) => ({
+    ...item.program,
+    // ProgramCard expects specific fields
+    currentCompanies: item.companiesCount,
+    maxCompanies: item.program.maxCompanies || item.companiesCount || 0,
+  }));
+
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Programlarım</h1>
-        <p className="text-muted-foreground mt-2">Toplam {allPrograms.length} programa atandınız</p>
-      </div>
-
-      {/* Programs Grid */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {allPrograms.map((item) => (
-          <Card
-            key={item.program.id}
-            className="hover:shadow-lg transition-shadow cursor-pointer"
-            onClick={() => handleProgramClick(item)}
-          >
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <CardTitle className="text-lg">{item.program.name}</CardTitle>
-                  {item.program.city && (
-                    <CardDescription className="flex items-center gap-1 mt-1">
-                      <MapPin className="h-3 w-3" />
-                      {item.program.city}
-                    </CardDescription>
-                  )}
-                </div>
-                <Badge variant={getStatusVariant(item.program.status)}>
-                  {getStatusLabel(item.program.status)}
-                </Badge>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="max-w-7xl mx-auto p-4 md:p-6 space-y-6 md:space-y-8">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="space-y-1 w-full sm:w-auto">
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">
+              Programlarım
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base lg:text-lg">
+              Atandığınız e-ihracat dönüşüm programları
+            </p>
+            <div className="flex items-center gap-4 mt-2">
+              <div className="text-xs md:text-sm text-gray-600 dark:text-gray-400">
+                {allPrograms.length} program
               </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Description */}
-              {item.program.description && (
-                <p className="text-sm text-muted-foreground line-clamp-2">
-                  {item.program.description}
-                </p>
-              )}
+            </div>
+          </div>
+        </div>
 
-              {/* Stats */}
-              <div className="flex items-center gap-4 text-sm">
-                <div className="flex items-center gap-1">
-                  <Building2 className="h-4 w-4 text-muted-foreground" />
-                  <span className="font-medium">{item.companiesCount}</span>
-                  <span className="text-muted-foreground">firma</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <span className="font-medium text-green-600">{item.activeCompaniesCount}</span>
-                  <span className="text-muted-foreground">aktif</span>
-                </div>
-              </div>
-
-              {/* Dates */}
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <Calendar className="h-3 w-3" />
-                <span>
-                  {formatDate(item.program.startDate)} - {formatDate(item.program.endDate)}
-                </span>
-              </div>
-
-              {/* Action Button */}
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleProgramClick(item);
-                }}
-              >
-                Firmaları Görüntüle
-              </Button>
-            </CardContent>
-          </Card>
-        ))}
+        {/* Programs Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {programList.map((program) => (
+            <ProgramCard
+              key={program.id}
+              program={program}
+              onDetail={handleDetailClick}
+              showEdit={false}
+              showDelete={false}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );

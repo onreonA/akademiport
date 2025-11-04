@@ -1,6 +1,6 @@
 /**
  * Sidebar Menu Item Component
- * Individual menu item with icon, label, badge, and sub-menu support
+ * Modern menu item with glassmorphism, gradients, and smooth animations
  */
 
 'use client';
@@ -8,6 +8,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { cn } from '@/presentation/lib/utils';
 import { Badge } from '@/presentation/components/ui/atoms/badge';
@@ -47,17 +48,50 @@ export function SidebarMenuItem({ item }: SidebarMenuItemProps) {
         href={item.href}
         onClick={handleClick}
         className={cn(
-          'group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all hover:bg-accent',
-          isActive && 'bg-accent text-accent-foreground',
-          isCollapsed && 'justify-center px-2'
+          'group relative flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-medium',
+          'transition-all duration-200',
+          isActive
+            ? 'bg-primary/10 text-primary dark:bg-primary/20'
+            : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300',
+          isCollapsed && 'justify-center px-3'
         )}
         title={isCollapsed ? item.label : undefined}
       >
-        <Icon className={cn('h-5 w-5 shrink-0', isActive && 'text-primary')} />
+        {/* Active Indicator */}
+        {isActive && (
+          <motion.div
+            layoutId="activeIndicator"
+            className="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full bg-primary"
+            transition={{
+              type: 'spring',
+              stiffness: 500,
+              damping: 30,
+            }}
+          />
+        )}
+
+        {/* Icon */}
+        <div>
+          <Icon
+            className={cn(
+              'h-5 w-5 shrink-0 transition-colors duration-200',
+              isActive
+                ? 'text-primary'
+                : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300'
+            )}
+          />
+        </div>
 
         {!isCollapsed && (
           <>
-            <span className="flex-1">{item.label}</span>
+            <span
+              className={cn(
+                'flex-1 transition-colors duration-200',
+                isActive ? 'font-semibold tracking-wide' : 'font-medium'
+              )}
+            >
+              {item.label}
+            </span>
 
             {item.badge && (
               <Badge variant="secondary" className="text-xs">
@@ -66,43 +100,69 @@ export function SidebarMenuItem({ item }: SidebarMenuItemProps) {
             )}
 
             {hasChildren && (
-              <div className="ml-auto">
-                {isExpanded ? (
-                  <ChevronDown className="h-4 w-4" />
-                ) : (
-                  <ChevronRight className="h-4 w-4" />
-                )}
-              </div>
+              <motion.div
+                animate={{ rotate: isExpanded ? 90 : 0 }}
+                transition={{ duration: 0.2 }}
+                className="ml-auto"
+              >
+                <ChevronRight className="h-4 w-4 text-gray-400 dark:text-gray-500 transition-colors" />
+              </motion.div>
             )}
           </>
         )}
       </Link>
 
       {/* Sub-menu */}
-      {hasChildren && !isCollapsed && isExpanded && (
-        <div className="ml-8 mt-1 space-y-1">
-          {item.children!.map((child) => {
-            const isChildActive = pathname === child.href;
-            return (
-              <Link
-                key={child.id}
-                href={child.href}
-                className={cn(
-                  'block rounded-md px-3 py-2 text-sm transition-all hover:bg-accent',
-                  isChildActive && 'bg-accent font-medium text-accent-foreground'
-                )}
-              >
-                {child.label}
-                {child.badge && (
-                  <Badge variant="outline" className="ml-2 text-xs">
-                    {child.badge}
-                  </Badge>
-                )}
-              </Link>
-            );
-          })}
-        </div>
-      )}
+      <AnimatePresence>
+        {hasChildren && !isCollapsed && isExpanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2, ease: 'easeInOut' }}
+            className="ml-8 mt-1 space-y-1 overflow-hidden"
+          >
+            {item.children!.map((child, index) => {
+              const isChildActive = pathname === child.href;
+              return (
+                <motion.div
+                  key={child.id}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                >
+                  <Link
+                    href={child.href}
+                    className={cn(
+                      'group/sub flex items-center justify-between rounded-lg px-3 py-2 text-sm',
+                      'transition-all duration-200',
+                      isChildActive
+                        ? 'bg-primary/10 text-primary dark:bg-primary/20 font-medium'
+                        : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400'
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        'transition-colors',
+                        isChildActive
+                          ? 'text-primary font-medium'
+                          : 'group-hover/sub:text-gray-900 dark:group-hover/sub:text-white'
+                      )}
+                    >
+                      {child.label}
+                    </span>
+                    {child.badge && (
+                      <Badge variant="outline" className="ml-2 text-xs">
+                        {child.badge}
+                      </Badge>
+                    )}
+                  </Link>
+                </motion.div>
+              );
+            })}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

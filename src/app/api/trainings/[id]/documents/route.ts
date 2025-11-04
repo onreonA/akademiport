@@ -61,6 +61,17 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const { id } = await params;
     const body = await request.json();
 
+    console.log('🔍 POST /api/trainings/[id]/documents:', {
+      trainingId: id,
+      body: {
+        title: body.title,
+        fileName: body.fileName,
+        fileUrl: body.fileUrl,
+        orderIndex: body.orderIndex,
+        isLocked: body.isLocked,
+      },
+    });
+
     const createDocumentUseCase = new CreateTrainingDocumentUseCase(
       trainingDocumentRepository,
       trainingRepository
@@ -78,15 +89,26 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     });
 
     if (result.isFailure) {
+      console.error('❌ CreateTrainingDocumentUseCase failed:', {
+        error: result.error.message,
+        statusCode: result.error.statusCode,
+      });
       return NextResponse.json(
         { error: result.error.message },
         { status: result.error.statusCode }
       );
     }
 
+    console.log('✅ CreateTrainingDocumentUseCase success:', result.value);
     return NextResponse.json(result.value, { status: 201 });
   } catch (error) {
-    console.error('Error in POST /api/trainings/[id]/documents:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error('❌ Error in POST /api/trainings/[id]/documents:', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+    });
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Internal server error' },
+      { status: 500 }
+    );
   }
 }

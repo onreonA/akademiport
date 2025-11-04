@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
     const uint8Array = new Uint8Array(arrayBuffer);
 
     // Upload to Supabase Storage
-    const { data, error } = await supabase.storage.from(bucket).upload(filePath, uint8Array, {
+    const { error } = await supabase.storage.from(bucket).upload(filePath, uint8Array, {
       contentType: file.type,
       upsert: false,
     });

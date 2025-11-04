@@ -2,8 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Building2, Loader2 } from 'lucide-react';
-import { GradientHeader } from '@/presentation/components/ui/molecules/gradient-header';
+import { Building2, Loader2, ArrowLeft } from 'lucide-react';
 import { EnhancedCard } from '@/presentation/components/ui/atoms/enhanced-card';
 import { Button } from '@/presentation/components/ui/atoms/button';
 import { Input } from '@/presentation/components/ui/atoms/input';
@@ -60,21 +59,37 @@ export default function NewProjectTemplatePage() {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-background via-background to-primary/5 p-4 md:p-6">
-      <div className="mx-auto max-w-4xl space-y-6">
-        <GradientHeader
-          icon={Building2}
-          title="Yeni Proje Şablonu"
-          subtitle="Yeniden kullanılabilir bir proje şablonu oluşturun"
-          progress={0}
-        />
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="container mx-auto py-8 px-4 space-y-6 max-w-4xl">
+        {/* Header */}
+        <div className="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => router.back()}
+            className="hover:bg-gray-100 dark:hover:bg-gray-800"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <div className="space-y-1">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              Yeni Proje Şablonu Oluştur
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400">
+              Yeniden kullanılabilir bir proje şablonu oluşturun
+            </p>
+          </div>
+        </div>
 
-        <EnhancedCard variant="glass" className="p-6">
+        <EnhancedCard
+          variant="default"
+          className="p-6 border border-gray-200 dark:border-gray-800 shadow-sm"
+        >
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Name */}
             <div className="space-y-2">
-              <Label htmlFor="name">
-                Şablon Adı <span className="text-destructive">*</span>
+              <Label htmlFor="name" className="text-gray-700 dark:text-gray-300">
+                Şablon Adı <span className="text-red-600 dark:text-red-400">*</span>
               </Label>
               <Input
                 id="name"
@@ -87,7 +102,9 @@ export default function NewProjectTemplatePage() {
 
             {/* Description */}
             <div className="space-y-2">
-              <Label htmlFor="description">Açıklama</Label>
+              <Label htmlFor="description" className="text-gray-700 dark:text-gray-300">
+                Açıklama
+              </Label>
               <Textarea
                 id="description"
                 value={formData.description}
@@ -99,7 +116,9 @@ export default function NewProjectTemplatePage() {
 
             {/* Status */}
             <div className="space-y-2">
-              <Label htmlFor="status">Varsayılan Durum</Label>
+              <Label htmlFor="status" className="text-gray-700 dark:text-gray-300">
+                Varsayılan Durum
+              </Label>
               <Select
                 value={formData.status}
                 onValueChange={(value: ProjectStatus) =>
@@ -121,7 +140,9 @@ export default function NewProjectTemplatePage() {
 
             {/* Priority */}
             <div className="space-y-2">
-              <Label htmlFor="priority">Varsayılan Öncelik</Label>
+              <Label htmlFor="priority" className="text-gray-700 dark:text-gray-300">
+                Varsayılan Öncelik
+              </Label>
               <Select
                 value={formData.priority}
                 onValueChange={(value: ProjectPriority) =>
@@ -141,20 +162,19 @@ export default function NewProjectTemplatePage() {
             </div>
 
             {/* Actions */}
-            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+            <div className="flex flex-col-reverse gap-3 pt-4 border-t border-gray-200 dark:border-gray-800 sm:flex-row sm:justify-end">
               <Button
                 type="button"
-                variant="outline"
                 onClick={() => router.back()}
                 disabled={loading}
-                className="w-full sm:w-auto"
+                className="w-full sm:w-auto bg-gray-50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600 shadow-none transition-colors"
               >
                 İptal
               </Button>
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full sm:w-auto bg-linear-to-r from-primary to-secondary hover:opacity-90"
+                className="w-full sm:w-auto bg-primary text-white hover:bg-primary/90 shadow-sm transition-colors"
               >
                 {loading ? (
                   <>
@@ -170,10 +190,13 @@ export default function NewProjectTemplatePage() {
         </EnhancedCard>
 
         {/* Info Card */}
-        <EnhancedCard variant="default" className="border-l-4 border-l-primary p-4">
+        <EnhancedCard
+          variant="default"
+          className="border-l-4 border-l-primary p-4 border border-gray-200 dark:border-gray-800 shadow-sm"
+        >
           <div className="space-y-2">
             <h3 className="font-semibold text-primary">💡 Bilgi</h3>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
               Şablon oluşturduktan sonra, alt projeler ve görevler ekleyerek detaylandırabilirsiniz.
               Bu şablon, yeni firmalar için proje oluştururken kullanılabilir.
             </p>

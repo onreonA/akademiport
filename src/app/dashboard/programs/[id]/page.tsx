@@ -152,19 +152,35 @@ export default function ProgramDetailPage({ params }: { params: Promise<{ id: st
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Spinner size="lg" />
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="container mx-auto py-8 px-4">
+          <div className="flex items-center justify-center py-16">
+            <div className="text-center space-y-4">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+              <p className="text-lg text-gray-600 dark:text-gray-400">Yükleniyor...</p>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
 
   if (error || !program) {
     return (
-      <div className="container mx-auto py-8">
-        <div className="flex flex-col items-center justify-center py-12 space-y-4">
-          <AlertCircle className="h-12 w-12 text-destructive" />
-          <p className="text-lg font-medium">{error || 'Program bulunamadı'}</p>
-          <Button onClick={() => router.push('/dashboard/programs')}>Programlara Dön</Button>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="container mx-auto py-8 px-4">
+          <div className="flex flex-col items-center justify-center py-16 space-y-4">
+            <div className="w-16 h-16 mx-auto rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-6">
+              <AlertCircle className="h-8 w-8 text-red-600 dark:text-red-400" />
+            </div>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+              {error || 'Program Bulunamadı'}
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
+              {error || 'Program bilgileri yüklenemedi'}
+            </p>
+            <Button onClick={() => router.push('/dashboard/programs')}>Programlara Dön</Button>
+          </div>
         </div>
       </div>
     );
@@ -179,44 +195,54 @@ export default function ProgramDetailPage({ params }: { params: Promise<{ id: st
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
-      <div className="container mx-auto p-6 space-y-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="container mx-auto py-8 px-4 space-y-6 max-w-7xl">
         {/* Header */}
-        <div className="flex items-start justify-between">
-          <div className="flex items-start gap-4">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex items-start gap-4 flex-1 min-w-0">
             <Button
               variant="ghost"
               size="icon"
               onClick={() => router.back()}
-              className="hover:bg-primary/10 transition-colors mt-1"
+              className="hover:bg-gray-100 dark:hover:bg-gray-800 shrink-0"
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
-            <div className="space-y-2">
-              <div className="flex items-center gap-3">
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                  {program.name}
-                </h1>
-                <Badge className={statusColors[program.status]}>
+            <div className="space-y-2 flex-1 min-w-0">
+              <div className="flex items-center gap-3 flex-wrap">
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{program.name}</h1>
+                <Badge
+                  className={`${
+                    program.status === 'planned'
+                      ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800'
+                      : program.status === 'active'
+                        ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 border-green-200 dark:border-green-800'
+                        : program.status === 'completed'
+                          ? 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700'
+                          : program.status === 'paused'
+                            ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 border-orange-200 dark:border-orange-800'
+                            : 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800'
+                  } border font-medium px-2.5 py-1`}
+                >
                   {ProgramStatusLabels[program.status]}
                 </Badge>
               </div>
               {program.description && (
-                <p className="text-muted-foreground text-lg">{program.description}</p>
+                <p className="text-gray-600 dark:text-gray-400 text-base">{program.description}</p>
               )}
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             <Button
               variant="outline"
               size="sm"
               onClick={() => router.push(`/dashboard/programs/${id}/edit`)}
-              className="hover-lift"
+              className="shadow-sm"
             >
               <Edit className="mr-2 h-4 w-4" />
               Düzenle
             </Button>
-            <Button variant="destructive" size="sm" onClick={handleDelete} className="hover-lift">
+            <Button variant="destructive" size="sm" onClick={handleDelete} className="shadow-sm">
               <Trash2 className="mr-2 h-4 w-4" />
               Sil
             </Button>
@@ -261,10 +287,10 @@ export default function ProgramDetailPage({ params }: { params: Promise<{ id: st
         </div>
 
         {/* Tabs */}
-        <Card className="border-0 shadow-xl bg-card/50 backdrop-blur-sm">
+        <Card className="border border-gray-200 dark:border-gray-800 shadow-sm">
           <Tabs defaultValue="overview" className="space-y-6">
-            <CardHeader className="border-b border-border/50">
-              <TabsList className="bg-muted/50">
+            <CardHeader className="border-b border-gray-200 dark:border-gray-800">
+              <TabsList className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
                 <TabsTrigger value="overview" className="data-[state=active]:bg-primary/10">
                   <Briefcase className="w-4 h-4 mr-2" />
                   Genel Bakış

@@ -60,40 +60,37 @@ export default function NewCompanyPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
-      <div className="max-w-4xl mx-auto p-6 space-y-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="container mx-auto py-8 px-4 space-y-6 max-w-4xl">
         {/* Header */}
         <div className="flex items-center gap-4">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => router.back()}
-            className="hover:bg-primary/10 transition-colors"
+            className="hover:bg-gray-100 dark:hover:bg-gray-800"
           >
             <ArrowLeft className="w-4 h-4" />
           </Button>
           <div className="space-y-1">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-              Yeni Firma
-            </h1>
-            <p className="text-muted-foreground text-lg">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Yeni Firma Oluştur</h1>
+            <p className="text-gray-600 dark:text-gray-400">
               Yeni bir firma oluşturun ve sisteme ekleyin
             </p>
           </div>
         </div>
 
         {/* Form */}
-        <Card className="border-0 shadow-xl bg-card/50 backdrop-blur-sm">
-          <CardHeader className="border-b border-border/50">
-            <CardTitle className="flex items-center gap-2 text-xl">
-              <div className="p-2 rounded-lg bg-primary/10">
-                <Building2 className="h-5 w-5 text-primary" />
-              </div>
+        <Card className="border border-gray-200 dark:border-gray-800 shadow-sm">
+          <CardHeader className="border-b border-gray-200 dark:border-gray-800">
+            <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">
               Firma Bilgileri
             </CardTitle>
-            <p className="text-muted-foreground">Lütfen firma bilgilerini eksiksiz doldurun</p>
+            <p className="text-gray-600 dark:text-gray-400 text-sm">
+              Lütfen firma bilgilerini eksiksiz doldurun
+            </p>
           </CardHeader>
-          <CardContent className="p-8">
+          <CardContent className="pt-6">
             <CompanyForm
               programs={programs}
               onSubmit={handleSubmit}

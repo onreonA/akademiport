@@ -78,33 +78,44 @@ export default function NewTrainingPage() {
   };
 
   return (
-    <div className="container mx-auto py-8 space-y-6">
-      {/* Header */}
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={() => router.back()}>
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
-        <div>
-          <h1 className="text-3xl font-bold">Yeni Eğitim Oluştur</h1>
-          <p className="text-muted-foreground">Eğitim bilgilerini girin</p>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="container mx-auto py-8 px-4 space-y-6 max-w-4xl">
+        {/* Header */}
+        <div className="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => router.back()}
+            className="hover:bg-gray-100 dark:hover:bg-gray-800"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <div className="space-y-1">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              Yeni Eğitim Oluştur
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400">Eğitim bilgilerini girin</p>
+          </div>
         </div>
-      </div>
 
-      {/* Form Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Eğitim Bilgileri</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {loadingPrograms ? (
-            <div className="flex items-center justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            </div>
-          ) : (
-            <TrainingForm programs={programs} onSubmit={handleSubmit} onCancel={handleCancel} />
-          )}
-        </CardContent>
-      </Card>
+        {/* Form Card */}
+        <Card className="border border-gray-200 dark:border-gray-800 shadow-sm">
+          <CardHeader className="border-b border-gray-200 dark:border-gray-800">
+            <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">
+              Eğitim Bilgileri
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-6">
+            {loadingPrograms ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              </div>
+            ) : (
+              <TrainingForm programs={programs} onSubmit={handleSubmit} onCancel={handleCancel} />
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

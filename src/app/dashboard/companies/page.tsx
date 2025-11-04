@@ -96,32 +96,35 @@ export default function CompaniesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto p-4 md:p-6 space-y-6 md:space-y-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="space-y-1 w-full sm:w-auto">
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">
               Firmalar
             </h1>
-            <p className="text-muted-foreground text-lg">Tüm firmaları görüntüleyin ve yönetin</p>
+            <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base lg:text-lg">
+              Tüm firmaları görüntüleyin ve yönetin
+            </p>
             <div className="flex items-center gap-4 mt-2">
-              <div className="text-sm text-muted-foreground">
+              <div className="text-xs md:text-sm text-gray-600 dark:text-gray-400">
                 {total} firma • Sayfa {page} / {Math.ceil(total / limit)}
               </div>
             </div>
           </div>
           <Button
             onClick={() => router.push('/dashboard/companies/new')}
-            className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white shadow-lg hover:shadow-xl transition-all duration-300"
+            size="sm"
+            className="shadow-sm"
           >
-            <Plus className="w-4 h-4 mr-2" />
+            <Plus className="mr-2 h-4 w-4" />
             Yeni Firma
           </Button>
         </div>
 
         {/* Filters */}
-        <div className="bg-card/50 backdrop-blur-sm border border-primary/20 rounded-xl p-6 shadow-lg">
+        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-6 shadow-sm">
           <CompanyFilters
             search={search}
             city={city}
@@ -142,24 +145,22 @@ export default function CompaniesPage() {
           <div className="flex items-center justify-center py-16">
             <div className="text-center space-y-4">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-              <div className="text-lg text-muted-foreground">Firmalar yükleniyor...</div>
+              <div className="text-lg text-gray-600 dark:text-gray-400">Firmalar yükleniyor...</div>
             </div>
           </div>
         ) : companies.length === 0 ? (
           <div className="text-center py-16">
-            <div className="w-20 h-20 mx-auto rounded-full bg-muted flex items-center justify-center mb-6">
-              <Plus className="h-10 w-10 text-muted-foreground" />
+            <div className="w-20 h-20 mx-auto rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-6">
+              <Plus className="h-10 w-10 text-gray-400 dark:text-gray-500" />
             </div>
-            <h3 className="text-xl font-semibold mb-2">Firma Bulunamadı</h3>
-            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+            <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">
+              Firma Bulunamadı
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
               Henüz hiç firma kaydı oluşturulmamış. İlk firmanızı ekleyerek başlayın.
             </p>
-            <Button
-              onClick={() => router.push('/dashboard/companies/new')}
-              variant="outline"
-              className="hover:bg-primary hover:text-primary-foreground transition-colors"
-            >
-              <Plus className="w-4 h-4 mr-2" />
+            <Button onClick={() => router.push('/dashboard/companies/new')} variant="outline">
+              <Plus className="mr-2 h-4 w-4" />
               İlk Firmayı Ekle
             </Button>
           </div>
@@ -183,7 +184,6 @@ export default function CompaniesPage() {
                   variant="outline"
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page === 1}
-                  className="hover:bg-primary hover:text-primary-foreground transition-colors"
                 >
                   Önceki
                 </Button>
@@ -207,7 +207,6 @@ export default function CompaniesPage() {
                   variant="outline"
                   onClick={() => setPage((p) => p + 1)}
                   disabled={page >= Math.ceil(total / limit)}
-                  className="hover:bg-primary hover:text-primary-foreground transition-colors"
                 >
                   Sonraki
                 </Button>

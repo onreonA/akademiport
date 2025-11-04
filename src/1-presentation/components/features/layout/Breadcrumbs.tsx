@@ -29,10 +29,10 @@ export function Breadcrumbs() {
   if (breadcrumbs.length === 0) return null;
 
   return (
-    <nav className="flex items-center space-x-1 text-sm text-muted-foreground">
+    <nav className="flex items-center space-x-1 text-sm text-gray-600 dark:text-gray-400">
       <Link
         href="/"
-        className="flex items-center hover:text-foreground transition-colors"
+        className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors rounded-md p-1 hover:bg-gray-100 dark:hover:bg-gray-800"
         title="Ana Sayfa"
       >
         <Home className="h-4 w-4" />
@@ -42,11 +42,14 @@ export function Breadcrumbs() {
         const isLast = index === breadcrumbs.length - 1;
         return (
           <React.Fragment key={crumb.href}>
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-4 w-4 text-gray-400 dark:text-gray-500" />
             {isLast ? (
-              <span className="font-medium text-foreground">{crumb.label}</span>
+              <span className="font-medium text-gray-900 dark:text-white">{crumb.label}</span>
             ) : (
-              <Link href={crumb.href} className="hover:text-foreground transition-colors">
+              <Link
+                href={crumb.href}
+                className="hover:text-gray-900 dark:hover:text-white transition-colors rounded-md px-1.5 py-0.5 hover:bg-gray-100 dark:hover:bg-gray-800"
+              >
                 {crumb.label}
               </Link>
             )}

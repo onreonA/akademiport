@@ -15,6 +15,7 @@ import {
   User,
   Plus,
   ListTodo,
+  FileStack,
   type LucideIcon,
 } from 'lucide-react';
 import { UserRole } from '@/domain/enums/UserRole';
@@ -105,6 +106,60 @@ export const MASTER_ADMIN_NAVIGATION: NavigationConfig = {
           id: 'users-new',
           label: 'Yeni Kullanıcı',
           href: '/dashboard/users/new',
+        },
+      ],
+    },
+    {
+      id: 'projects',
+      label: 'Projeler',
+      icon: FileText,
+      href: '/dashboard/projects',
+      children: [
+        {
+          id: 'projects-all',
+          label: 'Tüm Projeler',
+          href: '/dashboard/projects',
+        },
+        {
+          id: 'projects-deleted',
+          label: 'Silinen Projeler',
+          href: '/dashboard/projects/deleted',
+        },
+      ],
+    },
+    {
+      id: 'trainings',
+      label: 'Eğitimler',
+      icon: GraduationCap,
+      href: '/dashboard/trainings',
+      children: [
+        {
+          id: 'trainings-all',
+          label: 'Tüm Eğitimler',
+          href: '/dashboard/trainings',
+        },
+        {
+          id: 'trainings-new',
+          label: 'Yeni Eğitim',
+          href: '/dashboard/trainings/new',
+        },
+      ],
+    },
+    {
+      id: 'project-templates',
+      label: 'Proje Şablonları',
+      icon: FileStack,
+      href: '/dashboard/project-templates',
+      children: [
+        {
+          id: 'project-templates-all',
+          label: 'Tüm Şablonlar',
+          href: '/dashboard/project-templates',
+        },
+        {
+          id: 'project-templates-new',
+          label: 'Yeni Şablon',
+          href: '/dashboard/project-templates/new',
         },
       ],
     },

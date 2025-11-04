@@ -18,14 +18,14 @@ export interface EnhancedCardProps extends React.HTMLAttributes<HTMLDivElement> 
 const EnhancedCard = React.forwardRef<HTMLDivElement, EnhancedCardProps>(
   ({ className, variant = 'default', hover = true, glow = false, children, ...props }, ref) => {
     const variants = {
-      default: 'bg-card border border-border shadow-md',
-      gradient: 'card-gradient shadow-lg',
-      glass: 'card-glass shadow-lg',
-      neon: 'card-neon shadow-lg',
+      default: 'bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm',
+      gradient: 'bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm',
+      glass: 'bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm',
+      neon: 'bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm',
     };
 
-    const hoverClass = hover ? 'hover-lift-enhanced' : '';
-    const glowClass = glow ? 'glow-primary' : '';
+    const hoverClass = hover ? 'hover:shadow-md transition-shadow duration-200' : '';
+    const glowClass = '';
 
     return (
       <div

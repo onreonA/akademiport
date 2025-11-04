@@ -121,12 +121,12 @@ export function ProgramForm({ program, onSubmit, onCancel }: ProgramFormProps) {
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Basic Information */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Temel Bilgiler</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Temel Bilgiler</h3>
 
         {/* Name */}
         <div className="space-y-2">
-          <label htmlFor="name" className="text-sm font-medium">
-            Program Adı <span className="text-destructive">*</span>
+          <label htmlFor="name" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            Program Adı <span className="text-red-600 dark:text-red-400">*</span>
           </label>
           <Input
             id="name"
@@ -135,12 +135,15 @@ export function ProgramForm({ program, onSubmit, onCancel }: ProgramFormProps) {
             placeholder="Örn: İzmir E-İhracat Programı 2024"
             className={errors.name ? 'border-destructive' : ''}
           />
-          {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
+          {errors.name && <p className="text-sm text-red-600 dark:text-red-400">{errors.name}</p>}
         </div>
 
         {/* Description */}
         <div className="space-y-2">
-          <label htmlFor="description" className="text-sm font-medium">
+          <label
+            htmlFor="description"
+            className="text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
             Açıklama
           </label>
           <Textarea
@@ -155,12 +158,12 @@ export function ProgramForm({ program, onSubmit, onCancel }: ProgramFormProps) {
 
       {/* Location & Type */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Konum ve Tip</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Konum ve Tip</h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* City */}
           <div className="space-y-2">
-            <label htmlFor="city" className="text-sm font-medium">
+            <label htmlFor="city" className="text-sm font-medium text-gray-700 dark:text-gray-300">
               Şehir
             </label>
             <Input
@@ -173,7 +176,10 @@ export function ProgramForm({ program, onSubmit, onCancel }: ProgramFormProps) {
 
           {/* Region */}
           <div className="space-y-2">
-            <label htmlFor="region" className="text-sm font-medium">
+            <label
+              htmlFor="region"
+              className="text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
               Bölge
             </label>
             <Input
@@ -187,7 +193,10 @@ export function ProgramForm({ program, onSubmit, onCancel }: ProgramFormProps) {
 
         {/* Program Type */}
         <div className="space-y-2">
-          <label htmlFor="programType" className="text-sm font-medium">
+          <label
+            htmlFor="programType"
+            className="text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
             Program Tipi
           </label>
           <Input
@@ -201,13 +210,18 @@ export function ProgramForm({ program, onSubmit, onCancel }: ProgramFormProps) {
 
       {/* Dates & Capacity */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Tarihler ve Kapasite</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+          Tarihler ve Kapasite
+        </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Start Date */}
           <div className="space-y-2">
-            <label htmlFor="startDate" className="text-sm font-medium">
-              Başlangıç Tarihi <span className="text-destructive">*</span>
+            <label
+              htmlFor="startDate"
+              className="text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
+              Başlangıç Tarihi <span className="text-red-600 dark:text-red-400">*</span>
             </label>
             <Input
               id="startDate"
@@ -216,13 +230,18 @@ export function ProgramForm({ program, onSubmit, onCancel }: ProgramFormProps) {
               onChange={(e) => handleChange('startDate', e.target.value)}
               className={errors.startDate ? 'border-destructive' : ''}
             />
-            {errors.startDate && <p className="text-sm text-destructive">{errors.startDate}</p>}
+            {errors.startDate && (
+              <p className="text-sm text-red-600 dark:text-red-400">{errors.startDate}</p>
+            )}
           </div>
 
           {/* End Date */}
           <div className="space-y-2">
-            <label htmlFor="endDate" className="text-sm font-medium">
-              Bitiş Tarihi <span className="text-destructive">*</span>
+            <label
+              htmlFor="endDate"
+              className="text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
+              Bitiş Tarihi <span className="text-red-600 dark:text-red-400">*</span>
             </label>
             <Input
               id="endDate"
@@ -231,14 +250,19 @@ export function ProgramForm({ program, onSubmit, onCancel }: ProgramFormProps) {
               onChange={(e) => handleChange('endDate', e.target.value)}
               className={errors.endDate ? 'border-destructive' : ''}
             />
-            {errors.endDate && <p className="text-sm text-destructive">{errors.endDate}</p>}
+            {errors.endDate && (
+              <p className="text-sm text-red-600 dark:text-red-400">{errors.endDate}</p>
+            )}
           </div>
         </div>
 
         {/* Max Companies */}
         <div className="space-y-2">
-          <label htmlFor="maxCompanies" className="text-sm font-medium">
-            Maksimum Firma Sayısı <span className="text-destructive">*</span>
+          <label
+            htmlFor="maxCompanies"
+            className="text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
+            Maksimum Firma Sayısı <span className="text-red-600 dark:text-red-400">*</span>
           </label>
           <Input
             id="maxCompanies"
@@ -248,18 +272,23 @@ export function ProgramForm({ program, onSubmit, onCancel }: ProgramFormProps) {
             onChange={(e) => handleChange('maxCompanies', parseInt(e.target.value, 10))}
             className={errors.maxCompanies ? 'border-destructive' : ''}
           />
-          {errors.maxCompanies && <p className="text-sm text-destructive">{errors.maxCompanies}</p>}
+          {errors.maxCompanies && (
+            <p className="text-sm text-red-600 dark:text-red-400">{errors.maxCompanies}</p>
+          )}
         </div>
       </div>
 
       {/* Additional Info */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Ek Bilgiler</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Ek Bilgiler</h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Sponsor */}
           <div className="space-y-2">
-            <label htmlFor="sponsor" className="text-sm font-medium">
+            <label
+              htmlFor="sponsor"
+              className="text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
               Sponsor
             </label>
             <Input
@@ -272,7 +301,10 @@ export function ProgramForm({ program, onSubmit, onCancel }: ProgramFormProps) {
 
           {/* Budget */}
           <div className="space-y-2">
-            <label htmlFor="budget" className="text-sm font-medium">
+            <label
+              htmlFor="budget"
+              className="text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
               Bütçe (TL)
             </label>
             <Input
@@ -291,7 +323,10 @@ export function ProgramForm({ program, onSubmit, onCancel }: ProgramFormProps) {
         {/* Status (only for edit) */}
         {program && (
           <div className="space-y-2">
-            <label htmlFor="status" className="text-sm font-medium">
+            <label
+              htmlFor="status"
+              className="text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
               Durum
             </label>
             <Select
@@ -314,11 +349,20 @@ export function ProgramForm({ program, onSubmit, onCancel }: ProgramFormProps) {
       </div>
 
       {/* Actions */}
-      <div className="flex gap-3 justify-end pt-4 border-t">
-        <Button type="button" variant="outline" onClick={onCancel} disabled={loading}>
+      <div className="flex gap-3 justify-end pt-4 border-t border-gray-200 dark:border-gray-800">
+        <Button
+          type="button"
+          onClick={onCancel}
+          disabled={loading}
+          className="bg-gray-50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600 shadow-none transition-colors"
+        >
           İptal
         </Button>
-        <Button type="submit" disabled={loading}>
+        <Button
+          type="submit"
+          disabled={loading}
+          className="bg-primary text-white hover:bg-primary/90 shadow-sm transition-colors"
+        >
           {loading ? (
             <>
               <Spinner size="sm" className="mr-2" />
