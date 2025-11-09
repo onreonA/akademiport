@@ -14,6 +14,7 @@ import { MobileSidebar } from './MobileSidebar';
 import { BottomNavigation } from './BottomNavigation';
 import { CommandPalette } from './CommandPalette';
 import { QuickActionsFAB } from './QuickActionsFAB';
+import { PageErrorBoundary } from '@/presentation/components/shared/PageErrorBoundary';
 
 // =====================================================
 // TYPES
@@ -69,7 +70,7 @@ function DashboardLayoutInner({
             variant === 'company-dashboard' ? 'p-0' : 'p-6'
           )}
         >
-          {children}
+          <PageErrorBoundary>{children}</PageErrorBoundary>
         </div>
       </main>
 

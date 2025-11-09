@@ -40,18 +40,46 @@ interface ConsultantProgramProviderProps {
 export function ConsultantProgramProvider({ children }: ConsultantProgramProviderProps) {
   const [selectedProgram, setSelectedProgramState] = useState<Program | null>(null);
   const [programs, setPrograms] = useState<Program[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Start with true to show loading
 
-  // Load selected program from localStorage on mount
+  // Fetch programs on mount
   useEffect(() => {
-    const savedProgramId = localStorage.getItem('consultant_selected_program_id');
-    if (savedProgramId && programs.length > 0) {
-      const program = programs.find((p) => p.id === savedProgramId);
-      if (program) {
-        setSelectedProgramState(program);
+    fetchPrograms();
+  }, []);
+
+  // Load selected program from localStorage after programs are loaded
+  useEffect(() => {
+    if (programs.length > 0 && !selectedProgram) {
+      const savedProgramId = localStorage.getItem('consultant_selected_program_id');
+      if (savedProgramId) {
+        const program = programs.find((p) => p.id === savedProgramId);
+        if (program) {
+          setSelectedProgramState(program);
+          return;
+        }
       }
+      // If no saved program or saved program not found, select first program
+      setSelectedProgramState(programs[0]);
     }
-  }, [programs]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [programs]); // Only depend on programs, not selectedProgram to avoid infinite loop
+
+  const fetchPrograms = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch('/api/consultant/programs');
+      const data = await response.json();
+
+      if (data.success) {
+        const programList = data.data.map((item: any) => item.program);
+        setPrograms(programList);
+      }
+    } catch (error) {
+      console.error('Failed to fetch programs:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Save selected program to localStorage
   const setSelectedProgram = (program: Program | null) => {

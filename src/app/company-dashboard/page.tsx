@@ -7,7 +7,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { Card, CardContent } from '@/presentation/components/ui/atoms/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/presentation/components/ui/atoms/card';
 import { Spinner } from '@/presentation/components/ui/atoms/spinner';
 import { ModernStatCard } from '@/presentation/components/ui/atoms/modern-stat-card';
 import {

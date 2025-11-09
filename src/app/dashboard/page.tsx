@@ -19,7 +19,6 @@ import {
 import { StatCard } from '@/presentation/components/ui/atoms/stat-card';
 import { MetricCard } from '@/presentation/components/ui/atoms/metric-card';
 import { ModernStatCard } from '@/presentation/components/ui/atoms/modern-stat-card';
-import { GradientHeader } from '@/presentation/components/ui/molecules/gradient-header';
 import { EnhancedCard } from '@/presentation/components/ui/atoms/enhanced-card';
 import { EmptyState } from '@/presentation/components/ui/atoms/empty-state';
 import { Badge } from '@/presentation/components/ui/atoms/badge';
@@ -79,12 +78,14 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto p-4 md:p-6 space-y-6 md:space-y-8">
         {/* Flat Header */}
-        <GradientHeader
-          title="Dashboard"
-          subtitle={`Hoş geldiniz, ${user.fullName}! 👋`}
-          icon={BarChart3}
-          progress={75}
-          actions={
+        <div className="space-y-2">
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">
+            Dashboard
+          </h1>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base lg:text-lg">
+              Hoş geldiniz, {user.fullName}! 👋
+            </p>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
               <Badge variant="secondary" className="text-center">
                 {UserRoleLabels[user.role]}
@@ -97,8 +98,8 @@ export default function DashboardPage() {
                 Çıkış Yap
               </Button>
             </div>
-          }
-        />
+          </div>
+        </div>
 
         {/* Modern Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

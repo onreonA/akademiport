@@ -9,6 +9,7 @@ import {
   ListCompanyTrainingsUseCase,
 } from '@/application/use-cases/company-training';
 import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
+import { logger } from '@/shared/utils/logger';
 
 const companyTrainingRepository = new CompanyTrainingRepository();
 const companyRepository = new CompanyRepository();
@@ -54,7 +55,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     return NextResponse.json({ trainings: result.value });
   } catch (error) {
-    console.error('Error in GET /api/companies/[id]/trainings:', error);
+    logger.error('Error in GET /api/companies/[id]/trainings:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -101,7 +102,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
     return NextResponse.json(result.value, { status: 201 });
   } catch (error) {
-    console.error('Error in POST /api/companies/[id]/trainings:', error);
+    logger.error('Error in POST /api/companies/[id]/trainings:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

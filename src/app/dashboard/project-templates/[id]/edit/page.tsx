@@ -9,11 +9,9 @@ import {
   Loader2,
   Trash2,
   FolderKanban,
-  ListTodo,
   Plus,
-  Edit,
+  Table,
 } from 'lucide-react';
-import { GradientHeader } from '@/presentation/components/ui/molecules/gradient-header';
 import { EnhancedCard } from '@/presentation/components/ui/atoms/enhanced-card';
 import { Button } from '@/presentation/components/ui/atoms/button';
 import { Input } from '@/presentation/components/ui/atoms/input';
@@ -27,9 +25,15 @@ import {
   SelectValue,
 } from '@/presentation/components/ui/atoms/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/presentation/components/ui/atoms/tabs';
-import { Badge } from '@/presentation/components/ui/atoms/badge';
 import { SubProjectModal } from '@/presentation/components/features/sub-projects/SubProjectModal';
 import { TaskModal } from '@/presentation/components/features/tasks/TaskModal';
+import { ProjectHierarchyAccordion } from '@/presentation/components/features/projects/ProjectHierarchyAccordion';
+import {
+  ProjectHierarchyDTO,
+  SubProjectWithTasksDTO,
+} from '@/application/dto/project-hierarchy.dto';
+import { ProjectAssignmentMatrix } from '@/presentation/components/features/projects/ProjectAssignmentMatrix';
+import { ProjectAssignmentMatrixDTO } from '@/application/dto/project-assignment.dto';
 import { toast } from 'sonner';
 import Link from 'next/link';
 
@@ -76,12 +80,17 @@ export default function EditProjectTemplatePage() {
   const [template, setTemplate] = useState<Template | null>(null);
   const [subProjects, setSubProjects] = useState<SubProject[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [subProjectHierarchy, setSubProjectHierarchy] = useState<SubProjectWithTasksDTO[]>([]);
+  const [structureLoading, setStructureLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('details');
   const [subProjectModalOpen, setSubProjectModalOpen] = useState(false);
   const [editingSubProject, setEditingSubProject] = useState<SubProject | null>(null);
   const [taskModalOpen, setTaskModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [selectedSubProjectId, setSelectedSubProjectId] = useState<string>('');
+  const [assignmentMatrix, setAssignmentMatrix] = useState<ProjectAssignmentMatrixDTO | null>(null);
+  const [matrixLoading, setMatrixLoading] = useState(false);
+  const [matrixError, setMatrixError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -91,18 +100,20 @@ export default function EditProjectTemplatePage() {
 
   useEffect(() => {
     fetchTemplate();
+    fetchHierarchy();
   }, [templateId]);
 
   useEffect(() => {
-    if (activeTab === 'subprojects') {
-      fetchSubProjects();
-    } else if (activeTab === 'tasks') {
-      fetchTasks();
-      if (subProjects.length === 0) {
-        fetchSubProjects();
-      }
+    if (activeTab === 'structure' && subProjectHierarchy.length === 0) {
+      fetchHierarchy();
     }
-  }, [activeTab]);
+  }, [activeTab, subProjectHierarchy.length]);
+
+  useEffect(() => {
+    if (activeTab === 'assignments' && !assignmentMatrix && !matrixLoading) {
+      fetchAssignmentMatrix();
+    }
+  }, [activeTab, assignmentMatrix, matrixLoading]);
 
   const fetchTemplate = async () => {
     try {
@@ -125,38 +136,91 @@ export default function EditProjectTemplatePage() {
     }
   };
 
-  const fetchSubProjects = async () => {
+  const fetchHierarchy = async () => {
     try {
-      const response = await fetch(`/api/sub-projects?projectId=${templateId}`);
-      if (!response.ok) throw new Error('Failed to fetch sub-projects');
-      const data = await response.json();
-      setSubProjects(Array.isArray(data) ? data : []);
+      setStructureLoading(true);
+      const response = await fetch(`/api/projects/${templateId}/hierarchy`);
+      if (!response.ok) throw new Error('Failed to fetch project hierarchy');
+
+      const data: { data?: ProjectHierarchyDTO } = await response.json();
+      const hierarchy = data.data;
+
+      if (!hierarchy) {
+        setSubProjectHierarchy([]);
+        setSubProjects([]);
+        setTasks([]);
+        return;
+      }
+
+      const subProjectsData = Array.isArray(hierarchy.subProjects) ? hierarchy.subProjects : [];
+
+      console.log('📁 [Edit Template] Hierarchy fetched:', {
+        subProjectCount: subProjectsData.length,
+        totalTasks: subProjectsData.reduce((acc, sp) => acc + (sp.tasks?.length || 0), 0),
+      });
+
+      setSubProjectHierarchy(subProjectsData);
+
+      const formattedSubProjects: SubProject[] = subProjectsData
+        .map((sp) => ({
+          id: sp.id,
+          name: sp.name,
+          description: sp.description,
+          status: sp.status,
+          progress: sp.progress ?? sp.stats?.completedTasks ?? 0,
+          orderIndex: sp.orderIndex ?? 0,
+        }))
+        .sort((a, b) => a.orderIndex - b.orderIndex);
+
+      const formattedTasks: Task[] = subProjectsData
+        .flatMap((sp) =>
+          (sp.tasks || []).map((task) => ({
+            id: task.id,
+            title: task.title,
+            description: task.description,
+            status: task.status,
+            priority: task.priority,
+            orderIndex: task.orderIndex ?? 0,
+            subProjectId: task.subProjectId,
+          }))
+        )
+        .sort((a, b) => a.orderIndex - b.orderIndex);
+
+      setSubProjects(formattedSubProjects);
+      setTasks(formattedTasks);
     } catch (error) {
-      console.error('Error fetching sub-projects:', error);
+      console.error('Error fetching project hierarchy:', error);
+      toast.error('Proje yapısı yüklenemedi');
+    } finally {
+      setStructureLoading(false);
     }
   };
 
-  const fetchTasks = async () => {
+  const fetchAssignmentMatrix = async () => {
     try {
-      const response = await fetch(`/api/projects/${templateId}/tasks`);
-      if (!response.ok) throw new Error('Failed to fetch tasks');
-      const data = await response.json();
-      setTasks(data.tasks || []);
+      setMatrixLoading(true);
+      setMatrixError(null);
+      const response = await fetch(`/api/projects/${templateId}/assignment-matrix`);
+      if (!response.ok) {
+        const errorBody = await response.json().catch(() => ({}));
+        throw new Error(errorBody.error || 'Atama matrisi yüklenemedi');
+      }
+
+      const data: ProjectAssignmentMatrixDTO = await response.json();
+      setAssignmentMatrix(data);
     } catch (error) {
-      console.error('Error fetching tasks:', error);
+      const message = error instanceof Error ? error.message : 'Atama matrisi yüklenemedi';
+      setMatrixError(message);
+      toast.error(message);
+    } finally {
+      setMatrixLoading(false);
     }
   };
 
   const handleSubProjectModalSuccess = () => {
-    fetchSubProjects();
+    fetchHierarchy();
     setSubProjectModalOpen(false);
     setEditingSubProject(null);
-  };
-
-  const handleEditSubProject = (subProject: SubProject, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setEditingSubProject(subProject);
-    setSubProjectModalOpen(true);
   };
 
   const handleCreateSubProject = () => {
@@ -164,8 +228,7 @@ export default function EditProjectTemplatePage() {
     setSubProjectModalOpen(true);
   };
 
-  const handleDeleteSubProject = async (subProjectId: string, e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleDeleteSubProject = async (subProjectId: string) => {
     if (
       !confirm('Bu alt projeyi silmek istediğinizden emin misiniz? Tüm görevler de silinecektir.')
     ) {
@@ -183,8 +246,7 @@ export default function EditProjectTemplatePage() {
       }
 
       toast.success('Alt proje başarıyla silindi!');
-      setSubProjects(subProjects.filter((sp) => sp.id !== subProjectId));
-      fetchTasks(); // Refresh tasks
+      await fetchHierarchy();
     } catch (error) {
       console.error('Error deleting sub-project:', error);
       toast.error(error instanceof Error ? error.message : 'Bir hata oluştu');
@@ -192,7 +254,7 @@ export default function EditProjectTemplatePage() {
   };
 
   const handleTaskModalSuccess = () => {
-    fetchTasks();
+    fetchHierarchy();
     setTaskModalOpen(false);
     setEditingTask(null);
     setSelectedSubProjectId('');
@@ -204,15 +266,13 @@ export default function EditProjectTemplatePage() {
     setTaskModalOpen(true);
   };
 
-  const handleEditTask = (task: Task, e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleEditTask = (task: Task) => {
     setEditingTask(task);
     setSelectedSubProjectId(task.subProjectId);
     setTaskModalOpen(true);
   };
 
-  const handleDeleteTask = async (taskId: string, e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleDeleteTask = async (taskId: string) => {
     if (!confirm('Bu görevi silmek istediğinizden emin misiniz?')) {
       return;
     }
@@ -228,10 +288,103 @@ export default function EditProjectTemplatePage() {
       }
 
       toast.success('Görev başarıyla silindi!');
-      setTasks(tasks.filter((t) => t.id !== taskId));
+      await fetchHierarchy();
     } catch (error) {
       console.error('Error deleting task:', error);
       toast.error(error instanceof Error ? error.message : 'Bir hata oluştu');
+    }
+  };
+
+  const handleMoveSubProject = async (subProjectId: string, direction: 'up' | 'down') => {
+    const orderedSubProjects = [...subProjects].sort((a, b) => a.orderIndex - b.orderIndex);
+    const currentIndex = orderedSubProjects.findIndex((sp) => sp.id === subProjectId);
+
+    if (currentIndex === -1) {
+      return;
+    }
+
+    const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+    if (targetIndex < 0 || targetIndex >= orderedSubProjects.length) {
+      return;
+    }
+
+    const current = orderedSubProjects[currentIndex];
+    const target = orderedSubProjects[targetIndex];
+
+    try {
+      const [currentResponse, targetResponse] = await Promise.all([
+        fetch(`/api/sub-projects/${current.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderIndex: target.orderIndex }),
+        }),
+        fetch(`/api/sub-projects/${target.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderIndex: current.orderIndex }),
+        }),
+      ]);
+
+      if (!currentResponse.ok || !targetResponse.ok) {
+        const currentError = await currentResponse.json().catch(() => ({}));
+        const targetError = await targetResponse.json().catch(() => ({}));
+        throw new Error(
+          currentError.error || targetError.error || 'Alt proje sırası güncellenemedi'
+        );
+      }
+
+      toast.success('Alt proje sırası güncellendi');
+      await fetchHierarchy();
+    } catch (error) {
+      console.error('Error updating sub-project order:', error);
+      toast.error(error instanceof Error ? error.message : 'Alt proje sırası güncellenemedi');
+    }
+  };
+
+  const handleMoveTask = async (taskId: string, direction: 'up' | 'down') => {
+    const currentTask = tasks.find((task) => task.id === taskId);
+    if (!currentTask) {
+      return;
+    }
+
+    const tasksInSubProject = tasks
+      .filter((task) => task.subProjectId === currentTask.subProjectId)
+      .sort((a, b) => a.orderIndex - b.orderIndex);
+
+    const currentIndex = tasksInSubProject.findIndex((task) => task.id === taskId);
+    const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+
+    if (targetIndex < 0 || targetIndex >= tasksInSubProject.length) {
+      return;
+    }
+
+    const targetTask = tasksInSubProject[targetIndex];
+
+    try {
+      const [currentResponse, targetResponse] = await Promise.all([
+        fetch(`/api/tasks/${currentTask.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderIndex: targetTask.orderIndex }),
+        }),
+        fetch(`/api/tasks/${targetTask.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderIndex: currentTask.orderIndex }),
+        }),
+      ]);
+
+      if (!currentResponse.ok || !targetResponse.ok) {
+        const currentError = await currentResponse.json().catch(() => ({}));
+        const targetError = await targetResponse.json().catch(() => ({}));
+        throw new Error(currentError.error || targetError.error || 'Görev sırası güncellenemedi');
+      }
+
+      toast.success('Görev sırası güncellendi');
+      await fetchHierarchy();
+    } catch (error) {
+      console.error('Error updating task order:', error);
+      toast.error(error instanceof Error ? error.message : 'Görev sırası güncellenemedi');
     }
   };
 
@@ -315,29 +468,48 @@ export default function EditProjectTemplatePage() {
     );
   }
 
+  const totalHierarchyTasks = subProjectHierarchy.reduce(
+    (acc, sp) => acc + (sp.tasks?.length || 0),
+    0
+  );
+
   return (
-    <div className="min-h-screen bg-linear-to-br from-background via-background to-primary/5 p-4 md:p-6">
-      <div className="mx-auto max-w-4xl space-y-6">
-        <GradientHeader
-          icon={Building2}
-          title="Şablon Düzenle"
-          subtitle={template.name}
-          progress={0}
-          actions={
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="max-w-7xl mx-auto p-4 md:p-6 space-y-6 md:space-y-8">
+        {/* Flat Header */}
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-4 flex-1 min-w-0">
             <Link href="/dashboard/project-templates">
-              <Button variant="outline" size="sm">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Geri Dön
+              <Button
+                variant="ghost"
+                size="icon"
+                className="hover:bg-gray-100 dark:hover:bg-gray-800"
+              >
+                <ArrowLeft className="w-4 h-4" />
               </Button>
             </Link>
-          }
-        />
+            <div className="space-y-2 flex-1 min-w-0">
+              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">
+                Şablon Düzenle
+              </h1>
+              <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base lg:text-lg">
+                {template?.name ?? 'Şablon'}
+              </p>
+            </div>
+          </div>
+        </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="details">Genel Bilgiler</TabsTrigger>
-            <TabsTrigger value="subprojects">Alt Projeler</TabsTrigger>
-            <TabsTrigger value="tasks">Görevler</TabsTrigger>
+            <TabsTrigger value="structure">
+              <FolderKanban className="w-4 h-4 mr-2" />
+              Proje Yapısı
+            </TabsTrigger>
+            <TabsTrigger value="assignments">
+              <Table className="w-4 h-4 mr-2" />
+              Atamalar
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="details" className="space-y-6">
@@ -457,200 +629,82 @@ export default function EditProjectTemplatePage() {
             </EnhancedCard>
           </TabsContent>
 
-          <TabsContent value="subprojects" className="space-y-4">
-            <div className="flex justify-between items-center">
+          <TabsContent value="structure" className="space-y-4">
+            <div className="flex justify-between items-center mb-4">
               <div>
-                <h3 className="text-lg font-semibold">Alt Projeler</h3>
-                <p className="text-sm text-muted-foreground">{subProjects.length} alt proje</p>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Proje Yapısı
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  {subProjectHierarchy.length} alt proje, {totalHierarchyTasks} görev
+                </p>
               </div>
               <Button size="sm" onClick={handleCreateSubProject}>
                 <Plus className="mr-2 h-4 w-4" />
                 Yeni Alt Proje
               </Button>
             </div>
-            {subProjects.length === 0 ? (
-              <EnhancedCard variant="glass" className="p-12 text-center">
-                <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                  <FolderKanban className="w-6 h-6 text-primary" />
-                </div>
-                <h4 className="font-semibold mb-2">Henüz alt proje yok</h4>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Şablonunuza alt projeler ekleyerek yapıyı oluşturun
+
+            {structureLoading ? (
+              <EnhancedCard className="p-12 text-center shadow-sm">
+                <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary" />
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-3">
+                  Proje yapısı yükleniyor...
                 </p>
-                <Button onClick={handleCreateSubProject}>
-                  <Plus className="mr-2 h-4 w-4" />
-                  İlk Alt Projeyi Oluştur
-                </Button>
               </EnhancedCard>
             ) : (
-              <div className="grid gap-4">
-                {subProjects.map((subProject) => (
-                  <EnhancedCard
-                    key={subProject.id}
-                    variant="glass"
-                    className="p-4 hover:shadow-lg transition-shadow cursor-pointer"
-                    onClick={(e) => handleEditSubProject(subProject, e)}
-                  >
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <h4 className="font-semibold">{subProject.name}</h4>
-                          <Badge
-                            variant={
-                              subProject.status === 'done'
-                                ? 'default'
-                                : subProject.status === 'in_progress'
-                                  ? 'secondary'
-                                  : 'outline'
-                            }
-                          >
-                            {subProject.status === 'todo' && 'Yapılacak'}
-                            {subProject.status === 'in_progress' && 'Devam Ediyor'}
-                            {subProject.status === 'review' && 'İncelemede'}
-                            {subProject.status === 'done' && 'Tamamlandı'}
-                            {subProject.status === 'cancelled' && 'İptal'}
-                          </Badge>
-                        </div>
-                        {subProject.description && (
-                          <p className="text-sm text-muted-foreground mb-3">
-                            {subProject.description}
-                          </p>
-                        )}
-                        <div className="flex items-center gap-4">
-                          <div className="flex-1">
-                            <div className="flex items-center justify-between text-xs mb-1">
-                              <span className="text-muted-foreground">İlerleme</span>
-                              <span className="font-medium">{subProject.progress}%</span>
-                            </div>
-                            <div className="h-2 bg-muted rounded-full overflow-hidden">
-                              <div
-                                className="h-full bg-linear-to-r from-blue-500 to-indigo-500 transition-all"
-                                style={{ width: `${subProject.progress}%` }}
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => handleEditSubProject(subProject, e)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => handleDeleteSubProject(subProject.id, e)}
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  </EnhancedCard>
-                ))}
-              </div>
+              <ProjectHierarchyAccordion
+                projectId={templateId}
+                subProjects={subProjectHierarchy}
+                mode="admin"
+                editable
+                reorderable
+                onSubProjectEdit={(subProject) => {
+                  const matched = subProjects.find((sp) => sp.id === subProject.id);
+                  setEditingSubProject(
+                    (matched || {
+                      id: subProject.id,
+                      name: subProject.name,
+                      description: subProject.description,
+                      status: subProject.status,
+                      progress: subProject.progress ?? 0,
+                      orderIndex: subProject.orderIndex ?? 0,
+                    }) as SubProject
+                  );
+                  setSubProjectModalOpen(true);
+                }}
+                onSubProjectDelete={handleDeleteSubProject}
+                onSubProjectMoveUp={(id) => handleMoveSubProject(id, 'up')}
+                onSubProjectMoveDown={(id) => handleMoveSubProject(id, 'down')}
+                onTaskEdit={(task) => {
+                  const matched = tasks.find((t) => t.id === task.id);
+                  handleEditTask(
+                    (matched || {
+                      id: task.id,
+                      title: task.title,
+                      description: task.description,
+                      status: task.status,
+                      priority: task.priority,
+                      orderIndex: task.orderIndex ?? 0,
+                      subProjectId: task.subProjectId,
+                    }) as Task
+                  );
+                }}
+                onTaskDelete={handleDeleteTask}
+                onTaskMoveUp={(taskId) => handleMoveTask(taskId, 'up')}
+                onTaskMoveDown={(taskId) => handleMoveTask(taskId, 'down')}
+                onTaskCreate={(subProjectId) => handleCreateTask(subProjectId)}
+              />
             )}
           </TabsContent>
 
-          <TabsContent value="tasks" className="space-y-4">
-            <div className="flex justify-between">
-              <div>
-                <h3 className="text-lg font-semibold">Görevler</h3>
-                <p className="text-sm text-muted-foreground">{tasks.length} görev</p>
-              </div>
-            </div>
-            {tasks.length === 0 ? (
-              <EnhancedCard variant="glass" className="p-12 text-center">
-                <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                  <ListTodo className="w-6 h-6 text-primary" />
-                </div>
-                <h4 className="font-semibold mb-2">Henüz görev yok</h4>
-                <p className="text-sm text-muted-foreground">
-                  Önce alt projeler oluşturun, sonra alt projeler için görevler ekleyebilirsiniz.
-                </p>
-              </EnhancedCard>
-            ) : (
-              <div className="grid gap-4">
-                {subProjects.map((subProject) => {
-                  const subProjectTasks = tasks.filter(
-                    (task) => task.subProjectId === subProject.id
-                  );
-                  if (subProjectTasks.length === 0) return null;
-
-                  return (
-                    <EnhancedCard key={subProject.id} variant="glass" className="p-4">
-                      <div className="flex items-center justify-between mb-3">
-                        <h4 className="font-semibold flex items-center gap-2">
-                          <FolderKanban className="w-4 h-4" />
-                          {subProject.name}
-                        </h4>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleCreateTask(subProject.id)}
-                        >
-                          <Plus className="w-3 h-3 mr-1" />
-                          Görev Ekle
-                        </Button>
-                      </div>
-                      <div className="space-y-2 ml-6">
-                        {subProjectTasks.length === 0 ? (
-                          <p className="text-sm text-muted-foreground text-center py-4">
-                            Bu alt projede henüz görev yok.
-                          </p>
-                        ) : (
-                          subProjectTasks.map((task) => (
-                            <div
-                              key={task.id}
-                              className="p-3 border rounded-lg bg-muted/50 flex items-center justify-between hover:shadow-md transition-shadow cursor-pointer"
-                              onClick={(e) => handleEditTask(task, e)}
-                            >
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2">
-                                  <span className="font-medium">{task.title}</span>
-                                  <Badge variant="outline" className="text-xs">
-                                    {task.status === 'todo' && 'Yapılacak'}
-                                    {task.status === 'in_progress' && 'Devam Ediyor'}
-                                    {task.status === 'review' && 'İncelemede'}
-                                    {task.status === 'done' && 'Tamamlandı'}
-                                    {task.status === 'cancelled' && 'İptal'}
-                                  </Badge>
-                                </div>
-                                {task.description && (
-                                  <p className="text-sm text-muted-foreground mt-1">
-                                    {task.description}
-                                  </p>
-                                )}
-                              </div>
-                              <div className="flex gap-2 ml-4">
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={(e) => handleEditTask(task, e)}
-                                >
-                                  <Edit className="h-3 w-3" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={(e) => handleDeleteTask(task.id, e)}
-                                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                >
-                                  <Trash2 className="h-3 w-3" />
-                                </Button>
-                              </div>
-                            </div>
-                          ))
-                        )}
-                      </div>
-                    </EnhancedCard>
-                  );
-                })}
-              </div>
-            )}
+          <TabsContent value="assignments" className="space-y-4">
+            <ProjectAssignmentMatrix
+              matrix={assignmentMatrix}
+              loading={matrixLoading}
+              error={matrixError}
+              onRefresh={fetchAssignmentMatrix}
+            />
           </TabsContent>
         </Tabs>
 

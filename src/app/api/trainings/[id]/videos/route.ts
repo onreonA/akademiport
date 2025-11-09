@@ -6,6 +6,7 @@ import {
   ListTrainingVideosUseCase,
 } from '@/application/use-cases/training-video';
 import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
+import { logger } from '@/shared/utils/logger';
 
 const trainingVideoRepository = new TrainingVideoRepository();
 const trainingRepository = new TrainingRepository();
@@ -37,7 +38,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     return NextResponse.json({ videos: result.value });
   } catch (error) {
-    console.error('Error in GET /api/trainings/[id]/videos:', error);
+    logger.error('Error in GET /api/trainings/[id]/videos:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -61,7 +62,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const { id } = await params;
     const body = await request.json();
 
-    console.log('🔍 POST /api/trainings/[id]/videos:', {
+    logger.info('🔍 POST /api/trainings/[id]/videos:', {
       trainingId: id,
       body: {
         title: body.title,
@@ -86,7 +87,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     });
 
     if (result.isFailure) {
-      console.error('❌ CreateTrainingVideoUseCase failed:', {
+      logger.error('❌ CreateTrainingVideoUseCase failed:', {
         error: result.error.message,
         statusCode: result.error.statusCode,
       });
@@ -96,10 +97,10 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       );
     }
 
-    console.log('✅ CreateTrainingVideoUseCase success:', result.value);
+    logger.info('✅ CreateTrainingVideoUseCase success:', result.value);
     return NextResponse.json(result.value, { status: 201 });
   } catch (error) {
-    console.error('❌ Error in POST /api/trainings/[id]/videos:', {
+    logger.error('❌ Error in POST /api/trainings/[id]/videos:', {
       error: error instanceof Error ? error.message : 'Unknown error',
       stack: error instanceof Error ? error.stack : undefined,
     });

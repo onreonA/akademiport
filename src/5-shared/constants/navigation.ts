@@ -16,6 +16,9 @@ import {
   Plus,
   ListTodo,
   FileStack,
+  Calendar,
+  CalendarCheck,
+  Clock,
   type LucideIcon,
 } from 'lucide-react';
 import { UserRole } from '@/domain/enums/UserRole';
@@ -146,6 +149,30 @@ export const MASTER_ADMIN_NAVIGATION: NavigationConfig = {
       ],
     },
     {
+      id: 'events',
+      label: 'Etkinlikler',
+      icon: Calendar,
+      href: '/dashboard/events',
+      children: [
+        {
+          id: 'events-all',
+          label: 'Tüm Etkinlikler',
+          href: '/dashboard/events',
+        },
+        {
+          id: 'events-new',
+          label: 'Yeni Etkinlik',
+          href: '/dashboard/events/new',
+        },
+      ],
+    },
+    {
+      id: 'appointments',
+      label: 'Randevular',
+      icon: CalendarCheck,
+      href: '/dashboard/appointments',
+    },
+    {
       id: 'project-templates',
       label: 'Proje Şablonları',
       icon: FileStack,
@@ -236,6 +263,24 @@ export const CONSULTANT_NAVIGATION: NavigationConfig = {
       badge: 'Yakında',
     },
     {
+      id: 'events',
+      label: 'Etkinlikler',
+      icon: Calendar,
+      href: '/consultant-dashboard/events',
+    },
+    {
+      id: 'appointments',
+      label: 'Randevular',
+      icon: CalendarCheck,
+      href: '/consultant-dashboard/appointments',
+    },
+    {
+      id: 'availability',
+      label: 'Müsaitlik',
+      icon: Clock,
+      href: '/consultant-dashboard/availability',
+    },
+    {
       id: 'reports',
       label: 'Raporlarım',
       icon: BarChart3,
@@ -284,6 +329,18 @@ export const COMPANY_ADMIN_NAVIGATION: NavigationConfig = {
       badge: 'Yakında',
     },
     {
+      id: 'events',
+      label: 'Etkinlikler',
+      icon: Calendar,
+      href: '/company-dashboard/events',
+    },
+    {
+      id: 'appointments',
+      label: 'Randevular',
+      icon: CalendarCheck,
+      href: '/company-dashboard/appointments',
+    },
+    {
       id: 'reports',
       label: 'Raporlar',
       icon: BarChart3,
@@ -330,6 +387,18 @@ export const COMPANY_USER_NAVIGATION: NavigationConfig = {
       icon: GraduationCap,
       href: '/company-dashboard/trainings',
       badge: 'Yakında',
+    },
+    {
+      id: 'events',
+      label: 'Etkinlikler',
+      icon: Calendar,
+      href: '/company-dashboard/events',
+    },
+    {
+      id: 'appointments',
+      label: 'Randevular',
+      icon: CalendarCheck,
+      href: '/company-dashboard/appointments',
     },
   ],
   bottom: [

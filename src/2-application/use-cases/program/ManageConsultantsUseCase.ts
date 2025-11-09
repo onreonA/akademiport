@@ -25,6 +25,7 @@ export interface RemoveConsultantInput {
 
 export interface GetConsultantsInput {
   programId: string;
+  skipProgramCheck?: boolean; // Skip program existence check (for company users where authorization is done at API level)
 }
 
 export class ManageConsultantsUseCase {
@@ -135,6 +136,9 @@ export class ManageConsultantsUseCase {
 
   /**
    * Get all consultants for a program
+   *
+   * Note: Program existence check is skipped for company users as they are already
+   * authorized at the API level. This avoids RLS policy issues.
    */
   async getConsultants(input: GetConsultantsInput): Promise<Result<User[]>> {
     try {
@@ -143,14 +147,18 @@ export class ManageConsultantsUseCase {
         return Result.fail('Program ID zorunludur');
       }
 
-      // 2. Check if program exists
-      const programResult = await this.programRepository.findById(input.programId);
+      // 2. Skip program existence check for company users (authorization done at API level)
+      // For other roles, check if program exists
+      if (!input.skipProgramCheck) {
+        const programResult = await this.programRepository.findById(input.programId);
 
-      if (programResult.isFailure || !programResult.value) {
-        return Result.fail('Program bulunamadı');
+        if (programResult.isFailure || !programResult.value) {
+          return Result.fail('Program bulunamadı');
+        }
       }
 
       // 3. Get consultants from program (user_programs JOIN users)
+      // This uses admin client internally, so it works for all roles
       const consultantsResult = await this.programRepository.getConsultants(input.programId);
 
       if (consultantsResult.isFailure) {

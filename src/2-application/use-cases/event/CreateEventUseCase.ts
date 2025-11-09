@@ -1,0 +1,85 @@
+import { IEventRepository } from '@/domain/interfaces/repositories/IEventRepository';
+import { CreateEventDto } from '@/domain/entities/Event';
+import { Result } from '@/core/result';
+import { AppError } from '@/core/errors';
+import { ZoomApiService } from '@/infrastructure/external/zoom-api.service';
+import { EventEntity } from '@/domain/entities/Event';
+
+export class CreateEventUseCase {
+  constructor(private eventRepository: IEventRepository) {}
+
+  async execute(
+    data: CreateEventDto,
+    userId: string,
+    createZoomMeeting: boolean = true
+  ): Promise<Result<{ id: string; zoomMeetingId?: string }>> {
+    try {
+      // Validation
+      const validationErrors = EventEntity.validate(data);
+      if (validationErrors.length > 0) {
+        return Result.fail(new AppError(validationErrors.join(', '), 400));
+      }
+
+      // Create event
+      const createData = {
+        ...data,
+        createdBy: userId,
+      };
+
+      const event = await this.eventRepository.create(createData);
+
+      // Create Zoom meeting if requested
+      let zoomMeetingId: string | undefined;
+      if (createZoomMeeting && data.createZoomMeeting !== false) {
+        try {
+          const zoomMeeting = await ZoomApiService.createMeeting({
+            topic: event.title,
+            type: 2, // Scheduled meeting
+            startTime: event.startTime.toISOString(),
+            duration: Math.round(
+              (event.endTime.getTime() - event.startTime.getTime()) / (1000 * 60)
+            ),
+            timezone: event.timezone,
+            password: event.zoomPassword || undefined,
+            agenda: event.description || undefined,
+            settings: {
+              hostVideo: true,
+              participantVideo: true,
+              joinBeforeHost: false,
+              muteUponEntry: false,
+              waitingRoom: true,
+              autoRecording: 'none',
+            },
+          });
+
+          if (zoomMeeting) {
+            zoomMeetingId = zoomMeeting.id;
+            await this.eventRepository.updateZoomMeeting(
+              event.id,
+              zoomMeeting.id,
+              zoomMeeting.joinUrl,
+              zoomMeeting.startUrl,
+              zoomMeeting.password || undefined
+            );
+          }
+        } catch (zoomError) {
+          logger.warn('Failed to create Zoom meeting, continuing without Zoom:', {
+            eventId: event.id,
+            error: zoomError instanceof Error ? zoomError.message : 'Unknown error',
+          });
+          // Continue without Zoom meeting - event is still created
+          // Note: In production, you might want to notify the user about this
+        }
+      }
+
+      return Result.ok({
+        id: event.id,
+        zoomMeetingId,
+      });
+    } catch (error) {
+      return Result.fail(
+        new AppError(error instanceof Error ? error.message : 'Failed to create event', 500)
+      );
+    }
+  }
+}

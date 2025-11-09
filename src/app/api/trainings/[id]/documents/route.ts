@@ -6,6 +6,7 @@ import {
   ListTrainingDocumentsUseCase,
 } from '@/application/use-cases/training-document';
 import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
+import { logger } from '@/shared/utils/logger';
 
 const trainingDocumentRepository = new TrainingDocumentRepository();
 const trainingRepository = new TrainingRepository();
@@ -37,7 +38,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     return NextResponse.json({ documents: result.value });
   } catch (error) {
-    console.error('Error in GET /api/trainings/[id]/documents:', error);
+    logger.error('Error in GET /api/trainings/[id]/documents:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -61,7 +62,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const { id } = await params;
     const body = await request.json();
 
-    console.log('🔍 POST /api/trainings/[id]/documents:', {
+    logger.info('🔍 POST /api/trainings/[id]/documents:', {
       trainingId: id,
       body: {
         title: body.title,
@@ -89,7 +90,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     });
 
     if (result.isFailure) {
-      console.error('❌ CreateTrainingDocumentUseCase failed:', {
+      logger.error('❌ CreateTrainingDocumentUseCase failed:', {
         error: result.error.message,
         statusCode: result.error.statusCode,
       });
@@ -99,10 +100,10 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       );
     }
 
-    console.log('✅ CreateTrainingDocumentUseCase success:', result.value);
+    logger.info('✅ CreateTrainingDocumentUseCase success:', result.value);
     return NextResponse.json(result.value, { status: 201 });
   } catch (error) {
-    console.error('❌ Error in POST /api/trainings/[id]/documents:', {
+    logger.error('❌ Error in POST /api/trainings/[id]/documents:', {
       error: error instanceof Error ? error.message : 'Unknown error',
       stack: error instanceof Error ? error.stack : undefined,
     });

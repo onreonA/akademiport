@@ -36,13 +36,7 @@ interface ProgramSelectorProps {
 // =====================================================
 
 export function ProgramSelector({ onProgramChange, className }: ProgramSelectorProps) {
-  const { selectedProgram, setSelectedProgram, programs, setPrograms, isLoading, setIsLoading } =
-    useConsultantProgram();
-
-  // Fetch programs on mount
-  useEffect(() => {
-    fetchPrograms();
-  }, []);
+  const { selectedProgram, setSelectedProgram, programs, isLoading } = useConsultantProgram();
 
   // Notify parent when program changes
   useEffect(() => {
@@ -51,27 +45,8 @@ export function ProgramSelector({ onProgramChange, className }: ProgramSelectorP
     }
   }, [selectedProgram, onProgramChange]);
 
-  const fetchPrograms = async () => {
-    try {
-      setIsLoading(true);
-      const response = await fetch('/api/consultant/programs');
-      const data = await response.json();
-
-      if (data.success) {
-        const programList = data.data.map((item: any) => item.program);
-        setPrograms(programList);
-
-        // Auto-select first program if none selected
-        if (!selectedProgram && programList.length > 0) {
-          setSelectedProgram(programList[0]);
-        }
-      }
-    } catch (error) {
-      console.error('Failed to fetch programs:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // Note: Programs are now automatically loaded by ConsultantProgramContext
+  // This component only handles program selection UI
 
   const handleValueChange = (programId: string) => {
     const program = programs.find((p) => p.id === programId);

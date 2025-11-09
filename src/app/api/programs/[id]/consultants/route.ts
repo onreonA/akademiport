@@ -79,19 +79,86 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 /**
  * GET /api/programs/[id]/consultants
  * Get all consultants for a program
+ *
+ * Authorization:
+ * - Master Admin, Program Manager: Can see all consultants
+ * - Consultant: Can see consultants in their assigned programs
+ * - Company Admin/User: Can see consultants in their company's program
  */
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id: programId } = await params;
 
+    // Get authenticated user
+    const user = await requireAuth(request);
+    const userRole = user.role as UserRole;
+
     console.log(
       '🔍 [GET /api/programs/[id]/consultants] Fetching consultants for program:',
-      programId
+      programId,
+      'User:',
+      { id: user.id, role: userRole, companyId: user.companyId }
     );
 
+    // For company users, verify they can access this program
+    if (userRole === UserRole.COMPANY_ADMIN || userRole === UserRole.COMPANY_USER) {
+      if (!user.companyId) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'Firma bilgisi bulunamadı',
+          },
+          { status: 403 }
+        );
+      }
+
+      // Get company to verify program access
+      const { CompanyRepository } = await import(
+        '@/4-infrastructure/database/repositories/CompanyRepository'
+      );
+      const { GetCompanyUseCase } = await import('@/application/use-cases/company');
+      const companyRepository = new CompanyRepository();
+      const getCompanyUseCase = new GetCompanyUseCase(companyRepository);
+
+      const companyResult = await getCompanyUseCase.execute(
+        user.companyId,
+        user.id,
+        userRole,
+        user.companyId
+      );
+
+      if (companyResult.isFailure || !companyResult.value) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'Firma bilgisi alınamadı',
+          },
+          { status: 403 }
+        );
+      }
+
+      // Verify company's program matches requested program
+      if (companyResult.value.programId !== programId) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'Bu programa erişim yetkiniz yok',
+          },
+          { status: 403 }
+        );
+      }
+
+      console.log(
+        '✅ [GET /api/programs/[id]/consultants] Company user authorized for program:',
+        programId
+      );
+    }
+
     // Execute use case
+    // Skip program check for company users (already authorized above)
     const result = await manageConsultantsUseCase.getConsultants({
       programId,
+      skipProgramCheck: userRole === UserRole.COMPANY_ADMIN || userRole === UserRole.COMPANY_USER,
     });
 
     if (result.isFailure) {

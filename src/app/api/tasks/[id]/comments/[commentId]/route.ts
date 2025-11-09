@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthenticatedUser } from '@/4-infrastructure/api/helpers/auth';
 import { TaskCommentRepository } from '@/4-infrastructure/database/repositories/TaskCommentRepository';
 import { DeleteTaskCommentUseCase } from '@/2-application/use-cases/task-comment/DeleteTaskCommentUseCase';
+import { logger } from '@/shared/utils/logger';
 
 /**
  * DELETE /api/tasks/[id]/comments/[commentId]
@@ -32,7 +33,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('❌ [Task Comment API] Error:', error);
+    logger.error('❌ [Task Comment API] Error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

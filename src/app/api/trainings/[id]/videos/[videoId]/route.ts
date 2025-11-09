@@ -5,6 +5,7 @@ import {
   DeleteTrainingVideoUseCase,
 } from '@/application/use-cases/training-video';
 import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
+import { logger } from '@/shared/utils/logger';
 
 const trainingVideoRepository = new TrainingVideoRepository();
 
@@ -31,7 +32,7 @@ export async function GET(
 
     return NextResponse.json(video);
   } catch (error) {
-    console.error('Error in GET /api/trainings/[id]/videos/[videoId]:', error);
+    logger.error('Error in GET /api/trainings/[id]/videos/[videoId]:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -77,7 +78,7 @@ export async function PUT(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error in PUT /api/trainings/[id]/videos/[videoId]:', error);
+    logger.error('Error in PUT /api/trainings/[id]/videos/[videoId]:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -115,7 +116,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error in DELETE /api/trainings/[id]/videos/[videoId]:', error);
+    logger.error('Error in DELETE /api/trainings/[id]/videos/[videoId]:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

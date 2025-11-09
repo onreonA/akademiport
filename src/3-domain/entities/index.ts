@@ -15,3 +15,6 @@ export * from './TrainingDocument';
 export * from './CompanyTraining';
 export * from './TrainingProgress';
 export * from './User';
+export * from './CompanyProjectAssignment';
+export * from './Event';
+export * from './Appointment';

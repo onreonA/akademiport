@@ -8,6 +8,7 @@ import {
   CalculateTrainingProgressUseCase,
 } from '@/application/use-cases/training-progress';
 import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
+import { logger } from '@/shared/utils/logger';
 
 const trainingProgressRepository = new TrainingProgressRepository();
 const companyRepository = new CompanyRepository();
@@ -63,7 +64,7 @@ export async function GET(
       const result = await calculateProgressUseCase.execute(id, trainingId);
 
       if (result.isFailure) {
-        console.error('❌ CalculateTrainingProgressUseCase failed:', {
+        logger.error('❌ CalculateTrainingProgressUseCase failed:', {
           companyId: id,
           trainingId,
           error: result.error.message,
@@ -95,10 +96,10 @@ export async function GET(
 
     return NextResponse.json({ progress: result.value });
   } catch (error) {
-    console.error('❌ Error in GET /api/companies/[id]/trainings/[trainingId]/progress:', error);
+    logger.error('❌ Error in GET /api/companies/[id]/trainings/[trainingId]/progress:', error);
     const errorMessage = error instanceof Error ? error.message : 'Internal server error';
     const errorStack = error instanceof Error ? error.stack : undefined;
-    console.error('Error details:', { errorMessage, errorStack });
+    logger.error('Error details:', { errorMessage, errorStack });
     return NextResponse.json({ error: errorMessage, details: errorStack }, { status: 500 });
   }
 }
@@ -153,7 +154,7 @@ export async function POST(
 
     return NextResponse.json(result.value, { status: 201 });
   } catch (error) {
-    console.error('Error in POST /api/companies/[id]/trainings/[trainingId]/progress:', error);
+    logger.error('Error in POST /api/companies/[id]/trainings/[trainingId]/progress:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

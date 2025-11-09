@@ -1,635 +1,942 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import {
-  Briefcase,
-  Calendar,
-  User,
-  TrendingUp,
-  CheckCircle2,
-  Clock,
-  AlertCircle,
+  Activity,
   ArrowLeft,
-  FolderOpen,
-  ListTodo,
-  Edit,
-  Trash2,
-  Building2,
+  Briefcase,
+  Gauge,
+  Layers,
+  Loader2,
+  Plus,
+  Table,
+  TrendingUp,
 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/presentation/components/ui/atoms/card';
-import { Badge } from '@/presentation/components/ui/atoms/badge';
 import { Button } from '@/presentation/components/ui/atoms/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/presentation/components/ui/atoms/tabs';
+import { Card, CardContent } from '@/presentation/components/ui/atoms/card';
+import { Badge } from '@/presentation/components/ui/atoms/badge';
+import { ProjectHierarchyAccordion } from '@/presentation/components/features/projects/ProjectHierarchyAccordion';
+import { ProjectAssignmentMatrix } from '@/presentation/components/features/projects/ProjectAssignmentMatrix';
+import {
+  ProjectHierarchyDTO,
+  SubProjectWithTasksDTO,
+  TaskDTO,
+} from '@/application/dto/project-hierarchy.dto';
+import { ProjectAssignmentMatrixDTO } from '@/application/dto/project-assignment.dto';
+import { SubProjectModal } from '@/presentation/components/features/sub-projects/SubProjectModal';
+import { TaskModal } from '@/presentation/components/features/tasks/TaskModal';
+import { toast } from 'sonner';
+import { ProjectDetailHeader } from './components/ProjectDetailHeader';
+import { BulkAssignmentDialog } from '@/presentation/components/features/projects/BulkAssignmentDialog';
+import { BulkDatesDialog } from '@/presentation/components/features/projects/BulkDatesDialog';
 
-interface Project {
+type TabValue = 'overview' | 'structure' | 'assignments';
+
+type EditableSubProject = {
   id: string;
   name: string;
-  description?: string;
-  status: string;
-  priority: string;
-  progress: number;
-  start_date?: string;
-  end_date?: string;
-  companyName?: string;
-  consultantName?: string;
-}
-
-interface SubProject {
-  id: string;
-  name: string;
-  description?: string;
+  description?: string | null;
   status: string;
   progress: number;
   order_index: number;
-}
+};
 
-interface Task {
-  id: string;
-  title: string;
-  description?: string;
-  status: string;
-  priority: string;
-  due_date?: string;
-  assigned_to?: string;
-}
-
-const statusConfig: Record<string, { label: string; color: string }> = {
+const STATUS_BADGES: Record<string, { label: string; badgeClass: string }> = {
   planning: {
     label: 'Planlama',
-    color:
-      'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800',
+    badgeClass:
+      'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 border-blue-200 dark:border-blue-700',
   },
   active: {
     label: 'Aktif',
-    color:
-      'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 border-green-200 dark:border-green-800',
-  },
-  on_hold: {
-    label: 'Beklemede',
-    color:
-      'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 border-orange-200 dark:border-orange-800',
-  },
-  completed: {
-    label: 'Tamamlandı',
-    color:
-      'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700',
-  },
-  cancelled: {
-    label: 'İptal',
-    color:
-      'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800',
-  },
-  todo: {
-    label: 'Yapılacak',
-    color:
-      'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700',
+    badgeClass:
+      'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-300 border-emerald-200 dark:border-emerald-700',
   },
   in_progress: {
     label: 'Devam Ediyor',
-    color:
-      'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800',
+    badgeClass:
+      'bg-primary/10 text-primary border-primary/40 dark:text-primary dark:border-primary/50',
+  },
+  on_hold: {
+    label: 'Beklemede',
+    badgeClass:
+      'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-300 border-orange-200 dark:border-orange-700',
   },
   review: {
     label: 'İncelemede',
-    color:
-      'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 border-orange-200 dark:border-orange-800',
+    badgeClass:
+      'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-300 border-amber-200 dark:border-amber-700',
   },
   done: {
     label: 'Tamamlandı',
-    color:
-      'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 border-green-200 dark:border-green-800',
+    badgeClass:
+      'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-300 border-emerald-200 dark:border-emerald-700',
+  },
+  completed: {
+    label: 'Tamamlandı',
+    badgeClass:
+      'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-300 border-emerald-200 dark:border-emerald-700',
+  },
+  cancelled: {
+    label: 'İptal',
+    badgeClass:
+      'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-300 border-red-200 dark:border-red-700',
   },
 };
 
-const priorityConfig: Record<string, { label: string; color: string }> = {
+const PRIORITY_BADGES: Record<string, { label: string; badgeClass: string }> = {
   low: {
     label: 'Düşük',
-    color:
-      'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700',
+    badgeClass:
+      'bg-gray-100 dark:bg-gray-900/40 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700',
   },
   medium: {
     label: 'Orta',
-    color:
-      'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800',
+    badgeClass:
+      'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 border-blue-200 dark:border-blue-700',
   },
   high: {
     label: 'Yüksek',
-    color:
-      'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 border-orange-200 dark:border-orange-800',
+    badgeClass:
+      'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-300 border-orange-200 dark:border-orange-700',
   },
   urgent: {
     label: 'Acil',
-    color:
-      'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800',
+    badgeClass:
+      'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-300 border-red-200 dark:border-red-700',
   },
   critical: {
     label: 'Kritik',
-    color:
-      'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800',
+    badgeClass:
+      'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-300 border-red-200 dark:border-red-700',
   },
 };
 
+const formatDate = (value?: string | null) => {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return date.toLocaleDateString('tr-TR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  });
+};
+
 export default function AdminProjectDetailPage() {
-  const params = useParams();
+  const params = useParams<{ id: string }>();
   const router = useRouter();
-  const projectId = params.id as string;
+  const projectId = params.id;
 
-  const [project, setProject] = useState<Project | null>(null);
-  const [subProjects, setSubProjects] = useState<SubProject[]>([]);
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState<TabValue>('overview');
+  const [hierarchy, setHierarchy] = useState<ProjectHierarchyDTO | null>(null);
+  const [hierarchyLoading, setHierarchyLoading] = useState(true);
+  const [hierarchyError, setHierarchyError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchProject();
+  const [matrix, setMatrix] = useState<ProjectAssignmentMatrixDTO | null>(null);
+  const [matrixLoading, setMatrixLoading] = useState(false);
+  const [matrixError, setMatrixError] = useState<string | null>(null);
+
+  const [subProjectModalOpen, setSubProjectModalOpen] = useState(false);
+  const [editingSubProject, setEditingSubProject] = useState<EditableSubProject | null>(null);
+  const [taskModalOpen, setTaskModalOpen] = useState(false);
+  const [taskModalSubProjectId, setTaskModalSubProjectId] = useState<string | null>(null);
+  const [editingTask, setEditingTask] = useState<TaskDTO | null>(null);
+  const [bulkAssignmentOpen, setBulkAssignmentOpen] = useState(false);
+  const [bulkAssignmentSubmitting, setBulkAssignmentSubmitting] = useState(false);
+  const [bulkDatesOpen, setBulkDatesOpen] = useState(false);
+  const [bulkDatesSubmitting, setBulkDatesSubmitting] = useState(false);
+
+  const fetchHierarchy = useCallback(async () => {
+    setHierarchyLoading(true);
+    setHierarchyError(null);
+
+    try {
+      const response = await fetch(`/api/projects/${projectId}/hierarchy`);
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({}));
+        throw new Error(payload?.error || 'Proje yapısı getirilemedi');
+      }
+
+      const payload = await response.json();
+      const data: ProjectHierarchyDTO | undefined = payload?.data ?? payload;
+
+      if (!data) {
+        throw new Error('Proje yapısı bulunamadı');
+      }
+
+      setHierarchy(data);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Beklenmeyen bir hata oluştu';
+      setHierarchyError(message);
+    } finally {
+      setHierarchyLoading(false);
+    }
+  }, [projectId]);
+
+  const fetchAssignmentMatrix = useCallback(async () => {
+    setMatrixLoading(true);
+    setMatrixError(null);
+
+    try {
+      const response = await fetch(`/api/projects/${projectId}/assignment-matrix`);
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({}));
+        throw new Error(payload?.error || 'Atama matrisi getirilemedi');
+      }
+
+      const payload = await response.json();
+      const data: ProjectAssignmentMatrixDTO | undefined = payload?.data ?? payload;
+
+      setMatrix(data ?? null);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Beklenmeyen bir hata oluştu';
+      setMatrixError(message);
+    } finally {
+      setMatrixLoading(false);
+    }
   }, [projectId]);
 
   useEffect(() => {
-    if (project && !loading) {
-      fetchSubProjects();
-      fetchTasks();
-    }
-  }, [project, loading]);
+    fetchHierarchy();
+  }, [fetchHierarchy]);
 
   useEffect(() => {
-    if (activeTab === 'subprojects' && subProjects.length === 0) {
-      fetchSubProjects();
-    } else if (activeTab === 'tasks' && tasks.length === 0) {
-      fetchTasks();
+    if (activeTab === 'assignments' && !matrix && !matrixLoading && !matrixError) {
+      fetchAssignmentMatrix();
     }
-  }, [activeTab]);
+  }, [activeTab, fetchAssignmentMatrix, matrix, matrixLoading, matrixError]);
 
-  const fetchProject = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(`/api/projects/${projectId}`);
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: 'Failed to fetch project' }));
-        throw new Error(errorData.error || 'Failed to fetch project');
+  const project = hierarchy?.project;
+  const stats = hierarchy?.stats;
+  const subProjects = useMemo<SubProjectWithTasksDTO[]>(
+    () => hierarchy?.subProjects ?? [],
+    [hierarchy]
+  );
+  const totalSubProjects = stats?.totalSubProjects ?? subProjects.length;
+  const totalTasks =
+    stats?.totalTasks ??
+    subProjects.reduce((accumulator, subProject) => acc + (subProject.tasks?.length ?? 0), 0);
+  const completedTasks = stats?.completedTasks ?? 0;
+
+  const allTasks = useMemo<TaskDTO[]>(() => {
+    return subProjects.flatMap((subProject) => subProject.tasks ?? []);
+  }, [subProjects]);
+
+  const mapSubProjectForModal = useCallback(
+    (subProject: SubProjectWithTasksDTO): EditableSubProject => ({
+      id: subProject.id,
+      name: subProject.name,
+      description: subProject.description ?? '',
+      status: subProject.status ?? 'todo',
+      progress: subProject.progress ?? 0,
+      order_index: subProject.orderIndex ?? 0,
+    }),
+    []
+  );
+
+  const handleCreateSubProject = useCallback(() => {
+    setEditingSubProject(null);
+    setSubProjectModalOpen(true);
+  }, []);
+
+  const handleEditSubProject = useCallback(
+    (subProject: SubProjectWithTasksDTO) => {
+      setEditingSubProject(mapSubProjectForModal(subProject));
+      setSubProjectModalOpen(true);
+    },
+    [mapSubProjectForModal]
+  );
+
+  const handleDeleteSubProject = useCallback(
+    async (subProjectId: string) => {
+      const confirmed = window.confirm('Alt projeyi silmek istediğinizden emin misiniz?');
+      if (!confirmed) {
+        return;
       }
-      const data = await response.json();
-      const projectData = data.project || data;
 
-      const normalizedProject = {
-        ...projectData,
-        status: projectData.status || 'todo',
-        priority: projectData.priority || 'medium',
-        progress: projectData.progress ?? 0,
-        start_date: projectData.startDate || projectData.start_date,
-        end_date: projectData.endDate || projectData.end_date,
-      };
+      try {
+        const response = await fetch(`/api/sub-projects/${subProjectId}`, {
+          method: 'DELETE',
+        });
 
-      setProject(normalizedProject);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-    } finally {
-      setLoading(false);
-    }
-  };
+        if (!response.ok) {
+          const payload = await response.json().catch(() => ({}));
+          throw new Error(payload?.error || 'Alt proje silinemedi.');
+        }
 
-  const fetchSubProjects = async () => {
-    try {
-      const response = await fetch(`/api/sub-projects?projectId=${projectId}`);
-      if (!response.ok) throw new Error('Failed to fetch sub-projects');
-      const data = await response.json();
-      setSubProjects(Array.isArray(data) ? data : data.subProjects || data.data || []);
-    } catch (err) {
-      console.error('Error fetching sub-projects:', err);
-    }
-  };
+        toast.success('Alt proje silindi.');
+        await fetchHierarchy();
+      } catch (error) {
+        console.error('Error deleting sub-project:', error);
+        toast.error(error instanceof Error ? error.message : 'Alt proje silinemedi.');
+      }
+    },
+    [fetchHierarchy]
+  );
 
-  const fetchTasks = async () => {
-    try {
-      const response = await fetch(`/api/projects/${projectId}/tasks`);
-      if (!response.ok) throw new Error('Failed to fetch tasks');
-      const data = await response.json();
-      setTasks(data.tasks || data.data || []);
-    } catch (err) {
-      console.error('Error fetching tasks:', err);
-    }
-  };
+  const handleMoveSubProject = useCallback(
+    async (subProjectId: string, direction: 'up' | 'down') => {
+      const ordered = [...subProjects].sort((a, b) => (a.orderIndex ?? 0) - (b.orderIndex ?? 0));
+      const currentIndex = ordered.findIndex((subProject) => subProject.id === subProjectId);
+      if (currentIndex === -1) {
+        return;
+      }
+      const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+      if (targetIndex < 0 || targetIndex >= ordered.length) {
+        return;
+      }
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <div className="container mx-auto py-8 px-4">
-          <div className="flex items-center justify-center py-16">
-            <div className="text-center space-y-4">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-              <p className="text-lg text-gray-600 dark:text-gray-400">Yükleniyor...</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+      const current = ordered[currentIndex];
+      const target = ordered[targetIndex];
 
-  if (error || !project) {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <div className="container mx-auto py-8 px-4">
-          <div className="flex flex-col items-center justify-center py-16 space-y-4">
-            <div className="w-16 h-16 mx-auto rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-6">
-              <AlertCircle className="h-8 w-8 text-red-600 dark:text-red-400" />
-            </div>
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-              Proje Bulunamadı
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
-              {error || 'Proje bilgileri yüklenemedi'}
-            </p>
-            <Button onClick={() => router.push('/dashboard/projects')}>
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Projeler Listesi
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+      try {
+        const [currentResponse, targetResponse] = await Promise.all([
+          fetch(`/api/sub-projects/${current.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ orderIndex: target.orderIndex ?? 0 }),
+          }),
+          fetch(`/api/sub-projects/${target.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ orderIndex: current.orderIndex ?? 0 }),
+          }),
+        ]);
 
-  const statusInfo = statusConfig[project.status] || statusConfig.todo;
-  const priorityInfo = priorityConfig[project.priority] || priorityConfig.medium;
+        if (!currentResponse.ok || !targetResponse.ok) {
+          const currentError = await currentResponse.json().catch(() => ({}));
+          const targetError = await targetResponse.json().catch(() => ({}));
+          throw new Error(
+            currentError?.error || targetError?.error || 'Alt proje sırası güncellenemedi.'
+          );
+        }
 
-  const formatDate = (date: string | Date | undefined) => {
-    if (!date) return 'Belirtilmemiş';
-    const d = typeof date === 'string' ? new Date(date) : date;
-    return d.toLocaleDateString('tr-TR', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
+        toast.success('Alt proje sırası güncellendi.');
+        await fetchHierarchy();
+      } catch (error) {
+        console.error('Error updating sub-project order:', error);
+        toast.error(error instanceof Error ? error.message : 'Alt proje sırası güncellenemedi.');
+      }
+    },
+    [subProjects, fetchHierarchy]
+  );
+
+  const handleCreateTask = useCallback((subProjectId: string) => {
+    setEditingTask(null);
+    setTaskModalSubProjectId(subProjectId);
+    setTaskModalOpen(true);
+  }, []);
+
+  const handleEditTask = useCallback((task: TaskDTO) => {
+    setEditingTask({
+      ...task,
+      orderIndex: task.orderIndex ?? 0,
     });
-  };
+    setTaskModalSubProjectId(task.subProjectId);
+    setTaskModalOpen(true);
+  }, []);
+
+  const handleDeleteTask = useCallback(
+    async (taskId: string) => {
+      const confirmed = window.confirm('Görevi silmek istediğinizden emin misiniz?');
+      if (!confirmed) {
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/tasks/${taskId}`, {
+          method: 'DELETE',
+        });
+
+        if (!response.ok) {
+          const payload = await response.json().catch(() => ({}));
+          throw new Error(payload?.error || 'Görev silinemedi.');
+        }
+
+        toast.success('Görev silindi.');
+        await fetchHierarchy();
+      } catch (error) {
+        console.error('Error deleting task:', error);
+        toast.error(error instanceof Error ? error.message : 'Görev silinemedi.');
+      }
+    },
+    [fetchHierarchy]
+  );
+
+  const handleMoveTask = useCallback(
+    async (taskId: string, direction: 'up' | 'down') => {
+      const currentTask = allTasks.find((task) => task.id === taskId);
+      if (!currentTask) {
+        return;
+      }
+
+      const tasksInSubProject = allTasks
+        .filter((task) => task.subProjectId === currentTask.subProjectId)
+        .sort((a, b) => (a.orderIndex ?? 0) - (b.orderIndex ?? 0));
+
+      const currentIndex = tasksInSubProject.findIndex((task) => task.id === taskId);
+      const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+      if (targetIndex < 0 || targetIndex >= tasksInSubProject.length) {
+        return;
+      }
+
+      const targetTask = tasksInSubProject[targetIndex];
+
+      try {
+        const [currentResponse, targetResponse] = await Promise.all([
+          fetch(`/api/tasks/${currentTask.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ orderIndex: targetTask.orderIndex ?? 0 }),
+          }),
+          fetch(`/api/tasks/${targetTask.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ orderIndex: currentTask.orderIndex ?? 0 }),
+          }),
+        ]);
+
+        if (!currentResponse.ok || !targetResponse.ok) {
+          const currentError = await currentResponse.json().catch(() => ({}));
+          const targetError = await targetResponse.json().catch(() => ({}));
+          throw new Error(
+            currentError?.error || targetError?.error || 'Görev sırası güncellenemedi.'
+          );
+        }
+
+        toast.success('Görev sırası güncellendi.');
+        await fetchHierarchy();
+      } catch (error) {
+        console.error('Error updating task order:', error);
+        toast.error(error instanceof Error ? error.message : 'Görev sırası güncellenemedi.');
+      }
+    },
+    [allTasks, fetchHierarchy]
+  );
+
+  const handleViewSubProject = useCallback((subProject: SubProjectWithTasksDTO) => {
+    toast.info(`Alt proje detay ekranı yakında: ${subProject.name}`);
+  }, []);
+
+  const handleViewTask = useCallback((task: TaskDTO) => {
+    toast.info(`Görev detay ekranı yakında: ${task.title}`);
+  }, []);
+
+  const hasMatrixData =
+    Boolean(matrix) && matrix!.companies.length > 0 && matrix!.subProjects.length > 0;
+
+  const handleOpenBulkAssignment = useCallback(() => {
+    if (!matrix) {
+      if (!matrixLoading) {
+        fetchAssignmentMatrix();
+      }
+      setBulkAssignmentOpen(true);
+      return;
+    }
+
+    if (matrix.companies.length === 0 || matrix.subProjects.length === 0) {
+      toast.info('Atama yapılacak firma veya alt proje bulunmuyor.');
+      return;
+    }
+
+    setBulkAssignmentOpen(true);
+  }, [fetchAssignmentMatrix, matrix, matrixLoading]);
+
+  const handleOpenBulkDates = useCallback(() => {
+    if (!matrix) {
+      if (!matrixLoading) {
+        fetchAssignmentMatrix();
+      }
+      setBulkDatesOpen(true);
+      return;
+    }
+
+    if (matrix.companies.length === 0 || matrix.subProjects.length === 0) {
+      toast.info('Tarih düzenleyebileceğiniz firma veya alt proje bulunmuyor.');
+      return;
+    }
+
+    setBulkDatesOpen(true);
+  }, [fetchAssignmentMatrix, matrix, matrixLoading]);
+
+  const handleBulkAssignmentSubmit = useCallback(
+    async (assignments: Array<{ companyId: string; subProjectIds: string[] }>) => {
+      try {
+        setBulkAssignmentSubmitting(true);
+        const response = await fetch(`/api/projects/${projectId}/assignments/bulk`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ assignments }),
+        });
+        const payload = await response.json().catch(() => ({}));
+
+        const errorItems: Array<{
+          companyId?: string;
+          subProjectId?: string | null;
+          error?: string;
+          message?: string;
+        }> = Array.isArray(payload?.errors)
+          ? payload.errors
+          : Array.isArray(payload?.details)
+            ? payload.details
+            : [];
+
+        if (!response.ok) {
+          const errorMessage = payload?.error || 'Alt proje atamaları güncellenemedi.';
+          if (errorItems.length > 0) {
+            const detail = errorItems
+              .map((item) => {
+                const targetFirma = item.companyId ?? 'Firma';
+                const subProjectLabel = item.subProjectId
+                  ? ` · Alt Proje ${item.subProjectId}`
+                  : '';
+                return `${targetFirma}${subProjectLabel}: ${
+                  item.error ?? item.message ?? 'Bilinmeyen hata'
+                }`;
+              })
+              .join('\n');
+            toast.error(errorMessage, { description: detail });
+          } else {
+            toast.error(errorMessage);
+          }
+          return;
+        }
+
+        const successCount = payload?.successCount ?? 0;
+        const removeCount = payload?.removeCount ?? 0;
+
+        toast.success('Alt proje atamaları güncellendi.', {
+          description: `Yeni atama: ${successCount} · Kaldırılan: ${removeCount}`,
+        });
+
+        if (errorItems.length > 0) {
+          const detail = errorItems
+            .map((item) => {
+              const targetFirma = item.companyId ?? 'Firma';
+              const subProjectLabel = item.subProjectId ? ` · Alt Proje ${item.subProjectId}` : '';
+              return `${targetFirma}${subProjectLabel}: ${
+                item.message ?? item.error ?? 'Bilinmeyen uyarı'
+              }`;
+            })
+            .join('\n');
+          toast.warning('Bazı işlemler tamamlanamadı', {
+            description: detail,
+          });
+        }
+        setBulkAssignmentOpen(false);
+        await fetchAssignmentMatrix();
+      } catch (error) {
+        console.error('Bulk assignment error:', error);
+        toast.error(error instanceof Error ? error.message : 'Alt proje atamaları güncellenemedi.');
+      } finally {
+        setBulkAssignmentSubmitting(false);
+      }
+    },
+    [projectId, fetchAssignmentMatrix]
+  );
+
+  const handleBulkDatesSubmit = useCallback(
+    async (
+      subProjectId: string,
+      dates: Array<{ companyId: string; startDate: string | null; endDate: string | null }>
+    ) => {
+      try {
+        setBulkDatesSubmitting(true);
+        const response = await fetch(
+          `/api/projects/${projectId}/sub-projects/${subProjectId}/dates/bulk`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ dates }),
+          }
+        );
+        const payload = await response.json().catch(() => ({}));
+
+        const errorItems: Array<{ companyId?: string; error?: string; message?: string }> =
+          Array.isArray(payload?.errors)
+            ? payload.errors
+            : Array.isArray(payload?.details)
+              ? payload.details
+              : [];
+
+        if (!response.ok) {
+          const errorMessage = payload?.error || 'Tarih güncellemeleri kaydedilemedi.';
+          if (errorItems.length > 0) {
+            const detail = errorItems
+              .map(
+                (item) =>
+                  `${item.companyId ?? 'Firma'}: ${item.error ?? item.message ?? 'Bilinmeyen hata'}`
+              )
+              .join('\n');
+            toast.error(errorMessage, { description: detail });
+          } else {
+            toast.error(errorMessage);
+          }
+          return;
+        }
+
+        const updatedCount = payload?.updatedCount ?? 0;
+        toast.success('Tarih güncellemeleri kaydedildi.', {
+          description: `${updatedCount} kayıt güncellendi.`,
+        });
+
+        if (errorItems.length > 0) {
+          const detail = errorItems
+            .map(
+              (item) =>
+                `${item.companyId ?? 'Firma'}: ${item.message ?? item.error ?? 'Bilinmeyen uyarı'}`
+            )
+            .join('\n');
+          toast.warning('Bazı firmalarda tarih güncellenemedi', {
+            description: detail,
+          });
+        }
+        setBulkDatesOpen(false);
+        await fetchAssignmentMatrix();
+      } catch (error) {
+        console.error('Bulk date assignment error:', error);
+        toast.error(error instanceof Error ? error.message : 'Tarih güncellemeleri kaydedilemedi.');
+      } finally {
+        setBulkDatesSubmitting(false);
+      }
+    },
+    [projectId, fetchAssignmentMatrix]
+  );
+
+  const statusBadge = project
+    ? (STATUS_BADGES[project.status] ?? {
+        label: project.status,
+        badgeClass:
+          'bg-gray-100 dark:bg-gray-900/40 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700',
+      })
+    : null;
+
+  const priorityBadge = project
+    ? (PRIORITY_BADGES[project.priority] ?? {
+        label: project.priority,
+        badgeClass:
+          'bg-gray-100 dark:bg-gray-900/40 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700',
+      })
+    : null;
+
+  const progressValue = project?.progress ?? stats?.overallProgress ?? 0;
+
+  const startDateLabel = formatDate(project?.startDate);
+  const endDateLabel = formatDate(project?.endDate);
+
+  const overviewCards = useMemo(
+    () => [
+      {
+        title: 'Genel İlerleme',
+        value: `${progressValue}%`,
+        description: 'Ana projenin tamamlanma oranı',
+        icon: TrendingUp,
+      },
+      {
+        title: 'Alt Proje',
+        value: totalSubProjects,
+        description: 'Toplam alt proje sayısı',
+        icon: Layers,
+      },
+      {
+        title: 'Görev',
+        value: totalTasks,
+        description: 'Toplam görev adedi',
+        icon: Briefcase,
+      },
+      {
+        title: 'Tamamlanan Görev',
+        value: completedTasks,
+        description: 'Tamamlanan görev sayısı',
+        icon: Gauge,
+      },
+    ],
+    [progressValue, totalSubProjects, totalTasks, completedTasks]
+  );
+
+  if (hierarchyLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center px-4">
+        <div className="text-center space-y-4">
+          <Loader2 className="h-10 w-10 animate-spin text-primary mx-auto" />
+          <p className="text-sm text-muted-foreground">Proje detayları yükleniyor...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (hierarchyError || !project) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center px-4">
+        <div className="max-w-md w-full space-y-6 rounded-2xl border border-destructive/30 bg-white dark:bg-gray-900/80 p-8 text-center">
+          <div className="mx-auto h-12 w-12 rounded-full bg-destructive/10 flex items-center justify-center">
+            <Activity className="h-6 w-6 text-destructive" />
+          </div>
+          <div className="space-y-2">
+            <h1 className="text-xl font-semibold text-foreground">Proje yüklenemedi</h1>
+            <p className="text-sm text-muted-foreground">
+              {hierarchyError || 'Proje bilgilerine ulaşılamadı. Lütfen tekrar deneyin.'}
+            </p>
+          </div>
+          <div className="flex items-center justify-center gap-3">
+            <Button variant="outline" onClick={fetchHierarchy}>
+              Yeniden Dene
+            </Button>
+            <Button onClick={() => router.push('/dashboard/projects')}>Projeler listesi</Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="container mx-auto py-8 px-4 space-y-6 max-w-7xl">
-        {/* Header */}
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex items-start gap-4 flex-1 min-w-0">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => router.push('/dashboard/projects')}
-              className="hover:bg-gray-100 dark:hover:bg-gray-800 shrink-0"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-            <div className="space-y-2 flex-1 min-w-0">
-              <div className="flex items-center gap-3 flex-wrap">
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{project.name}</h1>
-                <Badge className={`${statusInfo.color} border font-medium px-2.5 py-1`}>
-                  {statusInfo.label}
-                </Badge>
-                <Badge className={`${priorityInfo.color} border font-medium px-2.5 py-1`}>
-                  {priorityInfo.label}
-                </Badge>
-              </div>
-              <p className="text-gray-600 dark:text-gray-400 text-base">
-                {project.companyName || 'Proje Detayı'}
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 shrink-0">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => router.push(`/dashboard/projects/${projectId}/edit`)}
-              className="shadow-sm"
-            >
-              <Edit className="mr-2 h-4 w-4" />
-              Düzenle
-            </Button>
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-8 lg:px-6">
+        <div className="flex items-center gap-3">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="shrink-0 border border-border/60 bg-background hover:bg-muted"
+            onClick={() => router.push('/dashboard/projects')}
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <div className="flex-1">
+            <ProjectDetailHeader
+              name={project.name}
+              statusLabel={statusBadge?.label ?? project.status}
+              statusColorClass={statusBadge?.badgeClass ?? ''}
+              priorityLabel={priorityBadge?.label ?? null}
+              priorityColorClass={priorityBadge?.badgeClass ?? null}
+              companyName={project.companyName ?? null}
+              consultantName={project.consultantName ?? null}
+              startDate={startDateLabel}
+              endDate={endDateLabel}
+            />
           </div>
         </div>
 
-        {/* Info Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* İlerleme */}
-          <Card className="border border-gray-200 dark:border-gray-800 shadow-sm">
-            <CardContent className="p-4">
-              <div className="flex items-start gap-3">
-                <div className="p-2 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
-                  <TrendingUp className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          {overviewCards.map(({ title, value, description, icon: Icon }) => (
+            <Card
+              key={title}
+              className="border border-border/70 bg-white/90 shadow-sm dark:border-gray-800/70 dark:bg-gray-900/80"
+            >
+              <CardContent className="flex items-center gap-4 p-5">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <Icon className="h-5 w-5" />
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-                    İlerleme
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                    {title}
                   </p>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">
-                    {project.progress || 0}%
-                  </p>
-                  <div className="mt-2 w-full bg-gray-200 dark:bg-gray-800 rounded-full h-1.5">
-                    <div
-                      className="bg-primary h-1.5 rounded-full transition-all duration-300"
-                      style={{ width: `${project.progress || 0}%` }}
-                    />
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Durum */}
-          <Card className="border border-gray-200 dark:border-gray-800 shadow-sm">
-            <CardContent className="p-4">
-              <div className="flex items-start gap-3">
-                <div className="p-2 bg-green-50 dark:bg-green-950/20 rounded-lg">
-                  <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Durum</p>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">
-                    {statusInfo.label}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Öncelik */}
-          <Card className="border border-gray-200 dark:border-gray-800 shadow-sm">
-            <CardContent className="p-4">
-              <div className="flex items-start gap-3">
-                <div className="p-2 bg-orange-50 dark:bg-orange-950/20 rounded-lg">
-                  <AlertCircle className="h-4 w-4 text-orange-600 dark:text-orange-400" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-                    Öncelik
-                  </p>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">
-                    {priorityInfo.label}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Firma/Danışman */}
-          {(project.companyName || project.consultantName) && (
-            <Card className="border border-gray-200 dark:border-gray-800 shadow-sm">
-              <CardContent className="p-4">
-                <div className="flex items-start gap-3">
-                  <div className="p-2 bg-purple-50 dark:bg-purple-950/20 rounded-lg">
-                    {project.companyName ? (
-                      <Building2 className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-                    ) : (
-                      <User className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-                      {project.companyName ? 'Firma' : 'Danışman'}
-                    </p>
-                    <p
-                      className="text-sm font-medium text-gray-900 dark:text-white truncate"
-                      title={project.companyName || project.consultantName || 'Belirtilmemiş'}
-                    >
-                      {project.companyName || project.consultantName || 'Belirtilmemiş'}
-                    </p>
-                  </div>
+                  <p className="text-xl font-semibold text-foreground">{value}</p>
+                  <p className="text-xs text-muted-foreground">{description}</p>
                 </div>
               </CardContent>
             </Card>
-          )}
+          ))}
         </div>
 
-        {/* Tabs */}
-        <Card className="border border-gray-200 dark:border-gray-800 shadow-sm">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <CardHeader className="border-b border-gray-200 dark:border-gray-800">
-              <TabsList className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
-                <TabsTrigger value="overview" className="data-[state=active]:bg-primary/10">
-                  <Briefcase className="w-4 h-4 mr-2" />
+        <Card className="border border-border/70 bg-white/95 shadow-sm dark:border-gray-800/70 dark:bg-gray-900/80">
+          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as TabValue)}>
+            <div className="border-b border-border/70 bg-muted/30">
+              <TabsList className="h-auto gap-1 rounded-none border-none bg-transparent p-2">
+                <TabsTrigger value="overview" className="gap-2 rounded-lg px-4 py-2">
+                  <Briefcase className="h-4 w-4" />
                   Genel Bakış
                 </TabsTrigger>
-                <TabsTrigger
-                  value="subprojects"
-                  className="data-[state=active]:bg-primary/10"
-                  onClick={() => subProjects.length === 0 && fetchSubProjects()}
-                >
-                  <FolderOpen className="w-4 h-4 mr-2" />
-                  Alt Projeler ({subProjects.length})
+                <TabsTrigger value="structure" className="gap-2 rounded-lg px-4 py-2">
+                  <Layers className="h-4 w-4" />
+                  Proje Yapısı
                 </TabsTrigger>
-                <TabsTrigger
-                  value="tasks"
-                  className="data-[state=active]:bg-primary/10"
-                  onClick={() => tasks.length === 0 && fetchTasks()}
-                >
-                  <ListTodo className="w-4 h-4 mr-2" />
-                  Görevler ({tasks.length})
+                <TabsTrigger value="assignments" className="gap-2 rounded-lg px-4 py-2">
+                  <Table className="h-4 w-4" />
+                  Atamalar
                 </TabsTrigger>
               </TabsList>
-            </CardHeader>
+            </div>
 
-            <CardContent className="p-6">
-              <TabsContent value="overview" className="space-y-6 mt-0">
-                {/* Project Details */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <Card className="border border-gray-200 dark:border-gray-800 shadow-sm">
-                    <CardHeader>
-                      <CardTitle className="text-lg text-gray-900 dark:text-white">
-                        Proje Bilgileri
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      {project.description && (
-                        <div className="space-y-2">
-                          <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                            Açıklama
-                          </p>
-                          <p className="text-base text-gray-900 dark:text-white whitespace-pre-wrap">
-                            {project.description}
-                          </p>
-                        </div>
-                      )}
-                      <div className="space-y-2">
-                        <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                          Durum
-                        </p>
-                        <Badge className={`${statusInfo.color} border font-medium`}>
-                          {statusInfo.label}
-                        </Badge>
+            <TabsContent value="overview" className="p-6">
+              <div className="grid gap-6 lg:grid-cols-2">
+                <Card className="border border-border/60 bg-background/80 shadow-none dark:bg-gray-950/40">
+                  <CardContent className="space-y-4 p-6">
+                    <div className="space-y-1">
+                      <h2 className="text-lg font-semibold text-foreground">Proje Özeti</h2>
+                      <p className="text-sm text-muted-foreground">
+                        Projenin temel bilgilerinin kısa özeti
+                      </p>
+                    </div>
+                    {project.description ? (
+                      <div className="rounded-lg border border-border/50 bg-muted/30 p-4 text-sm text-muted-foreground">
+                        {project.description}
                       </div>
-                      <div className="space-y-2">
-                        <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                          Öncelik
-                        </p>
-                        <Badge className={`${priorityInfo.color} border font-medium`}>
-                          {priorityInfo.label}
-                        </Badge>
+                    ) : (
+                      <div className="rounded-lg border border-dashed border-border/60 bg-muted/20 p-4 text-sm text-muted-foreground">
+                        Açıklama eklenmemiş.
                       </div>
-                    </CardContent>
-                  </Card>
+                    )}
+                    <div className="flex flex-wrap gap-3">
+                      <Badge className={statusBadge?.badgeClass}>{statusBadge?.label}</Badge>
+                      {priorityBadge ? (
+                        <Badge className={priorityBadge.badgeClass}>{priorityBadge.label}</Badge>
+                      ) : null}
+                    </div>
+                  </CardContent>
+                </Card>
 
-                  <Card className="border border-gray-200 dark:border-gray-800 shadow-sm">
-                    <CardHeader>
-                      <CardTitle className="text-lg text-gray-900 dark:text-white">
-                        İlişkiler
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      {project.companyName && (
-                        <div className="space-y-2">
-                          <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                            Firma
-                          </p>
-                          <div className="flex items-center gap-2">
-                            <Building2 className="h-4 w-4 text-gray-500 dark:text-gray-400 shrink-0" />
-                            <p className="text-base text-gray-900 dark:text-white">
-                              {project.companyName}
-                            </p>
-                          </div>
-                        </div>
-                      )}
-                      {project.consultantName && (
-                        <div className="space-y-2">
-                          <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                            Danışman
-                          </p>
-                          <div className="flex items-center gap-2">
-                            <User className="h-4 w-4 text-gray-500 dark:text-gray-400 shrink-0" />
-                            <p className="text-base text-gray-900 dark:text-white">
-                              {project.consultantName}
-                            </p>
-                          </div>
-                        </div>
-                      )}
-                      {(project.start_date || project.end_date) && (
-                        <div className="space-y-2">
-                          <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                            Tarih Aralığı
-                          </p>
-                          <div className="flex items-center gap-2">
-                            <Calendar className="h-4 w-4 text-gray-500 dark:text-gray-400 shrink-0" />
-                            <p className="text-base text-gray-900 dark:text-white">
-                              {project.start_date
-                                ? formatDate(project.start_date)
-                                : 'Başlangıç yok'}{' '}
-                              - {project.end_date ? formatDate(project.end_date) : 'Bitiş yok'}
-                            </p>
-                          </div>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
+                <Card className="border border-border/60 bg-background/80 shadow-none dark:bg-gray-950/40">
+                  <CardContent className="space-y-4 p-6">
+                    <div className="space-y-1">
+                      <h2 className="text-lg font-semibold text-foreground">Zaman Çizelgesi</h2>
+                      <p className="text-sm text-muted-foreground">
+                        Projenin başlangıç ve bitiş tarihleri
+                      </p>
+                    </div>
+                    <div className="flex gap-6">
+                      <div>
+                        <p className="text-xs uppercase text-muted-foreground">Başlangıç</p>
+                        <p className="text-base font-medium text-foreground">
+                          {startDateLabel ?? 'Belirsiz'}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs uppercase text-muted-foreground">Bitiş</p>
+                        <p className="text-base font-medium text-foreground">
+                          {endDateLabel ?? 'Belirsiz'}
+                        </p>
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-xs uppercase text-muted-foreground mb-2">İlerleme</p>
+                      <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+                        <div
+                          className="h-full rounded-full bg-primary transition-all"
+                          style={{ width: `${Math.min(Math.max(progressValue, 0), 100)}%` }}
+                        />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="structure" className="space-y-4 p-6">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <h2 className="text-lg font-semibold text-foreground">Proje Yapısı</h2>
+                  <p className="text-sm text-muted-foreground">
+                    {totalSubProjects} alt proje · {totalTasks} görev
+                  </p>
                 </div>
-              </TabsContent>
+                <Button size="sm" onClick={handleCreateSubProject}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Yeni Alt Proje
+                </Button>
+              </div>
 
-              <TabsContent value="subprojects" className="space-y-4 mt-0">
-                {subProjects.length === 0 ? (
-                  <div className="text-center py-12 border border-gray-200 dark:border-gray-800 rounded-lg bg-white dark:bg-gray-900">
-                    <FolderOpen className="h-12 w-12 mx-auto mb-4 text-gray-400 dark:text-gray-500" />
-                    <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-white">
-                      Alt Proje Yok
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-400">
-                      Bu projede henüz alt proje bulunmuyor.
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {subProjects.map((subProject) => (
-                      <Card
-                        key={subProject.id}
-                        className="border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow"
-                      >
-                        <CardContent className="p-4">
-                          <div className="flex items-start justify-between gap-4">
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 mb-2">
-                                <h3 className="text-base font-semibold text-gray-900 dark:text-white">
-                                  {subProject.name}
-                                </h3>
-                                <Badge
-                                  className={`${statusConfig[subProject.status]?.color || statusConfig.todo.color} border font-medium`}
-                                >
-                                  {statusConfig[subProject.status]?.label || subProject.status}
-                                </Badge>
-                              </div>
-                              {subProject.description && (
-                                <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">
-                                  {subProject.description}
-                                </p>
-                              )}
-                              <div className="flex items-center gap-4">
-                                <div className="flex items-center gap-2">
-                                  <TrendingUp className="h-3.5 w-3.5 text-gray-500 dark:text-gray-400" />
-                                  <span className="text-xs text-gray-600 dark:text-gray-400">
-                                    İlerleme: {subProject.progress || 0}%
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                )}
-              </TabsContent>
+              <ProjectHierarchyAccordion
+                projectId={project.id}
+                subProjects={subProjects}
+                mode="admin"
+                editable
+                reorderable
+                onSubProjectView={handleViewSubProject}
+                onSubProjectEdit={handleEditSubProject}
+                onSubProjectDelete={handleDeleteSubProject}
+                onSubProjectMoveUp={(id) => handleMoveSubProject(id, 'up')}
+                onSubProjectMoveDown={(id) => handleMoveSubProject(id, 'down')}
+                onTaskCreate={handleCreateTask}
+                onTaskEdit={handleEditTask}
+                onTaskDelete={handleDeleteTask}
+                onTaskMoveUp={(taskId) => handleMoveTask(taskId, 'up')}
+                onTaskMoveDown={(taskId) => handleMoveTask(taskId, 'down')}
+                onTaskView={handleViewTask}
+              />
+            </TabsContent>
 
-              <TabsContent value="tasks" className="space-y-4 mt-0">
-                {tasks.length === 0 ? (
-                  <div className="text-center py-12 border border-gray-200 dark:border-gray-800 rounded-lg bg-white dark:bg-gray-900">
-                    <ListTodo className="h-12 w-12 mx-auto mb-4 text-gray-400 dark:text-gray-500" />
-                    <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-white">
-                      Görev Yok
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-400">
-                      Bu projede henüz görev bulunmuyor.
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {tasks.map((task) => (
-                      <Card
-                        key={task.id}
-                        className="border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow"
-                      >
-                        <CardContent className="p-4">
-                          <div className="flex items-start justify-between gap-4">
-                            <div className="flex-1 min-w-0">
-                              <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-2">
-                                {task.title}
-                              </h3>
-                              {task.description && (
-                                <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">
-                                  {task.description}
-                                </p>
-                              )}
-                              <div className="flex items-center gap-3 flex-wrap">
-                                <Badge
-                                  className={`${statusConfig[task.status]?.color || statusConfig.todo.color} border font-medium`}
-                                >
-                                  {statusConfig[task.status]?.label || task.status}
-                                </Badge>
-                                <Badge
-                                  className={`${priorityConfig[task.priority]?.color || priorityConfig.medium.color} border font-medium`}
-                                >
-                                  {priorityConfig[task.priority]?.label || task.priority}
-                                </Badge>
-                                {task.due_date && (
-                                  <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400">
-                                    <Clock className="h-3.5 w-3.5 shrink-0" />
-                                    <span>{formatDate(task.due_date)}</span>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                )}
-              </TabsContent>
-            </CardContent>
+            <TabsContent value="assignments" className="p-6">
+              <ProjectAssignmentMatrix
+                matrix={matrix}
+                loading={matrixLoading}
+                error={matrixError}
+                onRefresh={fetchAssignmentMatrix}
+                onBulkAssign={handleOpenBulkAssignment}
+                onBulkDates={handleOpenBulkDates}
+                actionsDisabled={
+                  matrixLoading || bulkAssignmentSubmitting || bulkDatesSubmitting || !hasMatrixData
+                }
+              />
+            </TabsContent>
           </Tabs>
         </Card>
+
+        {project && (
+          <SubProjectModal
+            projectId={project.id}
+            subProject={editingSubProject ?? undefined}
+            open={subProjectModalOpen}
+            onOpenChange={(open) => {
+              setSubProjectModalOpen(open);
+              if (!open) {
+                setEditingSubProject(null);
+              }
+            }}
+            onSuccess={() => fetchHierarchy()}
+          />
+        )}
+
+        {project && taskModalOpen && taskModalSubProjectId && (
+          <TaskModal
+            subProjectId={taskModalSubProjectId}
+            task={
+              editingTask
+                ? {
+                    ...editingTask,
+                    orderIndex: editingTask.orderIndex ?? 0,
+                  }
+                : undefined
+            }
+            open={taskModalOpen}
+            onOpenChange={(open) => {
+              setTaskModalOpen(open);
+              if (!open) {
+                setEditingTask(null);
+                setTaskModalSubProjectId(null);
+              }
+            }}
+            onSuccess={() => fetchHierarchy()}
+          />
+        )}
+
+        <BulkAssignmentDialog
+          open={bulkAssignmentOpen}
+          onOpenChange={(open) => {
+            if (!open && bulkAssignmentSubmitting) {
+              return;
+            }
+            setBulkAssignmentOpen(open);
+          }}
+          matrix={matrix}
+          onSubmit={handleBulkAssignmentSubmit}
+          submitting={bulkAssignmentSubmitting}
+        />
+
+        <BulkDatesDialog
+          open={bulkDatesOpen}
+          onOpenChange={(open) => {
+            if (!open && bulkDatesSubmitting) {
+              return;
+            }
+            setBulkDatesOpen(open);
+          }}
+          matrix={matrix}
+          onSubmit={handleBulkDatesSubmit}
+          submitting={bulkDatesSubmitting}
+        />
       </div>
     </div>
   );

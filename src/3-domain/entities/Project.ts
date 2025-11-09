@@ -10,6 +10,9 @@ export interface Project {
   id: string;
   companyId: string | null;
   consultantId: string | null;
+  programId: string | null; // Projenin bağlı olduğu program (performans için)
+  companyName?: string | null;
+  consultantName?: string | null;
   name: string;
   description: string | null;
   status: ProjectStatus;
@@ -26,6 +29,7 @@ export interface Project {
 export interface CreateProjectDto {
   companyId?: string | null;
   consultantId?: string | null;
+  programId?: string | null; // Projenin bağlı olduğu program
   name: string;
   description?: string | null;
   status?: ProjectStatus;
@@ -39,6 +43,7 @@ export interface CreateProjectDto {
 export interface UpdateProjectDto {
   companyId?: string | null;
   consultantId?: string | null;
+  programId?: string | null; // Projenin bağlı olduğu program
   name?: string;
   description?: string | null;
   status?: ProjectStatus;
@@ -55,6 +60,9 @@ export class ProjectEntity implements Project {
   id: string;
   companyId: string | null;
   consultantId: string | null;
+  programId: string | null;
+  companyName: string | null;
+  consultantName: string | null;
   name: string;
   description: string | null;
   status: ProjectStatus;
@@ -71,6 +79,9 @@ export class ProjectEntity implements Project {
     this.id = data.id;
     this.companyId = data.companyId;
     this.consultantId = data.consultantId;
+    this.programId = data.programId ?? null;
+    this.companyName = data.companyName ?? null;
+    this.consultantName = data.consultantName ?? null;
     this.name = data.name;
     this.description = data.description;
     this.status = data.status;

@@ -7,3 +7,7 @@ export * from './GetProjectUseCase';
 export * from './ListProjectsUseCase';
 export * from './GetProjectTemplatesUseCase';
 export * from './CreateProjectFromTemplateUseCase';
+export * from './GetProjectHierarchyUseCase';
+export * from './BulkAssignSubProjectsToCompaniesUseCase';
+export * from './BulkAssignDatesToCompanySubProjectsUseCase';
+export * from './GetAssignmentMatrixUseCase';

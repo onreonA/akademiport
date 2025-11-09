@@ -6,7 +6,12 @@
 
 import React from 'react';
 import { DashboardLayout } from '@/presentation/components/features/layout';
+import { ConsultantProgramProvider } from '@/shared/contexts/ConsultantProgramContext';
 
 export default function ConsultantDashboardLayout({ children }: { children: React.ReactNode }) {
-  return <DashboardLayout>{children}</DashboardLayout>;
+  return (
+    <ConsultantProgramProvider>
+      <DashboardLayout>{children}</DashboardLayout>
+    </ConsultantProgramProvider>
+  );
 }

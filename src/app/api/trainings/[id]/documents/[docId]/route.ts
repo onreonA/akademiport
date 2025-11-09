@@ -5,6 +5,7 @@ import {
   DeleteTrainingDocumentUseCase,
 } from '@/application/use-cases/training-document';
 import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
+import { logger } from '@/shared/utils/logger';
 
 const trainingDocumentRepository = new TrainingDocumentRepository();
 
@@ -31,7 +32,7 @@ export async function GET(
 
     return NextResponse.json(document);
   } catch (error) {
-    console.error('Error in GET /api/trainings/[id]/documents/[docId]:', error);
+    logger.error('Error in GET /api/trainings/[id]/documents/[docId]:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -79,7 +80,7 @@ export async function PUT(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error in PUT /api/trainings/[id]/documents/[docId]:', error);
+    logger.error('Error in PUT /api/trainings/[id]/documents/[docId]:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -117,7 +118,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error in DELETE /api/trainings/[id]/documents/[docId]:', error);
+    logger.error('Error in DELETE /api/trainings/[id]/documents/[docId]:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

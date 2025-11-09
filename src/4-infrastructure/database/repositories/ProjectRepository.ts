@@ -2,6 +2,13 @@ import { IProjectRepository } from '@/domain/interfaces/repositories/IProjectRep
 import { Project, CreateProjectDto, UpdateProjectDto } from '@/domain/entities/Project';
 import { createClient } from '@/infrastructure/database/supabase-server';
 
+const PROJECT_SELECT_FIELDS = `
+  *,
+  company:companies!projects_company_id_fkey ( id, name ),
+  consultant:users!projects_consultant_id_fkey ( id, full_name, email ),
+  program:programs!projects_program_id_fkey ( id, name )
+`;
+
 export class ProjectRepository implements IProjectRepository {
   async create(data: CreateProjectDto): Promise<Project> {
     const supabase = await createClient();
@@ -11,6 +18,7 @@ export class ProjectRepository implements IProjectRepository {
       .insert({
         company_id: data.companyId || null,
         consultant_id: data.consultantId || null,
+        program_id: data.programId || null,
         name: data.name,
         description: data.description || null,
         status: data.status || 'todo',
@@ -33,7 +41,7 @@ export class ProjectRepository implements IProjectRepository {
   async findById(id: string, includeDeleted: boolean = false): Promise<Project | null> {
     const supabase = await createClient();
 
-    let query = supabase.from('projects').select('*').eq('id', id);
+    let query = supabase.from('projects').select(PROJECT_SELECT_FIELDS).eq('id', id);
 
     // Soft delete kontrolü: includeDeleted true değilse sadece silinmemişleri getir
     if (!includeDeleted) {
@@ -66,7 +74,7 @@ export class ProjectRepository implements IProjectRepository {
     const limit = filters?.limit || 10;
     const offset = (page - 1) * limit;
 
-    let query = supabase.from('projects').select('*', { count: 'exact' });
+    let query = supabase.from('projects').select(PROJECT_SELECT_FIELDS, { count: 'exact' });
 
     // Soft delete kontrolü: includeDeleted true değilse sadece silinmemişleri getir
     if (!filters?.includeDeleted) {
@@ -106,7 +114,7 @@ export class ProjectRepository implements IProjectRepository {
   async findByCompanyId(companyId: string, includeDeleted: boolean = false): Promise<Project[]> {
     const supabase = await createClient();
 
-    let query = supabase.from('projects').select('*').eq('company_id', companyId);
+    let query = supabase.from('projects').select(PROJECT_SELECT_FIELDS).eq('company_id', companyId);
 
     // Soft delete kontrolü
     if (!includeDeleted) {
@@ -128,7 +136,10 @@ export class ProjectRepository implements IProjectRepository {
   ): Promise<Project[]> {
     const supabase = await createClient();
 
-    let query = supabase.from('projects').select('*').eq('consultant_id', consultantId);
+    let query = supabase
+      .from('projects')
+      .select(PROJECT_SELECT_FIELDS)
+      .eq('consultant_id', consultantId);
 
     // Soft delete kontrolü
     if (!includeDeleted) {
@@ -151,7 +162,7 @@ export class ProjectRepository implements IProjectRepository {
     console.log('🔍 [ProjectRepository] Querying projects table...');
     const { data: projects, error } = await supabase
       .from('projects')
-      .select('*')
+      .select(PROJECT_SELECT_FIELDS)
       .eq('is_template', true)
       .is('deleted_at', null) // Şablonlar silinemez ama yine de kontrol edelim
       .order('name', { ascending: true });
@@ -179,7 +190,7 @@ export class ProjectRepository implements IProjectRepository {
 
     const { data: projects, error } = await supabase
       .from('projects')
-      .select('*')
+      .select(PROJECT_SELECT_FIELDS)
       .eq('template_id', templateId)
       .order('created_at', { ascending: false });
 
@@ -197,6 +208,7 @@ export class ProjectRepository implements IProjectRepository {
 
     if (data.companyId !== undefined) updateData.company_id = data.companyId;
     if (data.consultantId !== undefined) updateData.consultant_id = data.consultantId;
+    if (data.programId !== undefined) updateData.program_id = data.programId;
     if (data.name !== undefined) updateData.name = data.name;
     if (data.description !== undefined) updateData.description = data.description;
     if (data.status !== undefined) updateData.status = data.status;
@@ -254,7 +266,7 @@ export class ProjectRepository implements IProjectRepository {
 
     const { data: projects, error } = await supabase
       .from('projects')
-      .select('*')
+      .select(PROJECT_SELECT_FIELDS)
       .not('deleted_at', 'is', null)
       .order('deleted_at', { ascending: false });
 
@@ -299,6 +311,10 @@ export class ProjectRepository implements IProjectRepository {
       id: data.id,
       companyId: data.company_id,
       consultantId: data.consultant_id,
+      programId: data.program_id ?? null,
+      companyName: data.company?.name ?? data.company_name ?? null,
+      consultantName:
+        data.consultant?.full_name ?? data.consultant_full_name ?? data.consultant?.email ?? null,
       name: data.name,
       description: data.description,
       status: data.status,

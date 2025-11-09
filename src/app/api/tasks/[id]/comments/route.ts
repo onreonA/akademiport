@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { TaskCommentRepository } from '@/infrastructure/database/repositories/TaskCommentRepository';
 import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
+import { logger } from '@/shared/utils/logger';
 
 /**
  * GET /api/tasks/[id]/comments
@@ -23,7 +24,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       comments: comments || [],
     });
   } catch (error) {
-    console.error('Error in GET /api/tasks/[id]/comments:', error);
+    logger.error('Error in GET /api/tasks/[id]/comments:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Internal server error' },
       { status: 500 }
@@ -58,7 +59,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     // Eğer parentCommentId varsa, bu bir cevaptır ve isQuestion false olmalı
     const finalIsQuestion = parentCommentId ? false : isQuestionValue;
 
-    console.log('[POST /api/tasks/[id]/comments] Received:', {
+    logger.info('[POST /api/tasks/[id]/comments] Received:', {
       comment: comment?.substring(0, 50),
       is_question,
       isQuestion,
@@ -76,7 +77,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       parentCommentId: parentCommentId || null,
     });
 
-    console.log('[POST /api/tasks/[id]/comments] Created comment:', {
+    logger.info('[POST /api/tasks/[id]/comments] Created comment:', {
       id: newComment.id,
       isQuestion: newComment.isQuestion,
     });
@@ -86,7 +87,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       comment: newComment,
     });
   } catch (error) {
-    console.error('Error in POST /api/tasks/[id]/comments:', error);
+    logger.error('Error in POST /api/tasks/[id]/comments:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Internal server error' },
       { status: 500 }

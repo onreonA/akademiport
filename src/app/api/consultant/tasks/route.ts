@@ -30,8 +30,10 @@ export async function GET(request: NextRequest) {
         ? request.nextUrl.searchParams.get('consultantId') || user.id
         : user.id;
 
-    // Get status filter from query params
+    // Get filters from query params
     const status = request.nextUrl.searchParams.get('status') || undefined;
+    const page = parseInt(request.nextUrl.searchParams.get('page') || '1', 10);
+    const limit = parseInt(request.nextUrl.searchParams.get('limit') || '12', 10);
 
     const useCase = new ListConsultantTasksUseCase(
       taskRepository,
@@ -39,7 +41,7 @@ export async function GET(request: NextRequest) {
       subProjectRepository
     );
 
-    const result = await useCase.execute(consultantId, { status });
+    const result = await useCase.execute(consultantId, { status, page, limit });
 
     if (result.isFailure) {
       return NextResponse.json(
@@ -48,7 +50,16 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({ success: true, tasks: result.value });
+    return NextResponse.json({
+      success: true,
+      tasks: result.value.tasks,
+      pagination: {
+        page: result.value.page,
+        limit: result.value.limit,
+        total: result.value.total,
+        totalPages: result.value.totalPages,
+      },
+    });
   } catch (error) {
     console.error('Error in GET /api/consultant/tasks:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

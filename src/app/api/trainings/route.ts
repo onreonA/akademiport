@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { TrainingRepository } from '@/infrastructure/database/repositories/TrainingRepository';
 import { CreateTrainingUseCase, ListTrainingsUseCase } from '@/application/use-cases/training';
 import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
+import { logger } from '@/shared/utils/logger';
 
 const trainingRepository = new TrainingRepository();
 
@@ -68,7 +69,7 @@ export async function GET(request: NextRequest) {
       total: result.value.total,
     });
   } catch (error) {
-    console.error('Error in GET /api/trainings:', error);
+    logger.error('Error in GET /api/trainings:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -116,7 +117,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result.value, { status: 201 });
   } catch (error) {
-    console.error('Error in POST /api/trainings:', error);
+    logger.error('Error in POST /api/trainings:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -3,11 +3,14 @@
  *
  * Tüm custom error'ların base class'ı
  */
-export class AppError extends Error {
+export class AppError<
+  TDetails extends Record<string, unknown> | Record<string, unknown>[] | undefined = undefined,
+> extends Error {
   constructor(
     message: string,
     public readonly statusCode: number = 500,
-    public readonly code?: string
+    public readonly code?: string,
+    public readonly details?: TDetails
   ) {
     super(message);
     this.name = 'AppError';
@@ -20,12 +23,12 @@ export class AppError extends Error {
  *
  * Input validation hatalarında kullanılır
  */
-export class ValidationError extends AppError {
+export class ValidationError extends AppError<Record<string, string> | undefined> {
   constructor(
     message: string,
     public readonly fields?: Record<string, string>
   ) {
-    super(message, 400, 'VALIDATION_ERROR');
+    super(message, 400, 'VALIDATION_ERROR', fields);
     this.name = 'ValidationError';
   }
 }

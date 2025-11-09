@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
+import { logger } from '@/shared/utils/logger';
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -34,15 +35,23 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       .from('tasks')
       .select('*')
       .in('sub_project_id', subProjectIds)
-      .order('created_at', { ascending: false });
+      .order('order_index', { ascending: true });
 
     if (tasksError) {
+      logger.error('❌ [Tasks API] Error fetching tasks:', tasksError);
       return NextResponse.json({ error: 'Failed to fetch tasks' }, { status: 500 });
     }
 
+    logger.info('✅ [Tasks API] Fetched tasks:', {
+      projectId,
+      subProjectCount: subProjects.length,
+      taskCount: tasks?.length || 0,
+      tasks: tasks?.map((t) => ({ id: t.id, title: t.title, subProjectId: t.sub_project_id })),
+    });
+
     return NextResponse.json({ tasks: tasks || [] }, { status: 200 });
   } catch (error) {
-    console.error('Error fetching project tasks:', error);
+    logger.error('Error fetching project tasks:', error);
     return NextResponse.json({ error: 'Failed to fetch tasks' }, { status: 500 });
   }
 }

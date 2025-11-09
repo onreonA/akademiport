@@ -15,3 +15,6 @@ export * from './ITrainingDocumentRepository';
 export * from './ICompanyTrainingRepository';
 export * from './ITrainingProgressRepository';
 export * from './IUserRepository';
+export * from './ICompanyProjectAssignmentRepository';
+export * from './IEventRepository';
+export * from './IAppointmentRepository';

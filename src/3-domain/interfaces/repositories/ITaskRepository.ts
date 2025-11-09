@@ -17,6 +17,11 @@ export interface ITaskRepository {
   findBySubProjectId(subProjectId: string): Promise<Task[]>;
 
   /**
+   * Birden fazla alt projeye ait görevleri getir
+   */
+  findBySubProjectIds(subProjectIds: string[]): Promise<Task[]>;
+
+  /**
    * Kullanıcıya atanmış görevleri getir
    */
   findByAssignedUserId(

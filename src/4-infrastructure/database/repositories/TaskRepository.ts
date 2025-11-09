@@ -69,6 +69,32 @@ export class TaskRepository implements ITaskRepository {
     return tasks?.map((t) => this.mapToEntity(t)) || [];
   }
 
+  async findBySubProjectIds(
+    subProjectIds: string[],
+    includeDeleted: boolean = false
+  ): Promise<Task[]> {
+    if (subProjectIds.length === 0) {
+      return [];
+    }
+
+    const supabase = await createClient();
+
+    let query = supabase.from('tasks').select('*').in('sub_project_id', subProjectIds);
+
+    // Soft delete kontrolü
+    if (!includeDeleted) {
+      query = query.is('deleted_at', null);
+    }
+
+    const { data: tasks, error } = await query.order('order_index', { ascending: true });
+
+    if (error) {
+      throw new Error(`Failed to find tasks by sub-project IDs: ${error.message}`);
+    }
+
+    return tasks?.map((t) => this.mapToEntity(t)) || [];
+  }
+
   async findByAssignedUserId(
     userId: string,
     filters?: { status?: string; priority?: string },

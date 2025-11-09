@@ -24,13 +24,17 @@ export function useRecentPages() {
   // Load from localStorage on mount
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      try {
-        setRecentPages(JSON.parse(stored));
-      } catch {
-        setRecentPages([]);
+    // Use setTimeout to avoid synchronous setState in effect
+    const timeoutId = setTimeout(() => {
+      if (stored) {
+        try {
+          setRecentPages(JSON.parse(stored));
+        } catch {
+          setRecentPages([]);
+        }
       }
-    }
+    }, 0);
+    return () => clearTimeout(timeoutId);
   }, []);
 
   // Add current page to recent pages
@@ -44,15 +48,19 @@ export function useRecentPages() {
       timestamp: Date.now(),
     };
 
-    setRecentPages((prev) => {
-      // Remove if already exists
-      const filtered = prev.filter((p) => p.path !== pathname);
-      // Add to beginning
-      const updated = [newPage, ...filtered].slice(0, MAX_RECENT_PAGES);
-      // Save to localStorage
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-      return updated;
-    });
+    // Use setTimeout to avoid synchronous setState in effect
+    const timeoutId = setTimeout(() => {
+      setRecentPages((prev) => {
+        // Remove if already exists
+        const filtered = prev.filter((p) => p.path !== pathname);
+        // Add to beginning
+        const updated = [newPage, ...filtered].slice(0, MAX_RECENT_PAGES);
+        // Save to localStorage
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+        return updated;
+      });
+    }, 0);
+    return () => clearTimeout(timeoutId);
   }, [pathname]);
 
   return recentPages;

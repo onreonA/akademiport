@@ -1,5 +1,7 @@
 @import 'tailwindcss';
 
+/* FullCalendar v6 automatically injects CSS - no manual imports needed */
+
 /* Custom Animations */
 @keyframes fadeIn {
   from {
@@ -135,6 +137,48 @@
 }
 
 /* Focus States */
+
+/* Availability events (green) - rendered as normal events but styled as background */
+.fc-event.availability-bg-event,
+.fc-event[data-availability="true"] {
+  opacity: 0.7 !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+  border-style: solid !important;
+  border-width: 2px !important;
+  font-size: 0.75rem !important;
+  font-weight: 500 !important;
+  min-height: 20px !important;
+  padding: 2px 4px !important;
+}
+
+/* Unavailable events (red) - rendered as normal events but styled as background */
+.fc-event.unavailable-bg-event,
+.fc-event[data-unavailable="true"] {
+  opacity: 0.7 !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+  border-style: solid !important;
+  border-width: 2px !important;
+  font-size: 0.75rem !important;
+  font-weight: 500 !important;
+  min-height: 20px !important;
+  padding: 2px 4px !important;
+}
+
+/* Normal events should be above background events */
+.fc-event:not(.fc-bgevent):not(.availability-bg-event):not(.unavailable-bg-event):not([data-availability="true"]):not([data-unavailable="true"]) {
+  z-index: 2 !important;
+  position: relative !important;
+}
+
+/* Hide title for background events */
+.fc-event.availability-bg-event .fc-event-title,
+.fc-event[data-availability="true"] .fc-event-title,
+.fc-event.unavailable-bg-event .fc-event-title,
+.fc-event[data-unavailable="true"] .fc-event-title {
+  display: none !important;
+}
 .focus-ring {
   transition: box-shadow 0.2s ease-in-out;
 }

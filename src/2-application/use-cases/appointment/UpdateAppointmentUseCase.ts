@@ -1,0 +1,70 @@
+import { IAppointmentRepository } from '@/domain/interfaces/repositories/IAppointmentRepository';
+import { UpdateAppointmentDto } from '@/domain/entities/Appointment';
+import { Result } from '@/core/result';
+import { AppError } from '@/core/errors';
+import { logger } from '@/shared/utils/logger';
+
+export class UpdateAppointmentUseCase {
+  constructor(private appointmentRepository: IAppointmentRepository) {}
+
+  async execute(appointmentId: string, data: UpdateAppointmentDto): Promise<Result<any>> {
+    try {
+      if (!appointmentId || appointmentId.trim().length === 0) {
+        return Result.fail(new AppError('Appointment ID is required', 400));
+      }
+
+      // Check if appointment exists
+      const existingAppointment = await this.appointmentRepository.findById(appointmentId);
+      if (!existingAppointment) {
+        return Result.fail(new AppError('Appointment not found', 404));
+      }
+
+      // Conflict detection if time is being changed
+      if (data.startTime || data.endTime) {
+        const startTime = data.startTime ? new Date(data.startTime) : existingAppointment.startTime;
+        const endTime = data.endTime ? new Date(data.endTime) : existingAppointment.endTime;
+
+        const conflicts = await this.appointmentRepository.findConflictingAppointments(
+          existingAppointment.consultantId,
+          startTime,
+          endTime,
+          appointmentId // Exclude current appointment
+        );
+
+        if (conflicts.length > 0) {
+          const conflictTimes = conflicts
+            .map(
+              (c) => `${c.startTime.toLocaleString('tr-TR')} - ${c.endTime.toLocaleString('tr-TR')}`
+            )
+            .join(', ');
+          return Result.fail(
+            new AppError(
+              `Danışmanın bu saatte başka bir randevusu bulunmaktadır: ${conflictTimes}`,
+              409
+            )
+          );
+        }
+      }
+
+      // Convert string dates to Date objects if provided
+      const updateData: UpdateAppointmentDto = {
+        ...data,
+        startTime: data.startTime ? new Date(data.startTime) : undefined,
+        endTime: data.endTime ? new Date(data.endTime) : undefined,
+      };
+
+      const updatedAppointment = await this.appointmentRepository.update(appointmentId, updateData);
+
+      logger.info('Appointment updated successfully', {
+        appointmentId: updatedAppointment.id,
+      });
+
+      return Result.ok(updatedAppointment);
+    } catch (error) {
+      logger.error('Error updating appointment:', error);
+      return Result.fail(
+        new AppError(error instanceof Error ? error.message : 'Failed to update appointment', 500)
+      );
+    }
+  }
+}

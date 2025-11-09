@@ -325,6 +325,25 @@
 
 **Detaylı Plan:** `sprint-detaylari/sprint-08-proje-yonetimi.md`
 
+#### Sprint 8 Ek: Bulk & Matrix Yönetimi (Kasım 2025)
+
+**Hedef:** Çoklu firma atamaları ve tarih yönetimini matris tabanlı arayüzle tamamlamak.
+
+**Kapsam:**
+
+- `company_project_assignments` tablosu ve RLS politikaları
+- Alt proje → görev kalıtımı (firmaya atanınca görevler otomatik görünür)
+- `BulkAssignSubProjectsToCompaniesUseCase`, `BulkAssignDatesToCompanySubProjectsUseCase`
+- `GetAssignmentMatrixUseCase`, `GetCompanyTasksWithInheritedDatesUseCase`
+- Matris sayfaları: Firma x Alt Proje atama, tarih matrisi, firma bazlı görev görünümü
+- Rol bazlı akışlar: Admin (tam kontrol), Danışman (atama/yönetim), Firma (takip)
+
+**Durum:** 🔴 Başlangıçta – analiz ve detay plan hazır, uygulama beklemede.
+
+**Bağımlılıklar:** Sprint 6, Sprint 7, Sprint 8 temel altyapısı
+
+**Notlar:** Ayrıntılı analiz ve görev listesi için `docs/SPRINT-8-TOPLU-ISLEMLER-ANALIZI.md` ve `docs/SPRINT-8-TOPLU-ISLEMLER-DETAYLI-PLAN.md` dosyalarına bakınız.
+
 ---
 
 ### Sprint 9: Eğitim Yönetimi (1.5 hafta)

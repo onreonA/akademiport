@@ -15,6 +15,8 @@ import { ModernStatCard } from '@/presentation/components/ui/atoms/modern-stat-c
 import { Badge } from '@/presentation/components/ui/atoms/badge';
 import { Button } from '@/presentation/components/ui/atoms/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/presentation/components/ui/atoms/tabs';
+import { Pagination } from '@/presentation/components/ui/molecules/pagination';
+import { useConsultantTasks, useConsultantTasksAll } from '@/shared/hooks/api';
 
 interface Task {
   id: string;
@@ -59,9 +61,6 @@ const statusConfig = {
 
 function ConsultantTasksPageContent() {
   const router = useRouter();
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
@@ -69,68 +68,80 @@ function ConsultantTasksPageContent() {
     }
     return 'all';
   });
-  // Stats için ayrı bir state
-  const [allTasks, setAllTasks] = useState<Task[]>([]);
+  // Pagination state
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 12,
+  });
 
-  const fetchAllTasks = async () => {
-    try {
-      const response = await fetch('/api/consultant/tasks');
-      if (response.ok) {
-        const data = await response.json();
-        setAllTasks(data.tasks || []);
-      }
-    } catch (err) {
-      // Ignore errors for stats
+  // Build filters for React Query
+  const getFilters = () => {
+    const filters: { status?: string; page: number; limit: number } = {
+      page: pagination.page,
+      limit: pagination.limit,
+    };
+
+    if (activeTab === 'pending') {
+      filters.status = 'review';
+    } else if (activeTab === 'in_progress') {
+      filters.status = 'in_progress';
+    } else if (activeTab === 'completed') {
+      filters.status = 'done';
     }
+
+    return filters;
   };
+
+  // React Query hooks
+  const {
+    data: tasksData,
+    isLoading: tasksLoading,
+    error: tasksError,
+  } = useConsultantTasks(getFilters());
+
+  const { data: allTasksData } = useConsultantTasksAll();
+
+  // Extract data
+  const tasks = tasksData?.tasks || [];
+  const paginationInfo = tasksData?.pagination || {
+    page: 1,
+    limit: 12,
+    total: 0,
+    totalPages: 0,
+  };
+  const allTasks = allTasksData?.tasks || [];
+
+  const loading = tasksLoading;
+  const error = tasksError ? (tasksError as Error).message : null;
 
   useEffect(() => {
     // URL'den tab parametresini oku
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       const tab = params.get('tab') || 'all';
-      if (tab !== activeTab) {
-        setActiveTab(tab);
-      }
+      // Use setTimeout to avoid synchronous setState in effect
+      const timeoutId = setTimeout(() => {
+        if (tab !== activeTab) {
+          setActiveTab(tab);
+        }
+      }, 0);
+      return () => clearTimeout(timeoutId);
     }
-  }, []);
-
-  useEffect(() => {
-    fetchTasks();
-    fetchAllTasks(); // Stats için de güncelle
   }, [activeTab]);
 
   useEffect(() => {
-    // Stats için tüm görevleri getir (sadece component mount olduğunda)
-    fetchAllTasks();
-  }, []);
+    // Tab değiştiğinde sayfayı 1'e sıfırla
+    // Use setTimeout to avoid synchronous setState in effect
+    const timeoutId = setTimeout(() => {
+      setPagination((prev) => ({ ...prev, page: 1 }));
+    }, 0);
+    return () => clearTimeout(timeoutId);
+  }, [activeTab]);
 
-  const fetchTasks = async () => {
-    try {
-      setLoading(true);
-
-      // Consultant'ın projelerindeki tüm görevleri getir
-      // Tab'a göre durum filtresi ekle
-      let url = '/api/consultant/tasks';
-      if (activeTab === 'pending') {
-        url += '?status=review';
-      } else if (activeTab === 'in_progress') {
-        url += '?status=in_progress';
-      } else if (activeTab === 'completed') {
-        url += '?status=done';
-      }
-      // activeTab === 'all' ise filter yok, tüm görevler gelir
-
-      const response = await fetch(url);
-      if (!response.ok) throw new Error('Failed to fetch tasks');
-      const data = await response.json();
-
-      setTasks(data.tasks || []);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-    } finally {
-      setLoading(false);
-    }
+  const handlePageChange = (page: number) => {
+    setPagination((prev) => ({ ...prev, page }));
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const stats = {
@@ -339,6 +350,16 @@ function ConsultantTasksPageContent() {
                     </div>
                   </EnhancedCard>
                 ))}
+              </div>
+            )}
+            {/* Pagination */}
+            {paginationInfo.totalPages > 1 && (
+              <div className="flex justify-center mt-6">
+                <Pagination
+                  currentPage={paginationInfo.page}
+                  totalPages={paginationInfo.totalPages}
+                  onPageChange={handlePageChange}
+                />
               </div>
             )}
           </TabsContent>

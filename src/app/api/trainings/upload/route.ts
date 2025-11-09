@@ -7,6 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/infrastructure/database/supabase-server';
 import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
+import { logger } from '@/shared/utils/logger';
 
 /**
  * POST /api/trainings/upload
@@ -86,7 +87,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (error) {
-      console.error('Supabase Storage upload error:', error);
+      logger.error('Supabase Storage upload error:', error);
       return NextResponse.json(
         { error: `Failed to upload file: ${error.message}` },
         { status: 500 }
@@ -110,7 +111,7 @@ export async function POST(request: NextRequest) {
       fileType: file.type,
     });
   } catch (error) {
-    console.error('Error in POST /api/trainings/upload:', error);
+    logger.error('Error in POST /api/trainings/upload:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

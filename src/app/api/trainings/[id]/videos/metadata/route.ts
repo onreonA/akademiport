@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { YouTubeApiService } from '@/infrastructure/external/youtube-api.service';
 import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
+import { logger } from '@/shared/utils/logger';
 
 /**
  * GET /api/trainings/[id]/videos/metadata?youtubeId=...
@@ -44,7 +45,7 @@ export async function GET(request: NextRequest) {
       thumbnailUrl: metadata.thumbnailUrl || null,
     });
   } catch (error) {
-    console.error('Error in GET /api/trainings/[id]/videos/metadata:', error);
+    logger.error('Error in GET /api/trainings/[id]/videos/metadata:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Internal server error' },
       { status: 500 }

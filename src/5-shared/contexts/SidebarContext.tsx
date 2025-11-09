@@ -36,10 +36,13 @@ export function SidebarProvider({ children }: { children: ReactNode }) {
   // Load initial state from localStorage
   useEffect(() => {
     const stored = localStorage.getItem('sidebar-collapsed');
-    if (stored !== null) {
-      setIsCollapsed(stored === 'true');
-    }
-    setIsInitialized(true);
+    // Use setTimeout to avoid synchronous setState in effect
+    const timeoutId = setTimeout(() => {
+      if (stored !== null) {
+        setIsCollapsed(stored === 'true');
+      }
+      setIsInitialized(true);
+    }, 0);
 
     // Auto-collapse after 5-6 seconds on first load
     const timer = setTimeout(() => {
@@ -50,7 +53,10 @@ export function SidebarProvider({ children }: { children: ReactNode }) {
       }
     }, 5500);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timeoutId);
+      clearTimeout(timer);
+    };
   }, []);
 
   // Save to localStorage when changed
