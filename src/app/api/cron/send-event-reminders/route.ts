@@ -2,12 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { EventRepository } from '@/infrastructure/database/repositories/EventRepository';
 import { UserRepository } from '@/infrastructure/database/repositories/UserRepository';
 import { ProgramRepository } from '@/infrastructure/database/repositories/ProgramRepository';
+import { ReminderRepository } from '@/infrastructure/database/repositories/ReminderRepository';
 import { SendEventRemindersUseCase } from '@/application/use-cases/event/SendEventRemindersUseCase';
 import { logger } from '@/shared/utils/logger';
 
 const eventRepository = new EventRepository();
 const userRepository = new UserRepository();
 const programRepository = new ProgramRepository();
+const reminderRepository = new ReminderRepository();
 
 /**
  * POST /api/cron/send-event-reminders
@@ -39,7 +41,8 @@ export async function POST(request: NextRequest) {
     const sendRemindersUseCase = new SendEventRemindersUseCase(
       eventRepository,
       userRepository,
-      programRepository
+      programRepository,
+      reminderRepository
     );
 
     const result = await sendRemindersUseCase.execute(reminderType);

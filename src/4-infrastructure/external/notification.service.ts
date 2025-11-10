@@ -2,15 +2,17 @@
  * Notification Service
  *
  * Provides notification functionality for events and appointments
- * Supports email notifications (WhatsApp integration planned for Sprint 16)
+ * Supports email and WhatsApp notifications
  */
 
 import { logger } from '@/shared/utils/logger';
+import { WhatsAppApiService } from './whatsapp-api.service';
 
 export interface NotificationRecipient {
   email: string;
   name?: string;
   userId?: string;
+  phoneNumber?: string; // WhatsApp phone number in E.164 format (e.g., +905551234567)
 }
 
 export interface EventNotificationData {
@@ -52,54 +54,171 @@ export class NotificationService {
   }
 
   /**
-   * Send event reminder notification
+   * Check if WhatsApp notifications are enabled
+   */
+  static isWhatsAppEnabled(): boolean {
+    return WhatsAppApiService.isAvailable();
+  }
+
+  /**
+   * Send event reminder notification (Email + WhatsApp)
    */
   static async sendEventReminder(
     recipients: NotificationRecipient[],
     eventData: EventNotificationData,
     reminderType: '3days' | '1day' | '1hour' = '1day'
   ): Promise<NotificationResult> {
-    if (!this.isEmailEnabled()) {
-      logger.warn('Email notifications are disabled. Skipping event reminder.');
-      return {
-        success: false,
-        sentCount: 0,
-        failedCount: recipients.length,
-        errors: recipients.map((r) => ({
+    const errors: Array<{ recipient: string; error: string }> = [];
+    let emailSentCount = 0;
+    let emailFailedCount = 0;
+    let whatsappSentCount = 0;
+    let whatsappFailedCount = 0;
+
+    // Send email reminders
+    if (this.isEmailEnabled()) {
+      const subject = this.getEventReminderSubject(eventData, reminderType);
+      const body = this.getEventReminderBody(eventData, reminderType);
+      const emailResult = await this.sendBulkEmail(recipients, subject, body);
+      emailSentCount = emailResult.sentCount;
+      emailFailedCount = emailResult.failedCount;
+      if (emailResult.errors) {
+        errors.push(...emailResult.errors);
+      }
+    } else {
+      logger.warn('Email notifications are disabled. Skipping email reminders.');
+      emailFailedCount = recipients.length;
+      errors.push(
+        ...recipients.map((r) => ({
           recipient: r.email,
           error: 'Email notifications disabled',
-        })),
-      };
+        }))
+      );
     }
 
-    const subject = this.getEventReminderSubject(eventData, reminderType);
-    const body = this.getEventReminderBody(eventData, reminderType);
+    // Send WhatsApp reminders
+    if (this.isWhatsAppEnabled()) {
+      const whatsappReminderType: '24hours' | '1hour' =
+        reminderType === '1day' ? '24hours' : reminderType === '1hour' ? '1hour' : '24hours';
 
-    return this.sendBulkEmail(recipients, subject, body);
+      for (const recipient of recipients) {
+        if (recipient.phoneNumber) {
+          try {
+            const success = await WhatsAppApiService.sendEventReminder(
+              recipient.phoneNumber,
+              {
+                eventTitle: eventData.eventTitle,
+                eventDate: eventData.eventDate,
+                eventTime: eventData.eventTime,
+                zoomJoinUrl: eventData.zoomJoinUrl,
+                programName: eventData.programName,
+              },
+              whatsappReminderType
+            );
+
+            if (success) {
+              whatsappSentCount++;
+            } else {
+              whatsappFailedCount++;
+              errors.push({
+                recipient: recipient.phoneNumber,
+                error: 'WhatsApp message failed to send',
+              });
+            }
+          } catch (error) {
+            whatsappFailedCount++;
+            errors.push({
+              recipient: recipient.phoneNumber,
+              error: error instanceof Error ? error.message : 'Unknown WhatsApp error',
+            });
+          }
+        }
+      }
+    }
+
+    return {
+      success: emailFailedCount === 0 && whatsappFailedCount === 0,
+      sentCount: emailSentCount + whatsappSentCount,
+      failedCount: emailFailedCount + whatsappFailedCount,
+      errors: errors.length > 0 ? errors : undefined,
+    };
   }
 
   /**
-   * Send appointment reminder notification
+   * Send appointment reminder notification (Email + WhatsApp)
    */
   static async sendAppointmentReminder(
     recipient: NotificationRecipient,
     appointmentData: AppointmentNotificationData,
     reminderType: '1day' | '1hour' = '1day'
   ): Promise<NotificationResult> {
-    if (!this.isEmailEnabled()) {
-      logger.warn('Email notifications are disabled. Skipping appointment reminder.');
-      return {
-        success: false,
-        sentCount: 0,
-        failedCount: 1,
-        errors: [{ recipient: recipient.email, error: 'Email notifications disabled' }],
-      };
+    const errors: Array<{ recipient: string; error: string }> = [];
+    let emailSentCount = 0;
+    let emailFailedCount = 0;
+    let whatsappSentCount = 0;
+    let whatsappFailedCount = 0;
+
+    // Send email reminder
+    if (this.isEmailEnabled()) {
+      const subject = this.getAppointmentReminderSubject(appointmentData, reminderType);
+      const body = this.getAppointmentReminderBody(appointmentData, reminderType);
+      const emailResult = await this.sendBulkEmail([recipient], subject, body);
+      emailSentCount = emailResult.sentCount;
+      emailFailedCount = emailResult.failedCount;
+      if (emailResult.errors) {
+        errors.push(...emailResult.errors);
+      }
+    } else {
+      logger.warn('Email notifications are disabled. Skipping email reminder.');
+      emailFailedCount = 1;
+      errors.push({
+        recipient: recipient.email,
+        error: 'Email notifications disabled',
+      });
     }
 
-    const subject = this.getAppointmentReminderSubject(appointmentData, reminderType);
-    const body = this.getAppointmentReminderBody(appointmentData, reminderType);
+    // Send WhatsApp reminder
+    if (this.isWhatsAppEnabled() && recipient.phoneNumber) {
+      try {
+        const whatsappReminderType: '24hours' | '1hour' =
+          reminderType === '1day' ? '24hours' : '1hour';
 
-    return this.sendBulkEmail([recipient], subject, body);
+        const success = await WhatsAppApiService.sendAppointmentReminder(
+          recipient.phoneNumber,
+          {
+            appointmentTitle: appointmentData.appointmentTitle,
+            appointmentDate: appointmentData.appointmentDate,
+            appointmentTime: appointmentData.appointmentTime,
+            consultantName: appointmentData.consultantName,
+            companyName: appointmentData.companyName,
+            zoomJoinUrl: appointmentData.zoomJoinUrl,
+          },
+          whatsappReminderType
+        );
+
+        if (success) {
+          whatsappSentCount++;
+        } else {
+          whatsappFailedCount++;
+          errors.push({
+            recipient: recipient.phoneNumber,
+            error: 'WhatsApp message failed to send',
+          });
+        }
+      } catch (error) {
+        whatsappFailedCount++;
+        errors.push({
+          recipient: recipient.phoneNumber,
+          error: error instanceof Error ? error.message : 'Unknown WhatsApp error',
+        });
+      }
+    }
+
+    return {
+      success: emailFailedCount === 0 && whatsappFailedCount === 0,
+      sentCount: emailSentCount + whatsappSentCount,
+      failedCount: emailFailedCount + whatsappFailedCount,
+      errors: errors.length > 0 ? errors : undefined,
+    };
   }
 
   /**

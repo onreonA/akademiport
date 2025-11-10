@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Run type check
+npm run type-check || exit 1
+
+# Run linter
+npm run lint || exit 1
+
+# Format check
+npm run format:check || (echo "Code formatting issues found. Run 'npm run format' to fix." && exit 1)
+
+# Run tests (only affected files if possible, otherwise skip)
+npm run test:run -- --changed || echo "Tests skipped for changed files"

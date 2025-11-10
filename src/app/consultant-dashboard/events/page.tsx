@@ -294,6 +294,7 @@ export default function ConsultantEventsPage() {
         onOpenChange={setFormOpen}
         onSubmit={handleCreateEvent}
         programId={selectedProgram.id}
+        consultantId={user?.id}
       />
     </div>
   );

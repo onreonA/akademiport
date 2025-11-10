@@ -26,8 +26,11 @@ vi.mock('@/4-infrastructure/database/repositories/SubProjectRepository', () => (
   SubProjectRepository: vi.fn(),
 }));
 
+// Mock use case with vi.fn() that returns a constructor
+const mockListConsultantTasksUseCase = vi.fn();
+
 vi.mock('@/application/use-cases/task', () => ({
-  ListConsultantTasksUseCase: vi.fn(),
+  ListConsultantTasksUseCase: mockListConsultantTasksUseCase,
 }));
 
 describe('GET /api/consultant/tasks', () => {
@@ -64,25 +67,25 @@ describe('GET /api/consultant/tasks', () => {
 
   it('allows consultant role to access endpoint', async () => {
     const { getAuthenticatedUser } = await import('@/4-infrastructure/api/helpers/auth');
-    const { ListConsultantTasksUseCase } = await import('@/application/use-cases/task');
 
     const user = createMockUser({ role: UserRole.CONSULTANT });
     vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
 
-    // Mock use case
-    vi.mocked(ListConsultantTasksUseCase).mockImplementation(
+    const executeMock = vi.fn().mockResolvedValue({
+      isFailure: false,
+      value: {
+        tasks: [],
+        total: 0,
+        page: 1,
+        limit: 12,
+        totalPages: 0,
+      },
+    });
+
+    mockListConsultantTasksUseCase.mockImplementation(
       () =>
         ({
-          execute: vi.fn().mockResolvedValue({
-            isFailure: false,
-            value: {
-              tasks: [],
-              total: 0,
-              page: 1,
-              limit: 12,
-              totalPages: 0,
-            },
-          }),
+          execute: executeMock,
         }) as any
     );
 
@@ -95,24 +98,25 @@ describe('GET /api/consultant/tasks', () => {
 
   it('allows master_admin role to access endpoint', async () => {
     const { getAuthenticatedUser } = await import('@/4-infrastructure/api/helpers/auth');
-    const { ListConsultantTasksUseCase } = await import('@/application/use-cases/task');
 
     const user = createMockUser({ role: UserRole.MASTER_ADMIN });
     vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
 
-    vi.mocked(ListConsultantTasksUseCase).mockImplementation(
+    const executeMock = vi.fn().mockResolvedValue({
+      isFailure: false,
+      value: {
+        tasks: [],
+        total: 0,
+        page: 1,
+        limit: 12,
+        totalPages: 0,
+      },
+    });
+
+    mockListConsultantTasksUseCase.mockImplementation(
       () =>
         ({
-          execute: vi.fn().mockResolvedValue({
-            isFailure: false,
-            value: {
-              tasks: [],
-              total: 0,
-              page: 1,
-              limit: 12,
-              totalPages: 0,
-            },
-          }),
+          execute: executeMock,
         }) as any
     );
 
@@ -125,7 +129,6 @@ describe('GET /api/consultant/tasks', () => {
 
   it('handles query parameters correctly', async () => {
     const { getAuthenticatedUser } = await import('@/4-infrastructure/api/helpers/auth');
-    const { ListConsultantTasksUseCase } = await import('@/application/use-cases/task');
 
     const user = createMockUser({ role: UserRole.CONSULTANT });
     vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
@@ -141,7 +144,7 @@ describe('GET /api/consultant/tasks', () => {
       },
     });
 
-    vi.mocked(ListConsultantTasksUseCase).mockImplementation(
+    mockListConsultantTasksUseCase.mockImplementation(
       () =>
         ({
           execute: executeMock,

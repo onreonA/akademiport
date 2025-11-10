@@ -18,3 +18,4 @@ export * from './IUserRepository';
 export * from './ICompanyProjectAssignmentRepository';
 export * from './IEventRepository';
 export * from './IAppointmentRepository';
+export * from './IReminderRepository';

@@ -237,6 +237,10 @@ export function AppointmentRequestForm({ onSuccess, onCancel }: AppointmentReque
       {
         onSuccess: (data) => {
           console.log('✅ [AppointmentRequestForm] Appointment created successfully:', data);
+
+          // Başarı toast mesajı göster
+          toast.success('Randevu talebi başarıyla gönderildi');
+
           // Reset form
           setSelectedConsultantId('');
           setTitle('');

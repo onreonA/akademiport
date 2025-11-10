@@ -89,11 +89,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     }
 
     const updateEventUseCase = new UpdateEventUseCase(eventRepository);
-    const result = await updateEventUseCase.execute(
-      id,
-      updateData,
-      body.updateZoomMeeting ?? false
-    );
+    const result = await updateEventUseCase.execute(id, updateData);
 
     if (result.isFailure) {
       return NextResponse.json(

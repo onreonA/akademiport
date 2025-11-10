@@ -1,4 +1,5 @@
 import { IEventRepository } from '@/domain/interfaces/repositories/IEventRepository';
+import { IReminderRepository } from '@/domain/interfaces/repositories/IReminderRepository';
 import { Result } from '@/core/result';
 import { AppError } from '@/core/errors';
 import {
@@ -22,7 +23,8 @@ export class SendEventRemindersUseCase {
   constructor(
     private eventRepository: IEventRepository,
     private userRepository: UserRepository,
-    private programRepository: ProgramRepository
+    private programRepository: ProgramRepository,
+    private reminderRepository: IReminderRepository
   ) {}
 
   async execute(reminderType: ReminderType): Promise<Result<SendEventRemindersResult>> {
@@ -85,21 +87,36 @@ export class SendEventRemindersUseCase {
             continue;
           }
 
-          // Get user details for attendees
+          // Get user details for attendees and check for duplicate reminders
           const recipients: NotificationRecipient[] = [];
           for (const attendee of attendees) {
+            // Check if reminder was already sent
+            const alreadySent = await this.reminderRepository.hasEventReminderBeenSent(
+              event.id,
+              attendee.userId,
+              reminderType
+            );
+
+            if (alreadySent) {
+              logger.debug(
+                `Reminder already sent to user ${attendee.userId} for event ${event.id} (${reminderType})`
+              );
+              continue;
+            }
+
             const userResult = await this.userRepository.findById(attendee.userId);
             if (userResult.isSuccess && userResult.value && userResult.value.email) {
               recipients.push({
                 email: userResult.value.email,
                 name: userResult.value.fullName,
                 userId: attendee.userId,
+                phoneNumber: userResult.value.phone || undefined,
               });
             }
           }
 
           if (recipients.length === 0) {
-            logger.warn(`Event ${event.id} has no valid recipients, skipping reminders`);
+            logger.info(`Event ${event.id} has no new recipients for ${reminderType} reminder`);
             continue;
           }
 
@@ -124,6 +141,26 @@ export class SendEventRemindersUseCase {
             },
             notificationReminderType
           );
+
+          // Record reminders in database
+          for (const recipient of recipients) {
+            try {
+              const recipientResult = notificationResult.errors?.find(
+                (e) => e.recipient === recipient.email
+              );
+
+              await this.reminderRepository.createEventReminder({
+                eventId: event.id,
+                userId: recipient.userId || '',
+                reminderType,
+                sentToEmail: recipient.email,
+                status: recipientResult ? 'failed' : 'sent',
+                errorMessage: recipientResult?.error,
+              });
+            } catch (error) {
+              logger.warn(`Failed to record reminder for ${recipient.email}:`, error);
+            }
+          }
 
           if (notificationResult.success) {
             result.remindersSent += notificationResult.sentCount;

@@ -63,6 +63,9 @@ export function EventForm({
       attendanceRequired: defaultValues?.attendanceRequired ?? true,
       isPublic: defaultValues?.isPublic ?? true,
       createZoomMeeting: defaultValues?.createZoomMeeting ?? true,
+      maxAttendees: defaultValues?.maxAttendees ?? null,
+      organizerName: defaultValues?.organizerName ?? null,
+      organizerEmail: defaultValues?.organizerEmail ?? null,
       ...defaultValues,
     },
   });
@@ -114,6 +117,7 @@ export function EventForm({
         attendanceRequired: defaultValues?.attendanceRequired ?? true,
         isPublic: defaultValues?.isPublic ?? true,
         createZoomMeeting: defaultValues?.createZoomMeeting ?? true,
+        maxAttendees: defaultValues?.maxAttendees ?? undefined,
         ...defaultValues,
       };
 
@@ -123,6 +127,15 @@ export function EventForm({
       }
       if (defaultValues?.endTime) {
         resetData.endTime = defaultValues.endTime; // Keep ISO for validation, will be converted on display
+      }
+
+      // Ensure maxAttendees is undefined if not provided or invalid (to avoid NaN)
+      if (
+        resetData.maxAttendees === null ||
+        resetData.maxAttendees === undefined ||
+        (typeof resetData.maxAttendees === 'number' && isNaN(resetData.maxAttendees))
+      ) {
+        delete resetData.maxAttendees; // Remove the property entirely instead of setting to undefined
       }
 
       reset(resetData);
@@ -170,17 +183,27 @@ export function EventForm({
 
     handleSubmit(onFormSubmit, (validationErrors) => {
       console.error('Form validation failed:', validationErrors);
-      // Show specific error messages
-      if (validationErrors.programId) {
+      // Show specific error messages (Zod refine errors are on specific paths)
+      if (validationErrors.endTime) {
+        // endTime path'inde refine hatası olabilir (başlangıç > bitiş)
+        toast.error(
+          validationErrors.endTime.message || 'Bitiş tarihi başlangıç tarihinden sonra olmalıdır'
+        );
+      } else if (validationErrors.startTime) {
+        toast.error(validationErrors.startTime.message || 'Başlangıç tarihi gereklidir');
+      } else if (validationErrors.programId) {
         toast.error(validationErrors.programId.message || 'Program seçimi gereklidir');
       } else if (validationErrors.consultantId) {
         toast.error(validationErrors.consultantId.message || 'Danışman ID gereklidir');
-      } else if (validationErrors.startTime) {
-        toast.error(validationErrors.startTime.message || 'Başlangıç tarihi gereklidir');
-      } else if (validationErrors.endTime) {
-        toast.error(validationErrors.endTime.message || 'Bitiş tarihi gereklidir');
+      } else if (validationErrors.title) {
+        toast.error(validationErrors.title.message || 'Etkinlik başlığı gereklidir');
       } else {
-        toast.error('Lütfen formdaki hataları düzeltin');
+        // Tüm hataları göster
+        const errorMessages = Object.values(validationErrors)
+          .map((error: any) => error?.message)
+          .filter(Boolean)
+          .join(', ');
+        toast.error(errorMessages || 'Lütfen formdaki hataları düzeltin');
       }
     })(e);
   };
@@ -327,7 +350,20 @@ export function EventForm({
               id="maxAttendees"
               type="number"
               min="1"
-              {...register('maxAttendees', { valueAsNumber: true })}
+              {...register('maxAttendees', {
+                setValueAs: (value) => {
+                  if (
+                    value === '' ||
+                    value === null ||
+                    value === undefined ||
+                    value === 'undefined'
+                  ) {
+                    return undefined;
+                  }
+                  const num = Number(value);
+                  return isNaN(num) ? undefined : num;
+                },
+              })}
               placeholder="Sınırsız için boş bırakın"
               className={errors.maxAttendees ? 'border-destructive' : ''}
             />

@@ -1,500 +1,498 @@
 # 🚀 AKADEMİ PORT - GENEL SPRINT PLANI
 
 **Proje Başlangıç:** 28 Ekim 2025  
-**Tahmini Tamamlanma:** Mart-Nisan 2026 (18-22 hafta)  
-**Toplam Sprint:** 23  
-**Metodoloji:** Agile + Vertical Slice Architecture
+**Güncel Tarih:** 10 Kasım 2025  
+**Tahmini Tamamlanma:** Nisan-Mayıs 2026 (21-23 hafta)  
+**Toplam Sprint:** 28  
+**Metodoloji:** Agile + Vertical Slice Architecture + Clean Architecture
 
 ---
 
-## 📊 SPRINT DURUMU
+## 📊 SPRINT DURUMU TABLOSU
 
-| Sprint   | Durum        | Başlangıç | Bitiş | Süre    |
-| -------- | ------------ | --------- | ----- | ------- |
-| Sprint 1 | ⏳ Hazır     | -         | -     | 1 hafta |
-| Sprint 2 | 📋 Planlandı | -         | -     | 1 hafta |
-| Sprint 3 | 📋 Planlandı | -         | -     | 1 hafta |
-| ...      | ...          | ...       | ...   | ...     |
+| Sprint        | Modül                 | Durum           | Süre      | Bağımlılık              |
+| ------------- | --------------------- | --------------- | --------- | ----------------------- |
+| **Sprint 1**  | Proje Kurulumu        | ✅ Tamamlandı   | 1 hafta   | -                       |
+| **Sprint 2**  | Database & Auth       | ✅ Tamamlandı   | 1 hafta   | Sprint 1                |
+| **Sprint 3**  | Design System         | ✅ Tamamlandı   | 1 hafta   | Sprint 1                |
+| **Sprint 4**  | Program Yönetimi      | ✅ Tamamlandı   | 1 hafta   | Sprint 2                |
+| **Sprint 5**  | User Management       | ✅ Tamamlandı   | 1 hafta   | Sprint 2, 4             |
+| **Sprint 6**  | Company Management    | ✅ Tamamlandı   | 1 hafta   | Sprint 4, 5             |
+| **Sprint 7**  | Consultant Panel      | ✅ Tamamlandı   | 1 hafta   | Sprint 4, 5, 6          |
+| **Sprint 8**  | Proje Yönetimi        | ✅ Tamamlandı   | 1.5 hafta | Sprint 6, 7             |
+| **Sprint 9**  | Eğitim Yönetimi       | ✅ Tamamlandı   | 1 hafta   | Sprint 6, 7             |
+| **Sprint 10** | Etkinlik Yönetimi     | ✅ Tamamlandı   | 1 hafta   | Sprint 6, 7             |
+| **Sprint 11** | Randevu Yönetimi      | ✅ Tamamlandı   | 1 hafta   | Sprint 7, 10            |
+| **Sprint 12** | **Haberler Modülü**   | 🏃 Devam Ediyor | 1 hafta   | Sprint 6                |
+| **Sprint 13** | Forum Modülü          | 📋 Planlandı    | 1 hafta   | Sprint 6, 7             |
+| **Sprint 14** | Liderlik Tablosu      | 📋 Planlandı    | 1 hafta   | Sprint 8, 9, 10, 12, 13 |
+| **Sprint 15** | E-ticaret Metrikleri  | 📋 Planlandı    | 1 hafta   | Sprint 6                |
+| **Sprint 16** | AI Raporlama          | 📋 Planlandı    | 1 hafta   | Sprint 15, 17           |
+| **Sprint 17** | AI Altyapısı          | 📋 Planlandı    | 1 hafta   | Sprint 2                |
+| **Sprint 18** | AI Özellikleri        | 📋 Planlandı    | 1 hafta   | Sprint 8, 9, 17         |
+| **Sprint 19** | AI İçerik Otomasyonu  | 📋 Planlandı    | 1 hafta   | Sprint 12, 13, 17, 18   |
+| **Sprint 20** | Kariyer Portalı       | 📋 Planlandı    | 1 hafta   | Sprint 6                |
+| **Sprint 21** | AI Kariyer Matching   | 📋 Planlandı    | 1 hafta   | Sprint 17, 18, 20       |
+| **Sprint 22** | Public Website        | 📋 Planlandı    | 1 hafta   | -                       |
+| **Sprint 23** | CMS (Site Yönetimi)   | 📋 Planlandı    | 1 hafta   | Sprint 22               |
+| **Sprint 24** | Email Sistemi         | 📋 Planlandı    | 0.5 hafta | Sprint 2                |
+| **Sprint 25** | Chatbot               | 📋 Planlandı    | 1 hafta   | Sprint 9, 17, 18        |
+| **Sprint 26** | Bildirim Sistemi      | 📋 Planlandı    | 0.5 hafta | Sprint 2, 24            |
+| **Sprint 27** | Dashboard & Analytics | 📋 Planlandı    | 0.5 hafta | Sprint 17, 18           |
+| **Sprint 28** | Production Hazırlık   | 📋 Planlandı    | 0.5 hafta | Tümü                    |
 
 **Gösterim:**
 
-- ⏳ Hazır (Başlamaya hazır)
-- 🏃 Devam Ediyor
 - ✅ Tamamlandı
-- 🔄 Review
-- ⚠️ Bloke
+- 🏃 Devam Ediyor
 - 📋 Planlandı
+- ⚠️ Bloke
 
 ---
 
-## 🎯 FAZ 1: TEMEL ALTYAPI (2-3 Hafta)
+## 🎯 FAZ 1: TEMEL ALTYAPI (3 Hafta) ✅ TAMAMLANDI
 
-### Sprint 1: Proje Kurulumu (1 hafta)
+### Sprint 1: Proje Kurulumu ✅
 
-**Hedef:** Çalışan boş proje + Design System temeli
+- Next.js 16 + TypeScript + Tailwind CSS v4
+- 6 katmanlı Clean Architecture
+- Design tokens & Storybook
 
-**Görevler:**
+### Sprint 2: Database & Auth ✅
 
-- Next.js 15 + TypeScript kurulumu
-- Tailwind CSS + Shadcn/ui kurulumu
-- 6 katmanlı klasör yapısı oluşturma
-- ESLint + Prettier konfigürasyonu
-- Git repository setup
-- Storybook kurulumu
-- Design tokens (colors, typography, spacing)
-
-**Çıktılar:**
-
-- ✅ Çalışan Next.js projesi
-- ✅ Klasör yapısı hazır
-- ✅ Design tokens tanımlandı
-- ✅ Storybook çalışıyor
-- ✅ Git repository hazır
-
-**Kabul Kriterleri:**
-
-- `npm run dev` çalışıyor
-- `npm run storybook` çalışıyor
-- Klasör yapısı dokümana uygun
-- Design tokens kullanılabilir
-
-**Bağımlılıklar:** Yok
-
-**Detaylı Plan:** `sprint-detaylari/sprint-01-proje-kurulumu.md`
-
----
-
-### Sprint 2: Database & Auth (1 hafta)
-
-**Hedef:** Supabase + Authentication sistemi çalışıyor
-
-**Görevler:**
-
-- Supabase projesi oluşturma
-- Database schema tasarımı (tüm tablolar)
-- Migration dosyaları (programs, users, companies, etc.)
-- Seed data hazırlama
-- Authentication sistemi (JWT + Zustand)
+- Supabase setup
+- Database schema & migrations
+- JWT Authentication
 - Role-based middleware
-- API route structure
 
-**Çıktılar:**
+### Sprint 3: Design System ✅
 
-- ✅ Supabase projesi hazır
-- ✅ Tüm tablolar oluşturuldu
-- ✅ Login/Logout çalışıyor
-- ✅ Role-based routing çalışıyor
-- ✅ Middleware koruma aktif
-
-**Kabul Kriterleri:**
-
-- Login yapılabiliyor
-- Roller kontrol ediliyor
-- Database'e bağlanılıyor
-- Migration'lar çalışıyor
-
-**Bağımlılıklar:** Sprint 1
-
-**Detaylı Plan:** `sprint-detaylari/sprint-02-database-auth.md`
+- UI Components (Shadcn/ui)
+- Atomic Design System
+- Responsive layouts
+- Dark mode support
 
 ---
 
-### Sprint 3: UI Foundation (1 hafta)
+## 🎯 FAZ 2: CORE MODULES (4 Hafta) ✅ TAMAMLANDI
 
-**Hedef:** Atomic Design System + Layout'lar hazır
+### Sprint 4: Program Yönetimi ✅
 
-**Görevler:**
+- Program CRUD
+- Program-Company ilişkisi
+- Program-Consultant ilişkisi
+- Dashboard & analytics
 
-- Atomic components (Button, Input, Badge, Avatar, etc.)
-- Molecule components (FormField, Card, Modal, etc.)
-- Organism components (Header, Sidebar, DataTable)
-- Layout templates (DashboardLayout, AuthLayout, PublicLayout)
-- Dark mode setup
-- Storybook documentation
-- Accessibility testing (WCAG 2.1 AA)
+### Sprint 5: User Management ✅
 
-**Çıktılar:**
+- User CRUD
+- Role management
+- User-Program ilişkisi
+- Profile management
 
-- ✅ 20+ atom component
-- ✅ 10+ molecule component
-- ✅ 5+ organism component
-- ✅ 3 layout template
-- ✅ Dark mode çalışıyor
-- ✅ Storybook'ta dokümante edildi
+### Sprint 6: Company Management ✅
 
-**Kabul Kriterleri:**
+- Company CRUD
+- Company users (max 2 aktif)
+- Company-Program ilişkisi
+- Company dashboard
 
-- Tüm componentler Storybook'ta
-- Dark mode toggle çalışıyor
-- Accessibility testleri geçiyor
-- Responsive tasarım
-
-**Bağımlılıklar:** Sprint 1
-
-**Detaylı Plan:** `sprint-detaylari/sprint-03-ui-foundation.md`
-
----
-
-## 🎯 FAZ 2: CORE MODULES (3-4 Hafta)
-
-### Sprint 4: Program Yönetimi (1 hafta)
-
-**Hedef:** Program CRUD + Master Admin paneli çalışıyor
-
-**Görevler:**
-
-- Program entity + repository
-- Program use cases (Create, Update, Delete, Get)
-- Program API routes
-- Master Admin: Program dashboard
-- Master Admin: Program CRUD sayfaları
-- Program yöneticisi atama
-- Danışman atama (Many-to-Many)
-- Firma atama
-- Program filtreleme ve arama
-
-**Çıktılar:**
-
-- ✅ Program oluşturulabiliyor
-- ✅ Program yöneticisi atanabiliyor
-- ✅ Danışman atanabiliyor
-- ✅ Firma atanabiliyor
-- ✅ Program listesi görüntülenebiliyor
-
-**Kabul Kriterleri:**
-
-- Master Admin program oluşturabiliyor
-- Program yöneticisi atayabiliyor
-- Danışman atayabiliyor
-- Firma ekleyebiliyor
-
-**Bağımlılıklar:** Sprint 2, Sprint 3
-
-**Detaylı Plan:** `sprint-detaylari/sprint-04-program-yonetimi.md`
-
----
-
-### Sprint 5: Kullanıcı Yönetimi (1 hafta)
-
-**Hedef:** Multi-role kullanıcı yönetimi çalışıyor
-
-**Görevler:**
-
-- User entity + repository
-- User use cases (CRUD, role management)
-- User API routes
-- Master Admin: User CRUD
-- Program bazlı yetkilendirme
-- User profile sayfası
-- User settings sayfası
-- Role değiştirme
-- Program atama (user_programs)
-
-**Çıktılar:**
-
-- ✅ Kullanıcı oluşturulabiliyor
-- ✅ Roller atanabiliyor
-- ✅ Program'a kullanıcı atanabiliyor
-- ✅ Profil güncellenebiliyor
-
-**Kabul Kriterleri:**
-
-- Master Admin kullanıcı ekleyebiliyor
-- Roller doğru çalışıyor
-- Program ataması yapılabiliyor
-- Profil sayfası çalışıyor
-
-**Bağımlılıklar:** Sprint 2, Sprint 3, Sprint 4
-
-**Detaylı Plan:** `sprint-detaylari/sprint-05-kullanici-yonetimi.md`
-
----
-
-### Sprint 6: Firma Yönetimi (1 hafta)
-
-**Hedef:** Firma CRUD + Firma paneli temeli
-
-**Görevler:**
-
-- Company entity + repository
-- Company use cases (CRUD)
-- Company API routes
-- Master Admin: Company CRUD
-- Program Manager: Company CRUD (kendi programı)
-- Company dashboard (temel)
-- Company profile
-- Company users management
-- Alt kullanıcı ekleme/çıkarma (max 2 aktif)
-
-**Çıktılar:**
-
-- ✅ Firma oluşturulabiliyor
-- ✅ Programa atanabiliyor
-- ✅ Alt kullanıcı eklenebiliyor
-- ✅ Firma dashboard çalışıyor
-
-**Kabul Kriterleri:**
-
-- Firma oluşturulabiliyor
-- Programa atanabiliyor
-- Alt kullanıcı eklenebiliyor (max 2)
-- Firma paneline giriş yapılabiliyor
-
-**Bağımlılıklar:** Sprint 4, Sprint 5
-
-**Detaylı Plan:** `sprint-detaylari/sprint-06-firma-yonetimi.md`
-
----
-
-### Sprint 7: Danışman Paneli (1 hafta)
-
-**Hedef:** Danışman paneli + Program seçici çalışıyor
-
-**Görevler:**
+### Sprint 7: Consultant Panel ✅
 
 - Consultant dashboard
-- Program seçici component
-- Atandığı programlar listesi
-- Atandığı firmalar listesi (program bazlı)
-- Firma detay sayfası
-- Quick actions (görev ata, proje oluştur, etc.)
-- Program bazlı filtreleme
-- İstatistikler (program bazlı)
-
-**Çıktılar:**
-
-- ✅ Danışman paneline giriş yapılabiliyor
-- ✅ Program seçebiliyor
-- ✅ Firmalarını görebiliyor
-- ✅ Quick actions çalışıyor
-
-**Kabul Kriterleri:**
-
-- Danışman giriş yapabiliyor
-- Program seçebiliyor
-- Sadece atandığı firmaları görebiliyor
-- Program değiştirince liste güncelleniyor
-
-**Bağımlılıklar:** Sprint 4, Sprint 5, Sprint 6
-
-**Detaylı Plan:** `sprint-detaylari/sprint-07-danisman-paneli.md`
+- Company listesi
+- Program seçimi
+- Analytics
 
 ---
 
-## 🎯 FAZ 3: İŞ MODÜLLERİ (4-5 Hafta)
+## 🎯 FAZ 3: PROJECT & TRAINING (2.5 Hafta) ✅ TAMAMLANDI
 
-### Sprint 8: Proje Yönetimi (1.5 hafta)
+### Sprint 8: Proje Yönetimi ✅
 
-**Hedef:** Ana Proje → Alt Proje → Görev hiyerarşisi çalışıyor
+- Project → Sub-Project → Task hiyerarşisi
+- Toplu firma atama
+- Toplu tarih atama
+- Matris görünümü
+- Task dependencies
+- Comments & activity log
 
-**Görevler:**
+### Sprint 9: Eğitim Yönetimi ✅
 
-- Project entity + repository
-- SubProject entity + repository
-- Task entity + repository
-- Use cases (CRUD, hierarchy, assignment)
-- API routes (projects, sub-projects, tasks)
-- Admin: Proje şablonları
-- Consultant: Proje oluşturma/atama
-- Consultant: Görev oluşturma/atama
-- Consultant: Görev onaylama
-- Company: Proje görüntüleme
-- Company: Görev tamamlama
-- Durum yönetimi (todo, in-progress, review, done)
-- İlerleme hesaplama
-- Görev altında yorum/soru sistemi
+- Video eğitimler (YouTube entegrasyonu)
+- Dökümanlar (PDF/Word)
+- Sıralı izleme sistemi
+- Progress tracking
+- Firma atama
 
-**Çıktılar:**
+### Sprint 10: Etkinlik Yönetimi ✅
 
-- ✅ Proje oluşturulabiliyor
-- ✅ Alt proje eklenebiliyor
-- ✅ Görev atanabiliyor
-- ✅ Görev tamamlanabiliyor
-- ✅ İlerleme hesaplanıyor
-- ✅ Danışman onaylayabiliyor
-
-**Kabul Kriterleri:**
-
-- Proje hiyerarşisi çalışıyor
-- Görev atama çalışıyor
-- Durum değişiklikleri çalışıyor
-- İlerleme doğru hesaplanıyor
-- Yorum sistemi çalışıyor
-
-**Bağımlılıklar:** Sprint 6, Sprint 7
-
-**Detaylı Plan:** `sprint-detaylari/sprint-08-proje-yonetimi.md`
-
-#### Sprint 8 Ek: Bulk & Matrix Yönetimi (Kasım 2025)
-
-**Hedef:** Çoklu firma atamaları ve tarih yönetimini matris tabanlı arayüzle tamamlamak.
-
-**Kapsam:**
-
-- `company_project_assignments` tablosu ve RLS politikaları
-- Alt proje → görev kalıtımı (firmaya atanınca görevler otomatik görünür)
-- `BulkAssignSubProjectsToCompaniesUseCase`, `BulkAssignDatesToCompanySubProjectsUseCase`
-- `GetAssignmentMatrixUseCase`, `GetCompanyTasksWithInheritedDatesUseCase`
-- Matris sayfaları: Firma x Alt Proje atama, tarih matrisi, firma bazlı görev görünümü
-- Rol bazlı akışlar: Admin (tam kontrol), Danışman (atama/yönetim), Firma (takip)
-
-**Durum:** 🔴 Başlangıçta – analiz ve detay plan hazır, uygulama beklemede.
-
-**Bağımlılıklar:** Sprint 6, Sprint 7, Sprint 8 temel altyapısı
-
-**Notlar:** Ayrıntılı analiz ve görev listesi için `docs/SPRINT-8-TOPLU-ISLEMLER-ANALIZI.md` ve `docs/SPRINT-8-TOPLU-ISLEMLER-DETAYLI-PLAN.md` dosyalarına bakınız.
-
----
-
-### Sprint 9: Eğitim Yönetimi (1.5 hafta)
-
-**Hedef:** Video + Döküman eğitim sistemi çalışıyor
-
-**Görevler:**
-
-- Training entity + repository
-- TrainingVideo entity + repository
-- TrainingDocument entity + repository
-- Use cases (CRUD, assignment, tracking)
-- API routes (trainings, videos, documents)
-- Admin: Eğitim CRUD
-- Admin: Video yükleme (YouTube unlisted)
-- Admin: Döküman yükleme (Supabase Storage)
-- Admin: Global vs Program eğitimleri
-- Consultant: Firmaya eğitim atama
-- Company: Eğitim listesi
-- Company: Video izleme + tracking
-- Company: Döküman okuma + tracking
-- Sıralı eğitim sistemi (video 1 bitince video 2 açılır)
-- Kilitli içerik
-- İzleme yüzdesi hesaplama
-
-**Çıktılar:**
-
-- ✅ Eğitim oluşturulabiliyor
-- ✅ Video eklenebiliyor (YouTube)
-- ✅ Döküman eklenebiliyor
-- ✅ Firmaya atanabiliyor
-- ✅ İzleme takibi çalışıyor
-- ✅ Sıralı sistem çalışıyor
-
-**Kabul Kriterleri:**
-
-- Eğitim oluşturulabiliyor
-- Video izlenebiliyor
-- Döküman okunabiliyor
-- İzleme kaydediliyor
-- Sıralı sistem çalışıyor
-
-**Bağımlılıklar:** Sprint 6, Sprint 7
-
-**Detaylı Plan:** `sprint-detaylari/sprint-09-egitim-yonetimi.md`
-
----
-
-### Sprint 10: Etkinlik Yönetimi (1 hafta)
-
-**Hedef:** Etkinlik + Takvim + Zoom entegrasyonu çalışıyor
-
-**Görevler:**
-
-- Event entity + repository
-- Use cases (CRUD, attendance)
-- API routes (events, attendance)
-- Zoom API entegrasyonu
-- Admin: Etkinlik CRUD
-- Admin: Zoom meeting oluşturma
-- Consultant: Etkinlik oluşturma (program bazlı)
-- Company: Etkinlik listesi
-- Company: Etkinlik detay
-- Company: Katılım kaydı
-- Takvim görünümü (FullCalendar)
-- Otomatik hatırlatmalar (email + WhatsApp)
+- Event CRUD
+- Zoom entegrasyonu
 - Katılım takibi
-- Zoom link paylaşımı
+- Otomatik hatırlatmalar (email + cron)
+- FullCalendar entegrasyonu
+
+### Sprint 11: Randevu Yönetimi ✅
+
+- Appointment CRUD
+- Consultant availability management
+- Zoom entegrasyonu
+- Onay/red sistemi
+- Revize (reschedule)
+- UnifiedCalendar (events + appointments)
+
+---
+
+## 🎯 FAZ 4: İÇERİK & TOPLULUK YÖNETİMİ (3 Hafta)
+
+### Sprint 12: Haberler Modülü (1 hafta) 🏃 DEVAM EDİYOR
+
+**Hedef:** Haber yönetimi + Liderlik tablosu entegrasyonu
+
+**Database:**
+
+```sql
+- news (ana tablo)
+- news_comments (yorumlar)
+- news_likes (beğeniler)
+- news_reads (okuma takibi - liderlik için)
+- news_tags (etiketler)
+- news_tag_relations (haber-etiket ilişkisi)
+```
+
+**Backend:**
+
+- Domain: News entity + NewsEntity class
+- Enums: NewsCategory, NewsStatus
+- Repository: INewsRepository, SupabaseNewsRepository
+- Use Cases: Create, Update, Delete, Publish, Like, Comment, RecordRead
+- API Routes: /api/news/\*
+
+**Frontend:**
+
+- Components: NewsList, NewsCard, NewsDetail, NewsForm, NewsComments
+- Admin Panel: Haber oluşturma, düzenleme, yayınlama
+- Company Panel: Haber okuma, beğeni, yorum
+- Public Blog: /blog
+
+**Liderlik Tablosu Entegrasyonu:**
+
+- Haber okuma: +2 puan
+- Tam okuma (>80% scroll): +5 puan bonus
+- Yorum yapma: +3 puan
+- Okuma süresi tracking
 
 **Çıktılar:**
 
-- ✅ Etkinlik oluşturulabiliyor
-- ✅ Zoom meeting otomatik oluşuyor
-- ✅ Takvim görünümü çalışıyor
-- ✅ Katılım kaydediliyor
-- ✅ Hatırlatmalar gidiyor
+- ✅ Manuel haber oluşturma/düzenleme
+- ✅ Kategori, etiket, görsel yönetimi
+- ✅ Yayınlama/arşivleme
+- ✅ Beğeni, yorum sistemi
+- ✅ Okuma süresi tracking
+- ✅ Liderlik tablosu entegrasyonu
+- ✅ Public blog görünümü
 
 **Kabul Kriterleri:**
 
-- Etkinlik oluşturulabiliyor
-- Zoom entegrasyonu çalışıyor
-- Takvim görünümü çalışıyor
-- Katılım takibi çalışıyor
+- Admin/Consultant haber oluşturabiliyor
+- Firma haberleri okuyup yorum yapabiliyor
+- Okuma süresi liderlik tablosuna yansıyor
+- Public blog erişilebilir
+
+**Bağımlılıklar:** Sprint 6
+
+**Detaylı Plan:** `sprint-detaylari/sprint-12-haberler-modulu.md`
+
+---
+
+### Sprint 13: Forum Modülü (1 hafta)
+
+**Hedef:** Forum sistemi + Liderlik tablosu entegrasyonu
+
+**Database:**
+
+```sql
+- forum_categories (kategoriler)
+- forum_topics (konular)
+- forum_replies (yanıtlar - nested)
+- forum_likes (beğeniler)
+- forum_notifications (bildirimler)
+- forum_activity (aktivite log)
+```
+
+**Backend:**
+
+- Domain: ForumCategory, ForumTopic, ForumReply entities
+- Enums: TopicStatus, TopicPriority
+- Repository: IForumRepository
+- Use Cases: CreateTopic, ReplyTopic, LikeTopic, PinTopic, CloseTopic, MarkSolution
+- API Routes: /api/forum/\*
+
+**Frontend:**
+
+- Components: CategoryList, TopicList, TopicDetail, ReplyForm, ReplyCard
+- Admin Panel: Kategori yönetimi, moderasyon
+- Consultant Panel: Moderasyon, pin/unpin, close/open
+- Company Panel: Konu oluşturma, yanıt yazma, beğeni
+
+**Liderlik Tablosu Entegrasyonu:**
+
+- Konu açma: +10 puan
+- Yanıt yazma: +5 puan
+- Çözüm işaretlenme: +20 puan
+
+**Özellikler:**
+
+- ✅ Kategori sistemi (Admin oluşturur)
+- ✅ Konu oluşturma (Firma kullanıcıları)
+- ✅ Yanıt sistemi (iç içe - nested)
+- ✅ Beğeni sistemi
+- ✅ Çözüm işaretleme (best answer)
+- ✅ Moderasyon (Consultant)
+- ✅ Pin/Unpin (önemli konular)
+- ✅ Konu kapatma/açma
+- ✅ Bildirimler (yanıt geldiğinde)
+- ✅ Arama & filtreleme
+- ✅ Liderlik tablosu entegrasyonu
+
+**Çıktılar:**
+
+- ✅ Forum kategorileri oluşturulabiliyor
+- ✅ Firmalar konu açabiliyor
+- ✅ Yanıt sistemi çalışıyor
+- ✅ Moderasyon çalışıyor
+- ✅ Bildirimler çalışıyor
+- ✅ Liderlik tablosuna yansıyor
+
+**Kabul Kriterleri:**
+
+- Firma kullanıcıları konu açıp yanıt yazabiliyor
+- Consultant moderasyon yapabiliyor
+- Bildirimler çalışıyor
+- Liderlik tablosuna puan yansıyor
 
 **Bağımlılıklar:** Sprint 6, Sprint 7
 
-**Detaylı Plan:** `sprint-detaylari/sprint-10-etkinlik-yonetimi.md`
+**Detaylı Plan:** `sprint-detaylari/sprint-13-forum-modulu.md`
 
 ---
 
-### Sprint 11: Randevu Yönetimi (1 hafta)
+### Sprint 14: Liderlik Tablosu Sistemi (1 hafta)
 
-**Hedef:** Danışman-Firma randevu sistemi çalışıyor
+**Hedef:** Kapsamlı liderlik tablosu + Rozet sistemi
 
-**Görevler:**
+**Database:**
 
-- Appointment entity + repository
-- Use cases (CRUD, reschedule)
-- API routes (appointments)
-- Zoom API entegrasyonu
-- Consultant: Müsaitlik takvimi
-- Consultant: Randevu oluşturma
-- Company: Randevu talep etme
-- Company: Randevu listesi
-- Randevu onay/red sistemi
-- Revize sistemi (reschedule)
-- Zoom meeting otomatik oluşturma
-- Otomatik hatırlatmalar (1 gün önce, 1 saat önce)
-- Katılım takibi
-- Randevu notları
+```sql
+- leaderboard_scores (puan kayıtları)
+- leaderboard_badges (rozet tanımları)
+- company_badges (firma rozetleri)
+- leaderboard_rankings (materialized view)
+```
+
+**Puan Kaynakları:**
+
+- Proje Yönetimi: Görev tamamlama, alt proje tamamlama, zamanında tamamlama
+- Eğitimler: Video izleme, döküman okuma, modül tamamlama
+- Etkinlikler: Katılım, zamanında katılım
+- Forum: Konu açma, yanıt yazma, çözüm işaretlenme
+- Haberler: Haber okuma, tam okuma, yorum yapma
+- Randevular: Randevu tamamlama, not ekleme
+
+**Rozet Sistemi:**
+
+- Proje rozetleri: İlk Adım, Görev Avcısı, Proje Ustası
+- Eğitim rozetleri: Öğrenmeye Açık, Bilgi Aşığı, Eğitim Şampiyonu
+- Etkinlik rozetleri: Katılımcı, Etkinlik Bağımlısı
+- Forum rozetleri: Soru Soran, Yardımsever, Çözüm Üreticisi
+- Haberler rozetleri: Bilgili, Sektör Takipçisi
+
+**Frontend:**
+
+- Liderlik tablosu sayfası (program bazlı)
+- Firma detay modal (puan dağılımı, rozetler)
+- Rozet galerisi
+- Puan geçmişi
+- Trend grafiği (haftalık/aylık)
+- Dashboard widget'ı
+
+**Özellikler:**
+
+- ✅ Çok kaynaklı puan sistemi
+- ✅ Otomatik puan hesaplama
+- ✅ Rozet kazanma sistemi
+- ✅ Program bazlı sıralama
+- ✅ Trend analizi
+- ✅ Puan geçmişi
+- ✅ Materialized view (performans)
+- ✅ Cron job (günlük güncelleme)
 
 **Çıktılar:**
 
-- ✅ Randevu oluşturulabiliyor
-- ✅ Müsaitlik takvimi çalışıyor
-- ✅ Zoom meeting oluşuyor
-- ✅ Hatırlatmalar gidiyor
-- ✅ Revize yapılabiliyor
+- ✅ Liderlik tablosu çalışıyor
+- ✅ Puanlar otomatik hesaplanıyor
+- ✅ Rozetler otomatik veriliyor
+- ✅ Trend analizi görüntülenebiliyor
 
 **Kabul Kriterleri:**
 
-- Randevu oluşturulabiliyor
-- Müsaitlik kontrolü çalışıyor
-- Zoom entegrasyonu çalışıyor
-- Revize yapılabiliyor
+- Tüm aktiviteler puan olarak yansıyor
+- Liderlik tablosu program bazlı çalışıyor
+- Rozetler otomatik veriliyor
+- Dashboard'da görüntülenebiliyor
 
-**Bağımlılıklar:** Sprint 7, Sprint 10
+**Bağımlılıklar:** Sprint 8, 9, 10, 12, 13
 
-**Detaylı Plan:** `sprint-detaylari/sprint-11-randevu-yonetimi.md`
+**Detaylı Plan:** `sprint-detaylari/sprint-14-liderlik-tablosu.md`
 
 ---
 
-## 🎯 FAZ 4: AI & OTOMASYON (2-3 Hafta)
+## 🎯 FAZ 5: E-TİCARET & RAPORLAMA (2 Hafta)
 
-### Sprint 12: AI Altyapısı (1 hafta)
+### Sprint 15: E-ticaret Metrikleri & Dashboard (1 hafta)
 
-**Hedef:** OpenAI + Claude entegrasyonu çalışıyor
+**Hedef:** Firma e-ticaret verilerini toplama ve görselleştirme
 
-**Görevler:**
+**Database:**
 
-- OpenAI API entegrasyonu
-- Anthropic (Claude) API entegrasyonu
-- Vercel AI SDK setup
-- AI service layer (Infrastructure)
-- AI service interface (Domain)
-- Prompt management sistemi
-- Token tracking
-- Cost tracking
-- Error handling
-- Rate limiting
-- Caching stratejisi
+```sql
+- ecommerce_metrics (aylık metrikler)
+- ecommerce_performance (materialized view)
+```
+
+**Metrikler:**
+
+- Alibaba (B2B): Ziyaretçi, ürün, RFQ, sipariş
+- B2C (Amazon, Etsy, vb.): Ziyaretçi, ürün, sipariş, gelir
+
+**Frontend:**
+
+- Company Dashboard: Aylık veri girişi formu
+- E-ticaret performans tablosu (ayrı liderlik)
+- Admin/Consultant: Tüm firmaların verileri
+- Bakanlık Dashboard: Toplu istatistikler
+- Grafikler: Ziyaretçi, ürün, sipariş, gelir trendi
+
+**Özellikler:**
+
+- ✅ Aylık veri girişi
+- ✅ Otomatik hatırlatma (her ayın sonu)
+- ✅ E-ticaret performans tablosu
+- ✅ Bakanlık dashboard'u
+- ✅ Karşılaştırma analizi
+- ✅ Trend grafikleri
+
+**Çıktılar:**
+
+- ✅ Firmalar aylık veri girebiliyor
+- ✅ E-ticaret performans tablosu çalışıyor
+- ✅ Bakanlık dashboard'u hazır
+- ✅ Grafikler görüntülenebiliyor
+
+**Kabul Kriterleri:**
+
+- Firma aylık veri girebiliyor
+- Veriler görselleştiriliyor
+- Bakanlık dashboard'u erişilebilir
+- Karşılaştırma analizi çalışıyor
+
+**Bağımlılıklar:** Sprint 6
+
+**Detaylı Plan:** `sprint-detaylari/sprint-15-eticaret-metrikleri.md`
+
+---
+
+### Sprint 16: AI Raporlama Sistemi (1 hafta)
+
+**Hedef:** AI destekli otomatik rapor üretimi
+
+**Database:**
+
+```sql
+- progress_reports (raporlar)
+- report_templates (şablonlar)
+```
+
+**Rapor Tipleri:**
+
+- Ara Rapor (alt proje tamamlandığında)
+- Aylık Rapor (her ayın sonu - otomatik)
+- Program Raporu (program bitişinde)
+- Firma Raporu (istek üzerine)
+- Bakanlık Raporu (istek üzerine)
+
+**AI Analizi:**
+
+- Özet (summary)
+- Güçlü yönler (strengths)
+- Zayıf yönler (weaknesses)
+- Öneriler (recommendations)
+- Risk skoru (0-100)
+- Başarı olasılığı (0-100)
+
+**Özellikler:**
+
+- ✅ Otomatik rapor üretimi (cron job)
+- ✅ AI analizi ve öneriler
+- ✅ PDF export
+- ✅ Email ile gönderim
+- ✅ Rapor geçmişi
+- ✅ Bakanlık özel dashboard
+
+**Çıktılar:**
+
+- ✅ Otomatik raporlar oluşuyor
+- ✅ AI analizi çalışıyor
+- ✅ PDF export çalışıyor
+- ✅ Bakanlık dashboard'u hazır
+
+**Kabul Kriterleri:**
+
+- Raporlar otomatik oluşuyor
+- AI analizi kaliteli
+- PDF export çalışıyor
+- Bakanlık dashboard'u kullanılabilir
+
+**Bağımlılıklar:** Sprint 15, Sprint 17 (AI Altyapısı)
+
+**Detaylı Plan:** `sprint-detaylari/sprint-16-ai-raporlama.md`
+
+---
+
+## 🎯 FAZ 6: AI ALTYAPISI & OTOMASYON (3 Hafta)
+
+### Sprint 17: AI Altyapısı (1 hafta)
+
+**Hedef:** OpenAI + Claude entegrasyonu
+
+**Services:**
+
+- openai.service.ts (OpenAI GPT-4)
+- claude.service.ts (Anthropic Claude)
+- ai-router.service.ts (use case bazlı provider seçimi)
+- prompt-manager.service.ts (prompt yönetimi)
+- token-tracker.service.ts (token sayımı)
+- cost-tracker.service.ts (maliyet hesaplama)
+
+**Database:**
+
+```sql
+- ai_usage_logs (kullanım logları)
+- ai_prompts (prompt şablonları)
+```
+
+**Özellikler:**
+
+- ✅ OpenAI API entegrasyonu
+- ✅ Claude API entegrasyonu
+- ✅ AI router (use case bazlı)
+- ✅ Prompt management
+- ✅ Token tracking
+- ✅ Cost tracking
+- ✅ Error handling & retry
+- ✅ Rate limiting
+- ✅ Caching
 
 **Çıktılar:**
 
@@ -513,15 +511,15 @@
 
 **Bağımlılıklar:** Sprint 2
 
-**Detaylı Plan:** `sprint-detaylari/sprint-12-ai-altyapisi.md`
+**Detaylı Plan:** `sprint-detaylari/sprint-17-ai-altyapisi.md`
 
 ---
 
-### Sprint 13: AI Özellikleri (1 hafta)
+### Sprint 18: AI Özellikleri (1 hafta)
 
-**Hedef:** AI asistan özellikleri çalışıyor
+**Hedef:** AI asistan özellikleri
 
-**Görevler:**
+**Özellikler:**
 
 - Görev açıklaması üretimi (AI)
 - Eğitim özeti çıkarma (AI)
@@ -529,6 +527,9 @@
 - Firma risk analizi (AI)
 - Başarı tahmini (AI)
 - Trend analizi (AI)
+
+**Frontend:**
+
 - Admin: AI özellikleri kullanımı
 - Consultant: AI asistan kullanımı
 - AI önerilerini kaydetme
@@ -549,120 +550,314 @@
 - Kullanıcı AI önerilerini görebiliyor
 - AI geçmişi kaydediliyor
 
-**Bağımlılıklar:** Sprint 8, Sprint 9, Sprint 12
+**Bağımlılıklar:** Sprint 8, 9, 17
 
-**Detaylı Plan:** `sprint-detaylari/sprint-13-ai-ozellikleri.md`
+**Detaylı Plan:** `sprint-detaylari/sprint-18-ai-ozellikleri.md`
 
 ---
 
-### Sprint 14: Chatbot (1 hafta)
+### Sprint 19: AI İçerik Otomasyonu (1 hafta)
 
-**Hedef:** AI Chatbot tüm panellerde çalışıyor
+**Hedef:** AI ile otomatik içerik üretimi ve moderasyon
 
-**Görevler:**
+**AI Haber Otomasyonu:**
+
+- N8N kurulumu (veya custom scraper)
+- Haber kaynakları (RSS feed'ler)
+- AI ile relevance analizi
+- AI ile haber yeniden yazma
+- Taslak olarak kaydetme
+- Admin/Consultant onay paneli
+- Otomatik yayınlama
+- Cron job (her gün sabah 09:00)
+
+**AI Forum Moderasyonu:**
+
+- Otomatik spam tespiti (AI)
+- Uygunsuz içerik tespiti (AI)
+- Konu kategorisi önerisi (AI)
+- Benzer konuları bulma (AI)
+- Otomatik yanıt önerisi (AI)
+
+**Çıktılar:**
+
+- ✅ Otomatik haber toplama çalışıyor
+- ✅ AI ile haber yeniden yazma çalışıyor
+- ✅ Onay sistemi çalışıyor
+- ✅ Forum moderasyonu çalışıyor
+
+**Kabul Kriterleri:**
+
+- Her gün otomatik haber taslakları oluşuyor
+- Admin/Consultant onaylayabiliyor
+- Forum spam tespiti çalışıyor
+
+**Bağımlılıklar:** Sprint 12, 13, 17, 18
+
+**Detaylı Plan:** `sprint-detaylari/sprint-19-ai-icerik-otomasyonu.md`
+
+---
+
+## 🎯 FAZ 7: İK YÖNETİMİ (2 Hafta)
+
+### Sprint 20: Kariyer Portalı - Program Bazlı (1 hafta)
+
+**Hedef:** Kariyer başvuru sistemi (program bazlı onay)
+
+**Database:**
+
+```sql
+- career_applications (başvurular)
+- career_jobs (iş ilanları)
+- hr_pool (İK havuzu)
+- application_status_history (durum geçmişi)
+```
+
+**Akış:**
+
+1. Aday başvuru yapar (program seçer)
+2. Danışman'a bildirim gider
+3. Danışman inceler → Onaylar/Reddeder
+4. Onaylanırsa → İK havuzuna ekler (sadece o program için)
+5. Program firmaları İK havuzunda görür
+
+**Frontend:**
+
+- Public kariyer sayfası (/kariyer)
+- 3 başvuru formu (Danışman, Stajyer, İK Personeli)
+- Program seçimi
+- CV upload
+- Admin panel: Başvuru yönetimi
+- Company panel: İK havuzu
+
+**Çıktılar:**
+
+- ✅ Kariyer başvuruları alınabiliyor
+- ✅ Danışman başvuruları inceleyebiliyor
+- ✅ İK havuzu çalışıyor
+- ✅ Firmalar adayları görebiliyor
+
+**Kabul Kriterleri:**
+
+- Başvuru formu çalışıyor
+- CV upload çalışıyor
+- Danışman başvuruları yönetebiliyor
+- Firmalar İK havuzunu görebiliyor
+
+**Bağımlılıklar:** Sprint 6
+
+**Detaylı Plan:** `sprint-detaylari/sprint-20-kariyer-portali.md`
+
+---
+
+### Sprint 21: AI Kariyer Matching (1 hafta)
+
+**Hedef:** AI ile aday-firma eşleştirme
+
+**AI Matching:**
+
+- CV analizi (AI)
+- Firma-aday eşleştirme (AI)
+- Match score hesaplama (0-100)
+- Otomatik öneri sistemi
+- Smart search
+
+**İş İlanları:**
+
+- Firma iş ilanı oluşturma
+- AI ile ilan optimizasyonu
+- Otomatik aday önerisi (AI)
+
+**Çıktılar:**
+
+- ✅ CV analizi çalışıyor
+- ✅ AI matching çalışıyor
+- ✅ İş ilanları yayınlanabiliyor
+- ✅ Otomatik öneriler çalışıyor
+
+**Kabul Kriterleri:**
+
+- AI CV'yi analiz edebiliyor
+- Match score hesaplanıyor
+- Firmaya uygun adaylar öneriliyor
+- İş ilanları çalışıyor
+
+**Bağımlılıklar:** Sprint 17, 18, 20
+
+**Detaylı Plan:** `sprint-detaylari/sprint-21-ai-kariyer-matching.md`
+
+---
+
+## 🎯 FAZ 8: PUBLIC WEBSITE & CMS (2 Hafta)
+
+### Sprint 22: Public Website (1 hafta)
+
+**Hedef:** Public website sayfaları
+
+**Sayfalar:**
+
+- Ana Sayfa (/)
+- Program Hakkında (/program)
+- Destekler (/destekler)
+- Platform Özellikleri (/ozellikler)
+- Başarı Hikayeleri (/basari-hikayeleri)
+- SSS (/sss)
+- İletişim & Başvuru (/iletisim)
+- Kariyer (/kariyer) - Sprint 20'de yapıldı
+- Blog (/blog) - Sprint 12'de yapıldı
+- Login (/login) - Zaten var
+
+**Özellikler:**
+
+- ✅ Responsive design
+- ✅ SEO optimization
+- ✅ Performance optimization
+- ✅ Contact form
+- ✅ Application form
+
+**Çıktılar:**
+
+- ✅ Public website yayında
+- ✅ SEO optimize edildi
+- ✅ Responsive
+
+**Kabul Kriterleri:**
+
+- Public website erişilebilir
+- SEO skorları yüksek
+- Responsive çalışıyor
+
+**Bağımlılıklar:** -
+
+**Detaylı Plan:** `sprint-detaylari/sprint-22-public-website.md`
+
+---
+
+### Sprint 23: CMS (Site Yönetimi) (1 hafta)
+
+**Hedef:** Admin'in site içeriğini yönetebilmesi
+
+**Database:**
+
+```sql
+- cms_pages (sayfalar)
+- cms_sections (bölümler)
+- cms_media (medya)
+- cms_settings (ayarlar)
+```
+
+**Özellikler:**
+
+- Sayfa yönetimi (CRUD)
+- Bölüm yönetimi (drag-drop)
+- Medya yönetimi (upload)
+- Site ayarları (genel, iletişim, sosyal medya, analytics)
+- Rich text editor (TipTap)
+- Image upload
+- SEO ayarları
+- Önizleme
+- Yayınlama/arşivleme
+
+**Çıktılar:**
+
+- ✅ Admin site içeriğini yönetebiliyor
+- ✅ Rich text editor çalışıyor
+- ✅ Medya yönetimi çalışıyor
+- ✅ Site ayarları çalışıyor
+
+**Kabul Kriterleri:**
+
+- Admin sayfaları düzenleyebiliyor
+- Medya upload çalışıyor
+- Site ayarları kaydediliyor
+- Önizleme çalışıyor
+
+**Bağımlılıklar:** Sprint 22
+
+**Detaylı Plan:** `sprint-detaylari/sprint-23-cms.md`
+
+---
+
+## 🎯 FAZ 9: CHATBOT & BİLDİRİMLER (2 Hafta)
+
+### Sprint 24: Email Sistemi (0.5 hafta)
+
+**Hedef:** SendGrid entegrasyonu + Email templates
+
+**Özellikler:**
+
+- SendGrid API entegrasyonu
+- Email service layer
+- Email templates (MJML)
+- Email queue system
+- Email analytics
+- Email tercihleri
+
+**Çıktılar:**
+
+- ✅ Email gönderimi çalışıyor
+- ✅ Template sistemi hazır
+- ✅ Queue sistemi çalışıyor
+
+**Kabul Kriterleri:**
+
+- Email'ler gönderiliyor
+- Template'ler render ediliyor
+- Kullanıcılar tercihleri yönetebiliyor
+
+**Bağımlılıklar:** Sprint 2
+
+**Detaylı Plan:** `sprint-detaylari/sprint-24-email-sistemi.md`
+
+---
+
+### Sprint 25: Chatbot (1 hafta)
+
+**Hedef:** AI Chatbot tüm panellerde
+
+**Özellikler:**
 
 - Chatbot UI component
 - Chatbot backend (streaming)
-- Context management (conversation history)
-- Eğitim içeriği arama (semantic search)
-- Akıllı yönlendirme (intent detection)
-- Danışman atama önerisi
-- Randevu oluşturma (chatbot üzerinden)
-- Public website chatbot
-- Admin panel chatbot
-- Consultant panel chatbot
-- Company panel chatbot
+- Context management
+- Intent detection
+- Eğitim içeriği arama
+- Akıllı yönlendirme
+- Tüm panellere entegrasyon
 - Chatbot analytics
-- Conversation history
 
 **Çıktılar:**
 
-- ✅ Chatbot UI çalışıyor
+- ✅ Chatbot tüm panellerde çalışıyor
 - ✅ Streaming responses çalışıyor
-- ✅ Context management çalışıyor
-- ✅ Tüm panellerde aktif
-- ✅ Akıllı yönlendirme çalışıyor
+- ✅ Intent detection çalışıyor
+- ✅ Eğitim arama çalışıyor
 
 **Kabul Kriterleri:**
 
-- Chatbot tüm panellerde çalışıyor
-- Streaming responses çalışıyor
-- Context hatırlanıyor
-- Akıllı yönlendirme çalışıyor
+- Chatbot soruları anlayıp yanıt verebiliyor
+- Kullanıcıları doğru yönlendirebiliyor
+- Eğitim içeriği arayabiliyor
+- Tüm panellerde erişilebilir
 
-**Bağımlılıklar:** Sprint 12, Sprint 13
+**Bağımlılıklar:** Sprint 9, 17, 18
 
-**Detaylı Plan:** `sprint-detaylari/sprint-14-chatbot.md`
-
----
-
-## 🎯 FAZ 5: İLETİŞİM & BİLDİRİMLER (2 Hafta)
-
-### Sprint 15: Email Sistemi (1 hafta)
-
-**Hedef:** Email otomasyonu çalışıyor
-
-**Görevler:**
-
-- SendGrid entegrasyonu
-- Email templates (MJML)
-- Transactional emails:
-  - Hoş geldiniz emaili
-  - Görev atama bildirimi
-  - Deadline hatırlatması
-  - Haftalık özet raporu
-  - Başarı kutlaması
-  - Sertifika gönderimi
-- Email queue system
-- Email scheduling
-- Email analytics
-- Unsubscribe management
-- AI personalization (email içeriği)
-
-**Çıktılar:**
-
-- ✅ SendGrid entegrasyonu çalışıyor
-- ✅ Email templates hazır
-- ✅ Otomatik emailler gidiyor
-- ✅ Email queue çalışıyor
-- ✅ Analytics çalışıyor
-
-**Kabul Kriterleri:**
-
-- Emailler gönderiliyor
-- Templates çalışıyor
-- Queue sistemi çalışıyor
-- Analytics görüntülenebiliyor
-
-**Bağımlılıklar:** Sprint 8, Sprint 9, Sprint 10, Sprint 11
-
-**Detaylı Plan:** `sprint-detaylari/sprint-15-email-sistemi.md`
+**Detaylı Plan:** `sprint-detaylari/sprint-25-chatbot.md`
 
 ---
 
-### Sprint 16: Bildirim Sistemi (1 hafta)
+### Sprint 26: Bildirim Sistemi (0.5 hafta)
 
-**Hedef:** Multi-channel bildirim sistemi çalışıyor
+**Hedef:** Kapsamlı bildirim sistemi
 
-**Görevler:**
+**Özellikler:**
 
 - In-app notifications
 - Push notifications (OneSignal)
-- WhatsApp Business API entegrasyonu
-- Notification entity + repository
-- Notification use cases
-- API routes (notifications)
-- Bildirim tercihleri (user settings)
+- WhatsApp entegrasyonu
+- Bildirim tercihleri
 - Bildirim geçmişi
-- Okundu/okunmadı takibi
-- Toplu bildirim gönderme
-- Program bazlı bildirimler
-- Otomatik bildirim kuralları:
-  - Görev atandı
-  - Görev deadline yaklaşıyor
-  - Etkinlik hatırlatması
-  - Randevu hatırlatması
-  - Yeni eğitim eklendi
+- Real-time bildirimler
 
 **Çıktılar:**
 
@@ -670,522 +865,132 @@
 - ✅ Push notifications çalışıyor
 - ✅ WhatsApp entegrasyonu çalışıyor
 - ✅ Bildirim tercihleri çalışıyor
-- ✅ Otomatik kurallar çalışıyor
 
 **Kabul Kriterleri:**
 
-- Bildirimler gönderiliyor
-- Kullanıcı tercihleri çalışıyor
+- Bildirimler gerçek zamanlı geliyor
+- Kullanıcılar tercihlerini yönetebiliyor
 - WhatsApp mesajları gidiyor
-- Otomatik kurallar çalışıyor
 
-**Bağımlılıklar:** Sprint 8, Sprint 9, Sprint 10, Sprint 11, Sprint 15
+**Bağımlılıklar:** Sprint 2, 24
 
-**Detaylı Plan:** `sprint-detaylari/sprint-16-bildirim-sistemi.md`
+**Detaylı Plan:** `sprint-detaylari/sprint-26-bildirim-sistemi.md`
 
 ---
 
-## 🎯 FAZ 6: RAPORLAMA & ANALİTİK (2 Hafta)
+## 🎯 FAZ 10: DASHBOARD & PRODUCTION (1 Hafta)
 
-### Sprint 17: Dashboard & Raporlar (1 hafta)
+### Sprint 27: Dashboard & Analytics (0.5 hafta)
 
-**Hedef:** Tüm paneller için dashboard ve raporlar çalışıyor
+**Hedef:** Gelişmiş dashboard ve analitik
 
-**Görevler:**
+**Özellikler:**
 
-- Master Admin dashboard:
-  - Tüm programlar özeti
-  - Toplam istatistikler
-  - Program karşılaştırması
-  - Grafik ve chartlar
-- Program Manager dashboard:
-  - Program özeti
-  - Firma ilerlemeleri
-  - Danışman performansı
-- Consultant dashboard:
-  - Atandığı firmalar
-  - Görev durumları
-  - Yaklaşan deadline'lar
-- Company dashboard:
-  - Proje ilerlemesi
-  - Eğitim tamamlanma
-  - Yaklaşan etkinlikler
-- Custom reports:
-  - Firma ilerleme raporu
-  - Proje tamamlanma raporu
-  - Eğitim katılım raporu
-  - Etkinlik katılım raporu
+- Dashboard iyileştirmeleri
+- Custom reports
 - Export functionality (PDF, Excel)
-- Grafik ve chartlar (Recharts)
-
-**Çıktılar:**
-
-- ✅ Tüm dashboard'lar çalışıyor
-- ✅ Raporlar oluşturulabiliyor
-- ✅ Export çalışıyor
-- ✅ Grafikler görüntüleniyor
-
-**Kabul Kriterleri:**
-
-- Dashboard'lar çalışıyor
-- Raporlar doğru
-- Export çalışıyor
-- Grafikler responsive
-
-**Bağımlılıklar:** Sprint 4, Sprint 5, Sprint 6, Sprint 7, Sprint 8, Sprint 9
-
-**Detaylı Plan:** `sprint-detaylari/sprint-17-dashboard-raporlar.md`
-
----
-
-### Sprint 18: Analytics (1 hafta)
-
-**Hedef:** Google Analytics + Mixpanel entegrasyonu çalışıyor
-
-**Görevler:**
-
 - Google Analytics 4 entegrasyonu
 - Mixpanel entegrasyonu
-- Custom event tracking:
-  - Sayfa görüntülemeleri
-  - Button clicks
-  - Form submissions
-  - Video izleme
-  - Döküman okuma
-  - Görev tamamlama
-  - Etkinlik katılımı
-- Funnel analysis
-- Cohort analysis
-- User segmentation
-- A/B testing setup
 - AI-powered insights
-- Analytics dashboard
-- Custom reports
 
 **Çıktılar:**
 
-- ✅ Google Analytics çalışıyor
-- ✅ Mixpanel çalışıyor
-- ✅ Event tracking çalışıyor
-- ✅ Funnel analysis çalışıyor
+- ✅ Dashboard'lar iyileştirildi
+- ✅ Custom raporlar oluşturulabiliyor
+- ✅ Analytics çalışıyor
 - ✅ AI insights çalışıyor
 
 **Kabul Kriterleri:**
 
-- Analytics çalışıyor
-- Events kaydediliyor
-- Funnel görüntülenebiliyor
-- Insights görülebiliyor
+- Dashboard'lar bilgilendirici
+- Raporlar export edilebiliyor
+- Analytics verisi toplanıyor
+- AI insights üretilebiliyor
 
-**Bağımlılıklar:** Sprint 17
+**Bağımlılıklar:** Sprint 17, 18
 
-**Detaylı Plan:** `sprint-detaylari/sprint-18-analytics.md`
-
----
-
-## 🎯 FAZ 7: PUBLIC WEBSITE (1-2 Hafta)
-
-### Sprint 19: Public Pages (1 hafta)
-
-**Hedef:** Public website tamamlandı
-
-**Görevler:**
-
-- Ana sayfa:
-  - Hero section
-  - Program özeti
-  - Dönüşüm modeli
-  - Hedef kitle
-  - Başarı hikayeleri slider
-  - İstatistikler
-- Program Hakkında sayfası:
-  - 12 aylık süreç
-  - AI destekli sistem
-  - Neden katılmalı
-- Platform Özellikleri sayfası:
-  - Panel modülleri
-  - AI destekleri
-  - Raporlama & izleme
-  - Teknoloji altyapısı
-- Başarı Hikayeleri sayfası:
-  - Firma hikayeleri
-  - Sektör filtreleme
-  - Arama
-  - Detaylı modal
-- SSS sayfası:
-  - 6 kategori
-  - 24 soru-cevap
-  - Arama
-- İletişim/Başvuru sayfası:
-  - İletişim formu
-  - Başvuru formu
-  - Harita
-- Kariyer sayfası:
-  - Danışman başvurusu
-  - Stajyer başvurusu
-  - Firma İK havuzu
-
-**Çıktılar:**
-
-- ✅ Tüm public sayfalar tamamlandı
-- ✅ Responsive tasarım
-- ✅ SEO optimizasyonu
-- ✅ Performance optimizasyonu
-
-**Kabul Kriterleri:**
-
-- Tüm sayfalar çalışıyor
-- Mobile responsive
-- SEO skorları yüksek
-- Performance iyi
-
-**Bağımlılıklar:** Sprint 3
-
-**Detaylı Plan:** `sprint-detaylari/sprint-19-public-pages.md`
+**Detaylı Plan:** `sprint-detaylari/sprint-27-dashboard-analytics.md`
 
 ---
 
-### Sprint 20: SEO & Performance (1 hafta)
+### Sprint 28: Production Hazırlık (0.5 hafta)
 
-**Hedef:** SEO ve performance optimizasyonu tamamlandı
-
-**Görevler:**
-
-- SEO optimization:
-  - Meta tags
-  - Open Graph tags
-  - Twitter cards
-  - Structured data (JSON-LD)
-  - Sitemap.xml
-  - Robots.txt
-  - Canonical URLs
-- Performance optimization:
-  - Image optimization (Next.js Image)
-  - Code splitting
-  - Lazy loading
-  - Font optimization
-  - CSS optimization
-  - JavaScript optimization
-- Lighthouse optimization:
-  - Performance > 90
-  - Accessibility > 90
-  - Best Practices > 90
-  - SEO > 90
-- Core Web Vitals:
-  - LCP < 2.5s
-  - FID < 100ms
-  - CLS < 0.1
-
-**Çıktılar:**
-
-- ✅ SEO optimizasyonu tamamlandı
-- ✅ Performance optimizasyonu tamamlandı
-- ✅ Lighthouse skorları > 90
-- ✅ Core Web Vitals iyi
-
-**Kabul Kriterleri:**
-
-- Lighthouse skorları > 90
-- Core Web Vitals yeşil
-- Sitemap çalışıyor
-- Meta tags doğru
-
-**Bağımlılıklar:** Sprint 19
-
-**Detaylı Plan:** `sprint-detaylari/sprint-20-seo-performance.md`
-
----
-
-## 🎯 FAZ 8: TESTING & QA (2 Hafta)
-
-### Sprint 21: Testing (1 hafta)
-
-**Hedef:** Test coverage > 80%
+**Hedef:** Production'a hazır
 
 **Görevler:**
 
-- Unit tests (Jest):
-  - Use cases
-  - Services
-  - Utilities
-  - Helpers
-- Integration tests:
-  - API routes
-  - Database operations
-  - External services
-- E2E tests (Playwright):
-  - Critical user flows
-  - Login/Logout
-  - Proje oluşturma
-  - Görev atama
-  - Eğitim izleme
-- Component tests (Testing Library):
-  - UI components
-  - Forms
-  - Modals
-- Accessibility tests:
-  - Keyboard navigation
-  - Screen reader
-  - Color contrast
-- Performance tests:
-  - Load testing
-  - Stress testing
+- Environment variables kontrolü
+- Database migration kontrolü
+- RLS policies kontrolü
+- Error tracking (Sentry)
+- Monitoring setup
+- Backup stratejisi
+- SSL sertifikası
+- Domain setup
+- CDN setup
+- Performance optimization
+- Security audit
+- Documentation completion
 
 **Çıktılar:**
 
-- ✅ Unit test coverage > 80%
-- ✅ Integration tests yazıldı
-- ✅ E2E tests yazıldı
-- ✅ Accessibility tests geçiyor
-- ✅ Performance tests geçiyor
-
-**Kabul Kriterleri:**
-
-- Test coverage > 80%
-- Tüm critical flows test edildi
-- Accessibility testleri geçiyor
-- Performance testleri geçiyor
-
-**Bağımlılıklar:** Tüm önceki sprint'ler
-
-**Detaylı Plan:** `sprint-detaylari/sprint-21-testing.md`
-
----
-
-### Sprint 22: QA & Bug Fixes (1 hafta)
-
-**Hedef:** Tüm bug'lar düzeltildi, QA tamamlandı
-
-**Görevler:**
-
-- Manual testing:
-  - Tüm user flows
-  - Tüm paneller
-  - Tüm roller
-- Cross-browser testing:
-  - Chrome
-  - Firefox
-  - Safari
-  - Edge
-- Mobile testing:
-  - iOS Safari
-  - Android Chrome
-- Bug fixing:
-  - Critical bugs
-  - High priority bugs
-  - Medium priority bugs
-- Security audit:
-  - SQL injection
-  - XSS
-  - CSRF
-  - Authentication
-  - Authorization
-- Performance audit:
-  - Database queries
-  - API response times
-  - Frontend performance
-- Code review:
-  - Code quality
-  - Best practices
-  - Security
-
-**Çıktılar:**
-
-- ✅ Tüm critical bug'lar düzeltildi
-- ✅ Cross-browser uyumlu
-- ✅ Mobile responsive
-- ✅ Security audit geçti
-- ✅ Performance audit geçti
-
-**Kabul Kriterleri:**
-
-- Kritik bug kalmadı
-- Tüm tarayıcılarda çalışıyor
-- Mobile'da çalışıyor
-- Security testleri geçti
-
-**Bağımlılıklar:** Sprint 21
-
-**Detaylı Plan:** `sprint-detaylari/sprint-22-qa-bug-fixes.md`
-
----
-
-## 🎯 FAZ 9: DEPLOYMENT & LAUNCH (1 Hafta)
-
-### Sprint 23: Production Setup & Launch (1 hafta)
-
-**Hedef:** Production'a deploy edildi, sistem canlıda
-
-**Görevler:**
-
-- Production database setup:
-  - Supabase production project
-  - Migration'ları çalıştırma
-  - Seed data (production)
-- Environment variables:
-  - Production secrets
-  - API keys
-  - Database URLs
-- CI/CD pipeline (GitHub Actions):
-  - Automated testing
-  - Automated deployment
-  - Rollback strategy
-- Monitoring setup:
-  - Sentry (error tracking)
-  - Vercel Analytics
-  - Uptime monitoring
-- Backup strategy:
-  - Database backups
-  - Automated backups
-  - Backup retention
-- Documentation:
-  - API documentation
-  - User guide (Admin)
-  - User guide (Consultant)
-  - User guide (Company)
-  - Developer documentation
-- User training materials:
-  - Video tutorials
-  - PDF guides
-  - FAQ
-- Launch checklist:
-  - DNS setup
-  - SSL certificate
-  - Domain configuration
-  - Email configuration
-  - Analytics setup
-- Soft launch:
-  - Beta users
-  - Feedback collection
-  - Bug fixing
-- Official launch:
-  - Announcement
-  - Marketing
-  - Onboarding
-
-**Çıktılar:**
-
-- ✅ Production'da canlı
-- ✅ CI/CD çalışıyor
+- ✅ Production ortamı hazır
 - ✅ Monitoring aktif
-- ✅ Backup'lar çalışıyor
-- ✅ Dokümantasyon hazır
-- ✅ Kullanıcı eğitimleri hazır
+- ✅ Backup çalışıyor
+- ✅ Security audit tamamlandı
 
 **Kabul Kriterleri:**
 
-- Production'da çalışıyor
-- Monitoring çalışıyor
-- Backup'lar alınıyor
-- Dokümantasyon tamamlandı
+- Production ortamı çalışıyor
+- Monitoring aktif
+- Backup stratejisi hazır
+- Security audit tamamlandı
 
-**Bağımlılıklar:** Sprint 22
+**Bağımlılıklar:** Tüm sprint'ler
 
-**Detaylı Plan:** `sprint-detaylari/sprint-23-production-launch.md`
-
----
-
-## 📊 SPRINT ÖZET TABLOSU
-
-| Faz       | Sprint    | Konu                 | Süre      | Bağımlılık              | Durum        |
-| --------- | --------- | -------------------- | --------- | ----------------------- | ------------ |
-| **Faz 1** | Sprint 1  | Proje Kurulumu       | 1 hafta   | -                       | ⏳ Hazır     |
-| **Faz 1** | Sprint 2  | Database & Auth      | 1 hafta   | Sprint 1                | 📋 Planlandı |
-| **Faz 1** | Sprint 3  | UI Foundation        | 1 hafta   | Sprint 1                | 📋 Planlandı |
-| **Faz 2** | Sprint 4  | Program Yönetimi     | 1 hafta   | Sprint 2, 3             | 📋 Planlandı |
-| **Faz 2** | Sprint 5  | Kullanıcı Yönetimi   | 1 hafta   | Sprint 2, 3, 4          | 📋 Planlandı |
-| **Faz 2** | Sprint 6  | Firma Yönetimi       | 1 hafta   | Sprint 4, 5             | 📋 Planlandı |
-| **Faz 2** | Sprint 7  | Danışman Paneli      | 1 hafta   | Sprint 4, 5, 6          | 📋 Planlandı |
-| **Faz 3** | Sprint 8  | Proje Yönetimi       | 1.5 hafta | Sprint 6, 7             | 📋 Planlandı |
-| **Faz 3** | Sprint 9  | Eğitim Yönetimi      | 1.5 hafta | Sprint 6, 7             | 📋 Planlandı |
-| **Faz 3** | Sprint 10 | Etkinlik Yönetimi    | 1 hafta   | Sprint 6, 7             | 📋 Planlandı |
-| **Faz 3** | Sprint 11 | Randevu Yönetimi     | 1 hafta   | Sprint 7, 10            | 📋 Planlandı |
-| **Faz 4** | Sprint 12 | AI Altyapısı         | 1 hafta   | Sprint 2                | 📋 Planlandı |
-| **Faz 4** | Sprint 13 | AI Özellikleri       | 1 hafta   | Sprint 8, 9, 12         | 📋 Planlandı |
-| **Faz 4** | Sprint 14 | Chatbot              | 1 hafta   | Sprint 12, 13           | 📋 Planlandı |
-| **Faz 5** | Sprint 15 | Email Sistemi        | 1 hafta   | Sprint 8, 9, 10, 11     | 📋 Planlandı |
-| **Faz 5** | Sprint 16 | Bildirim Sistemi     | 1 hafta   | Sprint 8, 9, 10, 11, 15 | 📋 Planlandı |
-| **Faz 6** | Sprint 17 | Dashboard & Raporlar | 1 hafta   | Sprint 4-9              | 📋 Planlandı |
-| **Faz 6** | Sprint 18 | Analytics            | 1 hafta   | Sprint 17               | 📋 Planlandı |
-| **Faz 7** | Sprint 19 | Public Pages         | 1 hafta   | Sprint 3                | 📋 Planlandı |
-| **Faz 7** | Sprint 20 | SEO & Performance    | 1 hafta   | Sprint 19               | 📋 Planlandı |
-| **Faz 8** | Sprint 21 | Testing              | 1 hafta   | Tümü                    | 📋 Planlandı |
-| **Faz 8** | Sprint 22 | QA & Bug Fixes       | 1 hafta   | Sprint 21               | 📋 Planlandı |
-| **Faz 9** | Sprint 23 | Production & Launch  | 1 hafta   | Sprint 22               | 📋 Planlandı |
-
-**TOPLAM:** 18-22 Hafta (4.5-5.5 Ay)
+**Detaylı Plan:** `sprint-detaylari/sprint-28-production-hazirlik.md`
 
 ---
 
-## 🎯 KRİTİK YOLLAR (Critical Path)
+## 📊 PROJE İSTATİSTİKLERİ
 
-### MVP İçin Minimum Sprint'ler
+### Tamamlanan Sprint'ler: 11/28 (%39)
 
-```
-Sprint 1 → Sprint 2 → Sprint 3 → Sprint 4 → Sprint 5 → Sprint 6 → Sprint 7 → Sprint 8 → Sprint 23
+### Kalan Sprint'ler: 17/28 (%61)
 
-Minimum Süre: 10 hafta (2.5 ay)
-```
+### Tahmini Kalan Süre: 17-19 hafta
 
-### Full Launch İçin
+### Modül Dağılımı:
 
-```
-Tüm 23 sprint tamamlanmalı
-
-Tahmini Süre: 18-22 hafta (4.5-5.5 ay)
-```
-
----
-
-## 📝 NOTLAR
-
-### Sprint Değişiklik Yönetimi
-
-- Her sprint sonunda retrospective yapılacak
-- Öğrenilen dersler kaydedilecek
-- Gerekirse sonraki sprint'ler güncellenecek
-- Bu dosya yaşayan bir döküman
-
-### Sprint Detayları
-
-- Her sprint başında detaylı plan oluşturulacak
-- `sprint-detaylari/sprint-XX-konu.md` formatında
-- Günlük görev breakdown'u içerecek
-- Kabul kriterleri net olacak
-
-### Başarı Kriterleri
-
-- Her sprint sonunda demo yapılacak
-- Kabul kriterleri kontrol edilecek
-- Test coverage kontrol edilecek
-- Code review yapılacak
+- ✅ Temel Altyapı: 3 sprint (Tamamlandı)
+- ✅ Core Modules: 4 sprint (Tamamlandı)
+- ✅ Project & Training: 4 sprint (Tamamlandı)
+- 🏃 İçerik & Topluluk: 3 sprint (Devam ediyor)
+- 📋 E-ticaret & Raporlama: 2 sprint (Planlandı)
+- 📋 AI Altyapısı: 3 sprint (Planlandı)
+- 📋 İK Yönetimi: 2 sprint (Planlandı)
+- 📋 Public Website & CMS: 2 sprint (Planlandı)
+- 📋 Chatbot & Bildirimler: 2 sprint (Planlandı)
+- 📋 Dashboard & Production: 1 sprint (Planlandı)
 
 ---
 
-## 🔄 VERSİYON TAKIP
+## 🎯 SONRAKİ ADIMLAR
 
-| Versiyon | Tarih        | Değişiklik               | Yapan     |
-| -------- | ------------ | ------------------------ | --------- |
-| 1.0      | 28 Ekim 2025 | İlk versiyon oluşturuldu | AI + Ömer |
-|          |              |                          |           |
-
----
-
-## 📞 İLETİŞİM
-
-Sprint planı ile ilgili sorular, öneriler veya değişiklikler için:
-
-- Bu dökümanı güncelleyin
-- Versiyon numarasını artırın
-- Değişiklik tarihini ekleyin
+1. ✅ **Sprint 12: Haberler Modülü** - Devam ediyor
+2. 📋 **Sprint 13: Forum Modülü** - Sonraki
+3. 📋 **Sprint 14: Liderlik Tablosu** - Kritik (tüm modülleri birleştirir)
 
 ---
 
-**Hazırlayan:** AI Assistant + Ömer Ünsal  
-**Tarih:** 28 Ekim 2025  
-**Durum:** Aktif 🚀  
-**Sonraki Review:** Sprint 5 sonrası
+## 📚 DOKÜMANTASYON
+
+- ✅ [Architecture](../docs/ARCHITECTURE.md)
+- ✅ [API Documentation](../docs/API-DOCUMENTATION.md)
+- ✅ [Developer Guide](../docs/DEVELOPER.md)
+- ✅ [Proje Durum Raporu](../docs/PROJE-DURUM-RAPORU.md)
 
 ---
 
-🎉 **AKADEMİ PORT - SPRINT PLANI HAZIR!** 🚀
+**Son Güncelleme:** 10 Kasım 2025  
+**Güncelleme Notu:** Kullanıcı notlarına göre kapsamlı revize edildi. Liderlik tablosu, e-ticaret metrikleri, AI raporlama, program bazlı İK yönetimi ve CMS modülleri eklendi.

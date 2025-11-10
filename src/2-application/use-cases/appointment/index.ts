@@ -10,3 +10,4 @@ export * from './DeleteAppointmentUseCase';
 export * from './ApproveAppointmentUseCase';
 export * from './RejectAppointmentUseCase';
 export * from './RescheduleAppointmentUseCase';
+export * from './SendAppointmentRemindersUseCase';

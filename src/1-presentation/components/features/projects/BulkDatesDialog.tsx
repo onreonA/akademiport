@@ -44,7 +44,7 @@ export function BulkDatesDialog({
   onSubmit,
   submitting = false,
 }: BulkDatesDialogProps) {
-  const [selectedSubProjectId, setSelectedSubProjectId] = useState<string | null>(null);
+  const [selectedSubProjectId, setSelectedSubProjectId] = useState<string | undefined>(undefined);
   const [dates, setDates] = useState<DatesState>({});
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
 
@@ -64,20 +64,23 @@ export function BulkDatesDialog({
   }, [matrix]);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open) {
+      setSelectedSubProjectId(undefined);
+      return;
+    }
     // Use setTimeout to avoid synchronous setState in effect
     const timeoutId = setTimeout(() => {
       if (matrix && matrix.subProjects.length > 0) {
-        setSelectedSubProjectId((current) => current ?? matrix.subProjects[0]?.id ?? null);
+        setSelectedSubProjectId((current) => current ?? matrix.subProjects[0]?.id);
       } else {
-        setSelectedSubProjectId(null);
+        setSelectedSubProjectId(undefined);
       }
     }, 0);
     return () => clearTimeout(timeoutId);
   }, [open, matrix]);
 
   useEffect(() => {
-    if (!open || !matrix || !selectedSubProjectId) {
+    if (!open || !matrix || selectedSubProjectId === undefined) {
       // Use setTimeout to avoid synchronous setState in effect
       const timeoutId = setTimeout(() => {
         setDates({});
@@ -116,7 +119,7 @@ export function BulkDatesDialog({
   };
 
   const handleSubmit = async () => {
-    if (!selectedSubProjectId || !matrix || submitting) {
+    if (selectedSubProjectId === undefined || !matrix || submitting) {
       onOpenChange(false);
       return;
     }
@@ -147,7 +150,7 @@ export function BulkDatesDialog({
     matrix?.subProjects.find((subProject) => subProject.id === selectedSubProjectId) ?? null;
 
   const companiesWithAssignment = useMemo(() => {
-    if (!matrix || !selectedSubProjectId) return [];
+    if (!matrix || selectedSubProjectId === undefined) return [];
     return matrix.companies.map((company) => {
       const key = `${company.id}::${selectedSubProjectId}`;
       const assignment = assignmentMap.get(key);
@@ -244,7 +247,7 @@ export function BulkDatesDialog({
               )}
             </div>
             <Select
-              value={selectedSubProjectId ?? undefined}
+              value={selectedSubProjectId}
               onValueChange={(value) => {
                 setSelectedSubProjectId(value);
                 setDescriptionExpanded(false);
@@ -493,7 +496,10 @@ export function BulkDatesDialog({
           >
             İptal
           </Button>
-          <Button onClick={handleSubmit} disabled={submitting || !selectedSubProjectId || !matrix}>
+          <Button
+            onClick={handleSubmit}
+            disabled={submitting || selectedSubProjectId === undefined || !matrix}
+          >
             {submitting ? 'Kaydediliyor...' : 'Tarihleri Kaydet'}
           </Button>
         </DialogFooter>
