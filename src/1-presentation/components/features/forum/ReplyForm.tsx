@@ -67,7 +67,9 @@ export function ReplyForm({
           name="content"
           render={({ field }: { field: any }) => (
             <FormItem>
-              <FormLabel>{initialData ? 'Yanıtı Düzenle' : parentId ? 'Yanıtla' : 'Yanıt Yaz'}</FormLabel>
+              <FormLabel>
+                {initialData ? 'Yanıtı Düzenle' : parentId ? 'Yanıtla' : 'Yanıt Yaz'}
+              </FormLabel>
               <FormControl>
                 <Textarea
                   placeholder={initialData ? 'Yanıt içeriği...' : 'Yanıtınızı yazın...'}
@@ -99,4 +101,3 @@ export function ReplyForm({
     </FormProvider>
   );
 }
-

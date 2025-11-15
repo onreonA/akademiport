@@ -108,9 +108,7 @@ describe('UpdateBadgeUseCase', () => {
         name: 'Updated Badge',
       };
 
-      vi.mocked(mockRepository.updateBadge).mockResolvedValue(
-        Result.fail('Database error')
-      );
+      vi.mocked(mockRepository.updateBadge).mockResolvedValue(Result.fail('Database error'));
 
       const result = await useCase.execute('badge-1', dto);
 
@@ -127,9 +125,7 @@ describe('UpdateBadgeUseCase', () => {
         name: 'Updated Badge',
       };
 
-      vi.mocked(mockRepository.updateBadge).mockResolvedValue(
-        Result.fail('Badge not found')
-      );
+      vi.mocked(mockRepository.updateBadge).mockResolvedValue(Result.fail('Badge not found'));
 
       const result = await useCase.execute('non-existent-badge', dto);
 
@@ -138,6 +134,3 @@ describe('UpdateBadgeUseCase', () => {
     });
   });
 });
-
-
-

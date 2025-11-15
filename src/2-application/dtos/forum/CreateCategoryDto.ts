@@ -7,4 +7,3 @@ export interface CreateCategoryDto {
   orderIndex?: number;
   requireApproval?: boolean;
 }
-

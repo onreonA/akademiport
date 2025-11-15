@@ -10,10 +10,7 @@ import { CompanyRepository } from '@/4-infrastructure/database/repositories/Comp
  * POST /api/forum/topics/[id]/solution
  * Mark a reply as solution
  */
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const supabase = await createClient();
     const {
@@ -63,7 +60,10 @@ export async function POST(
 
     const leaderboardRepository = new SupabaseLeaderboardRepository();
     const companyRepository = new CompanyRepository();
-    const addLeaderboardScore = new AddLeaderboardScoreUseCase(leaderboardRepository, companyRepository);
+    const addLeaderboardScore = new AddLeaderboardScoreUseCase(
+      leaderboardRepository,
+      companyRepository
+    );
     const useCase = new MarkSolutionUseCase(repository, addLeaderboardScore);
     const result = await useCase.execute(id, replyId, user.id);
 
@@ -77,4 +77,3 @@ export async function POST(
     return NextResponse.json({ error: 'Çözüm işaretlenemedi' }, { status: 500 });
   }
 }
-

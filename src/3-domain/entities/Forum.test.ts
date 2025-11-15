@@ -82,9 +82,9 @@ describe('ForumTopicEntity', () => {
     it('close() should set status to CLOSED', () => {
       const entity = new ForumTopicEntity(validTopicData);
       const originalUpdatedAt = entity.updatedAt;
-      
+
       entity.close();
-      
+
       expect(entity.status).toBe(TopicStatus.CLOSED);
       expect(entity.updatedAt.getTime()).toBeGreaterThanOrEqual(originalUpdatedAt.getTime());
     });
@@ -93,9 +93,9 @@ describe('ForumTopicEntity', () => {
       const closedTopic = { ...validTopicData, status: TopicStatus.CLOSED };
       const entity = new ForumTopicEntity(closedTopic);
       const originalUpdatedAt = entity.updatedAt;
-      
+
       entity.open();
-      
+
       expect(entity.status).toBe(TopicStatus.OPEN);
       expect(entity.updatedAt.getTime()).toBeGreaterThanOrEqual(originalUpdatedAt.getTime());
     });
@@ -103,9 +103,9 @@ describe('ForumTopicEntity', () => {
     it('lock() should set isLocked to true', () => {
       const entity = new ForumTopicEntity(validTopicData);
       const originalUpdatedAt = entity.updatedAt;
-      
+
       entity.lock();
-      
+
       expect(entity.isLocked).toBe(true);
       expect(entity.updatedAt.getTime()).toBeGreaterThanOrEqual(originalUpdatedAt.getTime());
     });
@@ -114,9 +114,9 @@ describe('ForumTopicEntity', () => {
       const lockedTopic = { ...validTopicData, isLocked: true };
       const entity = new ForumTopicEntity(lockedTopic);
       const originalUpdatedAt = entity.updatedAt;
-      
+
       entity.unlock();
-      
+
       expect(entity.isLocked).toBe(false);
       expect(entity.updatedAt.getTime()).toBeGreaterThanOrEqual(originalUpdatedAt.getTime());
     });
@@ -124,9 +124,9 @@ describe('ForumTopicEntity', () => {
     it('pin() should set isPinned to true', () => {
       const entity = new ForumTopicEntity(validTopicData);
       const originalUpdatedAt = entity.updatedAt;
-      
+
       entity.pin();
-      
+
       expect(entity.isPinned).toBe(true);
       expect(entity.updatedAt.getTime()).toBeGreaterThanOrEqual(originalUpdatedAt.getTime());
     });
@@ -135,9 +135,9 @@ describe('ForumTopicEntity', () => {
       const pinnedTopic = { ...validTopicData, isPinned: true };
       const entity = new ForumTopicEntity(pinnedTopic);
       const originalUpdatedAt = entity.updatedAt;
-      
+
       entity.unpin();
-      
+
       expect(entity.isPinned).toBe(false);
       expect(entity.updatedAt.getTime()).toBeGreaterThanOrEqual(originalUpdatedAt.getTime());
     });
@@ -149,9 +149,9 @@ describe('ForumTopicEntity', () => {
       const originalUpdatedAt = entity.updatedAt;
       const userId = 'user-1';
       const replyId = 'reply-1';
-      
+
       entity.markSolution(replyId, userId);
-      
+
       expect(entity.solutionReplyId).toBe(replyId);
       expect(entity.solvedBy).toBe(userId);
       expect(entity.status).toBe(TopicStatus.SOLVED);
@@ -169,9 +169,9 @@ describe('ForumTopicEntity', () => {
       };
       const entity = new ForumTopicEntity(solvedTopic);
       const originalUpdatedAt = entity.updatedAt;
-      
+
       entity.unmarkSolution();
-      
+
       expect(entity.solutionReplyId).toBeNull();
       expect(entity.solvedBy).toBeNull();
       expect(entity.solvedAt).toBeNull();
@@ -265,4 +265,3 @@ describe('ForumTopicEntity', () => {
     });
   });
 });
-

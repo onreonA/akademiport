@@ -45,4 +45,3 @@ export const TOPIC_PRIORITY_COLORS: Record<TopicPriority, string> = {
   [TopicPriority.HIGH]: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
   [TopicPriority.URGENT]: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
 };
-

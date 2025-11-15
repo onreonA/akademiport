@@ -6,5 +6,3 @@ export interface RecordReadDto {
   scrollPercentage?: number;
   completed?: boolean;
 }
-
-

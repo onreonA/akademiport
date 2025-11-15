@@ -3,9 +3,11 @@
 ## Test Grupları
 
 ### GRUP 1: Domain Layer Tests ✅
+
 **Dosya:** `src/3-domain/entities/Forum.test.ts`
 
 **Test Senaryoları:**
+
 - ForumCategory entity validation
 - ForumTopic entity validation
 - ForumReply entity validation
@@ -14,9 +16,11 @@
 - ForumActivity entity validation
 
 ### GRUP 2: Use Case Tests ✅
+
 **Dosya:** `src/2-application/use-cases/forum/*.test.ts`
 
 **Test Senaryoları:**
+
 - CreateTopicUseCase
 - UpdateTopicUseCase
 - DeleteTopicUseCase
@@ -37,11 +41,13 @@
 - ListTopicsUseCase
 
 ### GRUP 3: Repository Integration Tests ⚠️
+
 **Dosya:** `src/4-infrastructure/database/repositories/SupabaseForumRepository.test.ts`
 
 **Not:** Supabase bağlantısı gerektirir
 
 **Test Senaryoları:**
+
 - Category CRUD operations
 - Topic CRUD operations
 - Reply CRUD operations
@@ -50,9 +56,11 @@
 - Search functionality
 
 ### GRUP 4: API Route Tests ✅
+
 **Dosyalar:** `src/app/api/forum/**/*.test.ts`
 
 **Test Senaryoları:**
+
 - GET /api/forum/topics - List topics
 - POST /api/forum/topics - Create topic
 - GET /api/forum/topics/[id] - Get topic detail
@@ -77,18 +85,22 @@
 - POST /api/forum/categories - Create category
 
 ### GRUP 5: Component Tests ✅
+
 **Dosyalar:** `src/1-presentation/components/features/forum/*.test.tsx`
 
 **Test Senaryoları:**
+
 - TopicCard component
 - TopicList component
 - TopicForm component
 - ReplyForm component
 
 ### GRUP 6: E2E Tests ✅
+
 **Dosyalar:** `e2e/forum/*.spec.ts`
 
 **Test Senaryoları:**
+
 - Forum topic creation flow
 - Forum reply flow
 - Forum like/unlike flow
@@ -111,4 +123,3 @@
 - API Routes: %90+
 - Components: %85+
 - E2E: Kritik flow'lar
-

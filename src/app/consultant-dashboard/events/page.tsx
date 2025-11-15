@@ -293,7 +293,7 @@ export default function ConsultantEventsPage() {
         open={formOpen}
         onOpenChange={setFormOpen}
         onSubmit={handleCreateEvent}
-            programId={selectedProgram?.id}
+        programId={selectedProgram?.id}
         consultantId={user?.id}
       />
     </div>

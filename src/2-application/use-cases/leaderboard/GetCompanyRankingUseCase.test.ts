@@ -68,9 +68,7 @@ describe('GetCompanyRankingUseCase', () => {
     });
 
     it('should fail when repository fails', async () => {
-      vi.mocked(mockRepository.getCompanyRanking).mockResolvedValue(
-        Result.fail('Database error')
-      );
+      vi.mocked(mockRepository.getCompanyRanking).mockResolvedValue(Result.fail('Database error'));
 
       const result = await useCase.execute('company-1', 'program-1');
 
@@ -84,4 +82,3 @@ describe('GetCompanyRankingUseCase', () => {
     });
   });
 });
-

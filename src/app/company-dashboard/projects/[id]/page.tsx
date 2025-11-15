@@ -426,7 +426,8 @@ export default function CompanyProjectDetailPage() {
     );
   }
 
-  const statusInfo = statusLabels[project.status as keyof typeof statusLabels] || statusLabels.active;
+  const statusInfo =
+    statusLabels[project.status as keyof typeof statusLabels] || statusLabels.active;
   const priorityInfo = priorityLabels[project.priority] || priorityLabels.medium;
 
   return (

@@ -27,10 +27,7 @@ export async function GET(
     const result = await useCase.execute(companyId);
 
     if (result.isFailure) {
-      return NextResponse.json(
-        { error: result.error?.message || result.error },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: result.error?.message || result.error }, { status: 400 });
     }
 
     return NextResponse.json({ badges: result.value });
@@ -39,4 +36,3 @@ export async function GET(
     return NextResponse.json({ error: 'Firma rozetleri alınamadı' }, { status: 500 });
   }
 }
-

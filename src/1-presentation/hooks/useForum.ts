@@ -1,7 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { ForumTopicWithDetails, ForumReplyWithDetails } from '@/3-domain/interfaces/repositories/IForumRepository';
-import { CreateTopicDto, UpdateTopicDto, TopicFilterDto, CreateReplyDto } from '@/2-application/dtos/forum';
+import {
+  ForumTopicWithDetails,
+  ForumReplyWithDetails,
+} from '@/3-domain/interfaces/repositories/IForumRepository';
+import {
+  CreateTopicDto,
+  UpdateTopicDto,
+  TopicFilterDto,
+  CreateReplyDto,
+} from '@/2-application/dtos/forum';
 import { ForumCategory } from '@/3-domain/entities/Forum';
 
 // =====================================================
@@ -21,7 +29,9 @@ export const forumKeys = {
 // API FUNCTIONS
 // =====================================================
 
-async function fetchTopicsList(filters?: TopicFilterDto): Promise<{ topics: ForumTopicWithDetails[]; total: number }> {
+async function fetchTopicsList(
+  filters?: TopicFilterDto
+): Promise<{ topics: ForumTopicWithDetails[]; total: number }> {
   const params = new URLSearchParams();
   if (filters) {
     Object.entries(filters).forEach(([key, value]) => {
@@ -89,7 +99,10 @@ async function deleteTopic(id: string): Promise<void> {
   }
 }
 
-async function fetchReplies(topicId: string, parentId?: string | null): Promise<{ replies: ForumReplyWithDetails[]; total: number }> {
+async function fetchReplies(
+  topicId: string,
+  parentId?: string | null
+): Promise<{ replies: ForumReplyWithDetails[]; total: number }> {
   const params = new URLSearchParams();
   if (parentId !== undefined) {
     params.append('parentId', parentId || '');
@@ -162,7 +175,15 @@ async function fetchCategories(programId: string): Promise<ForumCategory[]> {
   return response.json();
 }
 
-async function createCategory(dto: { programId: string; name: string; description?: string; icon?: string; color?: string; orderIndex?: number; requireApproval?: boolean }): Promise<ForumCategory> {
+async function createCategory(dto: {
+  programId: string;
+  name: string;
+  description?: string;
+  icon?: string;
+  color?: string;
+  orderIndex?: number;
+  requireApproval?: boolean;
+}): Promise<ForumCategory> {
   const response = await fetch('/api/forum/categories', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -368,7 +389,8 @@ export function useCreateReply() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ topicId, dto }: { topicId: string; dto: CreateReplyDto }) => createReply(topicId, dto),
+    mutationFn: ({ topicId, dto }: { topicId: string; dto: CreateReplyDto }) =>
+      createReply(topicId, dto),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: forumKeys.replies(variables.topicId) });
       queryClient.invalidateQueries({ queryKey: forumKeys.topicDetail(variables.topicId) });
@@ -415,7 +437,8 @@ export function useMarkSolution() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ topicId, replyId }: { topicId: string; replyId: string }) => markSolution(topicId, replyId),
+    mutationFn: ({ topicId, replyId }: { topicId: string; replyId: string }) =>
+      markSolution(topicId, replyId),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: forumKeys.topicDetail(variables.topicId) });
       queryClient.invalidateQueries({ queryKey: forumKeys.replies(variables.topicId) });
@@ -551,7 +574,8 @@ export function useUpdateReply() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, dto, topicId }: { id: string; dto: { content: string }; topicId: string }) => updateReply(id, dto),
+    mutationFn: ({ id, dto, topicId }: { id: string; dto: { content: string }; topicId: string }) =>
+      updateReply(id, dto),
     onSuccess: (_, variables) => {
       // Invalidate replies for the topic
       queryClient.invalidateQueries({ queryKey: forumKeys.replies(variables.topicId) });
@@ -568,7 +592,8 @@ export function useDeleteReply() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ replyId, topicId }: { replyId: string; topicId: string }) => deleteReply(replyId),
+    mutationFn: ({ replyId, topicId }: { replyId: string; topicId: string }) =>
+      deleteReply(replyId),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: forumKeys.replies(variables.topicId) });
       queryClient.invalidateQueries({ queryKey: forumKeys.topicDetail(variables.topicId) });
@@ -598,7 +623,8 @@ export function useUnlikeReply() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ replyId, topicId }: { replyId: string; topicId: string }) => unlikeReply(replyId),
+    mutationFn: ({ replyId, topicId }: { replyId: string; topicId: string }) =>
+      unlikeReply(replyId),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: forumKeys.replies(variables.topicId) });
     },
@@ -607,4 +633,3 @@ export function useUnlikeReply() {
     },
   });
 }
-

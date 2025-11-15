@@ -255,4 +255,3 @@ export class ForumTopicEntity implements ForumTopic {
     return errors;
   }
 }
-

@@ -44,7 +44,7 @@ test.describe('NewsForm Component', () => {
     // (FormMessage component'i error gösteriyor olmalı)
     const errorMessages = page.locator('.text-destructive, [role="alert"]');
     const errorCount = await errorMessages.count();
-    
+
     // En az bir validation error görünmeli
     expect(errorCount).toBeGreaterThan(0);
   });
@@ -100,7 +100,7 @@ test.describe('NewsForm Component', () => {
     // Haberi düzenle
     const newsCard = page.locator(`text=${editNewsTitle}`).locator('..').locator('..');
     const editBtn = newsCard.locator('button:has-text("Düzenle")');
-    
+
     if (await editBtn.isVisible()) {
       await editBtn.click();
       await page.waitForTimeout(1000);
@@ -150,4 +150,3 @@ test.describe('NewsForm Component', () => {
     }
   });
 });
-

@@ -49,10 +49,7 @@ export async function PATCH(
     const result = await useCase.execute(badgeId, dtoResult.data);
 
     if (result.isFailure) {
-      return NextResponse.json(
-        { error: result.error?.message || result.error },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: result.error?.message || result.error }, { status: 400 });
     }
 
     return NextResponse.json({ badge: result.value });
@@ -97,10 +94,7 @@ export async function DELETE(
     const result = await useCase.execute(badgeId);
 
     if (result.isFailure) {
-      return NextResponse.json(
-        { error: result.error?.message || result.error },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: result.error?.message || result.error }, { status: 400 });
     }
 
     return NextResponse.json({ message: 'Rozet silindi' });
@@ -109,4 +103,3 @@ export async function DELETE(
     return NextResponse.json({ error: 'Rozet silinemedi' }, { status: 500 });
   }
 }
-

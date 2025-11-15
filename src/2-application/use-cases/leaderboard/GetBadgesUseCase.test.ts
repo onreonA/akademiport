@@ -76,9 +76,7 @@ describe('GetBadgesUseCase', () => {
     });
 
     it('should fail when repository fails', async () => {
-      vi.mocked(mockRepository.getBadges).mockResolvedValue(
-        Result.fail('Database error')
-      );
+      vi.mocked(mockRepository.getBadges).mockResolvedValue(Result.fail('Database error'));
 
       const result = await useCase.execute();
 
@@ -101,4 +99,3 @@ describe('GetBadgesUseCase', () => {
     });
   });
 });
-

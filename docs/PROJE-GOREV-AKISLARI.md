@@ -21,4 +21,3 @@ Bu doküman, Sprint 8 kapsamındaki proje yönetimi görev akışlarında (admin
 ## Test Notları
 
 - Modallar ve yorum akışları UI üzerinden manuel test edilebilir. Tamamlama/soru gönderimi sonrası danışman panelinde hiyerarşinin güncellendiğini doğrulamak önerilir.
-

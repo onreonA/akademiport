@@ -55,7 +55,13 @@ export function AppointmentList({
   // Type-safe filter conversion
   const typedFilters = {
     ...filters,
-    status: filters.status as 'pending' | 'approved' | 'rejected' | 'cancelled' | 'completed' | undefined,
+    status: filters.status as
+      | 'pending'
+      | 'approved'
+      | 'rejected'
+      | 'cancelled'
+      | 'completed'
+      | undefined,
   };
   const { data, isLoading, error } = useAppointments(typedFilters);
 

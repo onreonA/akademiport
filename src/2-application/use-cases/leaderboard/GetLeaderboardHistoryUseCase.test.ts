@@ -101,9 +101,7 @@ describe('GetLeaderboardHistoryUseCase', () => {
     });
 
     it('should fail when repository fails', async () => {
-      vi.mocked(mockRepository.getHistory).mockResolvedValue(
-        Result.fail('Database error')
-      );
+      vi.mocked(mockRepository.getHistory).mockResolvedValue(Result.fail('Database error'));
 
       const result = await useCase.execute();
 
@@ -143,6 +141,3 @@ describe('GetLeaderboardHistoryUseCase', () => {
     });
   });
 });
-
-
-

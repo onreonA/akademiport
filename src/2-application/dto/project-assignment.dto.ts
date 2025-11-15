@@ -85,4 +85,3 @@ export interface CompanyAssignmentSummaryDTO {
   assignedSubProjects: string[];
   hasDatesConfigured: boolean;
 }
-

@@ -9,4 +9,3 @@ export interface UpdateTopicDto {
   isPinned?: boolean;
   isLocked?: boolean;
 }
-

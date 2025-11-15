@@ -14,10 +14,7 @@ export class LikeReplyUseCase {
 
       return Result.ok(undefined);
     } catch (error) {
-      return Result.fail(
-        error instanceof Error ? error.message : 'Beğeni eklenemedi'
-      );
+      return Result.fail(error instanceof Error ? error.message : 'Beğeni eklenemedi');
     }
   }
 }
-

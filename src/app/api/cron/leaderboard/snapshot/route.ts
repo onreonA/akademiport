@@ -17,10 +17,7 @@ export async function POST(request: NextRequest) {
     const result = await repository.createSnapshot();
 
     if (result.isFailure) {
-      return NextResponse.json(
-        { error: result.error?.message || result.error },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: result.error?.message || result.error }, { status: 500 });
     }
 
     return NextResponse.json({ message: 'Snapshot oluşturuldu' });
@@ -29,6 +26,3 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Snapshot oluşturulamadı' }, { status: 500 });
   }
 }
-
-
-

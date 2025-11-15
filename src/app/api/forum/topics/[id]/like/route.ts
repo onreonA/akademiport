@@ -7,10 +7,7 @@ import { LikeTopicUseCase, UnlikeTopicUseCase } from '@/2-application/use-cases/
  * POST /api/forum/topics/[id]/like
  * Like a topic
  */
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const supabase = await createClient();
     const {
@@ -72,4 +69,3 @@ export async function DELETE(
     return NextResponse.json({ error: 'Beğeni kaldırılamadı' }, { status: 500 });
   }
 }
-

@@ -40,9 +40,7 @@ describe('DeleteBadgeUseCase', () => {
     });
 
     it('should fail when repository fails', async () => {
-      vi.mocked(mockRepository.deleteBadge).mockResolvedValue(
-        Result.fail('Database error')
-      );
+      vi.mocked(mockRepository.deleteBadge).mockResolvedValue(Result.fail('Database error'));
 
       const result = await useCase.execute('badge-1');
 
@@ -55,9 +53,7 @@ describe('DeleteBadgeUseCase', () => {
     });
 
     it('should fail when badge not found', async () => {
-      vi.mocked(mockRepository.deleteBadge).mockResolvedValue(
-        Result.fail('Badge not found')
-      );
+      vi.mocked(mockRepository.deleteBadge).mockResolvedValue(Result.fail('Badge not found'));
 
       const result = await useCase.execute('non-existent-badge');
 
@@ -77,6 +73,3 @@ describe('DeleteBadgeUseCase', () => {
     });
   });
 });
-
-
-

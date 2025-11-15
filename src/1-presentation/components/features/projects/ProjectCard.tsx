@@ -135,7 +135,8 @@ export function ProjectCard({ project, onEdit, onDelete }: ProjectCardProps) {
               <Badge
                 className={`${priorityColors[project.priority as keyof typeof priorityColors] || priorityColors.medium} border font-medium px-2.5 py-1 text-xs`}
               >
-                {priorityLabels[project.priority as keyof typeof priorityLabels] || project.priority}
+                {priorityLabels[project.priority as keyof typeof priorityLabels] ||
+                  project.priority}
               </Badge>
             )}
           </div>

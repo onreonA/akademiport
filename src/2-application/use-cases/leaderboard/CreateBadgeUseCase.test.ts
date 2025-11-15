@@ -129,9 +129,7 @@ describe('CreateBadgeUseCase', () => {
         requirementValue: 100,
       };
 
-      vi.mocked(mockRepository.createBadge).mockResolvedValue(
-        Result.fail('Database error')
-      );
+      vi.mocked(mockRepository.createBadge).mockResolvedValue(Result.fail('Database error'));
 
       const result = await useCase.execute(dto);
 
@@ -145,4 +143,3 @@ describe('CreateBadgeUseCase', () => {
     });
   });
 });
-

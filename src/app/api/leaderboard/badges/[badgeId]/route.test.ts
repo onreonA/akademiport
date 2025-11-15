@@ -289,6 +289,3 @@ describe('DELETE /api/leaderboard/badges/[badgeId]', () => {
     expect(response.status).toBe(400);
   });
 });
-
-
-

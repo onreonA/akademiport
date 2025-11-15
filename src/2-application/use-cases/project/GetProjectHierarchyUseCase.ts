@@ -72,8 +72,10 @@ export class GetProjectHierarchyUseCase {
               assignedTo: task.assignedTo,
               assignedToName: task.assignedToName,
               subProjectId: task.subProjectId,
-              createdAt: task.createdAt instanceof Date ? task.createdAt.toISOString() : task.createdAt,
-              updatedAt: task.updatedAt instanceof Date ? task.updatedAt.toISOString() : task.updatedAt,
+              createdAt:
+                task.createdAt instanceof Date ? task.createdAt.toISOString() : task.createdAt,
+              updatedAt:
+                task.updatedAt instanceof Date ? task.updatedAt.toISOString() : task.updatedAt,
             })),
           stats: {
             totalTasks: tasks.length,
@@ -81,8 +83,14 @@ export class GetProjectHierarchyUseCase {
             inProgressTasks,
             todoTasks,
           },
-          createdAt: subProject.createdAt instanceof Date ? subProject.createdAt.toISOString() : subProject.createdAt,
-          updatedAt: subProject.updatedAt instanceof Date ? subProject.updatedAt.toISOString() : subProject.updatedAt,
+          createdAt:
+            subProject.createdAt instanceof Date
+              ? subProject.createdAt.toISOString()
+              : subProject.createdAt,
+          updatedAt:
+            subProject.updatedAt instanceof Date
+              ? subProject.updatedAt.toISOString()
+              : subProject.updatedAt,
         };
       });
 
@@ -102,15 +110,23 @@ export class GetProjectHierarchyUseCase {
           status: project.status,
           priority: project.priority,
           progress: overallProgress,
-          startDate: project.startDate instanceof Date ? project.startDate.toISOString() : project.startDate ?? undefined,
-          endDate: project.endDate instanceof Date ? project.endDate.toISOString() : project.endDate ?? undefined,
+          startDate:
+            project.startDate instanceof Date
+              ? project.startDate.toISOString()
+              : (project.startDate ?? undefined),
+          endDate:
+            project.endDate instanceof Date
+              ? project.endDate.toISOString()
+              : (project.endDate ?? undefined),
           companyId: project.companyId ?? undefined,
           companyName: project.companyName ?? undefined,
           consultantId: project.consultantId ?? undefined,
           consultantName: project.consultantName ?? undefined,
           isTemplate: project.isTemplate,
-          createdAt: project.createdAt instanceof Date ? project.createdAt.toISOString() : project.createdAt,
-          updatedAt: project.updatedAt instanceof Date ? project.updatedAt.toISOString() : project.updatedAt,
+          createdAt:
+            project.createdAt instanceof Date ? project.createdAt.toISOString() : project.createdAt,
+          updatedAt:
+            project.updatedAt instanceof Date ? project.updatedAt.toISOString() : project.updatedAt,
         },
         subProjects: subProjectsWithTasks.sort((a, b) => a.orderIndex - b.orderIndex),
         stats: {

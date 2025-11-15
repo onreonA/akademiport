@@ -181,9 +181,7 @@ describe('GET /api/forum/topics', () => {
       error: null,
     });
 
-    mockListTopicsUseCaseExecute.mockResolvedValue(
-      Result.ok({ topics: [], total: 0 })
-    );
+    mockListTopicsUseCaseExecute.mockResolvedValue(Result.ok({ topics: [], total: 0 }));
 
     const { GET } = await import('./route');
     const request = createMockRequest('http://localhost:3000/api/forum/topics');
@@ -294,9 +292,7 @@ describe('POST /api/forum/topics', () => {
       error: null,
     });
 
-    mockCreateTopicUseCaseExecute.mockResolvedValue(
-      Result.fail('Kategori bulunamadı')
-    );
+    mockCreateTopicUseCaseExecute.mockResolvedValue(Result.fail('Kategori bulunamadı'));
 
     const { POST } = await import('./route');
     const request = createMockRequest('http://localhost:3000/api/forum/topics', {
@@ -347,4 +343,3 @@ describe('POST /api/forum/topics', () => {
     expect(data.error).toBe('Firma bilgisi bulunamadı');
   });
 });
-

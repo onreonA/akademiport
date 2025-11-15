@@ -1,15 +1,44 @@
 'use client';
 
 import { use } from 'react';
-import { useTopicDetail, useReplies, useCreateReply, useLikeTopic, useUnlikeTopic, useMarkSolution, usePinTopic, useUnpinTopic, useLockTopic, useUnlockTopic, useCloseTopic, useApproveTopic, useDeleteTopic } from '@/1-presentation/hooks/useForum';
+import {
+  useTopicDetail,
+  useReplies,
+  useCreateReply,
+  useLikeTopic,
+  useUnlikeTopic,
+  useMarkSolution,
+  usePinTopic,
+  useUnpinTopic,
+  useLockTopic,
+  useUnlockTopic,
+  useCloseTopic,
+  useApproveTopic,
+  useDeleteTopic,
+} from '@/1-presentation/hooks/useForum';
 import { ReplyForm } from '@/1-presentation/components/features/forum/ReplyForm';
 import { CreateReplyDto, UpdateReplyDto } from '@/2-application/dtos/forum';
 import { Button } from '@/presentation/components/ui/atoms/button';
 import { Badge } from '@/presentation/components/ui/atoms/badge';
 import { Card, CardContent, CardHeader } from '@/presentation/components/ui/atoms/card';
-import { Loader2, ArrowLeft, Eye, Heart, MessageCircle, Pin, Lock, CheckCircle2, Trash2 } from 'lucide-react';
+import {
+  Loader2,
+  ArrowLeft,
+  Eye,
+  Heart,
+  MessageCircle,
+  Pin,
+  Lock,
+  CheckCircle2,
+  Trash2,
+} from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { TOPIC_STATUS_LABELS, TOPIC_STATUS_COLORS, TOPIC_PRIORITY_LABELS, TOPIC_PRIORITY_COLORS } from '@/3-domain/enums/ForumEnums';
+import {
+  TOPIC_STATUS_LABELS,
+  TOPIC_STATUS_COLORS,
+  TOPIC_PRIORITY_LABELS,
+  TOPIC_PRIORITY_COLORS,
+} from '@/3-domain/enums/ForumEnums';
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import { useState } from 'react';
@@ -20,11 +49,7 @@ import {
   DropdownMenuTrigger,
 } from '@/presentation/components/ui/atoms/dropdown-menu';
 
-export default function AdminTopicDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default function AdminTopicDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
   const { data: topic, isLoading } = useTopicDetail(id);
@@ -141,13 +166,9 @@ export default function AdminTopicDetailPage({
               <DropdownMenuItem onClick={handleLock}>
                 {topic.isLocked ? 'Kilidi Aç' : 'Kilitle'}
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleClose}>
-                Kapat
-              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleClose}>Kapat</DropdownMenuItem>
               {!topic.isApproved && (
-                <DropdownMenuItem onClick={handleApprove}>
-                  Onayla
-                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleApprove}>Onayla</DropdownMenuItem>
               )}
               <DropdownMenuItem onClick={handleDelete} className="text-red-600">
                 <Trash2 className="h-4 w-4 mr-2" />
@@ -163,7 +184,13 @@ export default function AdminTopicDetailPage({
         <CardHeader>
           <div className="flex items-center gap-2 mb-2 flex-wrap">
             {topic.category && topic.category.color && (
-              <Badge variant="outline" style={{ backgroundColor: topic.category.color + '20', borderColor: topic.category.color }}>
+              <Badge
+                variant="outline"
+                style={{
+                  backgroundColor: topic.category.color + '20',
+                  borderColor: topic.category.color,
+                }}
+              >
                 {topic.category.name}
               </Badge>
             )}
@@ -187,9 +214,7 @@ export default function AdminTopicDetailPage({
                 Çözüldü
               </Badge>
             )}
-            {!topic.isApproved && (
-              <Badge className="bg-orange-500">Onay Bekliyor</Badge>
-            )}
+            {!topic.isApproved && <Badge className="bg-orange-500">Onay Bekliyor</Badge>}
           </div>
           <h1 className="text-3xl font-bold">{topic.title}</h1>
         </CardHeader>
@@ -199,7 +224,8 @@ export default function AdminTopicDetailPage({
             {topic.authorName && <span>Yazar: {topic.authorName}</span>}
             {topic.createdAt && (
               <span>
-                Oluşturulma: {format(new Date(topic.createdAt), 'dd MMM yyyy HH:mm', { locale: tr })}
+                Oluşturulma:{' '}
+                {format(new Date(topic.createdAt), 'dd MMM yyyy HH:mm', { locale: tr })}
               </span>
             )}
           </div>
@@ -215,11 +241,7 @@ export default function AdminTopicDetailPage({
               <span>{topic.replyCount} yanıt</span>
             </div>
             <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleLike}
-              >
+              <Button variant="ghost" size="sm" onClick={handleLike}>
                 <Heart className="h-4 w-4" />
                 <span className="ml-1">{topic.likeCount}</span>
               </Button>
@@ -227,16 +249,14 @@ export default function AdminTopicDetailPage({
           </div>
 
           {/* Content */}
-          <div className="prose prose-lg max-w-none whitespace-pre-wrap">
-            {topic.content}
-          </div>
+          <div className="prose prose-lg max-w-none whitespace-pre-wrap">{topic.content}</div>
         </CardContent>
       </Card>
 
       {/* Replies */}
       <div className="space-y-4">
         <h2 className="text-2xl font-bold">Yanıtlar ({replies.length})</h2>
-        
+
         {repliesLoading ? (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -249,7 +269,10 @@ export default function AdminTopicDetailPage({
           </Card>
         ) : (
           replies.map((reply) => (
-            <Card key={reply.id} className={reply.isSolution ? 'border-l-4 border-l-green-500' : ''}>
+            <Card
+              key={reply.id}
+              className={reply.isSolution ? 'border-l-4 border-l-green-500' : ''}
+            >
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -280,9 +303,7 @@ export default function AdminTopicDetailPage({
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="prose prose-lg max-w-none whitespace-pre-wrap">
-                  {reply.content}
-                </div>
+                <div className="prose prose-lg max-w-none whitespace-pre-wrap">{reply.content}</div>
                 {reply.isEdited && (
                   <p className="text-xs text-muted-foreground mt-2">(Düzenlendi)</p>
                 )}
@@ -315,4 +336,3 @@ export default function AdminTopicDetailPage({
     </div>
   );
 }
-

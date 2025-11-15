@@ -6,10 +6,7 @@ import { SupabaseNewsRepository } from '@/4-infrastructure/database/repositories
  * POST /api/news/[id]/like
  * Like news
  */
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     const supabase = await createClient();
@@ -74,4 +71,3 @@ export async function DELETE(
     return NextResponse.json({ error: 'Beğeni kaldırılamadı' }, { status: 500 });
   }
 }
-

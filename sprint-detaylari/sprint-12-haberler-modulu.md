@@ -1684,14 +1684,14 @@ export class AddLeaderboardScoreUseCase {
 
 ### Test İlerleme Durumu
 
-| Grup | Test Türü | Durum | Sonuç |
-|------|-----------|-------|-------|
-| GRUP 1 | Domain Layer Tests | ✅ Tamamlandı | 15/15 ✅ |
-| GRUP 2 | Use Case Tests | ✅ Tamamlandı | 25/25 ✅ |
-| GRUP 3 | Repository Integration Tests | ✅ Tamamlandı | 30/30 ✅ |
-| GRUP 4 | API Route Tests | ✅ Tamamlandı | 25/25 ✅ |
-| GRUP 5 | Component Tests | ✅ Tamamlandı | 51/51 ✅ |
-| GRUP 6 | E2E Tests | 🟡 Devam Ediyor | Başlatıldı |
+| Grup   | Test Türü                    | Durum           | Sonuç      |
+| ------ | ---------------------------- | --------------- | ---------- |
+| GRUP 1 | Domain Layer Tests           | ✅ Tamamlandı   | 15/15 ✅   |
+| GRUP 2 | Use Case Tests               | ✅ Tamamlandı   | 25/25 ✅   |
+| GRUP 3 | Repository Integration Tests | ✅ Tamamlandı   | 30/30 ✅   |
+| GRUP 4 | API Route Tests              | ✅ Tamamlandı   | 25/25 ✅   |
+| GRUP 5 | Component Tests              | ✅ Tamamlandı   | 51/51 ✅   |
+| GRUP 6 | E2E Tests                    | 🟡 Devam Ediyor | Başlatıldı |
 
 **Toplam Test Sonucu:** 146/146 (%100) ✅
 
@@ -1740,7 +1740,7 @@ export class AddLeaderboardScoreUseCase {
 
 ### Tamamlanan İyileştirmeler
 
-1. **Form Component Refactoring:** 
+1. **Form Component Refactoring:**
    - `FormProvider` eklendi
    - `FormField` `Controller` ile entegre edildi
    - `FormFieldContext` ile label-input ilişkilendirmesi düzeltildi

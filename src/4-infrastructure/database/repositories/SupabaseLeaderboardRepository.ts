@@ -487,6 +487,3 @@ export class SupabaseLeaderboardRepository implements ILeaderboardRepository {
     };
   }
 }
-
-
-

@@ -19,6 +19,3 @@ export type CreateBadgeDto = z.infer<typeof CreateBadgeDtoSchema>;
 export const UpdateBadgeDtoSchema = CreateBadgeDtoSchema.partial();
 
 export type UpdateBadgeDto = z.infer<typeof UpdateBadgeDtoSchema>;
-
-
-

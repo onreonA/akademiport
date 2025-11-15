@@ -8,6 +8,3 @@ export const LeaderboardFilterDtoSchema = z.object({
 });
 
 export type LeaderboardFilterDto = z.infer<typeof LeaderboardFilterDtoSchema>;
-
-
-

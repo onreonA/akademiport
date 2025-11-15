@@ -32,10 +32,7 @@ export async function GET(request: NextRequest) {
     const result = await useCase.execute({ category, isActive });
 
     if (result.isFailure) {
-      return NextResponse.json(
-        { error: result.error?.message || result.error },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: result.error?.message || result.error }, { status: 400 });
     }
 
     return NextResponse.json({ badges: result.value });
@@ -86,10 +83,7 @@ export async function POST(request: NextRequest) {
     const result = await useCase.execute(dtoResult.data);
 
     if (result.isFailure) {
-      return NextResponse.json(
-        { error: result.error?.message || result.error },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: result.error?.message || result.error }, { status: 400 });
     }
 
     return NextResponse.json({ badge: result.value }, { status: 201 });
@@ -98,6 +92,3 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Rozet oluşturulamadı' }, { status: 500 });
   }
 }
-
-
-

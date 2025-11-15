@@ -6,7 +6,9 @@ import { ForumTopicWithDetails } from '@/3-domain/interfaces/repositories/IForum
 export class ListTopicsUseCase {
   constructor(private forumRepository: IForumRepository) {}
 
-  async execute(filters: TopicFilterDto): Promise<Result<{ topics: ForumTopicWithDetails[]; total: number }>> {
+  async execute(
+    filters: TopicFilterDto
+  ): Promise<Result<{ topics: ForumTopicWithDetails[]; total: number }>> {
     try {
       const repositoryFilters = {
         programId: filters.programId,
@@ -31,10 +33,7 @@ export class ListTopicsUseCase {
 
       return Result.ok(result.value);
     } catch (error) {
-      return Result.fail(
-        error instanceof Error ? error.message : 'Konular listelenemedi'
-      );
+      return Result.fail(error instanceof Error ? error.message : 'Konular listelenemedi');
     }
   }
 }
-

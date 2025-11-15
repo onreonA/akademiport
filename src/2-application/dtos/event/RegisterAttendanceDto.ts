@@ -8,6 +8,3 @@ export const RegisterAttendanceDtoSchema = z.object({
 });
 
 export type RegisterAttendanceDto = z.infer<typeof RegisterAttendanceDtoSchema>;
-
-
-

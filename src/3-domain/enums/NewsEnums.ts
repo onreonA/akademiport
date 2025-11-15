@@ -43,5 +43,3 @@ export const NEWS_STATUS_COLORS: Record<NewsStatus, string> = {
   [NewsStatus.PUBLISHED]: 'green',
   [NewsStatus.ARCHIVED]: 'orange',
 };
-
-

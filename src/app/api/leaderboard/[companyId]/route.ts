@@ -33,10 +33,7 @@ export async function GET(
     const result = await useCase.execute(companyId, programId);
 
     if (result.isFailure) {
-      return NextResponse.json(
-        { error: result.error?.message || result.error },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: result.error?.message || result.error }, { status: 400 });
     }
 
     return NextResponse.json({ ranking: result.value });
@@ -45,4 +42,3 @@ export async function GET(
     return NextResponse.json({ error: 'Firma sıralaması alınamadı' }, { status: 500 });
   }
 }
-

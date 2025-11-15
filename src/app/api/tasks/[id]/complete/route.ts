@@ -9,7 +9,10 @@ import { getAuthenticatedUser } from '@/4-infrastructure/api/helpers/auth';
 const taskRepository = new TaskRepository();
 const leaderboardRepository = new SupabaseLeaderboardRepository();
 const companyRepository = new CompanyRepository();
-const addLeaderboardScore = new AddLeaderboardScoreUseCase(leaderboardRepository, companyRepository);
+const addLeaderboardScore = new AddLeaderboardScoreUseCase(
+  leaderboardRepository,
+  companyRepository
+);
 
 /**
  * POST /api/tasks/[id]/complete
@@ -37,7 +40,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
     if (result.isFailure) {
       return NextResponse.json(
-        { error: (result.error as any)?.message || "Unknown error" },
+        { error: (result.error as any)?.message || 'Unknown error' },
         { status: (result.error as any)?.statusCode || 500 }
       );
     }

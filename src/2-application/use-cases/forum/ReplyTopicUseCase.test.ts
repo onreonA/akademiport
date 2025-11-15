@@ -108,18 +108,20 @@ describe('ReplyTopicUseCase', () => {
 
       vi.mocked(mockRepository.findTopicById).mockResolvedValue(Result.ok(mockTopic));
       vi.mocked(mockRepository.createReply).mockResolvedValue(Result.ok(mockReply));
-      vi.mocked(mockRepository.createNotification).mockResolvedValue(Result.ok({
-        id: 'notif-1',
-        userId: mockTopic.authorId,
-        topicId: topicId,
-        replyId: mockReply.id,
-        type: 'new_reply',
-        title: 'Test',
-        message: null,
-        isRead: false,
-        readAt: null,
-        createdAt: new Date(),
-      }));
+      vi.mocked(mockRepository.createNotification).mockResolvedValue(
+        Result.ok({
+          id: 'notif-1',
+          userId: mockTopic.authorId,
+          topicId: topicId,
+          replyId: mockReply.id,
+          type: 'new_reply',
+          title: 'Test',
+          message: null,
+          isRead: false,
+          readAt: null,
+          createdAt: new Date(),
+        })
+      );
 
       const result = await useCase.execute(dto, userId, companyId);
 
@@ -174,4 +176,3 @@ describe('ReplyTopicUseCase', () => {
     });
   });
 });
-

@@ -23,10 +23,16 @@ import { z } from 'zod';
 import { useSearchParams } from 'next/navigation';
 
 const categoryFormSchema = z.object({
-  name: z.string().min(1, 'Kategori adı gereklidir').max(100, 'Kategori adı 100 karakterden uzun olamaz'),
+  name: z
+    .string()
+    .min(1, 'Kategori adı gereklidir')
+    .max(100, 'Kategori adı 100 karakterden uzun olamaz'),
   description: z.string().max(500, 'Açıklama 500 karakterden uzun olamaz').optional(),
   icon: z.string().max(50, 'İkon 50 karakterden uzun olamaz').optional(),
-  color: z.string().regex(/^#[0-9A-F]{6}$/i, 'Geçerli bir hex renk kodu giriniz (örn: #FF5733)').optional(),
+  color: z
+    .string()
+    .regex(/^#[0-9A-F]{6}$/i, 'Geçerli bir hex renk kodu giriniz (örn: #FF5733)')
+    .optional(),
   orderIndex: z.number().int().min(0).optional(),
   requireApproval: z.boolean().default(false).optional(),
 });
@@ -81,9 +87,7 @@ function AdminCategoriesPageContent() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">Forum Kategorileri</h2>
-          <p className="text-sm text-muted-foreground">
-            {categories.length} kategori bulundu
-          </p>
+          <p className="text-sm text-muted-foreground">{categories.length} kategori bulundu</p>
         </div>
         <Button onClick={() => setIsCreateDialogOpen(true)}>
           <Plus className="h-4 w-4 mr-2" />
@@ -149,11 +153,7 @@ function AdminCategoriesPageContent() {
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
             <div>
               <Label htmlFor="name">Kategori Adı *</Label>
-              <Input
-                id="name"
-                {...form.register('name')}
-                placeholder="Örn: Genel Sorular"
-              />
+              <Input id="name" {...form.register('name')} placeholder="Örn: Genel Sorular" />
               {form.formState.errors.name && (
                 <p className="text-sm text-red-500 mt-1">{form.formState.errors.name.message}</p>
               )}
@@ -168,19 +168,16 @@ function AdminCategoriesPageContent() {
                 rows={3}
               />
               {form.formState.errors.description && (
-                <p className="text-sm text-red-500 mt-1">{form.formState.errors.description.message}</p>
+                <p className="text-sm text-red-500 mt-1">
+                  {form.formState.errors.description.message}
+                </p>
               )}
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="icon">İkon (Emoji)</Label>
-                <Input
-                  id="icon"
-                  {...form.register('icon')}
-                  placeholder="💬"
-                  maxLength={50}
-                />
+                <Input id="icon" {...form.register('icon')} placeholder="💬" maxLength={50} />
                 {form.formState.errors.icon && (
                   <p className="text-sm text-red-500 mt-1">{form.formState.errors.icon.message}</p>
                 )}
@@ -188,11 +185,7 @@ function AdminCategoriesPageContent() {
 
               <div>
                 <Label htmlFor="color">Renk</Label>
-                <Input
-                  id="color"
-                  type="color"
-                  {...form.register('color')}
-                />
+                <Input id="color" type="color" {...form.register('color')} />
                 {form.formState.errors.color && (
                   <p className="text-sm text-red-500 mt-1">{form.formState.errors.color.message}</p>
                 )}
@@ -222,11 +215,7 @@ function AdminCategoriesPageContent() {
             </div>
 
             <div className="flex justify-end gap-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setIsCreateDialogOpen(false)}
-              >
+              <Button type="button" variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
                 İptal
               </Button>
               <Button type="submit" disabled={createCategory.isPending}>
@@ -248,4 +237,3 @@ export default function AdminCategoriesPage() {
     </Suspense>
   );
 }
-

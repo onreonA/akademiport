@@ -3,13 +3,29 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { CreateBadgeDtoSchema, UpdateBadgeDtoSchema, CreateBadgeDto, UpdateBadgeDto } from '@/2-application/dtos/leaderboard';
-import { BadgeCategory, RequirementType, BADGE_CATEGORY_LABELS, REQUIREMENT_TYPE_LABELS } from '@/3-domain/enums/LeaderboardEnums';
+import {
+  CreateBadgeDtoSchema,
+  UpdateBadgeDtoSchema,
+  CreateBadgeDto,
+  UpdateBadgeDto,
+} from '@/2-application/dtos/leaderboard';
+import {
+  BadgeCategory,
+  RequirementType,
+  BADGE_CATEGORY_LABELS,
+  REQUIREMENT_TYPE_LABELS,
+} from '@/3-domain/enums/LeaderboardEnums';
 import { Button } from '@/presentation/components/ui/atoms/button';
 import { Input } from '@/presentation/components/ui/atoms/input';
 import { Label } from '@/presentation/components/ui/atoms/label';
 import { Textarea } from '@/presentation/components/ui/atoms/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/presentation/components/ui/atoms/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/presentation/components/ui/atoms/select';
 import { Switch } from '@/presentation/components/ui/atoms/switch';
 import { Badge } from '@/presentation/components/ui/atoms/badge';
 import { Badge as BadgeEntity } from '@/3-domain/entities/Leaderboard';
@@ -67,15 +83,8 @@ export function BadgeForm({ badge, onSubmit, onCancel, isSubmitting }: BadgeForm
       {/* Name */}
       <div className="space-y-2">
         <Label htmlFor="name">Rozet Adı *</Label>
-        <Input
-          id="name"
-          {...register('name')}
-          placeholder="Örn: İlk Adım"
-          maxLength={100}
-        />
-        {errors.name && (
-          <p className="text-sm text-destructive">{errors.name.message}</p>
-        )}
+        <Input id="name" {...register('name')} placeholder="Örn: İlk Adım" maxLength={100} />
+        {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
       </div>
 
       {/* Description */}
@@ -95,18 +104,9 @@ export function BadgeForm({ badge, onSubmit, onCancel, isSubmitting }: BadgeForm
       {/* Icon */}
       <div className="space-y-2">
         <Label htmlFor="icon">İkon (Emoji)</Label>
-        <Input
-          id="icon"
-          {...register('icon')}
-          placeholder="🎯"
-          maxLength={10}
-        />
-        <p className="text-xs text-muted-foreground">
-          Bir emoji veya ikon adı girin
-        </p>
-        {errors.icon && (
-          <p className="text-sm text-destructive">{errors.icon.message}</p>
-        )}
+        <Input id="icon" {...register('icon')} placeholder="🎯" maxLength={10} />
+        <p className="text-xs text-muted-foreground">Bir emoji veya ikon adı girin</p>
+        {errors.icon && <p className="text-sm text-destructive">{errors.icon.message}</p>}
       </div>
 
       {/* Category */}
@@ -127,9 +127,7 @@ export function BadgeForm({ badge, onSubmit, onCancel, isSubmitting }: BadgeForm
             ))}
           </SelectContent>
         </Select>
-        {errors.category && (
-          <p className="text-sm text-destructive">{errors.category.message}</p>
-        )}
+        {errors.category && <p className="text-sm text-destructive">{errors.category.message}</p>}
       </div>
 
       {/* Requirement Type */}
@@ -202,9 +200,7 @@ export function BadgeForm({ badge, onSubmit, onCancel, isSubmitting }: BadgeForm
           placeholder="0"
           min={0}
         />
-        <p className="text-xs text-muted-foreground">
-          Rozet kazanıldığında verilecek ekstra puan
-        </p>
+        <p className="text-xs text-muted-foreground">Rozet kazanıldığında verilecek ekstra puan</p>
         {errors.pointsBonus && (
           <p className="text-sm text-destructive">{errors.pointsBonus.message}</p>
         )}
@@ -252,6 +248,3 @@ export function BadgeForm({ badge, onSubmit, onCancel, isSubmitting }: BadgeForm
     </form>
   );
 }
-
-
-

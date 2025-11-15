@@ -7,7 +7,10 @@ import {
 } from '@/application/use-cases/appointment';
 import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
 import { logger } from '@/shared/utils/logger';
-import { UpdateAppointmentDtoSchema, type AppointmentResponseDto } from '@/application/dto/appointment';
+import {
+  UpdateAppointmentDtoSchema,
+  type AppointmentResponseDto,
+} from '@/application/dto/appointment';
 import { UserRole } from '@/domain/enums/UserRole';
 
 const appointmentRepository = new AppointmentRepository();
@@ -30,7 +33,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     if (result.isFailure) {
       return NextResponse.json(
-        { error: (result.error as any)?.message || "Unknown error" },
+        { error: (result.error as any)?.message || 'Unknown error' },
         { status: (result.error as any)?.statusCode || 500 }
       );
     }
@@ -140,7 +143,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
     if (result.isFailure) {
       return NextResponse.json(
-        { error: (result.error as any)?.message || "Unknown error" },
+        { error: (result.error as any)?.message || 'Unknown error' },
         { status: (result.error as any)?.statusCode || 500 }
       );
     }
@@ -216,7 +219,7 @@ export async function DELETE(
 
     if (result.isFailure) {
       return NextResponse.json(
-        { error: (result.error as any)?.message || "Unknown error" },
+        { error: (result.error as any)?.message || 'Unknown error' },
         { status: (result.error as any)?.statusCode || 500 }
       );
     }

@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: (result.error as any)?.message || "Unknown error",
+          error: (result.error as any)?.message || 'Unknown error',
         },
         { status: 500 }
       );

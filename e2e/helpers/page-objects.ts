@@ -397,9 +397,7 @@ export class NewsPage {
 
   // Locators
   get newNewsButton(): Locator {
-    return this.page.locator(
-      'button:has-text("Yeni Haber"), button:has-text("Haber Oluştur")'
-    );
+    return this.page.locator('button:has-text("Yeni Haber"), button:has-text("Haber Oluştur")');
   }
 
   get titleInput(): Locator {
@@ -415,7 +413,10 @@ export class NewsPage {
   }
 
   get categorySelect(): Locator {
-    return this.page.locator('[role="combobox"]').filter({ hasText: /kategori/i }).first();
+    return this.page
+      .locator('[role="combobox"]')
+      .filter({ hasText: /kategori/i })
+      .first();
   }
 
   get imageUrlInput(): Locator {

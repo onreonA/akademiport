@@ -11,10 +11,7 @@ import { CompanyRepository } from '@/4-infrastructure/database/repositories/Comp
  * POST /api/news/[id]/read
  * Record news read (for leaderboard)
  */
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     const supabase = await createClient();
@@ -49,7 +46,10 @@ export async function POST(
     const repository = new SupabaseNewsRepository();
     const leaderboardRepository = new SupabaseLeaderboardRepository();
     const companyRepository = new CompanyRepository();
-    const addLeaderboardScore = new AddLeaderboardScoreUseCase(leaderboardRepository, companyRepository);
+    const addLeaderboardScore = new AddLeaderboardScoreUseCase(
+      leaderboardRepository,
+      companyRepository
+    );
     const useCase = new RecordNewsReadUseCase(repository, addLeaderboardScore);
     const result = await useCase.execute(dto);
 
@@ -63,4 +63,3 @@ export async function POST(
     return NextResponse.json({ error: 'Okuma kaydedilemedi' }, { status: 500 });
   }
 }
-

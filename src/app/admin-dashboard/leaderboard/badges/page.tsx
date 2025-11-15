@@ -3,7 +3,12 @@
 import { useState } from 'react';
 import { BadgeGallery } from '@/1-presentation/components/features/leaderboard';
 import { BadgeForm } from '@/1-presentation/components/features/leaderboard/BadgeForm';
-import { useCreateBadge, useUpdateBadge, useDeleteBadge, useBadges } from '@/1-presentation/hooks/useLeaderboard';
+import {
+  useCreateBadge,
+  useUpdateBadge,
+  useDeleteBadge,
+  useBadges,
+} from '@/1-presentation/hooks/useLeaderboard';
 import {
   Dialog,
   DialogContent,
@@ -31,7 +36,12 @@ export default function AdminBadgesPage() {
   const handleCreate = async (data: CreateBadgeDto | UpdateBadgeDto) => {
     try {
       // Type guard: ensure it's CreateBadgeDto
-      if (!('name' in data && data.name) || !('category' in data && data.category) || !('requirementType' in data && data.requirementType) || !('requirementValue' in data && data.requirementValue)) {
+      if (
+        !('name' in data && data.name) ||
+        !('category' in data && data.category) ||
+        !('requirementType' in data && data.requirementType) ||
+        !('requirementValue' in data && data.requirementValue)
+      ) {
         toast.error('Eksik bilgiler var');
         return;
       }
@@ -108,25 +118,14 @@ export default function AdminBadgesPage() {
       {/* Badges List */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {badges.map((badge) => (
-          <div
-            key={badge.id}
-            className="border rounded-lg p-4 hover:shadow-lg transition-shadow"
-          >
+          <div key={badge.id} className="border rounded-lg p-4 hover:shadow-lg transition-shadow">
             <div className="flex items-start justify-between mb-2">
               <div className="text-4xl">{badge.icon || '🏆'}</div>
               <div className="flex gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setEditingBadge(badge)}
-                >
+                <Button variant="ghost" size="sm" onClick={() => setEditingBadge(badge)}>
                   <Edit className="h-4 w-4" />
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setDeletingBadge(badge)}
-                >
+                <Button variant="ghost" size="sm" onClick={() => setDeletingBadge(badge)}>
                   <Trash2 className="h-4 w-4 text-destructive" />
                 </Button>
               </div>
@@ -141,9 +140,7 @@ export default function AdminBadgesPage() {
                   +{badge.pointsBonus} bonus
                 </span>
               )}
-              {!badge.isActive && (
-                <span className="text-xs bg-muted px-2 py-1 rounded">Pasif</span>
-              )}
+              {!badge.isActive && <span className="text-xs bg-muted px-2 py-1 rounded">Pasif</span>}
             </div>
           </div>
         ))}
@@ -188,8 +185,8 @@ export default function AdminBadgesPage() {
           </DialogHeader>
           <div className="space-y-4">
             <p>
-              &quot;{deletingBadge?.name}&quot; rozetini silmek istediğinizden emin misiniz?
-              Bu işlem geri alınamaz.
+              &quot;{deletingBadge?.name}&quot; rozetini silmek istediğinizden emin misiniz? Bu
+              işlem geri alınamaz.
             </p>
             <div className="flex justify-end gap-4">
               <Button variant="outline" onClick={() => setDeletingBadge(null)}>
@@ -205,6 +202,3 @@ export default function AdminBadgesPage() {
     </div>
   );
 }
-
-
-

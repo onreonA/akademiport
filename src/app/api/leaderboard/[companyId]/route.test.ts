@@ -109,10 +109,7 @@ describe('GET /api/leaderboard/[companyId]', () => {
       totalScore: 1000,
       rank: 1,
     });
-    expect(mockGetCompanyRankingUseCaseExecute).toHaveBeenCalledWith(
-      'company-1',
-      'program-1'
-    );
+    expect(mockGetCompanyRankingUseCaseExecute).toHaveBeenCalledWith('company-1', 'program-1');
   });
 
   it('returns null when company has no ranking', async () => {
@@ -144,9 +141,7 @@ describe('GET /api/leaderboard/[companyId]', () => {
       error: null,
     } as any);
 
-    mockGetCompanyRankingUseCaseExecute.mockResolvedValue(
-      Result.fail('Failed to get ranking')
-    );
+    mockGetCompanyRankingUseCaseExecute.mockResolvedValue(Result.fail('Failed to get ranking'));
 
     const { GET } = await import('./route');
     const request = createMockRequest(
@@ -161,6 +156,3 @@ describe('GET /api/leaderboard/[companyId]', () => {
     expect(data.error).toBeDefined();
   });
 });
-
-
-

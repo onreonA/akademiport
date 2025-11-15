@@ -7,4 +7,3 @@ export interface UpdateCategoryDto {
   isActive?: boolean;
   requireApproval?: boolean;
 }
-

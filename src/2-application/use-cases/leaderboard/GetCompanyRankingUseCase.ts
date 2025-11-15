@@ -11,7 +11,10 @@ export class GetCompanyRankingUseCase {
       const result = await this.leaderboardRepository.getCompanyRanking(companyId, programId);
 
       if (result.isFailure) {
-        const errorMessage = result.error instanceof Error ? result.error.message : (result.error || 'Firma sıralaması alınamadı');
+        const errorMessage =
+          result.error instanceof Error
+            ? result.error.message
+            : result.error || 'Firma sıralaması alınamadı';
         return Result.fail(new AppError(errorMessage, 500));
       }
 
@@ -23,6 +26,3 @@ export class GetCompanyRankingUseCase {
     }
   }
 }
-
-
-

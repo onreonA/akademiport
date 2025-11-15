@@ -7,10 +7,7 @@ import { PublishNewsUseCase } from '@/2-application/use-cases/news';
  * POST /api/news/[id]/publish
  * Publish news
  */
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     const supabase = await createClient();
@@ -47,4 +44,3 @@ export async function POST(
     return NextResponse.json({ error: 'Haber yayınlanamadı' }, { status: 500 });
   }
 }
-

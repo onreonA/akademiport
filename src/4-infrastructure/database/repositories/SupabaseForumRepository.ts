@@ -131,7 +131,10 @@ export class SupabaseForumRepository implements IForumRepository {
     }
   }
 
-  async updateCategory(id: string, category: Partial<ForumCategory>): Promise<Result<ForumCategory>> {
+  async updateCategory(
+    id: string,
+    category: Partial<ForumCategory>
+  ): Promise<Result<ForumCategory>> {
     try {
       const supabase = await this.getSupabaseClient();
 
@@ -143,7 +146,8 @@ export class SupabaseForumRepository implements IForumRepository {
       if (category.color !== undefined) updateData.color = category.color;
       if (category.orderIndex !== undefined) updateData.order_index = category.orderIndex;
       if (category.isActive !== undefined) updateData.is_active = category.isActive;
-      if (category.requireApproval !== undefined) updateData.require_approval = category.requireApproval;
+      if (category.requireApproval !== undefined)
+        updateData.require_approval = category.requireApproval;
 
       const { data, error } = await supabase
         .from('forum_categories')
@@ -185,7 +189,14 @@ export class SupabaseForumRepository implements IForumRepository {
   async createTopic(
     topic: Omit<
       ForumTopic,
-      'id' | 'createdAt' | 'updatedAt' | 'viewCount' | 'replyCount' | 'likeCount' | 'lastReplyAt' | 'lastReplyBy'
+      | 'id'
+      | 'createdAt'
+      | 'updatedAt'
+      | 'viewCount'
+      | 'replyCount'
+      | 'likeCount'
+      | 'lastReplyAt'
+      | 'lastReplyBy'
     >
   ): Promise<Result<ForumTopic>> {
     try {
@@ -227,11 +238,7 @@ export class SupabaseForumRepository implements IForumRepository {
     try {
       const supabase = await this.getSupabaseClient();
 
-      const { data, error } = await supabase
-        .from('forum_topics')
-        .select('*')
-        .eq('id', id)
-        .single();
+      const { data, error } = await supabase.from('forum_topics').select('*').eq('id', id).single();
 
       if (error) {
         if (error.code === 'PGRST116') {
@@ -276,17 +283,15 @@ export class SupabaseForumRepository implements IForumRepository {
     try {
       const supabase = await this.getSupabaseClient();
 
-      let query = supabase
-        .from('forum_topics')
-        .select(
-          `
+      let query = supabase.from('forum_topics').select(
+        `
           *,
           forum_categories!forum_topics_category_id_fkey(*),
           users!forum_topics_author_id_fkey(id, full_name, email),
           companies(id, name)
         `,
-          { count: 'exact' }
-        );
+        { count: 'exact' }
+      );
 
       // Apply filters
       if (filters.programId) {
@@ -348,7 +353,9 @@ export class SupabaseForumRepository implements IForumRepository {
 
       const topics: ForumTopicWithDetails[] = (data || []).map((item: any) => ({
         ...this.mapToTopicEntity(item),
-        category: item.forum_categories ? this.mapToCategoryEntity(item.forum_categories) : undefined,
+        category: item.forum_categories
+          ? this.mapToCategoryEntity(item.forum_categories)
+          : undefined,
         authorName: item.users?.full_name,
         authorEmail: item.users?.email,
         companyName: item.companies?.name,
@@ -446,7 +453,11 @@ export class SupabaseForumRepository implements IForumRepository {
     return this.updateTopic(id, { isApproved: false });
   }
 
-  async markSolution(topicId: string, replyId: string, userId: string): Promise<Result<ForumTopic>> {
+  async markSolution(
+    topicId: string,
+    replyId: string,
+    userId: string
+  ): Promise<Result<ForumTopic>> {
     try {
       const supabase = await this.getSupabaseClient();
 
@@ -866,7 +877,10 @@ export class SupabaseForumRepository implements IForumRepository {
     }
   }
 
-  async getUserNotifications(userId: string, unreadOnly?: boolean): Promise<Result<ForumNotification[]>> {
+  async getUserNotifications(
+    userId: string,
+    unreadOnly?: boolean
+  ): Promise<Result<ForumNotification[]>> {
     try {
       const supabase = await this.getSupabaseClient();
 
@@ -992,12 +1006,14 @@ export class SupabaseForumRepository implements IForumRepository {
   async getActivityStats(
     companyId: string,
     programId?: string
-  ): Promise<Result<{
-    totalPoints: number;
-    topicsCreated: number;
-    repliesCreated: number;
-    solutionsMarked: number;
-  }>> {
+  ): Promise<
+    Result<{
+      totalPoints: number;
+      topicsCreated: number;
+      repliesCreated: number;
+      solutionsMarked: number;
+    }>
+  > {
     try {
       const activityResult = await this.getActivity(undefined, companyId, programId);
       if (activityResult.isFailure) {
@@ -1026,12 +1042,14 @@ export class SupabaseForumRepository implements IForumRepository {
   // STATISTICS
   // =====================================================
 
-  async getCategoryStatistics(categoryId: string): Promise<Result<{
-    topicCount: number;
-    replyCount: number;
-    totalViews: number;
-    totalLikes: number;
-  }>> {
+  async getCategoryStatistics(categoryId: string): Promise<
+    Result<{
+      topicCount: number;
+      replyCount: number;
+      totalViews: number;
+      totalLikes: number;
+    }>
+  > {
     try {
       const supabase = await this.getSupabaseClient();
 
@@ -1060,12 +1078,14 @@ export class SupabaseForumRepository implements IForumRepository {
     }
   }
 
-  async getTopicStatistics(topicId: string): Promise<Result<{
-    viewCount: number;
-    replyCount: number;
-    likeCount: number;
-    solutionCount: number;
-  }>> {
+  async getTopicStatistics(topicId: string): Promise<
+    Result<{
+      viewCount: number;
+      replyCount: number;
+      likeCount: number;
+      solutionCount: number;
+    }>
+  > {
     try {
       const topicResult = await this.findTopicById(topicId);
       if (topicResult.isFailure || !topicResult.value) {
@@ -1198,4 +1218,3 @@ export class SupabaseForumRepository implements IForumRepository {
     };
   }
 }
-

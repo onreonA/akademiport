@@ -375,7 +375,10 @@ describe('SupabaseNewsRepository Integration Tests', () => {
       testNewsIds.push(testNews.id);
 
       // Create tag
-      const tagResult = await repository.createTag(`test-tag-${Date.now()}`, `test-tag-${Date.now()}`);
+      const tagResult = await repository.createTag(
+        `test-tag-${Date.now()}`,
+        `test-tag-${Date.now()}`
+      );
       expect(tagResult.isSuccess).toBe(true);
 
       if (tagResult.isSuccess) {
@@ -397,7 +400,10 @@ describe('SupabaseNewsRepository Integration Tests', () => {
       testNewsIds.push(testNews.id);
 
       // Create and add tag
-      const tagResult = await repository.createTag(`test-tag-${Date.now()}`, `test-tag-${Date.now()}`);
+      const tagResult = await repository.createTag(
+        `test-tag-${Date.now()}`,
+        `test-tag-${Date.now()}`
+      );
       expect(tagResult.isSuccess).toBe(true);
 
       if (tagResult.isSuccess) {
@@ -573,4 +579,3 @@ describe('SupabaseNewsRepository Integration Tests', () => {
     });
   });
 });
-

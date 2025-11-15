@@ -154,10 +154,12 @@ describe('PUT /api/forum/topics/[id]', () => {
       content: 'Updated content',
     };
 
-    mockFindTopicById.mockResolvedValue(Result.ok({
-      id: 'topic-1',
-      authorId: mockUser.id,
-    }));
+    mockFindTopicById.mockResolvedValue(
+      Result.ok({
+        id: 'topic-1',
+        authorId: mockUser.id,
+      })
+    );
     mockFrom.mockReturnValue({
       select: mockSelect,
     });
@@ -195,10 +197,12 @@ describe('PUT /api/forum/topics/[id]', () => {
       error: null,
     } as any);
 
-    mockFindTopicById.mockResolvedValue(Result.ok({
-      id: 'topic-1',
-      authorId: mockUser.id,
-    }));
+    mockFindTopicById.mockResolvedValue(
+      Result.ok({
+        id: 'topic-1',
+        authorId: mockUser.id,
+      })
+    );
     mockFrom.mockReturnValue({
       select: mockSelect,
     });
@@ -212,9 +216,7 @@ describe('PUT /api/forum/topics/[id]', () => {
       data: { role: 'master_admin' },
       error: null,
     });
-    mockUpdateTopic.mockResolvedValue(
-      Result.fail('Konu güncellenemedi')
-    );
+    mockUpdateTopic.mockResolvedValue(Result.fail('Konu güncellenemedi'));
 
     const { PUT } = await import('./route');
     const request = createMockRequest('http://localhost:3000/api/forum/topics/topic-1', {
@@ -261,10 +263,12 @@ describe('DELETE /api/forum/topics/[id]', () => {
       error: null,
     } as any);
 
-    mockFindTopicById.mockResolvedValue(Result.ok({
-      id: 'topic-1',
-      authorId: mockUser.id,
-    }));
+    mockFindTopicById.mockResolvedValue(
+      Result.ok({
+        id: 'topic-1',
+        authorId: mockUser.id,
+      })
+    );
     mockFrom.mockReturnValue({
       select: mockSelect,
     });
@@ -298,10 +302,12 @@ describe('DELETE /api/forum/topics/[id]', () => {
       error: null,
     } as any);
 
-    mockFindTopicById.mockResolvedValue(Result.ok({
-      id: 'topic-1',
-      authorId: mockUser.id,
-    }));
+    mockFindTopicById.mockResolvedValue(
+      Result.ok({
+        id: 'topic-1',
+        authorId: mockUser.id,
+      })
+    );
     mockFrom.mockReturnValue({
       select: mockSelect,
     });
@@ -315,9 +321,7 @@ describe('DELETE /api/forum/topics/[id]', () => {
       data: { role: 'master_admin' },
       error: null,
     });
-    mockDeleteTopic.mockResolvedValue(
-      Result.fail('Konu silinemedi')
-    );
+    mockDeleteTopic.mockResolvedValue(Result.fail('Konu silinemedi'));
 
     const { DELETE } = await import('./route');
     const request = createMockRequest('http://localhost:3000/api/forum/topics/topic-1', {
@@ -330,4 +334,3 @@ describe('DELETE /api/forum/topics/[id]', () => {
     expect(data.error).toBe('Konu silinemedi');
   });
 });
-

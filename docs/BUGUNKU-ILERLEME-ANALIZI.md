@@ -514,4 +514,3 @@ Bugün sprint dışı dağınık çalışma yapıldı ancak tutarlı bir tema et
 **Hazırlayan:** AI Assistant  
 **Versiyon:** 1.0  
 **Tarih:** Ocak 2025
-

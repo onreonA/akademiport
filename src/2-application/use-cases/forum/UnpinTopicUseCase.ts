@@ -14,10 +14,7 @@ export class UnpinTopicUseCase {
 
       return Result.ok(undefined);
     } catch (error) {
-      return Result.fail(
-        error instanceof Error ? error.message : 'Sabitleme kaldırılamadı'
-      );
+      return Result.fail(error instanceof Error ? error.message : 'Sabitleme kaldırılamadı');
     }
   }
 }
-

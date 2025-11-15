@@ -11,10 +11,7 @@ import { CompanyRepository } from '@/4-infrastructure/database/repositories/Comp
  * GET /api/forum/topics/[id]/replies
  * List replies for a topic
  */
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const supabase = await createClient();
     const {
@@ -53,10 +50,7 @@ export async function GET(
  * POST /api/forum/topics/[id]/replies
  * Create reply for a topic
  */
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const supabase = await createClient();
     const {
@@ -90,7 +84,10 @@ export async function POST(
     const repository = new SupabaseForumRepository();
     const leaderboardRepository = new SupabaseLeaderboardRepository();
     const companyRepository = new CompanyRepository();
-    const addLeaderboardScore = new AddLeaderboardScoreUseCase(leaderboardRepository, companyRepository);
+    const addLeaderboardScore = new AddLeaderboardScoreUseCase(
+      leaderboardRepository,
+      companyRepository
+    );
     const useCase = new ReplyTopicUseCase(repository, addLeaderboardScore);
     const result = await useCase.execute(dto, user.id, userData.company_id);
 
@@ -104,4 +101,3 @@ export async function POST(
     return NextResponse.json({ error: 'Yanıt oluşturulamadı' }, { status: 500 });
   }
 }
-

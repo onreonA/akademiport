@@ -86,6 +86,3 @@ export function BadgeGallery({ companyId, category }: BadgeGalleryProps) {
     </div>
   );
 }
-
-
-

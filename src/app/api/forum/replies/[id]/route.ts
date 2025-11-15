@@ -8,10 +8,7 @@ import { UpdateReplyDto } from '@/2-application/dtos/forum';
  * PUT /api/forum/replies/[id]
  * Update a reply
  */
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const supabase = await createClient();
     const {
@@ -86,4 +83,3 @@ export async function DELETE(
     return NextResponse.json({ error: 'Yanıt silinemedi' }, { status: 500 });
   }
 }
-

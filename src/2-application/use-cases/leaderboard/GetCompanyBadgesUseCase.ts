@@ -11,7 +11,10 @@ export class GetCompanyBadgesUseCase {
       const result = await this.leaderboardRepository.getCompanyBadges(companyId);
 
       if (result.isFailure) {
-        const errorMessage = result.error instanceof Error ? result.error.message : (result.error || 'Firma rozetleri alınamadı');
+        const errorMessage =
+          result.error instanceof Error
+            ? result.error.message
+            : result.error || 'Firma rozetleri alınamadı';
         return Result.fail(new AppError(errorMessage, 500));
       }
 
@@ -23,6 +26,3 @@ export class GetCompanyBadgesUseCase {
     }
   }
 }
-
-
-

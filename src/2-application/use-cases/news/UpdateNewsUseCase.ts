@@ -74,4 +74,3 @@ export class UpdateNewsUseCase {
     return Result.ok(result.value);
   }
 }
-

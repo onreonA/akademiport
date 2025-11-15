@@ -107,4 +107,3 @@ Kalan hatalar muhtemelen şunlarla ilgili:
 2. ⏳ E2E testlerini tamamla
 3. ⏳ Sprint 12 dokümantasyonunu güncelle
 4. ⏳ Sprint 13'e başla
-

@@ -139,8 +139,22 @@ describe('NewsCard', () => {
   it('displays tags when provided', () => {
     const news = createMockNews({
       tags: [
-        { id: 'tag-1', name: 'Tag 1', slug: 'tag-1', usageCount: 1, createdAt: new Date(), updatedAt: new Date() },
-        { id: 'tag-2', name: 'Tag 2', slug: 'tag-2', usageCount: 1, createdAt: new Date(), updatedAt: new Date() },
+        {
+          id: 'tag-1',
+          name: 'Tag 1',
+          slug: 'tag-1',
+          usageCount: 1,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          id: 'tag-2',
+          name: 'Tag 2',
+          slug: 'tag-2',
+          usageCount: 1,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
       ],
     });
     render(<NewsCard news={news} />);
@@ -152,10 +166,38 @@ describe('NewsCard', () => {
   it('shows "+N" badge when more than 3 tags', () => {
     const news = createMockNews({
       tags: [
-        { id: 'tag-1', name: 'Tag 1', slug: 'tag-1', usageCount: 1, createdAt: new Date(), updatedAt: new Date() },
-        { id: 'tag-2', name: 'Tag 2', slug: 'tag-2', usageCount: 1, createdAt: new Date(), updatedAt: new Date() },
-        { id: 'tag-3', name: 'Tag 3', slug: 'tag-3', usageCount: 1, createdAt: new Date(), updatedAt: new Date() },
-        { id: 'tag-4', name: 'Tag 4', slug: 'tag-4', usageCount: 1, createdAt: new Date(), updatedAt: new Date() },
+        {
+          id: 'tag-1',
+          name: 'Tag 1',
+          slug: 'tag-1',
+          usageCount: 1,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          id: 'tag-2',
+          name: 'Tag 2',
+          slug: 'tag-2',
+          usageCount: 1,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          id: 'tag-3',
+          name: 'Tag 3',
+          slug: 'tag-3',
+          usageCount: 1,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          id: 'tag-4',
+          name: 'Tag 4',
+          slug: 'tag-4',
+          usageCount: 1,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
       ],
     });
     render(<NewsCard news={news} />);
@@ -247,4 +289,3 @@ describe('NewsCard', () => {
     expect(screen.getByText(/Yazar: John Doe/i)).toBeInTheDocument();
   });
 });
-

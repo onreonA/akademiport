@@ -28,10 +28,7 @@ export class DeleteReplyUseCase {
 
       return Result.ok(undefined);
     } catch (error) {
-      return Result.fail(
-        error instanceof Error ? error.message : 'Yanıt silinemedi'
-      );
+      return Result.fail(error instanceof Error ? error.message : 'Yanıt silinemedi');
     }
   }
 }
-

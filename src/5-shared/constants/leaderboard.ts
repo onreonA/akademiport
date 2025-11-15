@@ -40,6 +40,3 @@ export function getPointsForActivity(activityType: string): number {
   const key = activityType.toUpperCase().replace(/-/g, '_');
   return LEADERBOARD_POINTS[key] || 0;
 }
-
-
-

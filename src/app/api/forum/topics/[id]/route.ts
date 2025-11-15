@@ -7,10 +7,7 @@ import { UpdateTopicDto } from '@/2-application/dtos/forum';
  * GET /api/forum/topics/[id]
  * Get topic by ID
  */
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const supabase = await createClient();
     const {
@@ -48,10 +45,7 @@ export async function GET(
  * PUT /api/forum/topics/[id]
  * Update topic
  */
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const supabase = await createClient();
     const {
@@ -168,4 +162,3 @@ export async function DELETE(
     return NextResponse.json({ error: 'Konu silinemedi' }, { status: 500 });
   }
 }
-

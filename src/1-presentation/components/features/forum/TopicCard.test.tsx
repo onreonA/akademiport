@@ -169,4 +169,3 @@ describe('TopicCard', () => {
     expect(link).toHaveAttribute('href', '/admin-dashboard/forum/topics/topic-1');
   });
 });
-

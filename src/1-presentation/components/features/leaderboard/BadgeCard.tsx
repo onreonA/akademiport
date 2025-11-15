@@ -1,7 +1,13 @@
 'use client';
 
 import { Badge as BadgeEntity } from '@/3-domain/entities/Leaderboard';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/presentation/components/ui/atoms/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/presentation/components/ui/atoms/card';
 import { Badge } from '@/presentation/components/ui/atoms/badge';
 import { BADGE_CATEGORY_LABELS } from '@/3-domain/enums/LeaderboardEnums';
 
@@ -12,10 +18,13 @@ interface BadgeCardProps {
 }
 
 export function BadgeCard({ badge, earned = false, earnedAt }: BadgeCardProps) {
-  const categoryLabel = BADGE_CATEGORY_LABELS[badge.category as keyof typeof BADGE_CATEGORY_LABELS] || badge.category;
+  const categoryLabel =
+    BADGE_CATEGORY_LABELS[badge.category as keyof typeof BADGE_CATEGORY_LABELS] || badge.category;
 
   return (
-    <Card className={`transition-all hover:shadow-lg ${earned ? 'ring-2 ring-primary' : 'opacity-60'}`}>
+    <Card
+      className={`transition-all hover:shadow-lg ${earned ? 'ring-2 ring-primary' : 'opacity-60'}`}
+    >
       <CardHeader className="text-center">
         <div className="text-6xl mb-2">{badge.icon || '🏆'}</div>
         <CardTitle className="text-lg">{badge.name}</CardTitle>
@@ -41,6 +50,3 @@ export function BadgeCard({ badge, earned = false, earnedAt }: BadgeCardProps) {
     </Card>
   );
 }
-
-
-

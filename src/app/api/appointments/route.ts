@@ -81,9 +81,7 @@ export async function GET(request: NextRequest) {
       startDate: validationResult.data.startDate
         ? new Date(validationResult.data.startDate)
         : undefined,
-      endDate: validationResult.data.endDate
-        ? new Date(validationResult.data.endDate)
-        : undefined,
+      endDate: validationResult.data.endDate ? new Date(validationResult.data.endDate) : undefined,
     };
 
     const listAppointmentsUseCase = new ListAppointmentsUseCase(appointmentRepository);
@@ -91,7 +89,7 @@ export async function GET(request: NextRequest) {
 
     if (result.isFailure) {
       return NextResponse.json(
-        { error: (result.error as any)?.message || "Unknown error" },
+        { error: (result.error as any)?.message || 'Unknown error' },
         { status: (result.error as any)?.statusCode || 500 }
       );
     }
@@ -180,7 +178,7 @@ export async function POST(request: NextRequest) {
     if (!validationResult.success) {
       console.error(
         '❌ [POST /api/appointments] Validation failed:',
-          validationResult.error.issues
+        validationResult.error.issues
       );
       return NextResponse.json(
         {
@@ -206,7 +204,7 @@ export async function POST(request: NextRequest) {
 
     if (result.isFailure) {
       return NextResponse.json(
-        { error: (result.error as any)?.message || "Unknown error" },
+        { error: (result.error as any)?.message || 'Unknown error' },
         { status: (result.error as any)?.statusCode || 500 }
       );
     }

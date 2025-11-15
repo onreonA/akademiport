@@ -80,9 +80,7 @@ describe('GetLeaderboardUseCase', () => {
         programId: 'program-1',
       };
 
-      vi.mocked(mockRepository.getRankings).mockResolvedValue(
-        Result.fail('Database error')
-      );
+      vi.mocked(mockRepository.getRankings).mockResolvedValue(Result.fail('Database error'));
 
       const result = await useCase.execute(filter);
 
@@ -105,4 +103,3 @@ describe('GetLeaderboardUseCase', () => {
     });
   });
 });
-

@@ -14,10 +14,7 @@ export class ApproveTopicUseCase {
 
       return Result.ok(undefined);
     } catch (error) {
-      return Result.fail(
-        error instanceof Error ? error.message : 'Konu onaylanamadı'
-      );
+      return Result.fail(error instanceof Error ? error.message : 'Konu onaylanamadı');
     }
   }
 }
-

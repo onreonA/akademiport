@@ -14,10 +14,7 @@ export class UnlikeReplyUseCase {
 
       return Result.ok(undefined);
     } catch (error) {
-      return Result.fail(
-        error instanceof Error ? error.message : 'Beğeni kaldırılamadı'
-      );
+      return Result.fail(error instanceof Error ? error.message : 'Beğeni kaldırılamadı');
     }
   }
 }
-

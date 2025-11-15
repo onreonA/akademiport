@@ -99,4 +99,3 @@ export class CreateNewsUseCase {
       .substring(0, 100);
   }
 }
-

@@ -34,7 +34,9 @@ export class CompleteTaskUseCase {
       // Add leaderboard score if companyId and programId are provided
       if (companyId && programId && this.addLeaderboardScore) {
         const isEarly = task.dueDate && new Date() < task.dueDate;
-        const activityType = isEarly ? ActivityType.TASK_COMPLETED_EARLY : ActivityType.TASK_COMPLETED;
+        const activityType = isEarly
+          ? ActivityType.TASK_COMPLETED_EARLY
+          : ActivityType.TASK_COMPLETED;
 
         await this.addLeaderboardScore.execute({
           companyId,

@@ -1,7 +1,12 @@
 'use client';
 
 import { use } from 'react';
-import { useNewsDetail, useUpdateNews, usePublishNews, useDeleteNews } from '@/1-presentation/hooks/useNews';
+import {
+  useNewsDetail,
+  useUpdateNews,
+  usePublishNews,
+  useDeleteNews,
+} from '@/1-presentation/hooks/useNews';
 import { NewsForm } from '@/1-presentation/components/features/news';
 import { UpdateNewsDto } from '@/2-application/dtos/news';
 import { Button } from '@/presentation/components/ui/atoms/button';
@@ -9,15 +14,15 @@ import { Badge } from '@/presentation/components/ui/atoms/badge';
 import { Card, CardContent, CardHeader } from '@/presentation/components/ui/atoms/card';
 import { Loader2, ArrowLeft, Eye, Heart, MessageCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { NEWS_CATEGORY_LABELS, NEWS_STATUS_LABELS, NEWS_STATUS_COLORS } from '@/3-domain/enums/NewsEnums';
+import {
+  NEWS_CATEGORY_LABELS,
+  NEWS_STATUS_LABELS,
+  NEWS_STATUS_COLORS,
+} from '@/3-domain/enums/NewsEnums';
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
 
-export default function AdminNewsDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default function AdminNewsDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
   const { data: news, isLoading } = useNewsDetail(id);
@@ -73,9 +78,7 @@ export default function AdminNewsDetailPage({
           Geri
         </Button>
         <div className="flex items-center gap-2">
-          {news.status === 'draft' && (
-            <Button onClick={handlePublish}>Yayınla</Button>
-          )}
+          {news.status === 'draft' && <Button onClick={handlePublish}>Yayınla</Button>}
           <Button variant="destructive" onClick={handleDelete}>
             Sil
           </Button>
@@ -94,9 +97,7 @@ export default function AdminNewsDetailPage({
             {news.isPinned && <Badge className="bg-red-500">Sabitlenmiş</Badge>}
           </div>
           <h1 className="text-3xl font-bold">{news.title}</h1>
-          {news.summary && (
-            <p className="text-muted-foreground mt-2">{news.summary}</p>
-          )}
+          {news.summary && <p className="text-muted-foreground mt-2">{news.summary}</p>}
         </CardHeader>
         <CardContent>
           {/* Meta Info */}
@@ -173,4 +174,3 @@ export default function AdminNewsDetailPage({
     </div>
   );
 }
-

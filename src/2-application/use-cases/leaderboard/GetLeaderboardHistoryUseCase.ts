@@ -12,7 +12,10 @@ export class GetLeaderboardHistoryUseCase {
       const result = await this.leaderboardRepository.getHistory(filter);
 
       if (result.isFailure) {
-        const errorMessage = result.error instanceof Error ? result.error.message : (result.error || 'Geçmiş veriler alınamadı');
+        const errorMessage =
+          result.error instanceof Error
+            ? result.error.message
+            : result.error || 'Geçmiş veriler alınamadı';
         return Result.fail(new AppError(errorMessage, 500));
       }
 
@@ -24,6 +27,3 @@ export class GetLeaderboardHistoryUseCase {
     }
   }
 }
-
-
-

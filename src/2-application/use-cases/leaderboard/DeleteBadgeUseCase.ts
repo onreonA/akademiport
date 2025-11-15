@@ -10,7 +10,8 @@ export class DeleteBadgeUseCase {
       const result = await this.leaderboardRepository.deleteBadge(badgeId);
 
       if (result.isFailure) {
-        const errorMessage = result.error instanceof Error ? result.error.message : (result.error || 'Rozet silinemedi');
+        const errorMessage =
+          result.error instanceof Error ? result.error.message : result.error || 'Rozet silinemedi';
         return Result.fail(new AppError(errorMessage, 500));
       }
 
@@ -22,4 +23,3 @@ export class DeleteBadgeUseCase {
     }
   }
 }
-

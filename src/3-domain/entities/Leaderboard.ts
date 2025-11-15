@@ -81,6 +81,3 @@ export interface LeaderboardHistory {
   badgeCount: number;
   createdAt: Date;
 }
-
-
-

@@ -219,4 +219,3 @@ describe('DELETE /api/news/[id]/like', () => {
     expect(data.error).toContain('Beğeni kaldırılamadı');
   });
 });
-

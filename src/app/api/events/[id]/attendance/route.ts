@@ -14,7 +14,10 @@ import { logger } from '@/5-shared/utils/logger';
 const eventRepository = new EventRepository();
 const leaderboardRepository = new SupabaseLeaderboardRepository();
 const companyRepository = new CompanyRepository();
-const addLeaderboardScore = new AddLeaderboardScoreUseCase(leaderboardRepository, companyRepository);
+const addLeaderboardScore = new AddLeaderboardScoreUseCase(
+  leaderboardRepository,
+  companyRepository
+);
 
 /**
  * GET /api/events/[id]/attendance
@@ -34,7 +37,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     if (result.isFailure) {
       return NextResponse.json(
-        { error: (result.error as any)?.message || "Unknown error" },
+        { error: (result.error as any)?.message || 'Unknown error' },
         { status: (result.error as any)?.statusCode || 500 }
       );
     }
@@ -87,7 +90,10 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       );
     }
 
-    const registerAttendanceUseCase = new RegisterEventAttendanceUseCase(eventRepository, addLeaderboardScore);
+    const registerAttendanceUseCase = new RegisterEventAttendanceUseCase(
+      eventRepository,
+      addLeaderboardScore
+    );
     const result = await registerAttendanceUseCase.execute(
       validationResult.data.eventId,
       validationResult.data.userId,
@@ -97,7 +103,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
     if (result.isFailure) {
       return NextResponse.json(
-        { error: (result.error as any)?.message || "Unknown error" },
+        { error: (result.error as any)?.message || 'Unknown error' },
         { status: (result.error as any)?.statusCode || 500 }
       );
     }

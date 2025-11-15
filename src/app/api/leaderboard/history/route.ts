@@ -32,10 +32,7 @@ export async function GET(request: NextRequest) {
     const result = await useCase.execute({ companyId, programId, startDate, endDate });
 
     if (result.isFailure) {
-      return NextResponse.json(
-        { error: result.error?.message || result.error },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: result.error?.message || result.error }, { status: 400 });
     }
 
     return NextResponse.json({ history: result.value });
@@ -44,6 +41,3 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Geçmiş veriler alınamadı' }, { status: 500 });
   }
 }
-
-
-

@@ -7,10 +7,7 @@ import { CloseTopicUseCase } from '@/2-application/use-cases/forum';
  * POST /api/forum/topics/[id]/close
  * Close a topic
  */
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const supabase = await createClient();
     const {
@@ -62,4 +59,3 @@ export async function POST(
     return NextResponse.json({ error: 'Konu kapatılamadı' }, { status: 500 });
   }
 }
-

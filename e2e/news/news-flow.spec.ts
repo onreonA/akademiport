@@ -146,7 +146,7 @@ test.describe('Haberler Modülü Akışı', () => {
     // 2. Haberi düzenle
     const newsCard = page.locator(`text=${updateNewsTitle}`).locator('..').locator('..');
     const editBtn = newsCard.locator('button:has-text("Düzenle")');
-    
+
     if (await editBtn.isVisible()) {
       await editBtn.click();
       await page.waitForTimeout(1000);
@@ -197,7 +197,7 @@ test.describe('Haberler Modülü Akışı', () => {
     // 2. Haberi sil
     const newsCard = page.locator(`text=${deleteNewsTitle}`).locator('..').locator('..');
     const deleteBtn = newsCard.locator('button:has-text("Sil")');
-    
+
     if (await deleteBtn.isVisible()) {
       // Silme onayı için dialog bekleniyor
       await Promise.all([
@@ -264,4 +264,3 @@ test.describe('Haberler Modülü Akışı', () => {
     }
   });
 });
-

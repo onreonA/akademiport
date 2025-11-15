@@ -74,7 +74,6 @@ export function createMockUser(
  * Mock getAuthenticatedUser helper
  */
 export function mockAuthenticatedUser(user: ReturnType<typeof createMockUser>) {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { vi } = require('vitest');
   return vi.fn().mockResolvedValue(user);
 }

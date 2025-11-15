@@ -1,7 +1,12 @@
 'use client';
 
 import { ForumTopicWithDetails } from '@/3-domain/interfaces/repositories/IForumRepository';
-import { TOPIC_STATUS_LABELS, TOPIC_STATUS_COLORS, TOPIC_PRIORITY_LABELS, TOPIC_PRIORITY_COLORS } from '@/3-domain/enums/ForumEnums';
+import {
+  TOPIC_STATUS_LABELS,
+  TOPIC_STATUS_COLORS,
+  TOPIC_PRIORITY_LABELS,
+  TOPIC_PRIORITY_COLORS,
+} from '@/3-domain/enums/ForumEnums';
 import { Card, CardContent, CardFooter, CardHeader } from '@/presentation/components/ui/atoms/card';
 import { Badge } from '@/presentation/components/ui/atoms/badge';
 import { Button } from '@/presentation/components/ui/atoms/button';
@@ -35,12 +40,20 @@ export function TopicCard({
   const priorityLabel = TOPIC_PRIORITY_LABELS[topic.priority];
 
   return (
-    <Card className={`overflow-hidden hover:shadow-lg transition-shadow ${topic.isPinned ? 'border-l-4 border-l-primary' : ''}`}>
+    <Card
+      className={`overflow-hidden hover:shadow-lg transition-shadow ${topic.isPinned ? 'border-l-4 border-l-primary' : ''}`}
+    >
       <CardHeader>
         {/* Category, Status & Priority */}
         <div className="flex items-center gap-2 mb-2 flex-wrap">
           {topic.category && topic.category.color && (
-            <Badge variant="outline" style={{ backgroundColor: topic.category.color + '20', borderColor: topic.category.color }}>
+            <Badge
+              variant="outline"
+              style={{
+                backgroundColor: topic.category.color + '20',
+                borderColor: topic.category.color,
+              }}
+            >
               {topic.category.name}
             </Badge>
           )}
@@ -121,20 +134,12 @@ export function TopicCard({
         {showActions && (
           <div className="flex items-center gap-2">
             {onPin && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => onPin(topic.id)}
-              >
+              <Button variant="ghost" size="sm" onClick={() => onPin(topic.id)}>
                 {topic.isPinned ? 'Sabitlemeyi Kaldır' : 'Sabitle'}
               </Button>
             )}
             {onLock && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => onLock(topic.id)}
-              >
+              <Button variant="ghost" size="sm" onClick={() => onLock(topic.id)}>
                 {topic.isLocked ? 'Kilidi Aç' : 'Kilitle'}
               </Button>
             )}
@@ -154,4 +159,3 @@ export function TopicCard({
     </Card>
   );
 }
-

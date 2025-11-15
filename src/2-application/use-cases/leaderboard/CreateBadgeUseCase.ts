@@ -25,7 +25,10 @@ export class CreateBadgeUseCase {
       const result = await this.leaderboardRepository.createBadge(badgeData);
 
       if (result.isFailure) {
-        const errorMessage = result.error instanceof Error ? result.error.message : (result.error || 'Rozet oluşturulamadı');
+        const errorMessage =
+          result.error instanceof Error
+            ? result.error.message
+            : result.error || 'Rozet oluşturulamadı';
         return Result.fail(new AppError(errorMessage, 500));
       }
 
@@ -37,6 +40,3 @@ export class CreateBadgeUseCase {
     }
   }
 }
-
-
-

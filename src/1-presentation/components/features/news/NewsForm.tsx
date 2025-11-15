@@ -49,7 +49,12 @@ interface NewsFormProps {
   isSubmitting?: boolean;
 }
 
-export function NewsForm({ programId, initialData, onSubmit, isSubmitting = false }: NewsFormProps) {
+export function NewsForm({
+  programId,
+  initialData,
+  onSubmit,
+  isSubmitting = false,
+}: NewsFormProps) {
   const form = useForm<NewsFormValues>({
     resolver: zodResolver(newsFormSchema) as any,
     defaultValues: {
@@ -75,7 +80,10 @@ export function NewsForm({ programId, initialData, onSubmit, isSubmitting = fals
       summary: values.summary || undefined,
       metaDescription: values.metaDescription || undefined,
       metaKeywords: values.metaKeywords
-        ? values.metaKeywords.split(',').map((k) => k.trim()).filter(Boolean)
+        ? values.metaKeywords
+            .split(',')
+            .map((k) => k.trim())
+            .filter(Boolean)
         : undefined,
     };
 
@@ -128,11 +136,7 @@ export function NewsForm({ programId, initialData, onSubmit, isSubmitting = fals
             <FormItem>
               <FormLabel>İçerik *</FormLabel>
               <FormControl>
-                <Textarea
-                  placeholder="Haber içeriği (HTML destekli)..."
-                  rows={10}
-                  {...field}
-                />
+                <Textarea placeholder="Haber içeriği (HTML destekli)..." rows={10} {...field} />
               </FormControl>
               <FormDescription>HTML etiketleri kullanabilirsiniz</FormDescription>
               <FormMessage name="content" />
@@ -206,11 +210,7 @@ export function NewsForm({ programId, initialData, onSubmit, isSubmitting = fals
             <FormItem>
               <FormLabel>Meta Açıklama</FormLabel>
               <FormControl>
-                <Textarea
-                  placeholder="SEO için kısa açıklama..."
-                  rows={2}
-                  {...field}
-                />
+                <Textarea placeholder="SEO için kısa açıklama..." rows={2} {...field} />
               </FormControl>
               <FormDescription>Arama motorları için açıklama (max 160 karakter)</FormDescription>
               <FormMessage />
@@ -243,7 +243,9 @@ export function NewsForm({ programId, initialData, onSubmit, isSubmitting = fals
               <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                 <div className="space-y-0.5">
                   <FormLabel className="text-base">Öne Çıkan</FormLabel>
-                  <FormDescription>Bu haber öne çıkan haberler arasında gösterilsin mi?</FormDescription>
+                  <FormDescription>
+                    Bu haber öne çıkan haberler arasında gösterilsin mi?
+                  </FormDescription>
                 </div>
                 <FormControl>
                   <Switch checked={field.value} onCheckedChange={field.onChange} />
@@ -280,4 +282,3 @@ export function NewsForm({ programId, initialData, onSubmit, isSubmitting = fals
     </FormProvider>
   );
 }
-

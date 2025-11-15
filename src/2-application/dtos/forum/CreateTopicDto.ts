@@ -7,4 +7,3 @@ export interface CreateTopicDto {
   content: string;
   priority?: TopicPriority;
 }
-

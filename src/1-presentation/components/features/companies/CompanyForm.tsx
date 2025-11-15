@@ -115,9 +115,7 @@ export function CompanyForm({
           </SelectContent>
         </Select>
         {get(errors, 'programId.message') && (
-          <p className="text-sm text-destructive">
-            {get(errors, 'programId.message') as string}
-          </p>
+          <p className="text-sm text-destructive">{get(errors, 'programId.message') as string}</p>
         )}
       </div>
 
@@ -154,7 +152,9 @@ export function CompanyForm({
           <Label htmlFor="tradeRegistryNumber">Ticaret Sicil No</Label>
           <Input id="tradeRegistryNumber" {...register('tradeRegistryNumber')} />
           {get(errors, 'tradeRegistryNumber.message') && (
-            <p className="text-sm text-destructive">{get(errors, 'tradeRegistryNumber.message') as string}</p>
+            <p className="text-sm text-destructive">
+              {get(errors, 'tradeRegistryNumber.message') as string}
+            </p>
           )}
         </div>
       </div>
@@ -217,7 +217,9 @@ export function CompanyForm({
           <Label htmlFor="postalCode">Posta Kodu</Label>
           <Input id="postalCode" {...register('postalCode')} />
           {get(errors, 'postalCode.message') && (
-            <p className="text-sm text-destructive">{get(errors, 'postalCode.message') as string}</p>
+            <p className="text-sm text-destructive">
+              {get(errors, 'postalCode.message') as string}
+            </p>
           )}
         </div>
       </div>
@@ -240,7 +242,9 @@ export function CompanyForm({
             {...register('employeeCount', { valueAsNumber: true })}
           />
           {get(errors, 'employeeCount.message') && (
-            <p className="text-sm text-destructive">{get(errors, 'employeeCount.message') as string}</p>
+            <p className="text-sm text-destructive">
+              {get(errors, 'employeeCount.message') as string}
+            </p>
           )}
         </div>
 
@@ -252,7 +256,9 @@ export function CompanyForm({
             {...register('foundationYear', { valueAsNumber: true })}
           />
           {get(errors, 'foundationYear.message') && (
-            <p className="text-sm text-destructive">{get(errors, 'foundationYear.message') as string}</p>
+            <p className="text-sm text-destructive">
+              {get(errors, 'foundationYear.message') as string}
+            </p>
           )}
         </div>
       </div>

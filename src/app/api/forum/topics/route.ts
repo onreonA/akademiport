@@ -37,11 +37,12 @@ export async function GET(request: NextRequest) {
 
     // Get query params
     const searchParams = request.nextUrl.searchParams;
-    
+
     // Company users için sadece onaylanmış konuları göster
     const userRole = userData.role;
-    const defaultIsApproved = (userRole === 'company_user' || userRole === 'company_admin') ? true : undefined;
-    
+    const defaultIsApproved =
+      userRole === 'company_user' || userRole === 'company_admin' ? true : undefined;
+
     const filters: TopicFilterDto = {
       programId: searchParams.get('programId') || programId,
       categoryId: searchParams.get('categoryId') || undefined,
@@ -51,14 +52,19 @@ export async function GET(request: NextRequest) {
       priority: searchParams.get('priority') as any,
       isPinned: searchParams.get('isPinned') === 'true' ? true : undefined,
       isLocked: searchParams.get('isLocked') === 'true' ? true : undefined,
-      isApproved: searchParams.get('isApproved') === 'true' ? true : searchParams.get('isApproved') === 'false' ? false : defaultIsApproved,
+      isApproved:
+        searchParams.get('isApproved') === 'true'
+          ? true
+          : searchParams.get('isApproved') === 'false'
+            ? false
+            : defaultIsApproved,
       search: searchParams.get('search') || undefined,
       page: searchParams.get('page') ? parseInt(searchParams.get('page')!) : 1,
       limit: searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : 20,
       sortBy: (searchParams.get('sortBy') as any) || 'lastReplyAt',
       sortOrder: (searchParams.get('sortOrder') as 'asc' | 'desc') || 'desc',
     };
-    
+
     console.log('Forum topics filters:', { programId, filters, userRole });
 
     const repository = new SupabaseForumRepository();
@@ -114,7 +120,10 @@ export async function POST(request: NextRequest) {
     const repository = new SupabaseForumRepository();
     const leaderboardRepository = new SupabaseLeaderboardRepository();
     const companyRepository = new CompanyRepository();
-    const addLeaderboardScore = new AddLeaderboardScoreUseCase(leaderboardRepository, companyRepository);
+    const addLeaderboardScore = new AddLeaderboardScoreUseCase(
+      leaderboardRepository,
+      companyRepository
+    );
     const useCase = new CreateTopicUseCase(repository, addLeaderboardScore);
     const result = await useCase.execute(dto, user.id, userData.company_id);
 
@@ -128,4 +137,3 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Konu oluşturulamadı' }, { status: 500 });
   }
 }
-

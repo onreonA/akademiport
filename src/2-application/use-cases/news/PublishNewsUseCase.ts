@@ -34,4 +34,3 @@ export class PublishNewsUseCase {
     return Result.ok(result.value);
   }
 }
-

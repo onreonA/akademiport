@@ -218,7 +218,10 @@ export default function AdminProjectDetailPage() {
   const totalSubProjects = stats?.totalSubProjects ?? subProjects.length;
   const totalTasks =
     stats?.totalTasks ??
-    subProjects.reduce((accumulator, subProject) => accumulator + (subProject.tasks?.length ?? 0), 0);
+    subProjects.reduce(
+      (accumulator, subProject) => accumulator + (subProject.tasks?.length ?? 0),
+      0
+    );
   const completedTasks = stats?.completedTasks ?? 0;
 
   const allTasks = useMemo<TaskDTO[]>(() => {
@@ -877,14 +880,18 @@ export default function AdminProjectDetailPage() {
         {project && (
           <SubProjectModal
             projectId={project.id}
-            subProject={editingSubProject ? {
-              id: editingSubProject.id,
-              name: editingSubProject.name,
-              description: editingSubProject.description ?? undefined,
-              status: editingSubProject.status,
-              progress: editingSubProject.progress,
-              order_index: editingSubProject.order_index,
-            } as any : null}
+            subProject={
+              editingSubProject
+                ? ({
+                    id: editingSubProject.id,
+                    name: editingSubProject.name,
+                    description: editingSubProject.description ?? undefined,
+                    status: editingSubProject.status,
+                    progress: editingSubProject.progress,
+                    order_index: editingSubProject.order_index,
+                  } as any)
+                : null
+            }
             open={subProjectModalOpen}
             onOpenChange={(open) => {
               setSubProjectModalOpen(open);

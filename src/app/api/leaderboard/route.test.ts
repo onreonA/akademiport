@@ -178,13 +178,10 @@ describe('GET /api/leaderboard', () => {
     mockGetLeaderboardUseCaseExecute.mockResolvedValue(Result.ok(mockRankings));
 
     const { GET } = await import('./route');
-    const request = createMockRequest(
-      'http://localhost:3000/api/leaderboard?limit=200&offset=-1'
-    );
+    const request = createMockRequest('http://localhost:3000/api/leaderboard?limit=200&offset=-1');
     const response = await GET(request);
 
     // Should fail validation or handle gracefully
     expect([200, 400]).toContain(response.status);
   });
 });
-

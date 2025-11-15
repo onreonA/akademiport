@@ -14,10 +14,7 @@ export class CloseTopicUseCase {
 
       return Result.ok(undefined);
     } catch (error) {
-      return Result.fail(
-        error instanceof Error ? error.message : 'Konu kapatılamadı'
-      );
+      return Result.fail(error instanceof Error ? error.message : 'Konu kapatılamadı');
     }
   }
 }
-

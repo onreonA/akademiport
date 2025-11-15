@@ -178,4 +178,3 @@ ORDER BY sp.order_index;
 **Tarih:** Ocak 2025  
 **Versiyon:** 1.0  
 **Durum:** ✅ Migration Hazır - Uygulanacak
-

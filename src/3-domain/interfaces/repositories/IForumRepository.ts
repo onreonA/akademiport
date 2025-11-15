@@ -63,12 +63,21 @@ export interface IForumRepository {
   createTopic(
     topic: Omit<
       ForumTopic,
-      'id' | 'createdAt' | 'updatedAt' | 'viewCount' | 'replyCount' | 'likeCount' | 'lastReplyAt' | 'lastReplyBy'
+      | 'id'
+      | 'createdAt'
+      | 'updatedAt'
+      | 'viewCount'
+      | 'replyCount'
+      | 'likeCount'
+      | 'lastReplyAt'
+      | 'lastReplyBy'
     >
   ): Promise<Result<ForumTopic>>;
   findTopicById(id: string): Promise<Result<ForumTopic | null>>;
   findTopicBySlug(programId: string, slug: string): Promise<Result<ForumTopic | null>>;
-  findAllTopics(filters: ForumTopicFilters): Promise<Result<{ topics: ForumTopicWithDetails[]; total: number }>>;
+  findAllTopics(
+    filters: ForumTopicFilters
+  ): Promise<Result<{ topics: ForumTopicWithDetails[]; total: number }>>;
   updateTopic(id: string, topic: Partial<ForumTopic>): Promise<Result<ForumTopic>>;
   deleteTopic(id: string): Promise<Result<void>>;
 
@@ -90,7 +99,9 @@ export interface IForumRepository {
     reply: Omit<ForumReply, 'id' | 'createdAt' | 'updatedAt' | 'likeCount' | 'isEdited'>
   ): Promise<Result<ForumReply>>;
   findReplyById(id: string): Promise<Result<ForumReply | null>>;
-  findAllReplies(filters: ForumReplyFilters): Promise<Result<{ replies: ForumReplyWithDetails[]; total: number }>>;
+  findAllReplies(
+    filters: ForumReplyFilters
+  ): Promise<Result<{ replies: ForumReplyWithDetails[]; total: number }>>;
   updateReply(id: string, reply: Partial<ForumReply>): Promise<Result<ForumReply>>;
   deleteReply(id: string): Promise<Result<void>>;
   approveReply(id: string): Promise<Result<ForumReply>>;
@@ -114,26 +125,38 @@ export interface IForumRepository {
   deleteNotification(id: string): Promise<Result<void>>;
 
   // Activity (for leaderboard)
-  getActivity(userId?: string, companyId?: string, programId?: string): Promise<Result<ForumActivity[]>>;
-  getActivityStats(companyId: string, programId?: string): Promise<Result<{
-    totalPoints: number;
-    topicsCreated: number;
-    repliesCreated: number;
-    solutionsMarked: number;
-  }>>;
+  getActivity(
+    userId?: string,
+    companyId?: string,
+    programId?: string
+  ): Promise<Result<ForumActivity[]>>;
+  getActivityStats(
+    companyId: string,
+    programId?: string
+  ): Promise<
+    Result<{
+      totalPoints: number;
+      topicsCreated: number;
+      repliesCreated: number;
+      solutionsMarked: number;
+    }>
+  >;
 
   // Statistics
-  getCategoryStatistics(categoryId: string): Promise<Result<{
-    topicCount: number;
-    replyCount: number;
-    totalViews: number;
-    totalLikes: number;
-  }>>;
-  getTopicStatistics(topicId: string): Promise<Result<{
-    viewCount: number;
-    replyCount: number;
-    likeCount: number;
-    solutionCount: number;
-  }>>;
+  getCategoryStatistics(categoryId: string): Promise<
+    Result<{
+      topicCount: number;
+      replyCount: number;
+      totalViews: number;
+      totalLikes: number;
+    }>
+  >;
+  getTopicStatistics(topicId: string): Promise<
+    Result<{
+      viewCount: number;
+      replyCount: number;
+      likeCount: number;
+      solutionCount: number;
+    }>
+  >;
 }
-

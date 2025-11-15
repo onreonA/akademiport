@@ -8,10 +8,7 @@ import { UpdateNewsDto } from '@/2-application/dtos/news';
  * GET /api/news/[id]
  * Get single news by ID
  */
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     const supabase = await createClient();
@@ -49,10 +46,7 @@ export async function GET(
  * PUT /api/news/[id]
  * Update news
  */
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     const supabase = await createClient();
@@ -136,4 +130,3 @@ export async function DELETE(
     return NextResponse.json({ error: 'Haber silinemedi' }, { status: 500 });
   }
 }
-

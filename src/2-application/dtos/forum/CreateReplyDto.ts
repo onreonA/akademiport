@@ -3,4 +3,3 @@ export interface CreateReplyDto {
   content: string;
   parentId?: string | null; // For nested replies
 }
-

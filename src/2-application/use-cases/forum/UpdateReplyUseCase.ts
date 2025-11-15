@@ -5,7 +5,11 @@ import { UpdateReplyDto } from '@/2-application/dtos/forum';
 export class UpdateReplyUseCase {
   constructor(private forumRepository: IForumRepository) {}
 
-  async execute(replyId: string, dto: UpdateReplyDto, userId: string): Promise<Result<{ id: string }>> {
+  async execute(
+    replyId: string,
+    dto: UpdateReplyDto,
+    userId: string
+  ): Promise<Result<{ id: string }>> {
     try {
       // Check if reply exists and user is author
       const replyResult = await this.forumRepository.findReplyById(replyId);
@@ -31,10 +35,7 @@ export class UpdateReplyUseCase {
 
       return Result.ok({ id: result.value.id });
     } catch (error) {
-      return Result.fail(
-        error instanceof Error ? error.message : 'Yanıt güncellenemedi'
-      );
+      return Result.fail(error instanceof Error ? error.message : 'Yanıt güncellenemedi');
     }
   }
 }
-

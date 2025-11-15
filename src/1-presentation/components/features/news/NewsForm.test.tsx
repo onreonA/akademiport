@@ -135,9 +135,12 @@ describe('NewsForm', () => {
       await user.click(submitButton);
 
       // Wait for validation - form should not submit when content is empty
-      await waitFor(() => {
-        expect(mockOnSubmit).not.toHaveBeenCalled();
-      }, { timeout: 2000 });
+      await waitFor(
+        () => {
+          expect(mockOnSubmit).not.toHaveBeenCalled();
+        },
+        { timeout: 2000 }
+      );
 
       // Note: FormMessage error display may not work perfectly in test environment
       // The important thing is that form validation prevents submission
@@ -230,7 +233,7 @@ describe('NewsForm', () => {
             title: 'New News Title',
             content: 'New News Content',
             programId: 'program-1',
-          }),
+          })
         );
       });
     });
@@ -252,7 +255,7 @@ describe('NewsForm', () => {
           expect.objectContaining({
             title: 'Updated Title',
             programId: undefined,
-          }),
+          })
         );
       });
     });
@@ -277,7 +280,7 @@ describe('NewsForm', () => {
         expect(mockOnSubmit).toHaveBeenCalledWith(
           expect.objectContaining({
             metaKeywords: ['keyword1', 'keyword2', 'keyword3'],
-          }),
+          })
         );
       });
     });
@@ -302,7 +305,7 @@ describe('NewsForm', () => {
             imageAlt: undefined,
             summary: undefined,
             metaDescription: undefined,
-          }),
+          })
         );
       });
     });
@@ -344,7 +347,7 @@ describe('NewsForm', () => {
         expect(mockOnSubmit).toHaveBeenCalledWith(
           expect.objectContaining({
             isFeatured: true,
-          }),
+          })
         );
       });
     });
@@ -369,10 +372,9 @@ describe('NewsForm', () => {
         expect(mockOnSubmit).toHaveBeenCalledWith(
           expect.objectContaining({
             isPinned: true,
-          }),
+          })
         );
       });
     });
   });
 });
-

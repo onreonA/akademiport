@@ -159,9 +159,7 @@ describe('CreateTopicUseCase', () => {
 
       vi.mocked(mockRepository.findCategoryById).mockResolvedValue(Result.ok(mockCategory));
       vi.mocked(mockRepository.findTopicBySlug).mockResolvedValue(Result.ok(null));
-      vi.mocked(mockRepository.createTopic).mockResolvedValue(
-        Result.fail('Repository error')
-      );
+      vi.mocked(mockRepository.createTopic).mockResolvedValue(Result.fail('Repository error'));
 
       const result = await useCase.execute(dto, userId, companyId);
 
@@ -192,9 +190,7 @@ describe('CreateTopicUseCase', () => {
       };
 
       vi.mocked(mockRepository.findCategoryById).mockResolvedValue(Result.ok(mockCategory));
-      vi.mocked(mockRepository.findTopicBySlug).mockRejectedValue(
-        new Error('Database error')
-      );
+      vi.mocked(mockRepository.findTopicBySlug).mockRejectedValue(new Error('Database error'));
 
       const result = await useCase.execute(dto, userId, companyId);
 
@@ -203,4 +199,3 @@ describe('CreateTopicUseCase', () => {
     });
   });
 });
-

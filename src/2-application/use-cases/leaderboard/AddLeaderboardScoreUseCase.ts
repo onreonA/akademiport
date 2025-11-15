@@ -36,7 +36,8 @@ export class AddLeaderboardScoreUseCase {
       });
 
       if (result.isFailure) {
-        const errorMessage = result.error instanceof Error ? result.error.message : (result.error || 'Puan eklenemedi');
+        const errorMessage =
+          result.error instanceof Error ? result.error.message : result.error || 'Puan eklenemedi';
         return Result.fail(new AppError(errorMessage, 500));
       }
 
@@ -53,4 +54,3 @@ export class AddLeaderboardScoreUseCase {
     }
   }
 }
-

@@ -208,4 +208,3 @@ describe('POST /api/news/[id]/publish', () => {
     expect(data.error).toBe('Haber yayınlanamadı');
   });
 });
-

@@ -40,9 +40,7 @@ export function useCompanyRanking(companyId: string, programId: string) {
   return useQuery<{ ranking: LeaderboardRanking | null }>({
     queryKey: ['leaderboard', 'company', companyId, programId],
     queryFn: async () => {
-      const response = await fetch(
-        `/api/leaderboard/${companyId}?programId=${programId}`
-      );
+      const response = await fetch(`/api/leaderboard/${companyId}?programId=${programId}`);
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error || 'Firma sıralaması alınamadı');
@@ -167,13 +165,7 @@ export function useUpdateBadge() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({
-      badgeId,
-      data,
-    }: {
-      badgeId: string;
-      data: Partial<Badge>;
-    }) => {
+    mutationFn: async ({ badgeId, data }: { badgeId: string; data: Partial<Badge> }) => {
       const response = await fetch(`/api/leaderboard/badges/${badgeId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -217,6 +209,3 @@ export function useDeleteBadge() {
     },
   });
 }
-
-
-

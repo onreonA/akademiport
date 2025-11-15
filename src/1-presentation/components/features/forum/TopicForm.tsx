@@ -80,7 +80,11 @@ export function TopicForm({
           render={({ field }: { field: any }) => (
             <FormItem>
               <FormLabel>Kategori *</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value} disabled={!!initialData}>
+              <Select
+                onValueChange={field.onChange}
+                defaultValue={field.value}
+                disabled={!!initialData}
+              >
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Kategori seçiniz" />
@@ -123,11 +127,7 @@ export function TopicForm({
             <FormItem>
               <FormLabel>İçerik *</FormLabel>
               <FormControl>
-                <Textarea
-                  placeholder="Konu içeriği..."
-                  rows={10}
-                  {...field}
-                />
+                <Textarea placeholder="Konu içeriği..." rows={10} {...field} />
               </FormControl>
               <FormDescription>Konunuzun detaylı açıklaması</FormDescription>
               <FormMessage />
@@ -173,4 +173,3 @@ export function TopicForm({
     </FormProvider>
   );
 }
-

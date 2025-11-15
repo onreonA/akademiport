@@ -14,10 +14,7 @@ export class PinTopicUseCase {
 
       return Result.ok(undefined);
     } catch (error) {
-      return Result.fail(
-        error instanceof Error ? error.message : 'Konu sabitlenemedi'
-      );
+      return Result.fail(error instanceof Error ? error.message : 'Konu sabitlenemedi');
     }
   }
 }
-

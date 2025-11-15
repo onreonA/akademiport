@@ -97,10 +97,7 @@ export class ReplyTopicUseCase {
 
       return Result.ok({ id: result.value.id });
     } catch (error) {
-      return Result.fail(
-        error instanceof Error ? error.message : 'Yanıt oluşturulamadı'
-      );
+      return Result.fail(error instanceof Error ? error.message : 'Yanıt oluşturulamadı');
     }
   }
 }
-

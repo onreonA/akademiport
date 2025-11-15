@@ -5,8 +5,19 @@ import { useTopicsList, useDeleteTopic } from '@/1-presentation/hooks/useForum';
 import { TopicCard } from './TopicCard';
 import { Button } from '@/presentation/components/ui/atoms/button';
 import { Input } from '@/presentation/components/ui/atoms/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/presentation/components/ui/atoms/select';
-import { TopicStatus, TopicPriority, TOPIC_STATUS_LABELS, TOPIC_PRIORITY_LABELS } from '@/3-domain/enums/ForumEnums';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/presentation/components/ui/atoms/select';
+import {
+  TopicStatus,
+  TopicPriority,
+  TOPIC_STATUS_LABELS,
+  TOPIC_PRIORITY_LABELS,
+} from '@/3-domain/enums/ForumEnums';
 import { TopicFilterDto } from '@/2-application/dtos/forum';
 import { Loader2, Plus, Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -68,9 +79,7 @@ export function TopicList({
       <div className="flex items-center justify-between mb-4">
         <div>
           <h2 className="text-2xl font-bold mb-1">Forum Konuları</h2>
-          <p className="text-sm text-muted-foreground">
-            {total} konu bulundu
-          </p>
+          <p className="text-sm text-muted-foreground">{total} konu bulundu</p>
         </div>
         {onCreateClick && (
           <Button onClick={onCreateClick}>
@@ -178,4 +187,3 @@ export function TopicList({
     </div>
   );
 }
-

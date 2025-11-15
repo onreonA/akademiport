@@ -43,9 +43,7 @@ export class RecordNewsReadUseCase {
 
     // Add leaderboard score
     if (this.addLeaderboardScore) {
-      const activityType = completed
-        ? ActivityType.NEWS_READ_COMPLETED
-        : ActivityType.NEWS_READ;
+      const activityType = completed ? ActivityType.NEWS_READ_COMPLETED : ActivityType.NEWS_READ;
 
       await this.addLeaderboardScore.execute({
         companyId: dto.companyId,
@@ -63,4 +61,3 @@ export class RecordNewsReadUseCase {
     return Result.ok(result.value);
   }
 }
-

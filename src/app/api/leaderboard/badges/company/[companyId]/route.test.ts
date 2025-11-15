@@ -40,7 +40,9 @@ describe('GET /api/leaderboard/badges/company/[companyId]', () => {
     } as any);
 
     const { GET } = await import('./route');
-    const request = createMockRequest('http://localhost:3000/api/leaderboard/badges/company/company-1');
+    const request = createMockRequest(
+      'http://localhost:3000/api/leaderboard/badges/company/company-1'
+    );
     const response = await GET(request, {
       params: Promise.resolve({ companyId: 'company-1' }),
     });
@@ -86,7 +88,9 @@ describe('GET /api/leaderboard/badges/company/[companyId]', () => {
     mockGetCompanyBadgesUseCaseExecute.mockResolvedValue(Result.ok(mockCompanyBadges));
 
     const { GET } = await import('./route');
-    const request = createMockRequest('http://localhost:3000/api/leaderboard/badges/company/company-1');
+    const request = createMockRequest(
+      'http://localhost:3000/api/leaderboard/badges/company/company-1'
+    );
     const response = await GET(request, {
       params: Promise.resolve({ companyId: 'company-1' }),
     });
@@ -111,7 +115,9 @@ describe('GET /api/leaderboard/badges/company/[companyId]', () => {
     mockGetCompanyBadgesUseCaseExecute.mockResolvedValue(Result.ok([]));
 
     const { GET } = await import('./route');
-    const request = createMockRequest('http://localhost:3000/api/leaderboard/badges/company/company-1');
+    const request = createMockRequest(
+      'http://localhost:3000/api/leaderboard/badges/company/company-1'
+    );
     const response = await GET(request, {
       params: Promise.resolve({ companyId: 'company-1' }),
     });
@@ -131,7 +137,9 @@ describe('GET /api/leaderboard/badges/company/[companyId]', () => {
     mockGetCompanyBadgesUseCaseExecute.mockResolvedValue(Result.fail('Failed to get badges'));
 
     const { GET } = await import('./route');
-    const request = createMockRequest('http://localhost:3000/api/leaderboard/badges/company/company-1');
+    const request = createMockRequest(
+      'http://localhost:3000/api/leaderboard/badges/company/company-1'
+    );
     const response = await GET(request, {
       params: Promise.resolve({ companyId: 'company-1' }),
     });
@@ -141,6 +149,3 @@ describe('GET /api/leaderboard/badges/company/[companyId]', () => {
     expect(data.error).toBeDefined();
   });
 });
-
-
-

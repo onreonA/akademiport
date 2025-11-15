@@ -14,10 +14,7 @@ export class LockTopicUseCase {
 
       return Result.ok(undefined);
     } catch (error) {
-      return Result.fail(
-        error instanceof Error ? error.message : 'Konu kilitlenemedi'
-      );
+      return Result.fail(error instanceof Error ? error.message : 'Konu kilitlenemedi');
     }
   }
 }
-

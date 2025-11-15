@@ -157,7 +157,9 @@ export default function ConsultantProjectsPage() {
         {loading ? (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {[1, 2, 3].map((i) => (
-              <EnhancedCard key={i} className="h-48 animate-pulse bg-muted">{null}</EnhancedCard>
+              <EnhancedCard key={i} className="h-48 animate-pulse bg-muted">
+                {null}
+              </EnhancedCard>
             ))}
           </div>
         ) : filteredProjects.length === 0 ? (

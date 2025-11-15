@@ -29,7 +29,9 @@ test.describe('Forum Modülü Akışı', () => {
     }
 
     // 2. Yeni Konu butonuna tıkla
-    const newTopicButton = page.locator('button:has-text("Yeni Konu"), button:has-text("+ Yeni Konu")').first();
+    const newTopicButton = page
+      .locator('button:has-text("Yeni Konu"), button:has-text("+ Yeni Konu")')
+      .first();
     await newTopicButton.waitFor({ state: 'visible', timeout: 10000 });
     await newTopicButton.click();
 
@@ -40,19 +42,31 @@ test.describe('Forum Modülü Akışı', () => {
     // 3. Form alanlarını doldur
     // Form'un render edilmesini bekle
     await page.waitForTimeout(1000);
-    
+
     // Title input'unu bul (name="title" veya id="title")
-    const titleInput = page.locator('input[name="title"], input[id="title"], input[placeholder*="Başlık"], input[placeholder*="Konu başlığı"]').first();
+    const titleInput = page
+      .locator(
+        'input[name="title"], input[id="title"], input[placeholder*="Başlık"], input[placeholder*="Konu başlığı"]'
+      )
+      .first();
     await titleInput.waitFor({ state: 'visible', timeout: 10000 });
     await titleInput.fill(testTopicTitle);
 
     // Content textarea'sını bul
-    const contentInput = page.locator('textarea[name="content"], textarea[id="content"], textarea[placeholder*="İçerik"], textarea[placeholder*="Konu içeriği"]').first();
+    const contentInput = page
+      .locator(
+        'textarea[name="content"], textarea[id="content"], textarea[placeholder*="İçerik"], textarea[placeholder*="Konu içeriği"]'
+      )
+      .first();
     await contentInput.waitFor({ state: 'visible', timeout: 10000 });
     await contentInput.fill(testTopicContent);
 
     // Category seç (eğer varsa)
-    const categorySelect = page.locator('label:has-text("Kategori")').locator('..').locator('[role="combobox"]').first();
+    const categorySelect = page
+      .locator('label:has-text("Kategori")')
+      .locator('..')
+      .locator('[role="combobox"]')
+      .first();
     if (await categorySelect.isVisible({ timeout: 3000 }).catch(() => false)) {
       await categorySelect.click();
       await page.waitForTimeout(300);
@@ -63,7 +77,9 @@ test.describe('Forum Modülü Akışı', () => {
     }
 
     // 4. Submit butonuna tıkla ve API response'unu bekle
-    const submitButton = page.locator('button[type="submit"]:has-text("Oluştur"), button:has-text("Kaydet")').first();
+    const submitButton = page
+      .locator('button[type="submit"]:has-text("Oluştur"), button:has-text("Kaydet")')
+      .first();
     await Promise.all([
       page
         .waitForResponse(
@@ -86,15 +102,22 @@ test.describe('Forum Modülü Akışı', () => {
     await page.waitForTimeout(1000);
 
     // 7. Yanıt yaz
-    const replyTextarea = page.locator('textarea[placeholder*="Yanıt"], textarea[id="reply-content"]').first();
+    const replyTextarea = page
+      .locator('textarea[placeholder*="Yanıt"], textarea[id="reply-content"]')
+      .first();
     await replyTextarea.waitFor({ state: 'visible', timeout: 5000 });
     await replyTextarea.fill(testReplyContent);
 
-    const replySubmitButton = page.locator('button:has-text("Yanıtla"), button:has-text("Gönder")').first();
+    const replySubmitButton = page
+      .locator('button:has-text("Yanıtla"), button:has-text("Gönder")')
+      .first();
     await Promise.all([
       page
         .waitForResponse(
-          (response) => response.url().includes('/api/forum/topics') && response.url().includes('/replies') && response.status() < 400
+          (response) =>
+            response.url().includes('/api/forum/topics') &&
+            response.url().includes('/replies') &&
+            response.status() < 400
         )
         .catch(() => null),
       replySubmitButton.click(),
@@ -106,12 +129,17 @@ test.describe('Forum Modülü Akışı', () => {
     await expect(page.locator(`text=${testReplyContent}`)).toBeVisible({ timeout: 10000 });
 
     // 9. Konuyu beğen (eğer like butonu varsa)
-    const likeButton = page.locator('button:has-text("Beğen"), button[aria-label*="beğen"]').first();
+    const likeButton = page
+      .locator('button:has-text("Beğen"), button[aria-label*="beğen"]')
+      .first();
     if (await likeButton.isVisible({ timeout: 3000 }).catch(() => false)) {
       await Promise.all([
         page
           .waitForResponse(
-            (response) => response.url().includes('/api/forum/topics') && response.url().includes('/like') && response.status() < 400
+            (response) =>
+              response.url().includes('/api/forum/topics') &&
+              response.url().includes('/like') &&
+              response.status() < 400
           )
           .catch(() => null),
         likeButton.click(),
@@ -145,12 +173,17 @@ test.describe('Forum Modülü Akışı', () => {
       await page.waitForTimeout(1000);
 
       // 3. Konuyu sabitle
-      const pinButton = page.locator('button:has-text("Sabitle"), button[aria-label*="pin"]').first();
+      const pinButton = page
+        .locator('button:has-text("Sabitle"), button[aria-label*="pin"]')
+        .first();
       if (await pinButton.isVisible({ timeout: 3000 }).catch(() => false)) {
         await Promise.all([
           page
             .waitForResponse(
-              (response) => response.url().includes('/api/forum/topics') && response.url().includes('/pin') && response.status() < 400
+              (response) =>
+                response.url().includes('/api/forum/topics') &&
+                response.url().includes('/pin') &&
+                response.status() < 400
             )
             .catch(() => null),
           pinButton.click(),
@@ -159,12 +192,17 @@ test.describe('Forum Modülü Akışı', () => {
       }
 
       // 4. Konuyu kilitle
-      const lockButton = page.locator('button:has-text("Kilitle"), button[aria-label*="lock"]').first();
+      const lockButton = page
+        .locator('button:has-text("Kilitle"), button[aria-label*="lock"]')
+        .first();
       if (await lockButton.isVisible({ timeout: 3000 }).catch(() => false)) {
         await Promise.all([
           page
             .waitForResponse(
-              (response) => response.url().includes('/api/forum/topics') && response.url().includes('/lock') && response.status() < 400
+              (response) =>
+                response.url().includes('/api/forum/topics') &&
+                response.url().includes('/lock') &&
+                response.status() < 400
             )
             .catch(() => null),
           lockButton.click(),
@@ -173,12 +211,17 @@ test.describe('Forum Modülü Akışı', () => {
       }
 
       // 5. Bir yanıtı çözüm olarak işaretle
-      const solutionButton = page.locator('button:has-text("Çözüm"), button[aria-label*="solution"]').first();
+      const solutionButton = page
+        .locator('button:has-text("Çözüm"), button[aria-label*="solution"]')
+        .first();
       if (await solutionButton.isVisible({ timeout: 3000 }).catch(() => false)) {
         await Promise.all([
           page
             .waitForResponse(
-              (response) => response.url().includes('/api/forum/topics') && response.url().includes('/solution') && response.status() < 400
+              (response) =>
+                response.url().includes('/api/forum/topics') &&
+                response.url().includes('/solution') &&
+                response.status() < 400
             )
             .catch(() => null),
           solutionButton.click(),
@@ -202,7 +245,9 @@ test.describe('Forum Modülü Akışı', () => {
     }
 
     // 2. Sayfa başlığını kontrol et
-    await expect(page.locator('h1, h2').filter({ hasText: /forum/i })).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('h1, h2').filter({ hasText: /forum/i })).toBeVisible({
+      timeout: 10000,
+    });
 
     // 3. Arama kutusunu kontrol et
     const searchInput = page.locator('input[placeholder*="ara"], input[type="search"]').first();
@@ -212,11 +257,13 @@ test.describe('Forum Modülü Akışı', () => {
     }
 
     // 4. Filtreleri kontrol et (eğer varsa)
-    const statusFilter = page.locator('select, [role="combobox"]').filter({ hasText: /durum/i }).first();
+    const statusFilter = page
+      .locator('select, [role="combobox"]')
+      .filter({ hasText: /durum/i })
+      .first();
     if (await statusFilter.isVisible({ timeout: 3000 }).catch(() => false)) {
       await statusFilter.click();
       await page.waitForTimeout(500);
     }
   });
 });
-

@@ -1,7 +1,11 @@
 'use client';
 
 import { NewsWithTags } from '@/3-domain/interfaces/repositories/INewsRepository';
-import { NEWS_CATEGORY_LABELS, NEWS_STATUS_COLORS, NEWS_STATUS_LABELS } from '@/3-domain/enums/NewsEnums';
+import {
+  NEWS_CATEGORY_LABELS,
+  NEWS_STATUS_COLORS,
+  NEWS_STATUS_LABELS,
+} from '@/3-domain/enums/NewsEnums';
 import { Card, CardContent, CardFooter, CardHeader } from '@/presentation/components/ui/atoms/card';
 import { Badge } from '@/presentation/components/ui/atoms/badge';
 import { Button } from '@/presentation/components/ui/atoms/button';
@@ -152,4 +156,3 @@ export function NewsCard({
     </Card>
   );
 }
-

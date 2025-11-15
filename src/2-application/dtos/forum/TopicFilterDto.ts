@@ -16,4 +16,3 @@ export interface TopicFilterDto {
   sortBy?: 'createdAt' | 'lastReplyAt' | 'replyCount' | 'viewCount' | 'likeCount';
   sortOrder?: 'asc' | 'desc';
 }
-

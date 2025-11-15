@@ -118,7 +118,9 @@ export async function GET(request: NextRequest) {
       ...validationResult.data,
       programId: validationResult.data.programId || undefined,
       consultantId: validationResult.data.consultantId || undefined,
-      startDate: validationResult.data.startDate ? new Date(validationResult.data.startDate) : undefined,
+      startDate: validationResult.data.startDate
+        ? new Date(validationResult.data.startDate)
+        : undefined,
       endDate: validationResult.data.endDate ? new Date(validationResult.data.endDate) : undefined,
     } as EventFilterDto;
 
@@ -127,7 +129,7 @@ export async function GET(request: NextRequest) {
 
     if (result.isFailure) {
       return NextResponse.json(
-        { error: (result.error as any)?.message || "Unknown error" },
+        { error: (result.error as any)?.message || 'Unknown error' },
         { status: (result.error as any)?.statusCode || 500 }
       );
     }
@@ -199,7 +201,7 @@ export async function POST(request: NextRequest) {
 
     if (result.isFailure) {
       return NextResponse.json(
-        { error: (result.error as any)?.message || "Unknown error" },
+        { error: (result.error as any)?.message || 'Unknown error' },
         { status: (result.error as any)?.statusCode || 500 }
       );
     }

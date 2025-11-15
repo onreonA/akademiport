@@ -29,7 +29,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Kullanıcı bilgileri bulunamadı' }, { status: 404 });
     }
 
-    const programId = request.nextUrl.searchParams.get('programId') || userData.companies?.[0]?.program_id;
+    const programId =
+      request.nextUrl.searchParams.get('programId') || userData.companies?.[0]?.program_id;
 
     if (!programId) {
       return NextResponse.json({ error: 'Program ID gereklidir' }, { status: 400 });
@@ -76,7 +77,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    
+
     // Generate slug from name
     const slug: string = (body.name || '')
       .toLowerCase()
@@ -123,4 +124,3 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Kategori oluşturulamadı' }, { status: 500 });
   }
 }
-

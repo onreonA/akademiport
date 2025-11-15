@@ -2,9 +2,19 @@
 
 import { useState, useEffect } from 'react';
 import { useCompanyRanking, useCompanyBadges } from '@/1-presentation/hooks/useLeaderboard';
-import { LeaderboardTable, BadgeGallery, TrendChart } from '@/1-presentation/components/features/leaderboard';
+import {
+  LeaderboardTable,
+  BadgeGallery,
+  TrendChart,
+} from '@/1-presentation/components/features/leaderboard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/presentation/components/ui/atoms/tabs';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/presentation/components/ui/atoms/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/presentation/components/ui/atoms/card';
 import { Badge } from '@/presentation/components/ui/atoms/badge';
 import { Loader2 } from 'lucide-react';
 
@@ -35,10 +45,7 @@ export default function CompanyLeaderboardPage() {
     }
   };
 
-  const { data: rankingData, isLoading: rankingLoading } = useCompanyRanking(
-    companyId,
-    programId
-  );
+  const { data: rankingData, isLoading: rankingLoading } = useCompanyRanking(companyId, programId);
   const { data: badgesData, isLoading: badgesLoading } = useCompanyBadges(companyId);
 
   const ranking = rankingData?.ranking;
@@ -56,9 +63,7 @@ export default function CompanyLeaderboardPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Liderlik Tablosu</h1>
-        <p className="text-muted-foreground mt-2">
-          Puanlarınızı ve sıralamanızı görüntüleyin
-        </p>
+        <p className="text-muted-foreground mt-2">Puanlarınızı ve sıralamanızı görüntüleyin</p>
       </div>
 
       {/* Company Stats */}
@@ -151,4 +156,3 @@ export default function CompanyLeaderboardPage() {
     </div>
   );
 }
-

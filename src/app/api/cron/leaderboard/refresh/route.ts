@@ -17,10 +17,7 @@ export async function POST(request: NextRequest) {
     const result = await repository.refreshRankings();
 
     if (result.isFailure) {
-      return NextResponse.json(
-        { error: result.error?.message || result.error },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: result.error?.message || result.error }, { status: 500 });
     }
 
     return NextResponse.json({ message: 'Liderlik tablosu yenilendi' });
@@ -29,6 +26,3 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Liderlik tablosu yenilenemedi' }, { status: 500 });
   }
 }
-
-
-

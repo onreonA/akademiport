@@ -404,4 +404,3 @@ describe('DELETE /api/news/[id]', () => {
     expect(data.error).toContain('Haber silinemedi');
   });
 });
-

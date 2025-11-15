@@ -309,4 +309,3 @@ describe('POST /api/leaderboard/badges', () => {
     expect(response.status).toBe(400);
   });
 });
-

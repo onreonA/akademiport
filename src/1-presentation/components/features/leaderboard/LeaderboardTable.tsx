@@ -131,6 +131,3 @@ export function LeaderboardTable({ programId, companyId, limit }: LeaderboardTab
     </Table>
   );
 }
-
-
-

@@ -5,13 +5,7 @@ import {
   NewsFilters,
   NewsWithTags,
 } from '@/3-domain/interfaces/repositories/INewsRepository';
-import {
-  News,
-  NewsTag,
-  NewsComment,
-  NewsLike,
-  NewsRead,
-} from '@/3-domain/entities/News';
+import { News, NewsTag, NewsComment, NewsLike, NewsRead } from '@/3-domain/entities/News';
 import { NewsStatus } from '@/3-domain/enums/NewsEnums';
 
 export class SupabaseNewsRepository implements INewsRepository {
@@ -74,11 +68,7 @@ export class SupabaseNewsRepository implements INewsRepository {
     try {
       const supabase = await this.getSupabaseClient();
 
-      const { data, error } = await supabase
-        .from('news')
-        .select('*')
-        .eq('id', id)
-        .single();
+      const { data, error } = await supabase.from('news').select('*').eq('id', id).single();
 
       if (error) {
         if (error.code === 'PGRST116') {
@@ -97,11 +87,7 @@ export class SupabaseNewsRepository implements INewsRepository {
     try {
       const supabase = await this.getSupabaseClient();
 
-      const { data, error } = await supabase
-        .from('news')
-        .select('*')
-        .eq('slug', slug)
-        .single();
+      const { data, error } = await supabase.from('news').select('*').eq('slug', slug).single();
 
       if (error) {
         if (error.code === 'PGRST116') {
@@ -120,9 +106,7 @@ export class SupabaseNewsRepository implements INewsRepository {
     try {
       const supabase = await this.getSupabaseClient();
 
-      let query = supabase
-        .from('news')
-        .select(`
+      let query = supabase.from('news').select(`
           *,
           users!news_author_id_fkey(id, full_name),
           news_tag_relations(
@@ -182,7 +166,8 @@ export class SupabaseNewsRepository implements INewsRepository {
 
       const newsWithTags = data.map((item: any) => {
         const news = this.mapToEntity(item);
-        const tags = item.news_tag_relations?.map((rel: any) => this.mapToTagEntity(rel.news_tags)) || [];
+        const tags =
+          item.news_tag_relations?.map((rel: any) => this.mapToTagEntity(rel.news_tags)) || [];
         const authorName = item.users?.full_name || 'Bilinmeyen';
 
         return {
@@ -519,7 +504,11 @@ export class SupabaseNewsRepository implements INewsRepository {
   // LIKES
   // =====================================================
 
-  async likeNews(newsId: string, userId: string, companyId: string | null): Promise<Result<NewsLike>> {
+  async likeNews(
+    newsId: string,
+    userId: string,
+    companyId: string | null
+  ): Promise<Result<NewsLike>> {
     try {
       const supabase = await this.getSupabaseClient();
 
@@ -647,10 +636,7 @@ export class SupabaseNewsRepository implements INewsRepository {
     try {
       const supabase = await this.getSupabaseClient();
 
-      const { data, error } = await supabase
-        .from('news_reads')
-        .select('*')
-        .eq('news_id', newsId);
+      const { data, error } = await supabase.from('news_reads').select('*').eq('news_id', newsId);
 
       if (error) {
         return Result.fail(`Okumalar listelenemedi: ${error.message}`);
@@ -666,16 +652,18 @@ export class SupabaseNewsRepository implements INewsRepository {
   // STATISTICS
   // =====================================================
 
-  async getStatistics(programId?: string): Promise<Result<{
-    totalNews: number;
-    publishedNews: number;
-    draftNews: number;
-    totalViews: number;
-    totalLikes: number;
-    totalComments: number;
-    totalReads: number;
-    completedReads: number;
-  }>> {
+  async getStatistics(programId?: string): Promise<
+    Result<{
+      totalNews: number;
+      publishedNews: number;
+      draftNews: number;
+      totalViews: number;
+      totalLikes: number;
+      totalComments: number;
+      totalReads: number;
+      completedReads: number;
+    }>
+  > {
     try {
       const supabase = await this.getSupabaseClient();
 
@@ -701,7 +689,10 @@ export class SupabaseNewsRepository implements INewsRepository {
       // Get reads statistics
       let readsQuery = supabase.from('news_reads').select('*');
       if (programId) {
-        readsQuery = readsQuery.in('news_id', data.map((n) => n.id));
+        readsQuery = readsQuery.in(
+          'news_id',
+          data.map((n) => n.id)
+        );
       }
 
       const { data: readsData } = await readsQuery;
@@ -805,4 +796,3 @@ export class SupabaseNewsRepository implements INewsRepository {
     };
   }
 }
-

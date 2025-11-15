@@ -226,4 +226,3 @@ describe('POST /api/news/[id]/read', () => {
     expect(data.error).toBe('Okuma kaydedilemedi');
   });
 });
-

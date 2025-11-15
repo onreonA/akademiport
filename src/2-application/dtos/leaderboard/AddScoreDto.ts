@@ -10,6 +10,3 @@ export const AddScoreDtoSchema = z.object({
 });
 
 export type AddScoreDto = z.infer<typeof AddScoreDtoSchema>;
-
-
-

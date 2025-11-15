@@ -3,7 +3,13 @@
 import { useState, useEffect } from 'react';
 import { LeaderboardTable, BadgeGallery } from '@/1-presentation/components/features/leaderboard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/presentation/components/ui/atoms/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/presentation/components/ui/atoms/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/presentation/components/ui/atoms/select';
 
 interface Program {
   id: string;
@@ -69,7 +75,9 @@ export default function AdminLeaderboardPage() {
         </TabsList>
 
         <TabsContent value="rankings" className="space-y-4">
-          <LeaderboardTable programId={selectedProgramId === 'all' ? undefined : selectedProgramId} />
+          <LeaderboardTable
+            programId={selectedProgramId === 'all' ? undefined : selectedProgramId}
+          />
         </TabsContent>
 
         <TabsContent value="badges" className="space-y-4">
@@ -79,4 +87,3 @@ export default function AdminLeaderboardPage() {
     </div>
   );
 }
-

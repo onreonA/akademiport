@@ -1,7 +1,12 @@
 'use client';
 
 import { use, useEffect, useState } from 'react';
-import { useNewsDetail, useLikeNews, useUnlikeNews, useRecordRead } from '@/1-presentation/hooks/useNews';
+import {
+  useNewsDetail,
+  useLikeNews,
+  useUnlikeNews,
+  useRecordRead,
+} from '@/1-presentation/hooks/useNews';
 import { Button } from '@/presentation/components/ui/atoms/button';
 import { Badge } from '@/presentation/components/ui/atoms/badge';
 import { Card, CardContent, CardHeader } from '@/presentation/components/ui/atoms/card';
@@ -12,11 +17,7 @@ import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import { createClient } from '@/infrastructure/database/supabase-client';
 
-export default function CompanyNewsDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default function CompanyNewsDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
   const { data: news, isLoading } = useNewsDetail(id);
@@ -108,18 +109,14 @@ export default function CompanyNewsDetailPage({
             {news.isFeatured && <Badge className="bg-yellow-500">Öne Çıkan</Badge>}
           </div>
           <h1 className="text-3xl font-bold">{news.title}</h1>
-          {news.summary && (
-            <p className="text-lg text-muted-foreground mt-2">{news.summary}</p>
-          )}
+          {news.summary && <p className="text-lg text-muted-foreground mt-2">{news.summary}</p>}
         </CardHeader>
         <CardContent>
           {/* Meta Info */}
           <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-4">
             {news.authorName && <span>Yazar: {news.authorName}</span>}
             {news.publishedAt && (
-              <span>
-                {format(new Date(news.publishedAt), 'dd MMM yyyy', { locale: tr })}
-              </span>
+              <span>{format(new Date(news.publishedAt), 'dd MMM yyyy', { locale: tr })}</span>
             )}
             {news.readingTime && (
               <div className="flex items-center gap-1">
@@ -181,4 +178,3 @@ export default function CompanyNewsDetailPage({
     </div>
   );
 }
-

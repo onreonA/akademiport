@@ -13,5 +13,3 @@ export interface UpdateNewsDto {
   isPinned?: boolean;
   tags?: string[]; // Tag IDs
 }
-
-

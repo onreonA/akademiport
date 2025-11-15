@@ -55,7 +55,10 @@ export interface ILeaderboardRepository {
   /**
    * Get company ranking
    */
-  getCompanyRanking(companyId: string, programId: string): Promise<Result<LeaderboardRanking | null>>;
+  getCompanyRanking(
+    companyId: string,
+    programId: string
+  ): Promise<Result<LeaderboardRanking | null>>;
 
   /**
    * Get all badges
@@ -105,8 +108,9 @@ export interface ILeaderboardRepository {
   /**
    * Get trend data for company
    */
-  getCompanyTrend(companyId: string, programId: string, weeks?: number): Promise<Result<LeaderboardHistory[]>>;
+  getCompanyTrend(
+    companyId: string,
+    programId: string,
+    weeks?: number
+  ): Promise<Result<LeaderboardHistory[]>>;
 }
-
-
-

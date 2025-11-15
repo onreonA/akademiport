@@ -350,4 +350,3 @@ describe('POST /api/news', () => {
     expect(data.error).toBe('Haber oluşturulamadı');
   });
 });
-

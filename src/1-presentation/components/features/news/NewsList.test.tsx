@@ -278,4 +278,3 @@ describe('NewsList', () => {
     expect(mutateAsync).toHaveBeenCalledWith('news-1');
   });
 });
-

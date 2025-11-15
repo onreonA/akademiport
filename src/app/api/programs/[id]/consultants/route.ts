@@ -163,7 +163,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     if (result.isFailure) {
       const errorMessage =
-        result.error instanceof Error ? (result.error as any)?.message || "Unknown error" : result.error || 'Bilinmeyen hata';
+        result.error instanceof Error
+          ? (result.error as any)?.message || 'Unknown error'
+          : result.error || 'Bilinmeyen hata';
       console.error('🔴 [GET /api/programs/[id]/consultants] Error:', errorMessage);
       console.error('🔴 [GET /api/programs/[id]/consultants] Full error object:', result.error);
       return NextResponse.json(

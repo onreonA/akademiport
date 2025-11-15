@@ -1,9 +1,11 @@
 # Build Hataları Tahmin Raporu
+
 **Tarih:** $(date +"%Y-%m-%d %H:%M")
 
 ## Mevcut Durum
 
 ### Tamamlanan Düzeltmeler ✅
+
 1. Import path'leri (@/domain → @/3-domain, @/core → @/6-core)
 2. Result.fail() null kontrolleri
 3. Zod error.errors → error.issues (12 dosya)
@@ -18,6 +20,7 @@
 ### Kalan Hatalar 🔄
 
 **Ana Kategori: `result.error` null kontrolleri**
+
 - `result.error.message` → `result.error?.message` veya `(result.error as AppError)?.message`
 - `result.error.statusCode` → `(result.error as AppError)?.statusCode || 500`
 
@@ -26,11 +29,13 @@
 ## Tahmin Süre
 
 ### Senaryo 1: Toplu Düzeltme (Önerilen) ⚡
+
 - **Süre:** 10-15 dakika
 - **Yöntem:** Regex ile toplu değiştirme
 - **Risk:** Düşük (pattern'ler tutarlı)
 
 ### Senaryo 2: Tek Tek Düzeltme 🐌
+
 - **Süre:** 30-45 dakika
 - **Yöntem:** Her dosyayı tek tek kontrol etme
 - **Risk:** Çok düşük ama zaman kaybı
@@ -38,6 +43,7 @@
 ## Önerilen Yaklaşım
 
 1. **Toplu Regex Değiştirme:**
+
    ```bash
    # result.error.message → result.error?.message
    # result.error.statusCode → (result.error as AppError)?.statusCode || 500
@@ -52,5 +58,3 @@
 **Tahmini Kalan Süre:** 10-20 dakika (toplu düzeltme ile)
 
 **Not:** Çoğu hata aynı pattern'i takip ediyor, bu yüzden toplu düzeltme mümkün.
-
-

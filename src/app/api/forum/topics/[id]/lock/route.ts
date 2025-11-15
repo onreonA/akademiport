@@ -7,10 +7,7 @@ import { LockTopicUseCase, UnlockTopicUseCase } from '@/2-application/use-cases/
  * POST /api/forum/topics/[id]/lock
  * Lock a topic
  */
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const supabase = await createClient();
     const {
@@ -94,4 +91,3 @@ export async function DELETE(
     return NextResponse.json({ error: 'Kilit açılamadı' }, { status: 500 });
   }
 }
-

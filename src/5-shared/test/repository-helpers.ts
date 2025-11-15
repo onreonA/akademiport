@@ -132,11 +132,7 @@ export async function createTestNews(
     updated_by: authorId,
   };
 
-  const { data, error } = await adminClient
-    .from('news')
-    .insert(newsData)
-    .select()
-    .single();
+  const { data, error } = await adminClient.from('news').insert(newsData).select().single();
 
   if (error) {
     throw new Error(`Failed to create test news: ${error.message}`);
@@ -212,4 +208,3 @@ export async function cleanupTestData(ids: {
     // Don't throw - cleanup errors shouldn't fail tests
   }
 }
-

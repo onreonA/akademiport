@@ -7,6 +7,3 @@ export * from './GetLeaderboardHistoryUseCase';
 export * from './CreateBadgeUseCase';
 export * from './UpdateBadgeUseCase';
 export * from './DeleteBadgeUseCase';
-
-
-

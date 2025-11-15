@@ -73,6 +73,3 @@ export const REQUIREMENT_TYPE_LABELS: Record<RequirementType, string> = {
   [RequirementType.MILESTONE]: 'Kilometre Taşı',
   [RequirementType.THRESHOLD]: 'Eşik Değeri',
 };
-
-
-

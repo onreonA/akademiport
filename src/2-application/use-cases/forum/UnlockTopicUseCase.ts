@@ -14,10 +14,7 @@ export class UnlockTopicUseCase {
 
       return Result.ok(undefined);
     } catch (error) {
-      return Result.fail(
-        error instanceof Error ? error.message : 'Kilit açılamadı'
-      );
+      return Result.fail(error instanceof Error ? error.message : 'Kilit açılamadı');
     }
   }
 }
-

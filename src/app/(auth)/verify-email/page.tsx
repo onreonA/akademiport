@@ -138,18 +138,20 @@ function VerifyEmailContent() {
 
 export default function VerifyEmailPage() {
   return (
-    <Suspense fallback={
-      <div className="flex min-h-screen items-center justify-center p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle className="text-2xl text-center">Email Doğrulanıyor</CardTitle>
-          </CardHeader>
-          <CardContent className="flex justify-center py-8">
-            <Spinner size="lg" />
-          </CardContent>
-        </Card>
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center p-4">
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle className="text-2xl text-center">Email Doğrulanıyor</CardTitle>
+            </CardHeader>
+            <CardContent className="flex justify-center py-8">
+              <Spinner size="lg" />
+            </CardContent>
+          </Card>
+        </div>
+      }
+    >
       <VerifyEmailContent />
     </Suspense>
   );

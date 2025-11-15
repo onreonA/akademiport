@@ -3,7 +3,13 @@
 import { useState, useEffect } from 'react';
 import { LeaderboardTable, BadgeGallery } from '@/1-presentation/components/features/leaderboard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/presentation/components/ui/atoms/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/presentation/components/ui/atoms/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/presentation/components/ui/atoms/select';
 
 interface Program {
   id: string;
@@ -52,8 +58,8 @@ export default function ConsultantLeaderboardPage() {
       {!loading && programs.length > 0 && (
         <div className="flex items-center gap-4">
           <label className="text-sm font-medium">Program:</label>
-          <Select 
-            value={selectedProgramId || programs[0]?.id || ''} 
+          <Select
+            value={selectedProgramId || programs[0]?.id || ''}
             onValueChange={setSelectedProgramId}
           >
             <SelectTrigger className="w-[300px]">
@@ -87,4 +93,3 @@ export default function ConsultantLeaderboardPage() {
     </div>
   );
 }
-

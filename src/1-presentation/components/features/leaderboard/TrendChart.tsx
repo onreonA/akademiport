@@ -135,6 +135,3 @@ export function TrendChart({ companyId, programId, weeks = 12 }: TrendChartProps
     </ResponsiveContainer>
   );
 }
-
-
-

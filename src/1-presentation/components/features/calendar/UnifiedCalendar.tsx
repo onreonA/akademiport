@@ -632,7 +632,10 @@ export function UnifiedCalendar({
               // Type assertion for arg.el (FullCalendar v6 EventMountArg has el property)
               const el = (arg as any).el as HTMLElement | undefined;
               if (!el) {
-                console.warn('⚠️ [UnifiedCalendar] eventDidMount: el is undefined for event:', eventId);
+                console.warn(
+                  '⚠️ [UnifiedCalendar] eventDidMount: el is undefined for event:',
+                  eventId
+                );
                 return;
               }
 

@@ -180,6 +180,3 @@ describe('GET /api/leaderboard/history', () => {
     expect(data.error).toBeDefined();
   });
 });
-
-
-

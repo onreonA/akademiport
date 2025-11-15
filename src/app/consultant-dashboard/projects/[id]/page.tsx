@@ -438,7 +438,8 @@ export default function ConsultantProjectDetailPage() {
     );
   }
 
-  const statusInfo = statusLabels[project.status as keyof typeof statusLabels] || statusLabels.active;
+  const statusInfo =
+    statusLabels[project.status as keyof typeof statusLabels] || statusLabels.active;
   const priorityInfo = priorityLabels[project.priority] || priorityLabels.medium;
   const hierarchyStats = hierarchy?.stats;
 

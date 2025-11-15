@@ -95,9 +95,7 @@ export class CreateTopicUseCase {
 
       return Result.ok({ id: result.value.id });
     } catch (error) {
-      return Result.fail(
-        error instanceof Error ? error.message : 'Konu oluşturulamadı'
-      );
+      return Result.fail(error instanceof Error ? error.message : 'Konu oluşturulamadı');
     }
   }
 
@@ -127,4 +125,3 @@ export class CreateTopicUseCase {
       .substring(0, 100);
   }
 }
-

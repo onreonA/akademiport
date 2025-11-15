@@ -11,7 +11,10 @@ const trainingProgressRepository = new TrainingProgressRepository();
 const companyRepository = new CompanyRepository();
 const trainingRepository = new TrainingRepository();
 const leaderboardRepository = new SupabaseLeaderboardRepository();
-const addLeaderboardScore = new AddLeaderboardScoreUseCase(leaderboardRepository, companyRepository);
+const addLeaderboardScore = new AddLeaderboardScoreUseCase(
+  leaderboardRepository,
+  companyRepository
+);
 
 /**
  * POST /api/trainings/[id]/videos/[videoId]/watch
@@ -58,7 +61,7 @@ export async function POST(
 
     if (result.isFailure) {
       return NextResponse.json(
-        { error: (result.error as any)?.message || "Unknown error" },
+        { error: (result.error as any)?.message || 'Unknown error' },
         { status: (result.error as any)?.statusCode || 500 }
       );
     }

@@ -18,12 +18,14 @@ Testler küçük gruplar halinde, aşağıdan yukarıya (bottom-up) yaklaşımla
 ### GRUP 1: Domain Layer Tests
 
 #### 1.1 NewsEnums Tests
+
 - ✅ `NewsCategory` enum değerleri doğru mu?
 - ✅ `NewsStatus` enum değerleri doğru mu?
 - ✅ Label mapping'ler doğru mu?
 - ✅ Status color mapping'ler doğru mu?
 
 #### 1.2 NewsEntity Tests
+
 - ✅ Entity oluşturma başarılı mı?
 - ✅ `isPublished()` metodu doğru çalışıyor mu?
 - ✅ `isDraft()` metodu doğru çalışıyor mu?
@@ -48,6 +50,7 @@ Testler küçük gruplar halinde, aşağıdan yukarıya (bottom-up) yaklaşımla
 ### GRUP 2: Use Case Tests
 
 #### 2.1 CreateNewsUseCase Tests
+
 - ✅ Geçerli DTO ile haber oluşturma başarılı mı?
 - ✅ Slug otomatik oluşturuluyor mu? (Türkçe karakter desteği)
 - ✅ Aynı başlıkta haber oluşturma engelleniyor mu?
@@ -58,6 +61,7 @@ Testler küçük gruplar halinde, aşağıdan yukarıya (bottom-up) yaklaşımla
 - ✅ Author ID eksikse hata veriyor mu?
 
 #### 2.2 UpdateNewsUseCase Tests
+
 - ✅ Haber bulunamazsa hata veriyor mu?
 - ✅ Geçerli güncelleme başarılı mı?
 - ✅ Content değiştiğinde reading time yeniden hesaplanıyor mu?
@@ -65,18 +69,21 @@ Testler küçük gruplar halinde, aşağıdan yukarıya (bottom-up) yaklaşımla
 - ✅ Validation hataları doğru dönüyor mu?
 
 #### 2.3 PublishNewsUseCase Tests
+
 - ✅ Haber bulunamazsa hata veriyor mu?
 - ✅ Draft haber yayınlanıyor mu?
 - ✅ Zaten yayında olan haber tekrar yayınlanamıyor mu?
 - ✅ `publishedAt` tarihi set ediliyor mu?
 
 #### 2.4 RecordNewsReadUseCase Tests
+
 - ✅ Haber bulunamazsa hata veriyor mu?
 - ✅ Okuma kaydı başarılı mı?
 - ✅ Scroll percentage >80 ise `completed` true oluyor mu?
 - ✅ Read duration doğru kaydediliyor mu?
 
 #### 2.5 GetNewsListUseCase Tests
+
 - ✅ Filtreleme çalışıyor mu? (programId, category, status)
 - ✅ Arama çalışıyor mu? (title, summary, content)
 - ✅ Pagination çalışıyor mu?
@@ -87,6 +94,7 @@ Testler küçük gruplar halinde, aşağıdan yukarıya (bottom-up) yaklaşımla
 ### GRUP 3: Repository Integration Tests
 
 #### 3.1 SupabaseNewsRepository CRUD Tests
+
 - ✅ `create()` başarılı mı?
 - ✅ `findById()` doğru haber döndürüyor mu?
 - ✅ `findBySlug()` doğru haber döndürüyor mu?
@@ -95,15 +103,18 @@ Testler küçük gruplar halinde, aşağıdan yukarıya (bottom-up) yaklaşımla
 - ✅ `delete()` başarılı mı?
 
 #### 3.2 Status Operations Tests
+
 - ✅ `publish()` başarılı mı?
 - ✅ `archive()` başarılı mı?
 - ✅ `unpublish()` başarılı mı?
 
 #### 3.3 Feature Operations Tests
+
 - ✅ `feature()` / `unfeature()` çalışıyor mu?
 - ✅ `pin()` / `unpin()` çalışıyor mu?
 
 #### 3.4 Tag Operations Tests
+
 - ✅ `getTags()` tüm tag'leri döndürüyor mu?
 - ✅ `createTag()` başarılı mı?
 - ✅ `addTagToNews()` başarılı mı?
@@ -111,6 +122,7 @@ Testler küçük gruplar halinde, aşağıdan yukarıya (bottom-up) yaklaşımla
 - ✅ `getNewsTags()` doğru tag'leri döndürüyor mu?
 
 #### 3.5 Comment Operations Tests
+
 - ✅ `createComment()` başarılı mı?
 - ✅ `getComments()` doğru yorumları döndürüyor mu?
 - ✅ `updateComment()` başarılı mı?
@@ -118,16 +130,19 @@ Testler küçük gruplar halinde, aşağıdan yukarıya (bottom-up) yaklaşımla
 - ✅ `approveComment()` başarılı mı?
 
 #### 3.6 Like Operations Tests
+
 - ✅ `likeNews()` başarılı mı?
 - ✅ `unlikeNews()` başarılı mı?
 - ✅ `isLikedByUser()` doğru sonuç döndürüyor mu?
 
 #### 3.7 Read Operations Tests
+
 - ✅ `recordRead()` başarılı mı?
 - ✅ `getUserReads()` doğru okumaları döndürüyor mu?
 - ✅ `getNewsReads()` doğru okumaları döndürüyor mu?
 
 #### 3.8 Statistics Tests
+
 - ✅ `getStatistics()` doğru istatistikleri döndürüyor mu?
 
 ---
@@ -135,12 +150,14 @@ Testler küçük gruplar halinde, aşağıdan yukarıya (bottom-up) yaklaşımla
 ### GRUP 4: API Route Tests
 
 #### 4.1 GET /api/news Tests
+
 - ✅ Yetkisiz kullanıcı erişemiyor mu?
 - ✅ Liste başarıyla dönüyor mu?
 - ✅ Filtreleme query params ile çalışıyor mu?
 - ✅ Pagination çalışıyor mu?
 
 #### 4.2 POST /api/news Tests
+
 - ✅ Yetkisiz kullanıcı erişemiyor mu?
 - ✅ Non-admin/consultant erişemiyor mu?
 - ✅ Geçerli haber oluşturma başarılı mı?
@@ -148,39 +165,46 @@ Testler küçük gruplar halinde, aşağıdan yukarıya (bottom-up) yaklaşımla
 - ✅ 201 status code dönüyor mu?
 
 #### 4.3 GET /api/news/[id] Tests
+
 - ✅ Yetkisiz kullanıcı erişemiyor mu?
 - ✅ Haber bulunamazsa 404 dönüyor mu?
 - ✅ Başarılı detay dönüyor mu?
 - ✅ Tag'ler dahil mi?
 
 #### 4.4 PUT /api/news/[id] Tests
+
 - ✅ Yetkisiz kullanıcı erişemiyor mu?
 - ✅ Non-admin/consultant erişemiyor mu?
 - ✅ Geçerli güncelleme başarılı mı?
 - ✅ Haber bulunamazsa 404 dönüyor mu?
 
 #### 4.5 DELETE /api/news/[id] Tests
+
 - ✅ Yetkisiz kullanıcı erişemiyor mu?
 - ✅ Non-admin/consultant erişemiyor mu?
 - ✅ Silme başarılı mı?
 - ✅ Haber bulunamazsa 404 dönüyor mu?
 
 #### 4.6 POST /api/news/[id]/publish Tests
+
 - ✅ Yetkisiz kullanıcı erişemiyor mu?
 - ✅ Non-admin/consultant erişemiyor mu?
 - ✅ Yayınlama başarılı mı?
 - ✅ Zaten yayında olan haber tekrar yayınlanamıyor mu?
 
 #### 4.7 POST /api/news/[id]/like Tests
+
 - ✅ Yetkisiz kullanıcı erişemiyor mu?
 - ✅ Beğeni başarılı mı?
 - ✅ Duplicate beğeni engelleniyor mu?
 
 #### 4.8 DELETE /api/news/[id]/like Tests
+
 - ✅ Yetkisiz kullanıcı erişemiyor mu?
 - ✅ Beğeni kaldırma başarılı mı?
 
 #### 4.9 POST /api/news/[id]/read Tests
+
 - ✅ Yetkisiz kullanıcı erişemiyor mu?
 - ✅ Şirket bilgisi yoksa hata veriyor mu?
 - ✅ Okuma kaydı başarılı mı?
@@ -191,6 +215,7 @@ Testler küçük gruplar halinde, aşağıdan yukarıya (bottom-up) yaklaşımla
 ### GRUP 5: Component Tests
 
 #### 5.1 NewsCard Component Tests
+
 - ✅ Haber bilgileri doğru render ediliyor mu?
 - ✅ Image varsa gösteriliyor mu?
 - ✅ Tags render ediliyor mu?
@@ -200,6 +225,7 @@ Testler küçük gruplar halinde, aşağıdan yukarıya (bottom-up) yaklaşımla
 - ✅ Link doğru URL'e gidiyor mu?
 
 #### 5.2 NewsList Component Tests
+
 - ✅ Liste render ediliyor mu?
 - ✅ Loading state gösteriliyor mu?
 - ✅ Empty state gösteriliyor mu?
@@ -208,6 +234,7 @@ Testler küçük gruplar halinde, aşağıdan yukarıya (bottom-up) yaklaşımla
 - ✅ Grid layout doğru mu?
 
 #### 5.3 NewsForm Component Tests
+
 - ✅ Form alanları render ediliyor mu?
 - ✅ Initial data doğru yükleniyor mu?
 - ✅ Validation çalışıyor mu?
@@ -223,6 +250,7 @@ Testler küçük gruplar halinde, aşağıdan yukarıya (bottom-up) yaklaşımla
 ### GRUP 6: E2E Tests (User Flows)
 
 #### 6.1 Admin: Haber Oluşturma ve Yayınlama Flow
+
 1. Admin login olur
 2. Haberler sayfasına gider
 3. "Yeni Haber" butonuna tıklar
@@ -235,6 +263,7 @@ Testler küçük gruplar halinde, aşağıdan yukarıya (bottom-up) yaklaşımla
 10. Company dashboard'da görünür
 
 #### 6.2 Company User: Haber Okuma ve Beğenme Flow
+
 1. Company user login olur
 2. Haberler sayfasına gider
 3. Bir habere tıklar
@@ -245,6 +274,7 @@ Testler küçük gruplar halinde, aşağıdan yukarıya (bottom-up) yaklaşımla
 8. Okuma kaydı oluşturulur (completed=true)
 
 #### 6.3 Admin: Haber Düzenleme Flow
+
 1. Admin login olur
 2. Haberler sayfasına gider
 3. Bir habere tıklar
@@ -254,6 +284,7 @@ Testler küçük gruplar halinde, aşağıdan yukarıya (bottom-up) yaklaşımla
 7. Değişiklikler kaydedilir
 
 #### 6.4 Filtreleme ve Arama Flow
+
 1. User login olur
 2. Haberler sayfasına gider
 3. Kategori filtresini seçer
@@ -264,6 +295,7 @@ Testler küçük gruplar halinde, aşağıdan yukarıya (bottom-up) yaklaşımla
 8. Liste tekrar filtrelenir
 
 #### 6.5 Tag Yönetimi Flow (Admin)
+
 1. Admin login olur
 2. Haber oluştururken tag seçer
 3. Haber kaydedilir
@@ -287,11 +319,13 @@ Testler küçük gruplar halinde, aşağıdan yukarıya (bottom-up) yaklaşımla
 ### Test Detayları
 
 #### GRUP 1: Domain Layer Tests ✅
+
 - NewsEnums validation: 4 test
 - NewsEntity business logic: 11 test
 - **Sonuç:** 15/15 ✅
 
 #### GRUP 2: Use Case Tests ✅
+
 - CreateNewsUseCase: 8 test
 - UpdateNewsUseCase: 5 test
 - PublishNewsUseCase: 4 test
@@ -300,6 +334,7 @@ Testler küçük gruplar halinde, aşağıdan yukarıya (bottom-up) yaklaşımla
 - **Sonuç:** 25/25 ✅
 
 #### GRUP 3: Repository Integration Tests ✅
+
 - CRUD operations: 6 test
 - Status operations: 3 test
 - Feature operations: 4 test
@@ -311,6 +346,7 @@ Testler küçük gruplar halinde, aşağıdan yukarıya (bottom-up) yaklaşımla
 - **Sonuç:** 30/30 ✅
 
 #### GRUP 4: API Route Tests ✅
+
 - GET /api/news: 4 test
 - POST /api/news: 5 test
 - GET /api/news/[id]: 4 test
@@ -323,12 +359,14 @@ Testler küçük gruplar halinde, aşağıdan yukarıya (bottom-up) yaklaşımla
 - **Sonuç:** 25/25 ✅
 
 #### GRUP 5: Component Tests ✅
+
 - NewsCard component: 15 test
 - NewsList component: 18 test
 - NewsForm component: 18 test
 - **Sonuç:** 51/51 ✅
 
 #### GRUP 6: E2E Tests 🟡
+
 - Haber oluşturma flow: Başlatıldı
 - Haber yayınlama flow: Başlatıldı
 - Haber okuma flow: Başlatıldı
@@ -362,5 +400,3 @@ npm test -- src/1-presentation/components/features/news
 # E2E tests
 npm run test:e2e -- e2e/news
 ```
-
-

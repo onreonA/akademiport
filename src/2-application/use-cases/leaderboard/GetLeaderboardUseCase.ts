@@ -12,7 +12,10 @@ export class GetLeaderboardUseCase {
       const result = await this.leaderboardRepository.getRankings(filter);
 
       if (result.isFailure) {
-        const errorMessage = result.error instanceof Error ? result.error.message : (result.error || 'Liderlik tablosu alınamadı');
+        const errorMessage =
+          result.error instanceof Error
+            ? result.error.message
+            : result.error || 'Liderlik tablosu alınamadı';
         return Result.fail(new AppError(errorMessage, 500));
       }
 
@@ -24,6 +27,3 @@ export class GetLeaderboardUseCase {
     }
   }
 }
-
-
-

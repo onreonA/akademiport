@@ -77,10 +77,7 @@ export class MarkSolutionUseCase {
 
       return Result.ok(undefined);
     } catch (error) {
-      return Result.fail(
-        error instanceof Error ? error.message : 'Çözüm işaretlenemedi'
-      );
+      return Result.fail(error instanceof Error ? error.message : 'Çözüm işaretlenemedi');
     }
   }
 }
-

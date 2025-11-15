@@ -16,7 +16,10 @@ const trainingProgressRepository = new TrainingProgressRepository();
 const companyRepository = new CompanyRepository();
 const trainingRepository = new TrainingRepository();
 const leaderboardRepository = new SupabaseLeaderboardRepository();
-const addLeaderboardScore = new AddLeaderboardScoreUseCase(leaderboardRepository, companyRepository);
+const addLeaderboardScore = new AddLeaderboardScoreUseCase(
+  leaderboardRepository,
+  companyRepository
+);
 
 /**
  * GET /api/companies/[id]/trainings/[trainingId]/progress
@@ -71,11 +74,11 @@ export async function GET(
         logger.error('❌ CalculateTrainingProgressUseCase failed:', {
           companyId: id,
           trainingId,
-          error: (result.error as any)?.message || "Unknown error",
+          error: (result.error as any)?.message || 'Unknown error',
           statusCode: (result.error as any)?.statusCode || 500,
         });
         return NextResponse.json(
-          { error: (result.error as any)?.message || "Unknown error" },
+          { error: (result.error as any)?.message || 'Unknown error' },
           { status: (result.error as any)?.statusCode || 500 }
         );
       }
@@ -93,7 +96,7 @@ export async function GET(
 
     if (result.isFailure) {
       return NextResponse.json(
-        { error: (result.error as any)?.message || "Unknown error" },
+        { error: (result.error as any)?.message || 'Unknown error' },
         { status: (result.error as any)?.statusCode || 500 }
       );
     }
@@ -152,7 +155,7 @@ export async function POST(
 
     if (result.isFailure) {
       return NextResponse.json(
-        { error: (result.error as any)?.message || "Unknown error" },
+        { error: (result.error as any)?.message || 'Unknown error' },
         { status: (result.error as any)?.statusCode || 500 }
       );
     }

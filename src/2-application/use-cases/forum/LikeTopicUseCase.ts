@@ -27,10 +27,7 @@ export class LikeTopicUseCase {
 
       return Result.ok(undefined);
     } catch (error) {
-      return Result.fail(
-        error instanceof Error ? error.message : 'Konu beğenilemedi'
-      );
+      return Result.fail(error instanceof Error ? error.message : 'Konu beğenilemedi');
     }
   }
 }
-

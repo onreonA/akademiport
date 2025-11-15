@@ -268,5 +268,3 @@ export class NewsEntity implements News {
     return errors;
   }
 }
-
-

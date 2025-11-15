@@ -1,5 +1,9 @@
 import { Result } from '@/6-core/result/Result';
-import { INewsRepository, NewsFilters, NewsWithTags } from '@/3-domain/interfaces/repositories/INewsRepository';
+import {
+  INewsRepository,
+  NewsFilters,
+  NewsWithTags,
+} from '@/3-domain/interfaces/repositories/INewsRepository';
 
 export class GetNewsListUseCase {
   constructor(private newsRepository: INewsRepository) {}
@@ -14,4 +18,3 @@ export class GetNewsListUseCase {
     return Result.ok(result.value);
   }
 }
-

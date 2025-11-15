@@ -5,8 +5,19 @@ import { useNewsList, useDeleteNews, usePublishNews } from '@/1-presentation/hoo
 import { NewsCard } from './NewsCard';
 import { Button } from '@/presentation/components/ui/atoms/button';
 import { Input } from '@/presentation/components/ui/atoms/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/presentation/components/ui/atoms/select';
-import { NewsCategory, NewsStatus, NEWS_CATEGORY_LABELS, NEWS_STATUS_LABELS } from '@/3-domain/enums/NewsEnums';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/presentation/components/ui/atoms/select';
+import {
+  NewsCategory,
+  NewsStatus,
+  NEWS_CATEGORY_LABELS,
+  NEWS_STATUS_LABELS,
+} from '@/3-domain/enums/NewsEnums';
 import { Loader2, Plus, Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -59,9 +70,7 @@ export function NewsList({
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">Haberler</h2>
-          <p className="text-sm text-muted-foreground">
-            {newsList?.length || 0} haber bulundu
-          </p>
+          <p className="text-sm text-muted-foreground">{newsList?.length || 0} haber bulundu</p>
         </div>
         {onCreateClick && (
           <Button onClick={onCreateClick}>
@@ -149,4 +158,3 @@ export function NewsList({
     </div>
   );
 }
-

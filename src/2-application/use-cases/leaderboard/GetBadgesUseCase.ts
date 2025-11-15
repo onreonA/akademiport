@@ -12,7 +12,10 @@ export class GetBadgesUseCase {
       const result = await this.leaderboardRepository.getBadges(filter);
 
       if (result.isFailure) {
-        const errorMessage = result.error instanceof Error ? result.error.message : (result.error || 'Rozetler alınamadı');
+        const errorMessage =
+          result.error instanceof Error
+            ? result.error.message
+            : result.error || 'Rozetler alınamadı';
         return Result.fail(new AppError(errorMessage, 500));
       }
 
@@ -24,6 +27,3 @@ export class GetBadgesUseCase {
     }
   }
 }
-
-
-
