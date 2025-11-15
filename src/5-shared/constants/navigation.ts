@@ -21,6 +21,7 @@ import {
   Clock,
   Newspaper,
   MessageSquare,
+  Trophy,
   type LucideIcon,
 } from 'lucide-react';
 import { UserRole } from '@/domain/enums/UserRole';
@@ -211,6 +212,24 @@ export const MASTER_ADMIN_NAVIGATION: NavigationConfig = {
       ],
     },
     {
+      id: 'leaderboard',
+      label: 'Liderlik Tablosu',
+      icon: Trophy,
+      href: '/admin-dashboard/leaderboard',
+      children: [
+        {
+          id: 'leaderboard-rankings',
+          label: 'Sıralama',
+          href: '/admin-dashboard/leaderboard',
+        },
+        {
+          id: 'leaderboard-badges',
+          label: 'Rozet Yönetimi',
+          href: '/admin-dashboard/leaderboard/badges',
+        },
+      ],
+    },
+    {
       id: 'project-templates',
       label: 'Proje Şablonları',
       icon: FileStack,
@@ -331,6 +350,12 @@ export const CONSULTANT_NAVIGATION: NavigationConfig = {
       href: '/consultant-dashboard/forum',
     },
     {
+      id: 'leaderboard',
+      label: 'Liderlik Tablosu',
+      icon: Trophy,
+      href: '/consultant-dashboard/leaderboard',
+    },
+    {
       id: 'reports',
       label: 'Raporlarım',
       icon: BarChart3,
@@ -395,6 +420,12 @@ export const COMPANY_ADMIN_NAVIGATION: NavigationConfig = {
       label: 'Haberler',
       icon: Newspaper,
       href: '/company-dashboard/news',
+    },
+    {
+      id: 'leaderboard',
+      label: 'Liderlik Tablosu',
+      icon: Trophy,
+      href: '/company-dashboard/leaderboard',
     },
     {
       id: 'reports',
