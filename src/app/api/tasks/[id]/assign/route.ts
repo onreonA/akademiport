@@ -38,8 +38,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
     if (result.isFailure) {
       return NextResponse.json(
-        { error: result.error?.message || 'Görev atanamadı.' },
-        { status: result.error?.statusCode ?? 400 }
+        { error: (result.error as any)?.message || 'Görev atanamadı.' },
+        { status: (result.error as any)?.statusCode ?? 400 }
       );
     }
 

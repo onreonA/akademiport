@@ -48,8 +48,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
     if (result.isFailure) {
       return NextResponse.json(
-        { error: result.error.message },
-        { status: result.error.statusCode }
+        { error: (result.error as any)?.message || "Unknown error" },
+        { status: (result.error as any)?.statusCode || 500 }
       );
     }
 

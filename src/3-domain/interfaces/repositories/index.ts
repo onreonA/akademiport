@@ -2,8 +2,8 @@
  * Repository Interfaces Barrel Export
  */
 
-export * from './ICompanyRepository';
-export * from './IProgramRepository';
+export * from '../ICompanyRepository';
+export * from '../IProgramRepository';
 export * from './IProjectRepository';
 export * from './ISubProjectRepository';
 export * from './ITaskRepository';
@@ -14,7 +14,7 @@ export * from './ITrainingVideoRepository';
 export * from './ITrainingDocumentRepository';
 export * from './ICompanyTrainingRepository';
 export * from './ITrainingProgressRepository';
-export * from './IUserRepository';
+export * from '../IUserRepository';
 export * from './ICompanyProjectAssignmentRepository';
 export * from './IEventRepository';
 export * from './IAppointmentRepository';

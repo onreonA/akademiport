@@ -220,7 +220,8 @@ export interface AppointmentResponseDto {
   zoomJoinUrl: string | null;
   zoomStartUrl: string | null;
   zoomPassword: string | null;
-  notes: string | null; // Consultant notları
+  notes: string | null; // Consultant notları (deprecated, use consultantNotes)
+  consultantNotes: string | null; // Consultant notları
   companyNotes: string | null; // Company notları
   attendedAt: string | null; // ISO string
   createdAt: string; // ISO string

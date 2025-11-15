@@ -1,6 +1,6 @@
-import { ITaskRepository } from '@/domain/interfaces/repositories/ITaskRepository';
-import { Result } from '@/core/result';
-import { AppError } from '@/core/errors';
+import { ITaskRepository } from '@/3-domain/interfaces/repositories/ITaskRepository';
+import { Result } from '@/6-core/result/Result';
+import { AppError } from '@/6-core/errors/AppError';
 
 export class RejectTaskUseCase {
   constructor(private taskRepository: ITaskRepository) {}
@@ -21,7 +21,7 @@ export class RejectTaskUseCase {
       // Reject task (set status back to 'in_progress')
       await this.taskRepository.reject(taskId);
 
-      return Result.ok();
+      return Result.ok(undefined);
     } catch (error) {
       return Result.fail(
         new AppError(error instanceof Error ? error.message : 'Failed to reject task', 500)

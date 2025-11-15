@@ -1,11 +1,11 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { BulkAssignDatesToCompanySubProjectsUseCase } from './BulkAssignDatesToCompanySubProjectsUseCase';
-import { IProjectRepository } from '@/domain/interfaces/repositories/IProjectRepository';
-import { ISubProjectRepository } from '@/domain/interfaces/repositories/ISubProjectRepository';
-import { ICompanyProjectAssignmentRepository } from '@/domain/interfaces/repositories/ICompanyProjectAssignmentRepository';
-import { Project } from '@/domain/entities/Project';
-import { SubProject } from '@/domain/entities/SubProject';
-import { CompanyProjectAssignment } from '@/domain/entities/CompanyProjectAssignment';
+import { IProjectRepository } from '@/3-domain/interfaces/repositories/IProjectRepository';
+import { ISubProjectRepository } from '@/3-domain/interfaces/repositories/ISubProjectRepository';
+import { ICompanyProjectAssignmentRepository } from '@/3-domain/interfaces/repositories/ICompanyProjectAssignmentRepository';
+import { Project } from '@/3-domain/entities/Project';
+import { SubProject } from '@/3-domain/entities/SubProject';
+import { CompanyProjectAssignment } from '@/3-domain/entities/CompanyProjectAssignment';
 
 describe('BulkAssignDatesToCompanySubProjectsUseCase', () => {
   let mockProjectRepository: IProjectRepository;

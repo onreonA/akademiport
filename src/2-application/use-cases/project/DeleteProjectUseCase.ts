@@ -1,6 +1,6 @@
-import { IProjectRepository } from '@/domain/interfaces/repositories/IProjectRepository';
-import { Result } from '@/core/result';
-import { AppError } from '@/core/errors';
+import { IProjectRepository } from '@/3-domain/interfaces/repositories/IProjectRepository';
+import { Result } from '@/6-core/result/Result';
+import { AppError } from '@/6-core/errors/AppError';
 
 export class DeleteProjectUseCase {
   constructor(private projectRepository: IProjectRepository) {}
@@ -16,7 +16,7 @@ export class DeleteProjectUseCase {
       // Delete project (cascade will delete sub-projects and tasks)
       await this.projectRepository.delete(id);
 
-      return Result.ok();
+      return Result.ok(undefined);
     } catch (error) {
       return Result.fail(
         new AppError(error instanceof Error ? error.message : 'Failed to delete project', 500)

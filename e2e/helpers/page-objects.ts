@@ -364,7 +364,7 @@ export class ProjectPage {
         .waitForResponse(
           (response) =>
             response.url().includes('/api/projects') &&
-            response.method() === 'POST' &&
+            response.request().method() === 'POST' &&
             response.status() < 400
         )
         .catch(() => null),
@@ -386,5 +386,158 @@ export class ProjectPage {
 
   async expectProjectVisible(name: string): Promise<void> {
     await expect(this.page.locator(`text=${name}`)).toBeVisible();
+  }
+}
+
+/**
+ * News Page Object
+ */
+export class NewsPage {
+  constructor(private page: Page) {}
+
+  // Locators
+  get newNewsButton(): Locator {
+    return this.page.locator(
+      'button:has-text("Yeni Haber"), button:has-text("Haber Oluştur")'
+    );
+  }
+
+  get titleInput(): Locator {
+    return this.page.locator('#title, input[id="title"]');
+  }
+
+  get summaryInput(): Locator {
+    return this.page.locator('textarea[placeholder*="özet"], textarea[name="summary"]');
+  }
+
+  get contentInput(): Locator {
+    return this.page.locator('textarea[placeholder*="içerik"], textarea[name="content"]');
+  }
+
+  get categorySelect(): Locator {
+    return this.page.locator('[role="combobox"]').filter({ hasText: /kategori/i }).first();
+  }
+
+  get imageUrlInput(): Locator {
+    return this.page.locator('input[placeholder*="image"], input[name="imageUrl"]');
+  }
+
+  get submitButton(): Locator {
+    return this.page.locator(
+      'button[type="submit"]:has-text("Oluştur"), button[type="submit"]:has-text("Güncelle"), button[type="submit"]'
+    );
+  }
+
+  get publishButton(): Locator {
+    return this.page.locator('button:has-text("Yayınla")');
+  }
+
+  get editButton(): Locator {
+    return this.page.locator('button:has-text("Düzenle")');
+  }
+
+  get deleteButton(): Locator {
+    return this.page.locator('button:has-text("Sil")');
+  }
+
+  get likeButton(): Locator {
+    return this.page.locator('button:has-text("Beğen"), [data-testid="like-button"]');
+  }
+
+  // Actions
+  async gotoAdmin(): Promise<void> {
+    await this.page.goto('/admin-dashboard/news');
+  }
+
+  async gotoCompany(): Promise<void> {
+    await this.page.goto('/company-dashboard/news');
+  }
+
+  async gotoConsultant(): Promise<void> {
+    await this.page.goto('/consultant-dashboard/news');
+  }
+
+  async createNews(data: {
+    title: string;
+    content: string;
+    summary?: string;
+    category?: string;
+    imageUrl?: string;
+  }): Promise<void> {
+    await this.newNewsButton.click();
+
+    // Dialog'un açılmasını bekle
+    await expect(this.page.locator('[role="dialog"]')).toBeVisible({ timeout: 10000 });
+    await this.page.waitForTimeout(500); // Form render için bekleme
+
+    await this.titleInput.fill(data.title);
+
+    if (data.summary) {
+      await this.summaryInput.fill(data.summary);
+    }
+
+    await this.contentInput.fill(data.content);
+
+    if (data.category) {
+      // Category select için Radix UI Select kullanılıyor
+      const categoryTrigger = this.page
+        .locator('label:has-text("Kategori")')
+        .locator('..')
+        .locator('[role="combobox"]')
+        .first();
+      await categoryTrigger.click();
+      await this.page.waitForTimeout(300);
+      await this.page.locator(`text=${data.category}`).click();
+    }
+
+    if (data.imageUrl) {
+      await this.imageUrlInput.fill(data.imageUrl);
+    }
+
+    // Submit butonuna tıkla ve API response'unu bekle
+    await Promise.all([
+      this.page
+        .waitForResponse(
+          (response) => response.url().includes('/api/news') && response.status() < 400
+        )
+        .catch(() => null),
+      this.submitButton.click(),
+    ]);
+
+    // Dialog'un kapanmasını bekle veya toast notification'ı kontrol et
+    await expect(this.page.locator('[role="dialog"]')).not.toBeVisible({ timeout: 10000 });
+  }
+
+  async expectNewsVisible(title: string): Promise<void> {
+    await expect(this.page.locator(`text=${title}`)).toBeVisible({ timeout: 5000 });
+  }
+
+  async clickNews(title: string): Promise<void> {
+    await this.page.locator(`text=${title}`).click();
+  }
+
+  async publishNews(title: string): Promise<void> {
+    // News card'ı bul ve publish butonuna tıkla
+    const newsCard = this.page.locator(`text=${title}`).locator('..').locator('..');
+    await newsCard.locator('button:has-text("Yayınla")').click();
+
+    // API response'unu bekle
+    await this.page
+      .waitForResponse(
+        (response) =>
+          response.url().includes('/api/news') &&
+          response.url().includes('/publish') &&
+          response.status() < 400
+      )
+      .catch(() => null);
+  }
+
+  async likeNews(title: string): Promise<void> {
+    // News detay sayfasında veya card'da like butonuna tıkla
+    const likeBtn = this.page.locator('button:has-text("Beğen")').first();
+    if (await likeBtn.isVisible()) {
+      await likeBtn.click();
+      await this.page.waitForTimeout(500);
+    }
   }
 }

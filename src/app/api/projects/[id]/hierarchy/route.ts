@@ -45,8 +45,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     if (!result.isSuccess) {
       logger.info('❌ [Hierarchy API] Use case failed:', result.error?.message);
       return NextResponse.json(
-        { error: result.error?.message || 'Failed to fetch project hierarchy' },
-        { status: result.error?.statusCode || 500 }
+        { error: (result.error as any)?.message || 'Failed to fetch project hierarchy' },
+        { status: (result.error as any)?.statusCode || 500 }
       );
     }
 

@@ -163,6 +163,7 @@ interface TaskItemProps
     | 'onTaskMoveUp'
     | 'onTaskMoveDown'
     | 'onTaskView'
+    | 'onTaskQuestion'
   > {
   task: TaskDTO;
   canMoveUp?: boolean;

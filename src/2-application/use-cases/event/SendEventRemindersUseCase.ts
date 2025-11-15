@@ -1,7 +1,7 @@
-import { IEventRepository } from '@/domain/interfaces/repositories/IEventRepository';
-import { IReminderRepository } from '@/domain/interfaces/repositories/IReminderRepository';
-import { Result } from '@/core/result';
-import { AppError } from '@/core/errors';
+import { IEventRepository } from '@/3-domain/interfaces/repositories/IEventRepository';
+import { IReminderRepository } from '@/3-domain/interfaces/repositories/IReminderRepository';
+import { Result } from '@/6-core/result/Result';
+import { AppError } from '@/6-core/errors/AppError';
 import {
   NotificationService,
   NotificationRecipient,
@@ -98,7 +98,7 @@ export class SendEventRemindersUseCase {
             );
 
             if (alreadySent) {
-              logger.debug(
+              logger.info(
                 `Reminder already sent to user ${attendee.userId} for event ${event.id} (${reminderType})`
               );
               continue;

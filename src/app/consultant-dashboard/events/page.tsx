@@ -252,7 +252,7 @@ export default function ConsultantEventsPage() {
 
         <TabsContent value="list" className="space-y-4">
           <EventList
-            programId={selectedProgram.id}
+            programId={selectedProgram?.id}
             onEventClick={handleEventClick}
             onCreateEvent={() => setFormOpen(true)}
             showCreateButton={false}
@@ -293,7 +293,7 @@ export default function ConsultantEventsPage() {
         open={formOpen}
         onOpenChange={setFormOpen}
         onSubmit={handleCreateEvent}
-        programId={selectedProgram.id}
+            programId={selectedProgram?.id}
         consultantId={user?.id}
       />
     </div>

@@ -1,6 +1,6 @@
-import { ITaskRepository } from '@/domain/interfaces/repositories/ITaskRepository';
-import { Result } from '@/core/result';
-import { AppError } from '@/core/errors';
+import { ITaskRepository } from '@/3-domain/interfaces/repositories/ITaskRepository';
+import { Result } from '@/6-core/result/Result';
+import { AppError } from '@/6-core/errors/AppError';
 
 export class AssignTaskUseCase {
   constructor(private taskRepository: ITaskRepository) {}
@@ -16,7 +16,7 @@ export class AssignTaskUseCase {
       // Assign task to user
       await this.taskRepository.assignTo(taskId, userId);
 
-      return Result.ok();
+      return Result.ok(undefined);
     } catch (error) {
       return Result.fail(
         new AppError(error instanceof Error ? error.message : 'Failed to assign task', 500)

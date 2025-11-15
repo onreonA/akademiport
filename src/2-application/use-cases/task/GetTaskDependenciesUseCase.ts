@@ -1,8 +1,8 @@
-import { ITaskDependencyRepository } from '@/domain/interfaces/repositories/ITaskDependencyRepository';
-import { ITaskRepository } from '@/domain/interfaces/repositories/ITaskRepository';
-import { TaskDependency } from '@/domain/entities/TaskDependency';
-import { Result } from '@/core/result';
-import { AppError } from '@/core/errors';
+import { ITaskDependencyRepository } from '@/3-domain/interfaces/repositories/ITaskDependencyRepository';
+import { ITaskRepository } from '@/3-domain/interfaces/repositories/ITaskRepository';
+import { TaskDependency } from '@/3-domain/entities/TaskDependency';
+import { Result } from '@/6-core/result/Result';
+import { AppError } from '@/6-core/errors/AppError';
 
 /**
  * GetTaskDependenciesUseCase

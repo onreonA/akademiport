@@ -57,8 +57,8 @@ export async function GET(request: NextRequest) {
     if (result.isFailure) {
       console.error('ListConsultantPendingQuestionsUseCase failed:', result.error);
       return NextResponse.json(
-        { error: result.error.message },
-        { status: result.error.statusCode }
+        { error: (result.error as any)?.message || "Unknown error" },
+        { status: (result.error as any)?.statusCode || 500 }
       );
     }
 

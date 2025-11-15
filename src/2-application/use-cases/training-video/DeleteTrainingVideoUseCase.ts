@@ -1,6 +1,6 @@
-import { ITrainingVideoRepository } from '@/domain/interfaces/repositories/ITrainingVideoRepository';
-import { Result } from '@/core/result';
-import { AppError } from '@/core/errors';
+import { ITrainingVideoRepository } from '@/3-domain/interfaces/repositories/ITrainingVideoRepository';
+import { Result } from '@/6-core/result/Result';
+import { AppError } from '@/6-core/errors/AppError';
 
 export class DeleteTrainingVideoUseCase {
   constructor(private trainingVideoRepository: ITrainingVideoRepository) {}

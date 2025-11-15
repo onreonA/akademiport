@@ -5,11 +5,11 @@
  */
 
 import { Result } from '@/core/result/Result';
-import { Program } from '@/domain/entities/Program';
+import { Program } from '@/3-domain/entities/Program';
 import { CreateProgramDto } from '@/application/dto/program';
-import { IProgramRepository } from '@/domain/interfaces/IProgramRepository';
-import { UserRole } from '@/domain/enums/UserRole';
-import { ProgramStatus } from '@/domain/enums/ProgramStatus';
+import { IProgramRepository } from '@/3-domain/interfaces/IProgramRepository';
+import { UserRole } from '@/3-domain/enums/UserRole';
+import { ProgramStatus } from '@/3-domain/enums/ProgramStatus';
 
 export interface CreateProgramInput extends CreateProgramDto {
   createdBy?: string;

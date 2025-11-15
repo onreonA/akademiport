@@ -124,6 +124,10 @@ export function AvailabilityManagement() {
     createAvailability.mutate(
       {
         ...data,
+        startTime: data.startTime, // Keep as string (HH:mm format)
+        endTime: data.endTime, // Keep as string (HH:mm format)
+        validFrom: data.validFrom ? new Date(data.validFrom) : null,
+        validUntil: data.validUntil ? new Date(data.validUntil) : null,
         programId: selectedProgram?.id || null,
       },
       {
@@ -150,7 +154,14 @@ export function AvailabilityManagement() {
     }
   ) => {
     updateAvailability.mutate(
-      { id, data },
+      {
+        id,
+        data: {
+          ...data,
+          validFrom: data.validFrom ? new Date(data.validFrom) : null,
+          validUntil: data.validUntil ? new Date(data.validUntil) : null,
+        },
+      },
       {
         onSuccess: () => {
           setEditingAvailability(null);

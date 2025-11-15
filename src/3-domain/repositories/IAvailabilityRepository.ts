@@ -3,17 +3,17 @@
  * Müsaitlik kuralları için repository interface
  */
 
-import type { Result } from '@/shared/core/Result';
+import type { Result } from '@/6-core/result/Result';
 import type {
   Availability,
   CreateAvailabilityDto,
   UpdateAvailabilityDto,
-} from '@/domain/entities/Availability';
+} from '@/3-domain/entities/Availability';
 import type {
   UnavailableDate,
   CreateUnavailableDateDto,
   UpdateUnavailableDateDto,
-} from '@/domain/entities/UnavailableDate';
+} from '@/3-domain/entities/UnavailableDate';
 
 export interface IAvailabilityRepository {
   // Availability CRUD

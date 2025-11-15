@@ -335,7 +335,7 @@ export class AvailabilityRepository implements IAvailabilityRepository {
       );
 
       if (unavailableResult.isFailure) {
-        return Result.fail(unavailableResult.error);
+        return Result.fail(unavailableResult.error || 'Müsaitlik kontrolü yapılamadı');
       }
 
       const unavailableDates = unavailableResult.value || [];
@@ -363,7 +363,7 @@ export class AvailabilityRepository implements IAvailabilityRepository {
       const availabilityResult = await this.findAvailabilityByConsultant(consultantId, programId);
 
       if (availabilityResult.isFailure) {
-        return Result.fail(availabilityResult.error);
+        return Result.fail(availabilityResult.error || 'Müsaitlik kuralları getirilemedi');
       }
 
       const availabilityRules = availabilityResult.value || [];

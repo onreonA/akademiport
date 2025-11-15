@@ -1,8 +1,8 @@
-import { IAppointmentRepository } from '@/domain/interfaces/repositories/IAppointmentRepository';
-import { CreateAppointmentDto } from '@/domain/entities/Appointment';
-import { Result } from '@/core/result';
-import { AppError } from '@/core/errors';
-import { AppointmentEntity } from '@/domain/entities/Appointment';
+import { IAppointmentRepository } from '@/3-domain/interfaces/repositories/IAppointmentRepository';
+import { CreateAppointmentDto } from '@/3-domain/entities/Appointment';
+import { Result } from '@/6-core/result/Result';
+import { AppError } from '@/6-core/errors/AppError';
+import { AppointmentEntity } from '@/3-domain/entities/Appointment';
 import { logger } from '@/shared/utils/logger';
 
 export class CreateAppointmentUseCase {

@@ -30,8 +30,8 @@ export async function GET(request: NextRequest) {
 
     if (result.isFailure) {
       return NextResponse.json(
-        { error: result.error?.message || 'Failed to list sub-projects' },
-        { status: result.error?.statusCode || 400 }
+        { error: (result.error as any)?.message || 'Failed to list sub-projects' },
+        { status: (result.error as any)?.statusCode || 400 }
       );
     }
 
@@ -79,8 +79,8 @@ export async function POST(request: NextRequest) {
 
     if (result.isFailure) {
       return NextResponse.json(
-        { error: result.error?.message || 'Failed to create sub-project' },
-        { status: result.error?.statusCode || 400 }
+        { error: (result.error as any)?.message || 'Failed to create sub-project' },
+        { status: (result.error as any)?.statusCode || 400 }
       );
     }
 

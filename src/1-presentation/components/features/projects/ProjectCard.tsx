@@ -127,15 +127,15 @@ export function ProjectCard({ project, onEdit, onDelete }: ProjectCardProps) {
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <Badge
-              className={`${statusColors[project.status] || statusColors.todo} border font-medium px-2.5 py-1 text-xs`}
+              className={`${statusColors[project.status as keyof typeof statusColors] || statusColors.todo} border font-medium px-2.5 py-1 text-xs`}
             >
-              {statusLabels[project.status] || project.status}
+              {statusLabels[project.status as keyof typeof statusLabels] || project.status}
             </Badge>
             {project.priority && (
               <Badge
-                className={`${priorityColors[project.priority] || priorityColors.medium} border font-medium px-2.5 py-1 text-xs`}
+                className={`${priorityColors[project.priority as keyof typeof priorityColors] || priorityColors.medium} border font-medium px-2.5 py-1 text-xs`}
               >
-                {priorityLabels[project.priority] || project.priority}
+                {priorityLabels[project.priority as keyof typeof priorityLabels] || project.priority}
               </Badge>
             )}
           </div>

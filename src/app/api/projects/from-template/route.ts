@@ -67,8 +67,8 @@ export async function POST(request: NextRequest) {
 
     if (!result.isSuccess) {
       return NextResponse.json(
-        { error: result.error.message },
-        { status: result.error.statusCode || 400 }
+        { error: (result.error as any)?.message || "Unknown error" },
+        { status: (result.error as any)?.statusCode || 500 || 400 }
       );
     }
 

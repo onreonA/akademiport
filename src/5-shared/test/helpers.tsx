@@ -7,7 +7,8 @@
 import { ReactElement } from 'react';
 import { render, RenderOptions } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+// ReactQueryDevtools is optional and only needed in development
+// import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 /**
  * Create a test QueryClient with default options

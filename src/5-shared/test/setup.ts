@@ -1,6 +1,11 @@
 import '@testing-library/jest-dom';
 import { expect, afterEach, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
+import { config } from 'dotenv';
+import { resolve } from 'path';
+
+// Load environment variables from .env.local for integration tests
+config({ path: resolve(process.cwd(), '.env.local') });
 
 // Cleanup after each test
 afterEach(() => {
@@ -30,9 +35,13 @@ vi.mock('next/image', () => ({
   }),
 }));
 
-// Mock environment variables
-process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
-process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-anon-key';
+// Mock environment variables (only if not already set from .env.local)
+if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
+  process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
+}
+if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-anon-key';
+}
 
 // Mock window.matchMedia
 Object.defineProperty(window, 'matchMedia', {
@@ -73,8 +82,8 @@ if (typeof Element !== 'undefined') {
   Element.prototype.scroll = Element.prototype.scroll || (() => {});
 
   // Focus APIs
-  Element.prototype.focus = Element.prototype.focus || (() => {});
-  Element.prototype.blur = Element.prototype.blur || (() => {});
+  HTMLElement.prototype.focus = HTMLElement.prototype.focus || (() => {});
+  HTMLElement.prototype.blur = HTMLElement.prototype.blur || (() => {});
 
   // getBoundingClientRect - return a mock rectangle
   const originalGetBoundingClientRect = Element.prototype.getBoundingClientRect;
@@ -140,7 +149,7 @@ if (typeof window !== 'undefined') {
           'transition',
         ].map((prop) => [prop, ''])
       ),
-    } as CSSStyleDeclaration;
+    } as unknown as CSSStyleDeclaration;
   };
 }
 

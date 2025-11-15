@@ -1,10 +1,10 @@
-import { Result } from '@/core/result';
-import { AppError } from '@/core/errors';
-import { IProjectRepository } from '@/domain/interfaces/repositories/IProjectRepository';
-import { ISubProjectRepository } from '@/domain/interfaces/repositories/ISubProjectRepository';
-import { ICompanyRepository } from '@/domain/interfaces/ICompanyRepository';
-import { ICompanyProjectAssignmentRepository } from '@/domain/interfaces/repositories/ICompanyProjectAssignmentRepository';
-import { IUserRepository } from '@/domain/interfaces/IUserRepository';
+import { Result } from '@/6-core/result/Result';
+import { AppError } from '@/6-core/errors/AppError';
+import { IProjectRepository } from '@/3-domain/interfaces/repositories/IProjectRepository';
+import { ISubProjectRepository } from '@/3-domain/interfaces/repositories/ISubProjectRepository';
+import { ICompanyRepository } from '@/3-domain/interfaces/ICompanyRepository';
+import { ICompanyProjectAssignmentRepository } from '@/3-domain/interfaces/repositories/ICompanyProjectAssignmentRepository';
+import { IUserRepository } from '@/3-domain/interfaces/IUserRepository';
 import { ProjectAssignmentMatrixDTO } from '@/application/dto/project-assignment.dto';
 
 /**
@@ -87,7 +87,7 @@ export class GetAssignmentMatrixUseCase {
         companies.push({
           id: company.id,
           name: company.name,
-          programName: null, // TODO: Program adını ekle
+          programName: undefined, // TODO: Program adını ekle
           city: company.city ?? null,
           sector: company.sector ?? null,
           isActive: company.isActive,

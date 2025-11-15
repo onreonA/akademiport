@@ -7,7 +7,7 @@
 'use client';
 
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/presentation/components/ui/atoms/button';
@@ -23,7 +23,7 @@ import { Spinner } from '@/presentation/components/ui/atoms/spinner';
 import { CheckCircle2, XCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
-export default function VerifyEmailPage() {
+function VerifyEmailContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isVerifying, setIsVerifying] = useState(true);
@@ -133,5 +133,24 @@ export default function VerifyEmailPage() {
         </CardFooter>
       </Card>
     </div>
+  );
+}
+
+export default function VerifyEmailPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle className="text-2xl text-center">Email Doğrulanıyor</CardTitle>
+          </CardHeader>
+          <CardContent className="flex justify-center py-8">
+            <Spinner size="lg" />
+          </CardContent>
+        </Card>
+      </div>
+    }>
+      <VerifyEmailContent />
+    </Suspense>
   );
 }

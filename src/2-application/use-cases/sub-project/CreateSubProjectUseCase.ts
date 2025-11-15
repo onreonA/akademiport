@@ -1,8 +1,8 @@
-import { ISubProjectRepository } from '@/domain/interfaces/repositories/ISubProjectRepository';
-import { IProjectRepository } from '@/domain/interfaces/repositories/IProjectRepository';
-import { SubProjectEntity, CreateSubProjectDto } from '@/domain/entities/SubProject';
-import { Result } from '@/core/result';
-import { AppError } from '@/core/errors';
+import { ISubProjectRepository } from '@/3-domain/interfaces/repositories/ISubProjectRepository';
+import { IProjectRepository } from '@/3-domain/interfaces/repositories/IProjectRepository';
+import { SubProjectEntity, CreateSubProjectDto } from '@/3-domain/entities/SubProject';
+import { Result } from '@/6-core/result/Result';
+import { AppError } from '@/6-core/errors/AppError';
 
 export class CreateSubProjectUseCase {
   constructor(

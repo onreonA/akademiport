@@ -254,21 +254,21 @@ export default function ProgramDetailPage({ params }: { params: Promise<{ id: st
           <StatCard
             title="Konum"
             value={program.city || 'Belirtilmemiş'}
-            description={program.region}
+            subtitle={program.region}
             icon={MapPin}
             color="blue"
           />
           <StatCard
             title="Süre"
             value={`${program.durationMonths || 0} Ay`}
-            description={`${formatDate(program.startDate)} - ${formatDate(program.endDate)}`}
+            subtitle={`${formatDate(program.startDate)} - ${formatDate(program.endDate)}`}
             icon={Calendar}
             color="green"
           />
           <StatCard
             title="Firmalar"
             value={`${program.currentCompanies} / ${program.maxCompanies}`}
-            description={`%${Math.round((program.currentCompanies / program.maxCompanies) * 100)} doluluk`}
+            subtitle={`%${Math.round((program.currentCompanies / program.maxCompanies) * 100)} doluluk`}
             icon={Building2}
             color="purple"
             trend={{
@@ -280,7 +280,7 @@ export default function ProgramDetailPage({ params }: { params: Promise<{ id: st
           <StatCard
             title="Bütçe"
             value={program.budget ? formatCurrency(program.budget) : 'Belirtilmemiş'}
-            description={program.sponsor}
+            subtitle={program.sponsor}
             icon={DollarSign}
             color="orange"
           />

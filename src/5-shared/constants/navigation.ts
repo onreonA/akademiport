@@ -19,6 +19,7 @@ import {
   Calendar,
   CalendarCheck,
   Clock,
+  Newspaper,
   type LucideIcon,
 } from 'lucide-react';
 import { UserRole } from '@/domain/enums/UserRole';
@@ -173,6 +174,24 @@ export const MASTER_ADMIN_NAVIGATION: NavigationConfig = {
       href: '/dashboard/appointments',
     },
     {
+      id: 'news',
+      label: 'Haberler',
+      icon: Newspaper,
+      href: '/admin-dashboard/news',
+      children: [
+        {
+          id: 'news-all',
+          label: 'Tüm Haberler',
+          href: '/admin-dashboard/news',
+        },
+        {
+          id: 'news-new',
+          label: 'Yeni Haber',
+          href: '/admin-dashboard/news/new',
+        },
+      ],
+    },
+    {
       id: 'project-templates',
       label: 'Proje Şablonları',
       icon: FileStack,
@@ -281,6 +300,12 @@ export const CONSULTANT_NAVIGATION: NavigationConfig = {
       href: '/consultant-dashboard/availability',
     },
     {
+      id: 'news',
+      label: 'Haberler',
+      icon: Newspaper,
+      href: '/consultant-dashboard/news',
+    },
+    {
       id: 'reports',
       label: 'Raporlarım',
       icon: BarChart3,
@@ -341,6 +366,12 @@ export const COMPANY_ADMIN_NAVIGATION: NavigationConfig = {
       href: '/company-dashboard/appointments',
     },
     {
+      id: 'news',
+      label: 'Haberler',
+      icon: Newspaper,
+      href: '/company-dashboard/news',
+    },
+    {
       id: 'reports',
       label: 'Raporlar',
       icon: BarChart3,
@@ -399,6 +430,12 @@ export const COMPANY_USER_NAVIGATION: NavigationConfig = {
       label: 'Randevular',
       icon: CalendarCheck,
       href: '/company-dashboard/appointments',
+    },
+    {
+      id: 'news',
+      label: 'Haberler',
+      icon: Newspaper,
+      href: '/company-dashboard/news',
     },
   ],
   bottom: [

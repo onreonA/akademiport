@@ -240,7 +240,7 @@ export default function CompanyProjectDetailPage() {
 
       const updatedSubProjects = prev.subProjects.map((subProject) => {
         const updatedTasks = (subProject.tasks || []).map((task) =>
-          task.id === taskId ? { ...task, status } : task
+          task.id === taskId ? { ...task, status: status as TaskDTO['status'] } : task
         );
 
         const stats = calculateSubProjectStats(updatedTasks);
@@ -426,7 +426,7 @@ export default function CompanyProjectDetailPage() {
     );
   }
 
-  const statusInfo = statusLabels[project.status] || statusLabels.active;
+  const statusInfo = statusLabels[project.status as keyof typeof statusLabels] || statusLabels.active;
   const priorityInfo = priorityLabels[project.priority] || priorityLabels.medium;
 
   return (

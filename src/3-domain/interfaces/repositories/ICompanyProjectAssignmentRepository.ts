@@ -47,3 +47,4 @@ export interface ICompanyProjectAssignmentRepository {
     subProjectId?: string | null;
   }): Promise<boolean>;
 }
+

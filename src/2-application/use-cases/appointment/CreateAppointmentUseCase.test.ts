@@ -4,8 +4,8 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { CreateAppointmentUseCase } from './CreateAppointmentUseCase';
-import { IAppointmentRepository } from '@/domain/interfaces/repositories/IAppointmentRepository';
-import { Appointment } from '@/domain/entities/Appointment';
+import { IAppointmentRepository } from '@/3-domain/interfaces/repositories/IAppointmentRepository';
+import { Appointment } from '@/3-domain/entities/Appointment';
 
 describe('CreateAppointmentUseCase', () => {
   let mockAppointmentRepository: IAppointmentRepository;

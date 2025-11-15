@@ -46,8 +46,8 @@ export function EventList({
     () => ({
       programId: programId || null,
       consultantId: consultantId || null,
-      category: categoryFilter !== 'all' ? categoryFilter : undefined,
-      status: statusFilter !== 'all' ? statusFilter : undefined,
+      category: categoryFilter !== 'all' ? (categoryFilter as 'webinar' | 'workshop' | 'networking' | 'announcement' | 'other') : undefined,
+      status: statusFilter !== 'all' ? (statusFilter as 'draft' | 'scheduled' | 'ongoing' | 'completed' | 'cancelled') : undefined,
       search: search || undefined,
       page,
       limit: 12,

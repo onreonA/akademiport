@@ -4,8 +4,8 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { ApproveAppointmentUseCase } from './ApproveAppointmentUseCase';
-import { IAppointmentRepository } from '@/domain/interfaces/repositories/IAppointmentRepository';
-import { Appointment } from '@/domain/entities/Appointment';
+import { IAppointmentRepository } from '@/3-domain/interfaces/repositories/IAppointmentRepository';
+import { Appointment } from '@/3-domain/entities/Appointment';
 
 // Mock ZoomApiService
 vi.mock('@/infrastructure/external/zoom-api.service', () => ({

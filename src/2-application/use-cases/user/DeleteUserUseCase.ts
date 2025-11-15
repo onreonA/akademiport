@@ -5,8 +5,8 @@
  */
 
 import { Result } from '@/core/result/Result';
-import { IUserRepository } from '@/domain/interfaces/IUserRepository';
-import { UserRole } from '@/domain/enums/UserRole';
+import { IUserRepository } from '@/3-domain/interfaces/IUserRepository';
+import { UserRole } from '@/3-domain/enums/UserRole';
 
 interface DeleteUserRequest {
   id: string;

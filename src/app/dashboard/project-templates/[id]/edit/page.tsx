@@ -711,7 +711,10 @@ export default function EditProjectTemplatePage() {
         {/* SubProject Modal */}
         <SubProjectModal
           projectId={templateId}
-          subProject={editingSubProject}
+          subProject={editingSubProject ? {
+            ...editingSubProject,
+            order_index: editingSubProject.orderIndex,
+          } : null}
           open={subProjectModalOpen}
           onOpenChange={(open) => {
             setSubProjectModalOpen(open);

@@ -5,9 +5,9 @@
  */
 
 import { Result } from '@/core/result/Result';
-import { IProgramRepository } from '@/domain/interfaces/IProgramRepository';
-import { ICompanyRepository } from '@/domain/interfaces/ICompanyRepository';
-import { UserRole } from '@/domain/enums/UserRole';
+import { IProgramRepository } from '@/3-domain/interfaces/IProgramRepository';
+import { ICompanyRepository } from '@/3-domain/interfaces/ICompanyRepository';
+import { UserRole } from '@/3-domain/enums/UserRole';
 
 export interface DeleteProgramInput {
   id: string;

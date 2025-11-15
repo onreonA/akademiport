@@ -1,7 +1,7 @@
-import { IEventRepository } from '@/domain/interfaces/repositories/IEventRepository';
-import { EventFilterDto } from '@/domain/entities/Event';
-import { Result } from '@/core/result';
-import { AppError } from '@/core/errors';
+import { IEventRepository } from '@/3-domain/interfaces/repositories/IEventRepository';
+import { EventFilterDto } from '@/3-domain/entities/Event';
+import { Result } from '@/6-core/result/Result';
+import { AppError } from '@/6-core/errors/AppError';
 
 export class ListEventsUseCase {
   constructor(private eventRepository: IEventRepository) {}

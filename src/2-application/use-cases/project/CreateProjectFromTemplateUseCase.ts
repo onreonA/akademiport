@@ -1,8 +1,8 @@
-import { IProjectRepository } from '@/domain/interfaces/repositories/IProjectRepository';
-import { ISubProjectRepository } from '@/domain/interfaces/repositories/ISubProjectRepository';
-import { ITaskRepository } from '@/domain/interfaces/repositories/ITaskRepository';
-import { Result } from '@/core/result';
-import { AppError } from '@/core/errors';
+import { IProjectRepository } from '@/3-domain/interfaces/repositories/IProjectRepository';
+import { ISubProjectRepository } from '@/3-domain/interfaces/repositories/ISubProjectRepository';
+import { ITaskRepository } from '@/3-domain/interfaces/repositories/ITaskRepository';
+import { Result } from '@/6-core/result/Result';
+import { AppError } from '@/6-core/errors/AppError';
 
 export interface CreateProjectFromTemplateDto {
   templateId: string;

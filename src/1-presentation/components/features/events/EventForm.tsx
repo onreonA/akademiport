@@ -51,10 +51,10 @@ export function EventForm({
     watch,
     setValue,
   } = useForm<CreateEventDto>({
-    resolver: zodResolver(CreateEventDtoSchema),
+    resolver: zodResolver(CreateEventDtoSchema) as any,
     defaultValues: {
-      programId: defaultValues?.programId || programId || '',
-      consultantId: defaultValues?.consultantId || consultantId || '',
+      programId: defaultValues?.programId || programId || ('' as any),
+      consultantId: defaultValues?.consultantId || consultantId || ('' as any),
       title: defaultValues?.title || '',
       description: defaultValues?.description || '',
       category: defaultValues?.category || 'webinar',

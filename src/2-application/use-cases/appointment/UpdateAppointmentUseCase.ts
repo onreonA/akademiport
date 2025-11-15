@@ -1,7 +1,7 @@
-import { IAppointmentRepository } from '@/domain/interfaces/repositories/IAppointmentRepository';
-import { UpdateAppointmentDto } from '@/domain/entities/Appointment';
-import { Result } from '@/core/result';
-import { AppError } from '@/core/errors';
+import { IAppointmentRepository } from '@/3-domain/interfaces/repositories/IAppointmentRepository';
+import { UpdateAppointmentDto } from '@/3-domain/entities/Appointment';
+import { Result } from '@/6-core/result/Result';
+import { AppError } from '@/6-core/errors/AppError';
 import { logger } from '@/shared/utils/logger';
 
 export class UpdateAppointmentUseCase {

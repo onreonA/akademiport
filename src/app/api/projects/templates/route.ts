@@ -12,6 +12,9 @@ export async function GET(request: NextRequest) {
     console.log('🔍 [Templates API] Starting...');
 
     const user = await getAuthenticatedUser(request);
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
     console.log('👤 [Templates API] User:', { id: user.id, role: user.role, email: user.email });
 
     // Only master_admin, program_manager, and consultant can access templates
@@ -50,11 +53,11 @@ export async function GET(request: NextRequest) {
       // Return more detailed error for debugging
       return NextResponse.json(
         {
-          error: result.error?.message || 'Failed to get templates',
+          error: (result.error as any)?.message || 'Failed to get templates',
           details: {
-            message: result.error?.message,
-            code: result.error?.code,
-            statusCode: result.error?.statusCode,
+            message: (result.error as any)?.message,
+            code: (result.error as any)?.code,
+            statusCode: (result.error as any)?.statusCode,
           },
         },
         { status: 400 }

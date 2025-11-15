@@ -1,7 +1,7 @@
-import { IEventRepository } from '@/domain/interfaces/repositories/IEventRepository';
-import { Result } from '@/core/result';
-import { AppError } from '@/core/errors';
-import { EventEntity } from '@/domain/entities/Event';
+import { IEventRepository } from '@/3-domain/interfaces/repositories/IEventRepository';
+import { Result } from '@/6-core/result/Result';
+import { AppError } from '@/6-core/errors/AppError';
+import { EventEntity } from '@/3-domain/entities/Event';
 
 export class RegisterEventAttendanceUseCase {
   constructor(private eventRepository: IEventRepository) {}

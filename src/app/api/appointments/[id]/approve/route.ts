@@ -45,7 +45,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const validationResult = ApproveAppointmentDtoSchema.safeParse(body);
     if (!validationResult.success) {
       return NextResponse.json(
-        { error: 'Validation failed', details: validationResult.error.errors },
+        { error: 'Validation failed', details: validationResult.error.issues },
         { status: 400 }
       );
     }
@@ -58,9 +58,10 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     );
 
     if (result.isFailure) {
+      const error = result.error as any;
       return NextResponse.json(
-        { error: result.error.message },
-        { status: result.error.statusCode }
+        { error: error?.message || 'Randevu onaylanamadı' },
+        { status: error?.statusCode || 500 }
       );
     }
 

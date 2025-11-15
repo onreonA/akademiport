@@ -1,8 +1,8 @@
-import { ITaskRepository } from '@/domain/interfaces/repositories/ITaskRepository';
-import { ITaskDependencyRepository } from '@/domain/interfaces/repositories/ITaskDependencyRepository';
-import { UpdateTaskDto } from '@/domain/entities/Task';
-import { Result } from '@/core/result';
-import { AppError } from '@/core/errors';
+import { ITaskRepository } from '@/3-domain/interfaces/repositories/ITaskRepository';
+import { ITaskDependencyRepository } from '@/3-domain/interfaces/repositories/ITaskDependencyRepository';
+import { UpdateTaskDto } from '@/3-domain/entities/Task';
+import { Result } from '@/6-core/result/Result';
+import { AppError } from '@/6-core/errors/AppError';
 
 export class UpdateTaskUseCase {
   constructor(
@@ -53,7 +53,7 @@ export class UpdateTaskUseCase {
       // Update task
       await this.taskRepository.update(id, data);
 
-      return Result.ok();
+      return Result.ok(undefined);
     } catch (error) {
       return Result.fail(
         new AppError(error instanceof Error ? error.message : 'Failed to update task', 500)

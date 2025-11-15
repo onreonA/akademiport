@@ -5,8 +5,8 @@
  */
 
 import { Result } from '@/core/result/Result';
-import { Program } from '@/domain/entities/Program';
-import { IProgramRepository } from '@/domain/interfaces/IProgramRepository';
+import { Program } from '@/3-domain/entities/Program';
+import { IProgramRepository } from '@/3-domain/interfaces/IProgramRepository';
 
 export interface GetProgramInput {
   id: string;

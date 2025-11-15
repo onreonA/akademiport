@@ -31,8 +31,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     if (result.isFailure) {
       return NextResponse.json(
-        { error: result.error.message },
-        { status: result.error.statusCode }
+        { error: (result.error as any)?.message || "Unknown error" },
+        { status: (result.error as any)?.statusCode || 500 }
       );
     }
 
@@ -91,12 +91,12 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
     if (result.isFailure) {
       logger.error('❌ CreateTrainingDocumentUseCase failed:', {
-        error: result.error.message,
-        statusCode: result.error.statusCode,
+        error: (result.error as any)?.message || "Unknown error",
+        statusCode: (result.error as any)?.statusCode || 500,
       });
       return NextResponse.json(
-        { error: result.error.message },
-        { status: result.error.statusCode }
+        { error: (result.error as any)?.message || "Unknown error" },
+        { status: (result.error as any)?.statusCode || 500 }
       );
     }
 

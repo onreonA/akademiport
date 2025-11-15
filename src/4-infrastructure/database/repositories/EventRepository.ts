@@ -1,12 +1,12 @@
-import { IEventRepository } from '@/domain/interfaces/repositories/IEventRepository';
+import { IEventRepository } from '@/3-domain/interfaces/repositories/IEventRepository';
 import {
   Event,
   CreateEventDto,
   UpdateEventDto,
   EventFilterDto,
   EventAttendance,
-} from '@/domain/entities/Event';
-import { createClient } from '@/infrastructure/database/supabase-server';
+} from '@/3-domain/entities/Event';
+import { createClient } from '@/4-infrastructure/database/supabase-server';
 
 export class EventRepository implements IEventRepository {
   async create(data: CreateEventDto): Promise<Event> {
@@ -29,7 +29,7 @@ export class EventRepository implements IEventRepository {
         organizer_name: data.organizerName || null,
         organizer_email: data.organizerEmail || null,
         is_public: data.isPublic ?? true,
-        created_by: data.createdBy || null,
+        created_by: (data as any).createdBy || null,
       })
       .select()
       .single();

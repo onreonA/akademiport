@@ -5,6 +5,7 @@ import { CreateEventUseCase, ListEventsUseCase } from '@/application/use-cases/e
 import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
 import { logger } from '@/shared/utils/logger';
 import { CreateEventDtoSchema, EventFilterDtoSchema } from '@/application/dto/event';
+import { EventFilterDto } from '@/3-domain/entities/Event';
 import { UserRole } from '@/domain/enums/UserRole';
 
 const eventRepository = new EventRepository();
@@ -60,7 +61,7 @@ export async function GET(request: NextRequest) {
           return NextResponse.json({ error: 'Bu programa erişim yetkiniz yok' }, { status: 403 });
         }
         // Consultant can see all events in their assigned programs (not just their own)
-        finalConsultantId = null; // Don't filter by consultantId
+        finalConsultantId = undefined; // Don't filter by consultantId
         finalProgramId = programId;
       } else {
         // If no programId provided, consultant should select a program first
@@ -84,41 +85,50 @@ export async function GET(request: NextRequest) {
           userId: user.id,
           availablePrograms: consultantPrograms.map((p) => ({ id: p.id, name: p.name })),
         });
-        finalConsultantId = null; // Don't filter by consultantId
-        // Don't set finalProgramId - let it be null so no events are returned
+        finalConsultantId = undefined; // Don't filter by consultantId
+        // Don't set finalProgramId - let it be undefined so no events are returned
         // This forces the consultant to select a program
       }
     }
 
-    // Parse dates
-    const filters: any = {
+    // Prepare filters for validation (schema expects strings)
+    const filtersForValidation: any = {
       programId: finalProgramId || null,
       consultantId: finalConsultantId || null,
       category,
       status,
-      startDate: startDate ? new Date(startDate) : null,
-      endDate: endDate ? new Date(endDate) : null,
+      startDate: startDate || null,
+      endDate: endDate || null,
       search,
       page,
       limit,
     };
 
     // Validate filters
-    const validationResult = EventFilterDtoSchema.safeParse(filters);
+    const validationResult = EventFilterDtoSchema.safeParse(filtersForValidation);
     if (!validationResult.success) {
       return NextResponse.json(
-        { error: 'Invalid filters', details: validationResult.error.errors },
+        { error: 'Invalid filters', details: validationResult.error.issues },
         { status: 400 }
       );
     }
 
+    // Convert validated data to EventFilterDto (convert string dates to Date objects)
+    const filtersForUseCase = {
+      ...validationResult.data,
+      programId: validationResult.data.programId || undefined,
+      consultantId: validationResult.data.consultantId || undefined,
+      startDate: validationResult.data.startDate ? new Date(validationResult.data.startDate) : undefined,
+      endDate: validationResult.data.endDate ? new Date(validationResult.data.endDate) : undefined,
+    } as EventFilterDto;
+
     const listEventsUseCase = new ListEventsUseCase(eventRepository);
-    const result = await listEventsUseCase.execute(validationResult.data);
+    const result = await listEventsUseCase.execute(filtersForUseCase);
 
     if (result.isFailure) {
       return NextResponse.json(
-        { error: result.error.message },
-        { status: result.error.statusCode }
+        { error: (result.error as any)?.message || "Unknown error" },
+        { status: (result.error as any)?.statusCode || 500 }
       );
     }
 
@@ -169,7 +179,7 @@ export async function POST(request: NextRequest) {
 
     if (!validationResult.success) {
       return NextResponse.json(
-        { error: 'Validation failed', details: validationResult.error.errors },
+        { error: 'Validation failed', details: validationResult.error.issues },
         { status: 400 }
       );
     }
@@ -181,8 +191,7 @@ export async function POST(request: NextRequest) {
         startTime: new Date(validationResult.data.startTime),
         endTime: new Date(validationResult.data.endTime),
         consultantId:
-          validationResult.data.consultantId || (user.role === 'consultant' ? user.id : undefined),
-        createdBy: user.id,
+          validationResult.data.consultantId || (user.role === 'consultant' ? user.id : ''),
       },
       user.id,
       validationResult.data.createZoomMeeting ?? true
@@ -190,8 +199,8 @@ export async function POST(request: NextRequest) {
 
     if (result.isFailure) {
       return NextResponse.json(
-        { error: result.error.message },
-        { status: result.error.statusCode }
+        { error: (result.error as any)?.message || "Unknown error" },
+        { status: (result.error as any)?.statusCode || 500 }
       );
     }
 

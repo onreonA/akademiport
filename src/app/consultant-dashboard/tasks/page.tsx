@@ -97,6 +97,7 @@ function ConsultantTasksPageContent() {
     data: tasksData,
     isLoading: tasksLoading,
     error: tasksError,
+    refetch: refetchTasks,
   } = useConsultantTasks(getFilters());
 
   const { data: allTasksData } = useConsultantTasksAll();
@@ -174,7 +175,7 @@ function ConsultantTasksPageContent() {
             <AlertCircle className="w-16 h-16 text-destructive mx-auto mb-4" />
             <h2 className="text-2xl font-bold mb-2">Hata Oluştu</h2>
             <p className="text-muted-foreground mb-4">{error}</p>
-            <Button onClick={fetchTasks}>Tekrar Dene</Button>
+            <Button onClick={() => refetchTasks()}>Tekrar Dene</Button>
           </EnhancedCard>
         </div>
       </div>

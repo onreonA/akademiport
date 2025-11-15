@@ -4,7 +4,7 @@
  */
 
 import { Result } from '@/core/result/Result';
-import type { IAvailabilityRepository } from '@/domain/repositories/IAvailabilityRepository';
+import type { IAvailabilityRepository } from '@/3-domain/repositories/IAvailabilityRepository';
 
 export interface CheckAvailabilityInput {
   consultantId: string;

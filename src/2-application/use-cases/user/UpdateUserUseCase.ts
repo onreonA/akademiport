@@ -5,9 +5,9 @@
  */
 
 import { Result } from '@/core/result/Result';
-import { IUserRepository } from '@/domain/interfaces/IUserRepository';
-import { User } from '@/domain/entities/User';
-import { UserRole } from '@/domain/enums/UserRole';
+import { IUserRepository } from '@/3-domain/interfaces/IUserRepository';
+import { User } from '@/3-domain/entities/User';
+import { UserRole } from '@/3-domain/enums/UserRole';
 import { UpdateUserDto } from '@/application/dto/user';
 
 interface UpdateUserRequest extends UpdateUserDto {

@@ -1,9 +1,9 @@
-import { ITrainingProgressRepository } from '@/domain/interfaces/repositories/ITrainingProgressRepository';
-import { ICompanyRepository } from '@/domain/interfaces/repositories/ICompanyRepository';
-import { ITrainingRepository } from '@/domain/interfaces/repositories/ITrainingRepository';
-import { TrainingProgress } from '@/domain/entities/TrainingProgress';
-import { Result } from '@/core/result';
-import { AppError } from '@/core/errors';
+import { ITrainingProgressRepository } from '@/3-domain/interfaces/repositories/ITrainingProgressRepository';
+import { ICompanyRepository } from '@/3-domain/interfaces/ICompanyRepository';
+import { ITrainingRepository } from '@/3-domain/interfaces/repositories/ITrainingRepository';
+import { TrainingProgress } from '@/3-domain/entities/TrainingProgress';
+import { Result } from '@/6-core/result/Result';
+import { AppError } from '@/6-core/errors/AppError';
 
 export class GetTrainingProgressUseCase {
   constructor(

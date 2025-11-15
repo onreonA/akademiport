@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { ApproveTaskUseCase } from './ApproveTaskUseCase';
-import { ITaskRepository } from '@/domain/interfaces/repositories/ITaskRepository';
-import { Task } from '@/domain/entities/Task';
+import { ITaskRepository } from '@/3-domain/interfaces/repositories/ITaskRepository';
+import { Task } from '@/3-domain/entities/Task';
 
 describe('ApproveTaskUseCase', () => {
   let mockRepository: ITaskRepository;

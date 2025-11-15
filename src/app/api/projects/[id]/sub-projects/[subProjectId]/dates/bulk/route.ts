@@ -50,11 +50,11 @@ export async function POST(
     if (result.isFailure && result.error instanceof AppError) {
       return NextResponse.json(
         {
-          error: result.error.message,
+          error: (result.error as any)?.message || "Unknown error",
           code: result.error.code,
           errors: Array.isArray(result.error.details) ? result.error.details : undefined,
         },
-        { status: result.error.statusCode }
+        { status: (result.error as any)?.statusCode || 500 }
       );
     }
 

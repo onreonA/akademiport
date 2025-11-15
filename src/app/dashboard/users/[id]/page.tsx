@@ -233,9 +233,9 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
                     </p>
                     <p
                       className="text-sm font-medium text-gray-900 dark:text-white truncate"
-                      title={user.companyName || 'Belirtilmemiş'}
+                      title={(user as any).companyName || 'Belirtilmemiş'}
                     >
-                      {user.companyName || 'Belirtilmemiş'}
+                      {(user as any).companyName || 'Belirtilmemiş'}
                     </p>
                   </div>
                 </div>

@@ -327,7 +327,7 @@ export class EventEntity implements Event {
       errors.push('Başlangıç tarihi geçmişte olamaz');
     }
 
-    if (data.maxAttendees !== null && data.maxAttendees < 1) {
+    if (data.maxAttendees !== null && data.maxAttendees !== undefined && data.maxAttendees < 1) {
       errors.push("Maksimum katılımcı sayısı 1'den küçük olamaz");
     }
 

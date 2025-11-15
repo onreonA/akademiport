@@ -4,12 +4,12 @@
  */
 
 import { Result } from '@/core/result/Result';
-import type { IAvailabilityRepository } from '@/domain/repositories/IAvailabilityRepository';
+import type { IAvailabilityRepository } from '@/3-domain/repositories/IAvailabilityRepository';
 import type {
   Availability,
   CreateAvailabilityDto,
   UpdateAvailabilityDto,
-} from '@/domain/entities/Availability';
+} from '@/3-domain/entities/Availability';
 
 export class ManageAvailabilityUseCase {
   constructor(private readonly availabilityRepository: IAvailabilityRepository) {}

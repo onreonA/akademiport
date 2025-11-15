@@ -4,8 +4,8 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { DeleteProjectUseCase } from './DeleteProjectUseCase';
-import { IProjectRepository } from '@/domain/interfaces/repositories/IProjectRepository';
-import { Project } from '@/domain/entities/Project';
+import { IProjectRepository } from '@/3-domain/interfaces/repositories/IProjectRepository';
+import { Project } from '@/3-domain/entities/Project';
 
 describe('DeleteProjectUseCase', () => {
   let mockProjectRepository: IProjectRepository;

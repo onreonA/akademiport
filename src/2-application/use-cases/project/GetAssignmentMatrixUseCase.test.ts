@@ -1,15 +1,15 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { GetAssignmentMatrixUseCase } from './GetAssignmentMatrixUseCase';
-import { IProjectRepository } from '@/domain/interfaces/repositories/IProjectRepository';
-import { ISubProjectRepository } from '@/domain/interfaces/repositories/ISubProjectRepository';
-import { ICompanyRepository } from '@/domain/interfaces/ICompanyRepository';
-import { ICompanyProjectAssignmentRepository } from '@/domain/interfaces/repositories/ICompanyProjectAssignmentRepository';
-import { IUserRepository } from '@/domain/interfaces/IUserRepository';
-import { Project } from '@/domain/entities/Project';
-import { SubProject } from '@/domain/entities/SubProject';
-import { Company } from '@/domain/entities/Company';
-import { CompanyProjectAssignment } from '@/domain/entities/CompanyProjectAssignment';
-import { Result } from '@/core/result';
+import { IProjectRepository } from '@/3-domain/interfaces/repositories/IProjectRepository';
+import { ISubProjectRepository } from '@/3-domain/interfaces/repositories/ISubProjectRepository';
+import { ICompanyRepository } from '@/3-domain/interfaces/ICompanyRepository';
+import { ICompanyProjectAssignmentRepository } from '@/3-domain/interfaces/repositories/ICompanyProjectAssignmentRepository';
+import { IUserRepository } from '@/3-domain/interfaces/IUserRepository';
+import { Project } from '@/3-domain/entities/Project';
+import { SubProject } from '@/3-domain/entities/SubProject';
+import { Company } from '@/3-domain/entities/Company';
+import { CompanyProjectAssignment } from '@/3-domain/entities/CompanyProjectAssignment';
+import { Result } from '@/6-core/result/Result';
 
 describe('GetAssignmentMatrixUseCase', () => {
   let mockProjectRepository: IProjectRepository;

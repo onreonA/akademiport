@@ -1,7 +1,7 @@
-import { ITrainingVideoRepository } from '@/domain/interfaces/repositories/ITrainingVideoRepository';
-import { UpdateTrainingVideoDto } from '@/domain/entities/TrainingVideo';
-import { Result } from '@/core/result';
-import { AppError } from '@/core/errors';
+import { ITrainingVideoRepository } from '@/3-domain/interfaces/repositories/ITrainingVideoRepository';
+import { UpdateTrainingVideoDto } from '@/3-domain/entities/TrainingVideo';
+import { Result } from '@/6-core/result/Result';
+import { AppError } from '@/6-core/errors/AppError';
 import { YouTubeApiService } from '@/infrastructure/external/youtube-api.service';
 
 export class UpdateTrainingVideoUseCase {

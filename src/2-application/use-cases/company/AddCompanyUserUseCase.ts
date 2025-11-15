@@ -4,8 +4,8 @@
  */
 
 import { Result } from '@/core/result/Result';
-import { UserRole } from '@/domain/enums/UserRole';
-import { ICompanyRepository } from '@/domain/interfaces/ICompanyRepository';
+import { UserRole } from '@/3-domain/enums/UserRole';
+import { ICompanyRepository } from '@/3-domain/interfaces/ICompanyRepository';
 
 export class AddCompanyUserUseCase {
   constructor(private companyRepository: ICompanyRepository) {}

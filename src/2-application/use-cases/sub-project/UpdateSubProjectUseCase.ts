@@ -1,7 +1,7 @@
-import { ISubProjectRepository } from '@/domain/interfaces/repositories/ISubProjectRepository';
-import { UpdateSubProjectDto } from '@/domain/entities/SubProject';
-import { Result } from '@/core/result';
-import { AppError } from '@/core/errors';
+import { ISubProjectRepository } from '@/3-domain/interfaces/repositories/ISubProjectRepository';
+import { UpdateSubProjectDto } from '@/3-domain/entities/SubProject';
+import { Result } from '@/6-core/result/Result';
+import { AppError } from '@/6-core/errors/AppError';
 
 export class UpdateSubProjectUseCase {
   constructor(private subProjectRepository: ISubProjectRepository) {}
@@ -17,7 +17,7 @@ export class UpdateSubProjectUseCase {
       // Update sub-project
       await this.subProjectRepository.update(id, data);
 
-      return Result.ok();
+      return Result.ok(undefined);
     } catch (error) {
       return Result.fail(
         new AppError(error instanceof Error ? error.message : 'Failed to update sub-project', 500)

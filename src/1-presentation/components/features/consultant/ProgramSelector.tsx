@@ -61,6 +61,7 @@ export function ProgramSelector({ onProgramChange, className }: ProgramSelectorP
       [ProgramStatus.PLANNED]: 'Planlandı',
       [ProgramStatus.COMPLETED]: 'Tamamlandı',
       [ProgramStatus.CANCELLED]: 'İptal',
+      [ProgramStatus.PAUSED]: 'Duraklatıldı',
     };
     return labels[status];
   };

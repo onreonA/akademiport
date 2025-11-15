@@ -6,10 +6,10 @@
  */
 
 import { Result } from '@/core/result/Result';
-import { UserRole } from '@/domain/enums/UserRole';
-import { ProgramStatus } from '@/domain/enums/ProgramStatus';
-import type { IUserRepository } from '@/domain/interfaces/IUserRepository';
-import type { ICompanyRepository } from '@/domain/interfaces/ICompanyRepository';
+import { UserRole } from '@/3-domain/enums/UserRole';
+import { ProgramStatus } from '@/3-domain/enums/ProgramStatus';
+import type { IUserRepository } from '@/3-domain/interfaces/IUserRepository';
+import type { ICompanyRepository } from '@/3-domain/interfaces/ICompanyRepository';
 import type {
   ConsultantDashboardData,
   ConsultantDashboardStats,

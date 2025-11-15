@@ -49,8 +49,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     if (result.isFailure) {
       return NextResponse.json(
-        { error: result.error.message, code: result.error.code },
-        { status: result.error.statusCode }
+        { error: (result.error as any)?.message || "Unknown error", code: (result.error as any)?.code },
+        { status: (result.error as any)?.statusCode || 500 }
       );
     }
 

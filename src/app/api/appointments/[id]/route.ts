@@ -7,7 +7,7 @@ import {
 } from '@/application/use-cases/appointment';
 import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
 import { logger } from '@/shared/utils/logger';
-import { UpdateAppointmentDtoSchema } from '@/application/dto/appointment';
+import { UpdateAppointmentDtoSchema, type AppointmentResponseDto } from '@/application/dto/appointment';
 import { UserRole } from '@/domain/enums/UserRole';
 
 const appointmentRepository = new AppointmentRepository();
@@ -30,8 +30,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     if (result.isFailure) {
       return NextResponse.json(
-        { error: result.error.message },
-        { status: result.error.statusCode }
+        { error: (result.error as any)?.message || "Unknown error" },
+        { status: (result.error as any)?.statusCode || 500 }
       );
     }
 
@@ -49,9 +49,24 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     }
     // Admin and Program Manager can see all appointments
 
+    // Map Appointment entity to AppointmentResponseDto
+    const appointmentResponse: AppointmentResponseDto = {
+      ...appointment,
+      consultantNotes: appointment.notes, // Map notes to consultantNotes
+      startTime: appointment.startTime.toISOString(),
+      endTime: appointment.endTime.toISOString(),
+      requestedAt: appointment.requestedAt.toISOString(),
+      approvedAt: appointment.approvedAt?.toISOString() || null,
+      rejectedAt: appointment.rejectedAt?.toISOString() || null,
+      rescheduledAt: appointment.rescheduledAt?.toISOString() || null,
+      attendedAt: appointment.attendedAt?.toISOString() || null,
+      createdAt: appointment.createdAt.toISOString(),
+      updatedAt: appointment.updatedAt.toISOString(),
+    };
+
     return NextResponse.json({
       success: true,
-      appointment,
+      appointment: appointmentResponse,
     });
   } catch (error) {
     logger.error('Error in GET /api/appointments/[id]:', error);
@@ -103,7 +118,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     const validationResult = UpdateAppointmentDtoSchema.safeParse(body);
     if (!validationResult.success) {
       return NextResponse.json(
-        { error: 'Validation failed', details: validationResult.error.errors },
+        { error: 'Validation failed', details: validationResult.error.issues },
         { status: 400 }
       );
     }
@@ -125,14 +140,30 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
     if (result.isFailure) {
       return NextResponse.json(
-        { error: result.error.message },
-        { status: result.error.statusCode }
+        { error: (result.error as any)?.message || "Unknown error" },
+        { status: (result.error as any)?.statusCode || 500 }
       );
     }
 
+    // Map Appointment entity to AppointmentResponseDto
+    const updatedAppointment = result.value;
+    const appointmentResponse: AppointmentResponseDto = {
+      ...updatedAppointment,
+      consultantNotes: updatedAppointment.notes, // Map notes to consultantNotes
+      startTime: updatedAppointment.startTime.toISOString(),
+      endTime: updatedAppointment.endTime.toISOString(),
+      requestedAt: updatedAppointment.requestedAt.toISOString(),
+      approvedAt: updatedAppointment.approvedAt?.toISOString() || null,
+      rejectedAt: updatedAppointment.rejectedAt?.toISOString() || null,
+      rescheduledAt: updatedAppointment.rescheduledAt?.toISOString() || null,
+      attendedAt: updatedAppointment.attendedAt?.toISOString() || null,
+      createdAt: updatedAppointment.createdAt.toISOString(),
+      updatedAt: updatedAppointment.updatedAt.toISOString(),
+    };
+
     return NextResponse.json({
       success: true,
-      appointment: result.value,
+      appointment: appointmentResponse,
     });
   } catch (error) {
     logger.error('Error in PATCH /api/appointments/[id]:', error);
@@ -185,8 +216,8 @@ export async function DELETE(
 
     if (result.isFailure) {
       return NextResponse.json(
-        { error: result.error.message },
-        { status: result.error.statusCode }
+        { error: (result.error as any)?.message || "Unknown error" },
+        { status: (result.error as any)?.statusCode || 500 }
       );
     }
 

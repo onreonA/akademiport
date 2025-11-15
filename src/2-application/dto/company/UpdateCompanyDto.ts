@@ -62,7 +62,7 @@ export const UpdateCompanySchema = z.object({
     .min(1, 'En az 1 kullanıcı olmalıdır')
     .max(10, 'En fazla 10 kullanıcı olabilir')
     .optional(),
-  settings: z.record(z.unknown()).optional(),
+  settings: z.record(z.string(), z.unknown()).optional(),
 });
 
 // TypeScript Type

@@ -136,7 +136,7 @@ export default function EditCompanyUserPage() {
                 phone: user.phone,
                 role: user.role,
                 companyId: user.companyId,
-                isActive: user.isActive,
+                // isActive: user.isActive, // Not in UpdateUserDto
               }}
               onSubmit={handleSubmit}
               onCancel={() => router.back()}

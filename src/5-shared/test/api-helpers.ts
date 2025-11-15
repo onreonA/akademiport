@@ -42,7 +42,12 @@ export function createMockRequest(
     }
   }
 
-  return new NextRequest(url, requestInit);
+  // Remove null signal to match NextRequest type
+  const cleanedInit: any = { ...requestInit };
+  if (cleanedInit.signal === null) {
+    delete cleanedInit.signal;
+  }
+  return new NextRequest(url, cleanedInit as any);
 }
 
 /**
@@ -69,5 +74,7 @@ export function createMockUser(
  * Mock getAuthenticatedUser helper
  */
 export function mockAuthenticatedUser(user: ReturnType<typeof createMockUser>) {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { vi } = require('vitest');
   return vi.fn().mockResolvedValue(user);
 }

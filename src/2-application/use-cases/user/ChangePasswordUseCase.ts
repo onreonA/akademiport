@@ -5,7 +5,7 @@
  */
 
 import { Result } from '@/core/result/Result';
-import { IUserRepository } from '@/domain/interfaces/IUserRepository';
+import { IUserRepository } from '@/3-domain/interfaces/IUserRepository';
 import { ChangePasswordDto, validatePasswordStrength } from '@/application/dto/user';
 
 interface ChangePasswordRequest extends ChangePasswordDto {

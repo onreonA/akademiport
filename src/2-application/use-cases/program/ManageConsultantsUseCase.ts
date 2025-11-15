@@ -5,9 +5,9 @@
  */
 
 import { Result } from '@/core/result/Result';
-import { User } from '@/domain/entities/User';
-import { IProgramRepository } from '@/domain/interfaces/IProgramRepository';
-import { UserRole } from '@/domain/enums/UserRole';
+import { User } from '@/3-domain/entities/User';
+import { IProgramRepository } from '@/3-domain/interfaces/IProgramRepository';
+import { UserRole } from '@/3-domain/enums/UserRole';
 
 export interface AddConsultantInput {
   programId: string;

@@ -1,7 +1,7 @@
-import { IAppointmentRepository } from '@/domain/interfaces/repositories/IAppointmentRepository';
-import { IReminderRepository } from '@/domain/interfaces/repositories/IReminderRepository';
-import { Result } from '@/core/result';
-import { AppError } from '@/core/errors';
+import { IAppointmentRepository } from '@/3-domain/interfaces/repositories/IAppointmentRepository';
+import { IReminderRepository } from '@/3-domain/interfaces/repositories/IReminderRepository';
+import { Result } from '@/6-core/result/Result';
+import { AppError } from '@/6-core/errors/AppError';
 import {
   NotificationService,
   NotificationRecipient,
@@ -132,7 +132,7 @@ export class SendAppointmentRemindersUseCase {
                 phoneNumber: consultant.phone || undefined,
               });
             } else {
-              logger.debug(
+              logger.info(
                 `Reminder already sent to consultant ${consultant.id} for appointment ${appointment.id} (${reminderType})`
               );
             }
@@ -155,7 +155,7 @@ export class SendAppointmentRemindersUseCase {
                 phoneNumber: companyUser.phone || undefined,
               });
             } else {
-              logger.debug(
+              logger.info(
                 `Reminder already sent to company user ${companyUser.id} for appointment ${appointment.id} (${reminderType})`
               );
             }

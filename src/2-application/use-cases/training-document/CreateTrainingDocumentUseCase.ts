@@ -1,8 +1,8 @@
-import { ITrainingDocumentRepository } from '@/domain/interfaces/repositories/ITrainingDocumentRepository';
-import { ITrainingRepository } from '@/domain/interfaces/repositories/ITrainingRepository';
-import { CreateTrainingDocumentDto } from '@/domain/entities/TrainingDocument';
-import { Result } from '@/core/result';
-import { AppError } from '@/core/errors';
+import { ITrainingDocumentRepository } from '@/3-domain/interfaces/repositories/ITrainingDocumentRepository';
+import { ITrainingRepository } from '@/3-domain/interfaces/repositories/ITrainingRepository';
+import { CreateTrainingDocumentDto } from '@/3-domain/entities/TrainingDocument';
+import { Result } from '@/6-core/result/Result';
+import { AppError } from '@/6-core/errors/AppError';
 
 export class CreateTrainingDocumentUseCase {
   constructor(

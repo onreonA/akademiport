@@ -1,6 +1,6 @@
-import { ITaskRepository } from '@/domain/interfaces/repositories/ITaskRepository';
-import { Result } from '@/core/result';
-import { AppError } from '@/core/errors';
+import { ITaskRepository } from '@/3-domain/interfaces/repositories/ITaskRepository';
+import { Result } from '@/6-core/result/Result';
+import { AppError } from '@/6-core/errors/AppError';
 
 export class CompleteTaskUseCase {
   constructor(private taskRepository: ITaskRepository) {}
@@ -26,7 +26,7 @@ export class CompleteTaskUseCase {
       // Complete task (set status to 'review')
       await this.taskRepository.complete(taskId);
 
-      return Result.ok();
+      return Result.ok(undefined);
     } catch (error) {
       return Result.fail(
         new AppError(error instanceof Error ? error.message : 'Failed to complete task', 500)

@@ -4,8 +4,8 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { DeleteEventUseCase } from './DeleteEventUseCase';
-import { IEventRepository } from '@/domain/interfaces/repositories/IEventRepository';
-import { Event } from '@/domain/entities/Event';
+import { IEventRepository } from '@/3-domain/interfaces/repositories/IEventRepository';
+import { Event } from '@/3-domain/entities/Event';
 
 describe('DeleteEventUseCase', () => {
   let mockEventRepository: IEventRepository;

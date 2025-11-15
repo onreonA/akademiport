@@ -52,7 +52,12 @@ export function AppointmentList({
     [consultantId, companyId, programId, activeTab, statusFilter, search, page]
   );
 
-  const { data, isLoading, error } = useAppointments(filters);
+  // Type-safe filter conversion
+  const typedFilters = {
+    ...filters,
+    status: filters.status as 'pending' | 'approved' | 'rejected' | 'cancelled' | 'completed' | undefined,
+  };
+  const { data, isLoading, error } = useAppointments(typedFilters);
 
   const appointments = data?.appointments || [];
   const pagination = data?.pagination || {

@@ -3,6 +3,7 @@ import { TrainingRepository } from '@/infrastructure/database/repositories/Train
 import { CreateTrainingUseCase, ListTrainingsUseCase } from '@/application/use-cases/training';
 import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
 import { logger } from '@/shared/utils/logger';
+import type { TrainingStatus, TrainingPriority } from '@/domain/entities/Training';
 
 const trainingRepository = new TrainingRepository();
 
@@ -26,8 +27,14 @@ export async function GET(request: NextRequest) {
         : searchParams.get('isGlobal') === 'false'
           ? false
           : undefined;
-    const status = searchParams.get('status') || undefined;
-    const priority = searchParams.get('priority') || undefined;
+    const statusParam = searchParams.get('status');
+    const status: TrainingStatus | undefined = statusParam && ['draft', 'active', 'archived'].includes(statusParam) 
+      ? (statusParam as TrainingStatus) 
+      : undefined;
+    const priorityParam = searchParams.get('priority');
+    const priority: TrainingPriority | undefined = priorityParam && ['low', 'medium', 'high', 'critical'].includes(priorityParam) 
+      ? (priorityParam as TrainingPriority) 
+      : undefined;
     const search = searchParams.get('search') || undefined;
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
@@ -59,8 +66,8 @@ export async function GET(request: NextRequest) {
 
     if (result.isFailure) {
       return NextResponse.json(
-        { error: result.error.message },
-        { status: result.error.statusCode }
+        { error: (result.error as any)?.message || "Unknown error" },
+        { status: (result.error as any)?.statusCode || 500 }
       );
     }
 
@@ -110,8 +117,8 @@ export async function POST(request: NextRequest) {
 
     if (result.isFailure) {
       return NextResponse.json(
-        { error: result.error.message },
-        { status: result.error.statusCode }
+        { error: (result.error as any)?.message || "Unknown error" },
+        { status: (result.error as any)?.statusCode || 500 }
       );
     }
 

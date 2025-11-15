@@ -1,12 +1,12 @@
-import { ICompanyTrainingRepository } from '@/domain/interfaces/repositories/ICompanyTrainingRepository';
-import { ICompanyRepository } from '@/domain/interfaces/repositories/ICompanyRepository';
-import { ITrainingRepository } from '@/domain/interfaces/repositories/ITrainingRepository';
-import { ITrainingVideoRepository } from '@/domain/interfaces/repositories/ITrainingVideoRepository';
-import { ITrainingDocumentRepository } from '@/domain/interfaces/repositories/ITrainingDocumentRepository';
-import { CompanyTraining } from '@/domain/entities/CompanyTraining';
-import { Training } from '@/domain/entities/Training';
-import { Result } from '@/core/result';
-import { AppError } from '@/core/errors';
+import { ICompanyTrainingRepository } from '@/3-domain/interfaces/repositories/ICompanyTrainingRepository';
+import { ICompanyRepository } from '@/3-domain/interfaces/ICompanyRepository';
+import { ITrainingRepository } from '@/3-domain/interfaces/repositories/ITrainingRepository';
+import { ITrainingVideoRepository } from '@/3-domain/interfaces/repositories/ITrainingVideoRepository';
+import { ITrainingDocumentRepository } from '@/3-domain/interfaces/repositories/ITrainingDocumentRepository';
+import { CompanyTraining } from '@/3-domain/entities/CompanyTraining';
+import { Training } from '@/3-domain/entities/Training';
+import { Result } from '@/6-core/result/Result';
+import { AppError } from '@/6-core/errors/AppError';
 
 export interface CompanyTrainingWithTraining extends CompanyTraining {
   training: Training;

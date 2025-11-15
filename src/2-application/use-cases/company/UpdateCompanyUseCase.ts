@@ -4,9 +4,9 @@
  */
 
 import { Result } from '@/core/result/Result';
-import { Company } from '@/domain/entities/Company';
-import { UserRole } from '@/domain/enums/UserRole';
-import { ICompanyRepository } from '@/domain/interfaces/ICompanyRepository';
+import { Company } from '@/3-domain/entities/Company';
+import { UserRole } from '@/3-domain/enums/UserRole';
+import { ICompanyRepository } from '@/3-domain/interfaces/ICompanyRepository';
 import type { UpdateCompanyDto } from '@/application/dto/company';
 
 export class UpdateCompanyUseCase {

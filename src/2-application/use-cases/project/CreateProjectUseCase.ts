@@ -1,7 +1,7 @@
-import { IProjectRepository } from '@/domain/interfaces/repositories/IProjectRepository';
-import { ProjectEntity, CreateProjectDto } from '@/domain/entities/Project';
-import { Result } from '@/core/result';
-import { AppError } from '@/core/errors';
+import { IProjectRepository } from '@/3-domain/interfaces/repositories/IProjectRepository';
+import { ProjectEntity, CreateProjectDto } from '@/3-domain/entities/Project';
+import { Result } from '@/6-core/result/Result';
+import { AppError } from '@/6-core/errors/AppError';
 
 export class CreateProjectUseCase {
   constructor(private projectRepository: IProjectRepository) {}

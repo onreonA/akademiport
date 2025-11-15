@@ -110,3 +110,4 @@ export class CompanyProjectAssignmentEntity implements CompanyProjectAssignment 
     return errors;
   }
 }
+

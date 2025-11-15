@@ -4,9 +4,9 @@
  */
 
 import { Result } from '@/core/result/Result';
-import { User } from '@/domain/entities/User';
-import { UserRole } from '@/domain/enums/UserRole';
-import { ICompanyRepository } from '@/domain/interfaces/ICompanyRepository';
+import { User } from '@/3-domain/entities/User';
+import { UserRole } from '@/3-domain/enums/UserRole';
+import { ICompanyRepository } from '@/3-domain/interfaces/ICompanyRepository';
 
 export class ListCompanyUsersUseCase {
   constructor(private companyRepository: ICompanyRepository) {}

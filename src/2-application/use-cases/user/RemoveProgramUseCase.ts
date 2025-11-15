@@ -5,9 +5,9 @@
  */
 
 import { Result } from '@/core/result/Result';
-import { IUserRepository } from '@/domain/interfaces/IUserRepository';
-import { IProgramRepository } from '@/domain/interfaces/IProgramRepository';
-import { UserRole } from '@/domain/enums/UserRole';
+import { IUserRepository } from '@/3-domain/interfaces/IUserRepository';
+import { IProgramRepository } from '@/3-domain/interfaces/IProgramRepository';
+import { UserRole } from '@/3-domain/enums/UserRole';
 import { RemoveProgramDto } from '@/application/dto/user';
 
 interface RemoveProgramRequest extends RemoveProgramDto {

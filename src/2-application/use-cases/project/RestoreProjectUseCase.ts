@@ -1,6 +1,6 @@
-import { IProjectRepository } from '@/domain/interfaces/repositories/IProjectRepository';
-import { Result } from '@/core/result';
-import { AppError } from '@/core/errors';
+import { IProjectRepository } from '@/3-domain/interfaces/repositories/IProjectRepository';
+import { Result } from '@/6-core/result/Result';
+import { AppError } from '@/6-core/errors/AppError';
 
 /**
  * RestoreProjectUseCase
@@ -11,18 +11,10 @@ export class RestoreProjectUseCase {
 
   async execute(id: string): Promise<Result<void>> {
     try {
-      // Check if project exists (including deleted ones)
-      const project = await this.projectRepository.findById(id, true);
-      if (!project) {
-        return Result.fail(new AppError('Project not found', 404));
-      }
-
-      // Check if project is deleted
-      // Note: Repository'de restore metodu zaten deleted_at kontrolü yapıyor
-      // Ama burada da kontrol edelim
+      // Restore project (repository will check if it exists and is deleted)
       await this.projectRepository.restore(id);
 
-      return Result.ok();
+      return Result.ok(undefined);
     } catch (error) {
       return Result.fail(
         new AppError(error instanceof Error ? error.message : 'Failed to restore project', 500)

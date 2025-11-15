@@ -1,6 +1,6 @@
-import { ITrainingRepository } from '@/domain/interfaces/repositories/ITrainingRepository';
-import { Result } from '@/core/result';
-import { AppError } from '@/core/errors';
+import { ITrainingRepository } from '@/3-domain/interfaces/repositories/ITrainingRepository';
+import { Result } from '@/6-core/result/Result';
+import { AppError } from '@/6-core/errors/AppError';
 
 export class DeleteTrainingUseCase {
   constructor(private trainingRepository: ITrainingRepository) {}

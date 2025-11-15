@@ -1,6 +1,6 @@
-import { ITaskDependencyRepository } from '@/domain/interfaces/repositories/ITaskDependencyRepository';
-import { Result } from '@/core/result';
-import { AppError } from '@/core/errors';
+import { ITaskDependencyRepository } from '@/3-domain/interfaces/repositories/ITaskDependencyRepository';
+import { Result } from '@/6-core/result/Result';
+import { AppError } from '@/6-core/errors/AppError';
 
 /**
  * DeleteTaskDependencyUseCase
@@ -20,7 +20,7 @@ export class DeleteTaskDependencyUseCase {
       // Delete dependency
       await this.taskDependencyRepository.delete(id);
 
-      return Result.ok();
+      return Result.ok(undefined);
     } catch (error) {
       return Result.fail(
         new AppError(

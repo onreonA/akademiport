@@ -3,11 +3,11 @@
  * Sprint 8 Extension: Fetch project with all sub-projects and tasks in one call
  */
 
-import { IProjectRepository } from '@/domain/interfaces/repositories/IProjectRepository';
-import { ISubProjectRepository } from '@/domain/interfaces/repositories/ISubProjectRepository';
-import { ITaskRepository } from '@/domain/interfaces/repositories/ITaskRepository';
-import { Result } from '@/core/result';
-import { AppError } from '@/core/errors';
+import { IProjectRepository } from '@/3-domain/interfaces/repositories/IProjectRepository';
+import { ISubProjectRepository } from '@/3-domain/interfaces/repositories/ISubProjectRepository';
+import { ITaskRepository } from '@/3-domain/interfaces/repositories/ITaskRepository';
+import { Result } from '@/6-core/result/Result';
+import { AppError } from '@/6-core/errors/AppError';
 import {
   ProjectHierarchyDTO,
   SubProjectWithTasksDTO,
@@ -55,7 +55,7 @@ export class GetProjectHierarchyUseCase {
         return {
           id: subProject.id,
           name: subProject.name,
-          description: subProject.description,
+          description: subProject.description ?? undefined,
           status: subProject.status,
           progress,
           orderIndex: subProject.orderIndex,
@@ -64,7 +64,7 @@ export class GetProjectHierarchyUseCase {
             .map((task) => ({
               id: task.id,
               title: task.title,
-              description: task.description,
+              description: task.description ?? undefined,
               status: task.status,
               priority: task.priority,
               orderIndex: task.orderIndex,
@@ -72,8 +72,8 @@ export class GetProjectHierarchyUseCase {
               assignedTo: task.assignedTo,
               assignedToName: task.assignedToName,
               subProjectId: task.subProjectId,
-              createdAt: task.createdAt,
-              updatedAt: task.updatedAt,
+              createdAt: task.createdAt instanceof Date ? task.createdAt.toISOString() : task.createdAt,
+              updatedAt: task.updatedAt instanceof Date ? task.updatedAt.toISOString() : task.updatedAt,
             })),
           stats: {
             totalTasks: tasks.length,
@@ -81,8 +81,8 @@ export class GetProjectHierarchyUseCase {
             inProgressTasks,
             todoTasks,
           },
-          createdAt: subProject.createdAt,
-          updatedAt: subProject.updatedAt,
+          createdAt: subProject.createdAt instanceof Date ? subProject.createdAt.toISOString() : subProject.createdAt,
+          updatedAt: subProject.updatedAt instanceof Date ? subProject.updatedAt.toISOString() : subProject.updatedAt,
         };
       });
 
@@ -98,19 +98,19 @@ export class GetProjectHierarchyUseCase {
         project: {
           id: project.id,
           name: project.name,
-          description: project.description,
+          description: project.description ?? undefined,
           status: project.status,
           priority: project.priority,
           progress: overallProgress,
-          startDate: project.startDate,
-          endDate: project.endDate,
-          companyId: project.companyId,
-          companyName: project.companyName,
-          consultantId: project.consultantId,
-          consultantName: project.consultantName,
+          startDate: project.startDate instanceof Date ? project.startDate.toISOString() : project.startDate ?? undefined,
+          endDate: project.endDate instanceof Date ? project.endDate.toISOString() : project.endDate ?? undefined,
+          companyId: project.companyId ?? undefined,
+          companyName: project.companyName ?? undefined,
+          consultantId: project.consultantId ?? undefined,
+          consultantName: project.consultantName ?? undefined,
           isTemplate: project.isTemplate,
-          createdAt: project.createdAt,
-          updatedAt: project.updatedAt,
+          createdAt: project.createdAt instanceof Date ? project.createdAt.toISOString() : project.createdAt,
+          updatedAt: project.updatedAt instanceof Date ? project.updatedAt.toISOString() : project.updatedAt,
         },
         subProjects: subProjectsWithTasks.sort((a, b) => a.orderIndex - b.orderIndex),
         stats: {

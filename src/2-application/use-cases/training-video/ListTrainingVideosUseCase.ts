@@ -1,8 +1,8 @@
-import { ITrainingVideoRepository } from '@/domain/interfaces/repositories/ITrainingVideoRepository';
-import { ITrainingRepository } from '@/domain/interfaces/repositories/ITrainingRepository';
-import { TrainingVideo } from '@/domain/entities/TrainingVideo';
-import { Result } from '@/core/result';
-import { AppError } from '@/core/errors';
+import { ITrainingVideoRepository } from '@/3-domain/interfaces/repositories/ITrainingVideoRepository';
+import { ITrainingRepository } from '@/3-domain/interfaces/repositories/ITrainingRepository';
+import { TrainingVideo } from '@/3-domain/entities/TrainingVideo';
+import { Result } from '@/6-core/result/Result';
+import { AppError } from '@/6-core/errors/AppError';
 
 export class ListTrainingVideosUseCase {
   constructor(

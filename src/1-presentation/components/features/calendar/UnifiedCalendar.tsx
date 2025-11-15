@@ -244,7 +244,7 @@ export function UnifiedCalendar({
 
             // Only add if end time is after start time
             if (availabilityEnd > availabilityStart) {
-              const availabilityEvent = {
+              const availabilityEvent: CalendarEvent = {
                 id: `availability-${rule.dayOfWeek}-${currentDate.toISOString().split('T')[0]}`,
                 title: `Müsait: ${rule.startTime}-${rule.endTime}`, // Show time range in title
                 start: availabilityStart,
@@ -254,6 +254,7 @@ export function UnifiedCalendar({
                 backgroundColor: '#dcfce7', // Light green background
                 borderColor: '#86efac', // Green border
                 textColor: '#166534', // Dark green text for better visibility
+                display: 'block', // Display as block (not background)
                 className: 'availability-bg-event', // Custom class for styling
                 extendedProps: {
                   isAvailability: true,
@@ -291,16 +292,17 @@ export function UnifiedCalendar({
         unavailable.endTime instanceof Date ? unavailable.endTime : new Date(unavailable.endTime);
 
       if (!isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
-        const unavailableEvent = {
+        const unavailableEvent: CalendarEvent = {
           id: `unavailable-${startDate.toISOString()}`,
           title: `Müsait Değil: ${startDate.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}-${endDate.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}`, // Show time range in title
           start: startDate,
           end: endDate,
-          type: 'event' as const,
+          type: 'event',
           color: '#fca5a5', // Red color
           backgroundColor: '#fee2e2', // Light red background
           borderColor: '#fca5a5', // Red border
           textColor: '#991b1b', // Dark red text for better visibility
+          display: 'block', // Display as block (not background)
           className: 'unavailable-bg-event', // Custom class for styling
           extendedProps: {
             isUnavailable: true,
@@ -582,11 +584,6 @@ export function UnifiedCalendar({
               // Add classes for background events
               if (isAvailabilityEvent) {
                 classes.push('availability-bg-event', 'fc-bgevent');
-                // Set data attribute (FullCalendar will use 'color' property for styling)
-                // Check if arg.el exists (it may be undefined for some event types)
-                if (arg.el) {
-                  arg.el.setAttribute('data-availability', 'true');
-                }
                 console.log(
                   '✅ [UnifiedCalendar] eventClassNames - Added availability classes to:',
                   eventId
@@ -595,11 +592,6 @@ export function UnifiedCalendar({
 
               if (isUnavailableEvent) {
                 classes.push('unavailable-bg-event', 'fc-bgevent');
-                // Set data attribute (FullCalendar will use 'color' property for styling)
-                // Check if arg.el exists (it may be undefined for some event types)
-                if (arg.el) {
-                  arg.el.setAttribute('data-unavailable', 'true');
-                }
                 console.log(
                   '❌ [UnifiedCalendar] eventClassNames - Added unavailable classes to:',
                   eventId
@@ -637,22 +629,29 @@ export function UnifiedCalendar({
                 eventExtendedProps: event?.extendedProps,
               });
 
+              // Type assertion for arg.el (FullCalendar v6 EventMountArg has el property)
+              const el = (arg as any).el as HTMLElement | undefined;
+              if (!el) {
+                console.warn('⚠️ [UnifiedCalendar] eventDidMount: el is undefined for event:', eventId);
+                return;
+              }
+
               // Handle background events (availability/unavailable)
               if (isAvailabilityEvent) {
-                arg.el.setAttribute('data-availability', 'true');
-                arg.el.classList.add('availability-bg-event', 'fc-bgevent');
+                el.setAttribute('data-availability', 'true');
+                el.classList.add('availability-bg-event', 'fc-bgevent');
                 // Force styles with !important via inline styles
-                arg.el.style.setProperty('background-color', '#dcfce7', 'important');
-                arg.el.style.setProperty('background', '#dcfce7', 'important');
-                arg.el.style.setProperty('border-color', '#86efac', 'important');
-                arg.el.style.setProperty('border-width', '2px', 'important');
-                arg.el.style.setProperty('border-style', 'solid', 'important');
-                arg.el.style.setProperty('opacity', '0.6', 'important');
-                arg.el.style.setProperty('pointer-events', 'none', 'important');
-                arg.el.style.setProperty('z-index', '0', 'important');
-                arg.el.style.setProperty('position', 'relative', 'important');
+                el.style.setProperty('background-color', '#dcfce7', 'important');
+                el.style.setProperty('background', '#dcfce7', 'important');
+                el.style.setProperty('border-color', '#86efac', 'important');
+                el.style.setProperty('border-width', '2px', 'important');
+                el.style.setProperty('border-style', 'solid', 'important');
+                el.style.setProperty('opacity', '0.6', 'important');
+                el.style.setProperty('pointer-events', 'none', 'important');
+                el.style.setProperty('z-index', '0', 'important');
+                el.style.setProperty('position', 'relative', 'important');
                 // Hide title
-                const titleEl = arg.el.querySelector('.fc-event-title');
+                const titleEl = el.querySelector('.fc-event-title');
                 if (titleEl) {
                   (titleEl as HTMLElement).style.setProperty('display', 'none', 'important');
                 }
@@ -661,20 +660,20 @@ export function UnifiedCalendar({
               }
 
               if (isUnavailableEvent) {
-                arg.el.setAttribute('data-unavailable', 'true');
-                arg.el.classList.add('unavailable-bg-event', 'fc-bgevent');
+                el.setAttribute('data-unavailable', 'true');
+                el.classList.add('unavailable-bg-event', 'fc-bgevent');
                 // Force styles with !important via inline styles
-                arg.el.style.setProperty('background-color', '#fee2e2', 'important');
-                arg.el.style.setProperty('background', '#fee2e2', 'important');
-                arg.el.style.setProperty('border-color', '#fca5a5', 'important');
-                arg.el.style.setProperty('border-width', '2px', 'important');
-                arg.el.style.setProperty('border-style', 'solid', 'important');
-                arg.el.style.setProperty('opacity', '0.6', 'important');
-                arg.el.style.setProperty('pointer-events', 'none', 'important');
-                arg.el.style.setProperty('z-index', '0', 'important');
-                arg.el.style.setProperty('position', 'relative', 'important');
+                el.style.setProperty('background-color', '#fee2e2', 'important');
+                el.style.setProperty('background', '#fee2e2', 'important');
+                el.style.setProperty('border-color', '#fca5a5', 'important');
+                el.style.setProperty('border-width', '2px', 'important');
+                el.style.setProperty('border-style', 'solid', 'important');
+                el.style.setProperty('opacity', '0.6', 'important');
+                el.style.setProperty('pointer-events', 'none', 'important');
+                el.style.setProperty('z-index', '0', 'important');
+                el.style.setProperty('position', 'relative', 'important');
                 // Hide title
-                const titleEl = arg.el.querySelector('.fc-event-title');
+                const titleEl = el.querySelector('.fc-event-title');
                 if (titleEl) {
                   (titleEl as HTMLElement).style.setProperty('display', 'none', 'important');
                 }
@@ -686,19 +685,19 @@ export function UnifiedCalendar({
               if (event && !isAvailabilityEvent && !isUnavailableEvent) {
                 // Use explicit backgroundColor and borderColor from event object
                 if (event.backgroundColor) {
-                  arg.el.style.setProperty('background-color', event.backgroundColor, 'important');
+                  el.style.setProperty('background-color', event.backgroundColor, 'important');
                 }
                 if (event.borderColor) {
-                  arg.el.style.setProperty('border-color', event.borderColor, 'important');
-                  arg.el.style.setProperty('border-width', '2px', 'important');
-                  arg.el.style.setProperty('border-style', 'solid', 'important');
+                  el.style.setProperty('border-color', event.borderColor, 'important');
+                  el.style.setProperty('border-width', '2px', 'important');
+                  el.style.setProperty('border-style', 'solid', 'important');
                 }
                 if (event.textColor) {
-                  arg.el.style.setProperty('color', event.textColor, 'important');
+                  el.style.setProperty('color', event.textColor, 'important');
                 }
                 // Ensure normal events appear above background events
-                arg.el.style.setProperty('z-index', '2', 'important');
-                arg.el.style.setProperty('position', 'relative', 'important');
+                el.style.setProperty('z-index', '2', 'important');
+                el.style.setProperty('position', 'relative', 'important');
                 console.log('🎨 [UnifiedCalendar] Applied normal event styles to:', eventId, {
                   backgroundColor: event.backgroundColor,
                   borderColor: event.borderColor,

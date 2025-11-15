@@ -6,11 +6,12 @@ import { TaskComment } from '@/domain/entities/TaskComment';
 // Mock Projects
 export const mockProject: Project = {
   id: 'project-1',
+  programId: 'program-1',
   companyId: 'company-1',
   consultantId: 'consultant-1',
   name: 'Test Project',
   description: 'Test project description',
-  status: 'active',
+  status: 'in_progress',
   priority: 'high',
   startDate: new Date('2025-01-01'),
   endDate: new Date('2025-12-31'),
@@ -23,11 +24,12 @@ export const mockProject: Project = {
 
 export const mockTemplate: Project = {
   id: 'template-1',
+  programId: 'program-1',
   companyId: null,
   consultantId: 'consultant-1',
   name: 'Project Template',
   description: 'Template description',
-  status: 'planning',
+  status: 'todo',
   priority: 'medium',
   startDate: null,
   endDate: null,
@@ -72,14 +74,14 @@ export const mockTask: Task = {
 export const mockCompletedTask: Task = {
   ...mockTask,
   id: 'task-2',
-  status: 'completed',
+  status: 'done',
   completedAt: new Date('2025-01-15'),
 };
 
 export const mockApprovedTask: Task = {
   ...mockTask,
   id: 'task-3',
-  status: 'approved',
+  status: 'review',
   completedAt: new Date('2025-01-15'),
   approvedAt: new Date('2025-01-16'),
   approvedBy: 'consultant-1',

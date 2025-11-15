@@ -1,8 +1,8 @@
-import { ITrainingVideoRepository } from '@/domain/interfaces/repositories/ITrainingVideoRepository';
-import { ITrainingDocumentRepository } from '@/domain/interfaces/repositories/ITrainingDocumentRepository';
-import { ITrainingProgressRepository } from '@/domain/interfaces/repositories/ITrainingProgressRepository';
-import { Result } from '@/core/result';
-import { AppError } from '@/core/errors';
+import { ITrainingVideoRepository } from '@/3-domain/interfaces/repositories/ITrainingVideoRepository';
+import { ITrainingDocumentRepository } from '@/3-domain/interfaces/repositories/ITrainingDocumentRepository';
+import { ITrainingProgressRepository } from '@/3-domain/interfaces/repositories/ITrainingProgressRepository';
+import { Result } from '@/6-core/result/Result';
+import { AppError } from '@/6-core/errors/AppError';
 
 export class CheckTrainingLockUseCase {
   constructor(

@@ -139,14 +139,14 @@ export class WhatsAppApiService {
       language: 'tr',
       components: [
         {
-          type: 'body',
+          type: 'body' as const,
           parameters: [
             {
-              type: 'text',
+              type: 'text' as const,
               text: eventData.eventTitle,
             },
             {
-              type: 'text',
+              type: 'text' as const,
               text: eventData.eventDate.toLocaleDateString('tr-TR', {
                 day: 'numeric',
                 month: 'long',
@@ -154,13 +154,13 @@ export class WhatsAppApiService {
               }),
             },
             {
-              type: 'text',
+              type: 'text' as const,
               text: eventData.eventTime,
             },
             ...(eventData.programName
               ? [
                   {
-                    type: 'text',
+                    type: 'text' as const,
                     text: eventData.programName,
                   },
                 ]
@@ -170,10 +170,10 @@ export class WhatsAppApiService {
         ...(eventData.zoomJoinUrl
           ? [
               {
-                type: 'button',
+                type: 'button' as const,
                 parameters: [
                   {
-                    type: 'text',
+                    type: 'text' as const,
                     text: eventData.zoomJoinUrl,
                   },
                 ],
@@ -210,14 +210,14 @@ export class WhatsAppApiService {
       language: 'tr',
       components: [
         {
-          type: 'body',
+          type: 'body' as const,
           parameters: [
             {
-              type: 'text',
+              type: 'text' as const,
               text: appointmentData.appointmentTitle,
             },
             {
-              type: 'text',
+              type: 'text' as const,
               text: appointmentData.appointmentDate.toLocaleDateString('tr-TR', {
                 day: 'numeric',
                 month: 'long',
@@ -225,15 +225,15 @@ export class WhatsAppApiService {
               }),
             },
             {
-              type: 'text',
+              type: 'text' as const,
               text: appointmentData.appointmentTime,
             },
             {
-              type: 'text',
+              type: 'text' as const,
               text: appointmentData.consultantName,
             },
             {
-              type: 'text',
+              type: 'text' as const,
               text: appointmentData.companyName,
             },
           ],
@@ -241,10 +241,10 @@ export class WhatsAppApiService {
         ...(appointmentData.zoomJoinUrl
           ? [
               {
-                type: 'button',
+                type: 'button' as const,
                 parameters: [
                   {
-                    type: 'text',
+                    type: 'text' as const,
                     text: appointmentData.zoomJoinUrl,
                   },
                 ],

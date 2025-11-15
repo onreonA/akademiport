@@ -5,8 +5,8 @@
  */
 
 import { Result } from '@/core/result/Result';
-import { IUserRepository } from '@/domain/interfaces/IUserRepository';
-import { User } from '@/domain/entities/User';
+import { IUserRepository } from '@/3-domain/interfaces/IUserRepository';
+import { User } from '@/3-domain/entities/User';
 import { UpdateProfileDto, validateSocialLinks } from '@/application/dto/user';
 
 interface UpdateProfileRequest extends UpdateProfileDto {

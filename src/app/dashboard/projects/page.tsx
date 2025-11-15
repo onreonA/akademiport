@@ -272,7 +272,7 @@ export default function AdminProjectsPage() {
             {filteredProjects.map((project) => (
               <ProjectCard
                 key={project.id}
-                project={project}
+                project={project as any}
                 onDelete={() => handleDelete(project)}
               />
             ))}

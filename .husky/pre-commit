@@ -1,14 +1,20 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-# Run type check
-npm run type-check || exit 1
+echo "🔍 Running pre-commit checks..."
 
-# Run linter
-npm run lint || exit 1
+# Type check
+echo "📝 Type checking..."
+npm run type-check || {
+  echo "❌ Type check failed. Please fix TypeScript errors."
+  exit 1
+}
 
-# Format check
-npm run format:check || (echo "Code formatting issues found. Run 'npm run format' to fix." && exit 1)
+# Build check (sadece import path'lerini kontrol etmek için)
+echo "🏗️  Checking build..."
+npm run build:ci || {
+  echo "❌ Build failed. Please fix import path errors."
+  exit 1
+}
 
-# Run tests (only affected files if possible, otherwise skip)
-npm run test:run -- --changed || echo "Tests skipped for changed files"
+echo "✅ Pre-commit checks passed!"

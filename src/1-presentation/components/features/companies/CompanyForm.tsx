@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, get } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CreateCompanySchema, type CreateCompanyDto } from '@/application/dto/company';
 import { Button } from '@/presentation/components/ui/atoms/button';
@@ -114,7 +114,11 @@ export function CompanyForm({
             ))}
           </SelectContent>
         </Select>
-        {errors.programId && <p className="text-sm text-destructive">{errors.programId.message}</p>}
+        {get(errors, 'programId.message') && (
+          <p className="text-sm text-destructive">
+            {get(errors, 'programId.message') as string}
+          </p>
+        )}
       </div>
 
       {/* Basic Info */}
@@ -122,14 +126,16 @@ export function CompanyForm({
         <div className="space-y-2">
           <Label htmlFor="name">Firma Adı *</Label>
           <Input id="name" {...register('name')} />
-          {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
+          {get(errors, 'name.message') && (
+            <p className="text-sm text-destructive">{get(errors, 'name.message') as string}</p>
+          )}
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="legalName">Yasal Adı</Label>
           <Input id="legalName" {...register('legalName')} />
-          {errors.legalName && (
-            <p className="text-sm text-destructive">{errors.legalName.message}</p>
+          {get(errors, 'legalName.message') && (
+            <p className="text-sm text-destructive">{get(errors, 'legalName.message') as string}</p>
           )}
         </div>
       </div>
@@ -139,16 +145,16 @@ export function CompanyForm({
         <div className="space-y-2">
           <Label htmlFor="taxNumber">Vergi Numarası</Label>
           <Input id="taxNumber" {...register('taxNumber')} />
-          {errors.taxNumber && (
-            <p className="text-sm text-destructive">{errors.taxNumber.message}</p>
+          {get(errors, 'taxNumber.message') && (
+            <p className="text-sm text-destructive">{get(errors, 'taxNumber.message') as string}</p>
           )}
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="tradeRegistryNumber">Ticaret Sicil No</Label>
           <Input id="tradeRegistryNumber" {...register('tradeRegistryNumber')} />
-          {errors.tradeRegistryNumber && (
-            <p className="text-sm text-destructive">{errors.tradeRegistryNumber.message}</p>
+          {get(errors, 'tradeRegistryNumber.message') && (
+            <p className="text-sm text-destructive">{get(errors, 'tradeRegistryNumber.message') as string}</p>
           )}
         </div>
       </div>
@@ -158,19 +164,25 @@ export function CompanyForm({
         <div className="space-y-2">
           <Label htmlFor="email">E-posta</Label>
           <Input id="email" type="email" {...register('email')} />
-          {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
+          {get(errors, 'email.message') && (
+            <p className="text-sm text-destructive">{get(errors, 'email.message') as string}</p>
+          )}
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="phone">Telefon</Label>
           <Input id="phone" {...register('phone')} />
-          {errors.phone && <p className="text-sm text-destructive">{errors.phone.message}</p>}
+          {get(errors, 'phone.message') && (
+            <p className="text-sm text-destructive">{get(errors, 'phone.message') as string}</p>
+          )}
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="website">Web Sitesi</Label>
           <Input id="website" type="url" {...register('website')} />
-          {errors.website && <p className="text-sm text-destructive">{errors.website.message}</p>}
+          {get(errors, 'website.message') && (
+            <p className="text-sm text-destructive">{get(errors, 'website.message') as string}</p>
+          )}
         </div>
       </div>
 
@@ -178,7 +190,9 @@ export function CompanyForm({
       <div className="space-y-2">
         <Label htmlFor="address">Adres</Label>
         <Textarea id="address" {...register('address')} rows={3} />
-        {errors.address && <p className="text-sm text-destructive">{errors.address.message}</p>}
+        {get(errors, 'address.message') && (
+          <p className="text-sm text-destructive">{get(errors, 'address.message') as string}</p>
+        )}
       </div>
 
       {/* Location */}
@@ -186,20 +200,24 @@ export function CompanyForm({
         <div className="space-y-2">
           <Label htmlFor="city">Şehir</Label>
           <Input id="city" {...register('city')} />
-          {errors.city && <p className="text-sm text-destructive">{errors.city.message}</p>}
+          {get(errors, 'city.message') && (
+            <p className="text-sm text-destructive">{get(errors, 'city.message') as string}</p>
+          )}
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="district">İlçe</Label>
           <Input id="district" {...register('district')} />
-          {errors.district && <p className="text-sm text-destructive">{errors.district.message}</p>}
+          {get(errors, 'district.message') && (
+            <p className="text-sm text-destructive">{get(errors, 'district.message') as string}</p>
+          )}
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="postalCode">Posta Kodu</Label>
           <Input id="postalCode" {...register('postalCode')} />
-          {errors.postalCode && (
-            <p className="text-sm text-destructive">{errors.postalCode.message}</p>
+          {get(errors, 'postalCode.message') && (
+            <p className="text-sm text-destructive">{get(errors, 'postalCode.message') as string}</p>
           )}
         </div>
       </div>
@@ -209,7 +227,9 @@ export function CompanyForm({
         <div className="space-y-2">
           <Label htmlFor="sector">Sektör</Label>
           <Input id="sector" {...register('sector')} />
-          {errors.sector && <p className="text-sm text-destructive">{errors.sector.message}</p>}
+          {get(errors, 'sector.message') && (
+            <p className="text-sm text-destructive">{get(errors, 'sector.message') as string}</p>
+          )}
         </div>
 
         <div className="space-y-2">
@@ -219,8 +239,8 @@ export function CompanyForm({
             type="number"
             {...register('employeeCount', { valueAsNumber: true })}
           />
-          {errors.employeeCount && (
-            <p className="text-sm text-destructive">{errors.employeeCount.message}</p>
+          {get(errors, 'employeeCount.message') && (
+            <p className="text-sm text-destructive">{get(errors, 'employeeCount.message') as string}</p>
           )}
         </div>
 
@@ -231,8 +251,8 @@ export function CompanyForm({
             type="number"
             {...register('foundationYear', { valueAsNumber: true })}
           />
-          {errors.foundationYear && (
-            <p className="text-sm text-destructive">{errors.foundationYear.message}</p>
+          {get(errors, 'foundationYear.message') && (
+            <p className="text-sm text-destructive">{get(errors, 'foundationYear.message') as string}</p>
           )}
         </div>
       </div>
@@ -247,7 +267,9 @@ export function CompanyForm({
           min={1}
           max={10}
         />
-        {errors.maxUsers && <p className="text-sm text-destructive">{errors.maxUsers.message}</p>}
+        {get(errors, 'maxUsers.message') && (
+          <p className="text-sm text-destructive">{get(errors, 'maxUsers.message') as string}</p>
+        )}
         <p className="text-sm text-muted-foreground">Varsayılan: 2 (1-10 arası)</p>
       </div>
 

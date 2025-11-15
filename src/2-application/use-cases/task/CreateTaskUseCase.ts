@@ -1,8 +1,8 @@
-import { ITaskRepository } from '@/domain/interfaces/repositories/ITaskRepository';
-import { ISubProjectRepository } from '@/domain/interfaces/repositories/ISubProjectRepository';
-import { TaskEntity, CreateTaskDto } from '@/domain/entities/Task';
-import { Result } from '@/core/result';
-import { AppError } from '@/core/errors';
+import { ITaskRepository } from '@/3-domain/interfaces/repositories/ITaskRepository';
+import { ISubProjectRepository } from '@/3-domain/interfaces/repositories/ISubProjectRepository';
+import { TaskEntity, CreateTaskDto } from '@/3-domain/entities/Task';
+import { Result } from '@/6-core/result/Result';
+import { AppError } from '@/6-core/errors/AppError';
 
 export class CreateTaskUseCase {
   constructor(

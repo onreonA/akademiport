@@ -1,6 +1,6 @@
-import { ITaskCommentRepository } from '@/domain/interfaces/repositories/ITaskCommentRepository';
-import { Result } from '@/core/result';
-import { AppError } from '@/core/errors';
+import { ITaskCommentRepository } from '@/3-domain/interfaces/repositories/ITaskCommentRepository';
+import { Result } from '@/6-core/result/Result';
+import { AppError } from '@/6-core/errors/AppError';
 
 export class DeleteTaskCommentUseCase {
   constructor(private taskCommentRepository: ITaskCommentRepository) {}
@@ -16,7 +16,7 @@ export class DeleteTaskCommentUseCase {
       // Delete comment
       await this.taskCommentRepository.delete(id);
 
-      return Result.ok();
+      return Result.ok(undefined);
     } catch (error) {
       return Result.fail(
         new AppError(error instanceof Error ? error.message : 'Failed to delete task comment', 500)

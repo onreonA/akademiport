@@ -12,8 +12,8 @@ export const useAppointments = (filters?: AppointmentFilterDto) => {
   if (filters?.companyId) queryParams.append('companyId', filters.companyId);
   if (filters?.programId) queryParams.append('programId', filters.programId);
   if (filters?.status) queryParams.append('status', filters.status);
-  if (filters?.startDate) queryParams.append('startDate', filters.startDate.toISOString());
-  if (filters?.endDate) queryParams.append('endDate', filters.endDate.toISOString());
+  if (filters?.startDate) queryParams.append('startDate', filters.startDate);
+  if (filters?.endDate) queryParams.append('endDate', filters.endDate);
   if (filters?.search) queryParams.append('search', filters.search);
   if (filters?.page) queryParams.append('page', String(filters.page));
   if (filters?.limit) queryParams.append('limit', String(filters.limit));

@@ -1,7 +1,7 @@
-import { ITaskCommentRepository } from '@/domain/interfaces/repositories/ITaskCommentRepository';
-import { TaskComment } from '@/domain/entities/TaskComment';
-import { Result } from '@/core/result';
-import { AppError } from '@/core/errors';
+import { ITaskCommentRepository } from '@/3-domain/interfaces/repositories/ITaskCommentRepository';
+import { TaskComment } from '@/3-domain/entities/TaskComment';
+import { Result } from '@/6-core/result/Result';
+import { AppError } from '@/6-core/errors/AppError';
 
 export class ListTaskCommentsUseCase {
   constructor(private taskCommentRepository: ITaskCommentRepository) {}
