@@ -19,3 +19,5 @@ export * from './ICompanyProjectAssignmentRepository';
 export * from './IEventRepository';
 export * from './IAppointmentRepository';
 export * from './IReminderRepository';
+export * from './INewsRepository';
+export * from './IForumRepository';
