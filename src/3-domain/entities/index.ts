@@ -18,3 +18,4 @@ export * from './User';
 export * from './CompanyProjectAssignment';
 export * from './Event';
 export * from './Appointment';
+export * from './Leaderboard';

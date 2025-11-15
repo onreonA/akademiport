@@ -21,3 +21,4 @@ export * from './IAppointmentRepository';
 export * from './IReminderRepository';
 export * from './INewsRepository';
 export * from './IForumRepository';
+export * from './ILeaderboardRepository';
