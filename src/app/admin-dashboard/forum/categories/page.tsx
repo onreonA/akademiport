@@ -1,6 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
+
+export const dynamic = 'force-dynamic';
 import { useCategories, useCreateCategory } from '@/1-presentation/hooks/useForum';
 import { Button } from '@/presentation/components/ui/atoms/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/presentation/components/ui/atoms/card';
@@ -18,7 +20,7 @@ import { Plus, Loader2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useConsultantProgram } from '@/5-shared/contexts/ConsultantProgramContext';
+import { useSearchParams } from 'next/navigation';
 
 const categoryFormSchema = z.object({
   name: z.string().min(1, 'Kategori adı gereklidir').max(100, 'Kategori adı 100 karakterden uzun olamaz'),
@@ -26,14 +28,14 @@ const categoryFormSchema = z.object({
   icon: z.string().max(50, 'İkon 50 karakterden uzun olamaz').optional(),
   color: z.string().regex(/^#[0-9A-F]{6}$/i, 'Geçerli bir hex renk kodu giriniz (örn: #FF5733)').optional(),
   orderIndex: z.number().int().min(0).optional(),
-  requireApproval: z.boolean().default(false),
+  requireApproval: z.boolean().default(false).optional(),
 });
 
 type CategoryFormValues = z.infer<typeof categoryFormSchema>;
 
-export default function AdminCategoriesPage() {
-  const { selectedProgram } = useConsultantProgram();
-  const programId = selectedProgram?.id || '';
+function AdminCategoriesPageContent() {
+  const searchParams = useSearchParams();
+  const programId = searchParams.get('programId') || '';
   const { data: categories = [], isLoading } = useCategories(programId);
   const createCategory = useCreateCategory();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -236,6 +238,14 @@ export default function AdminCategoriesPage() {
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+export default function AdminCategoriesPage() {
+  return (
+    <Suspense fallback={<div>Yükleniyor...</div>}>
+      <AdminCategoriesPageContent />
+    </Suspense>
   );
 }
 

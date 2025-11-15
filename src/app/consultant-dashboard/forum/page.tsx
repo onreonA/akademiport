@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { TopicList } from '@/1-presentation/components/features/forum/TopicList';
 import { TopicForm } from '@/1-presentation/components/features/forum/TopicForm';
 import { useCreateTopic, useCategories } from '@/1-presentation/hooks/useForum';
-import { CreateTopicDto } from '@/2-application/dtos/forum';
+import { CreateTopicDto, UpdateTopicDto } from '@/2-application/dtos/forum';
 import {
   Dialog,
   DialogContent,
@@ -22,12 +22,15 @@ export default function ConsultantForumPage() {
   const createTopic = useCreateTopic();
   const { data: categories = [] } = useCategories(selectedProgramId || '');
 
-  const handleCreate = async (dto: CreateTopicDto) => {
+  const handleCreate = async (dto: CreateTopicDto | UpdateTopicDto) => {
     if (!selectedProgramId) {
       alert('Lütfen bir program seçiniz');
       return;
     }
-    await createTopic.mutateAsync({ ...dto, programId: selectedProgramId });
+    // Type guard: ensure it's CreateTopicDto
+    if ('programId' in dto || !('id' in dto)) {
+      await createTopic.mutateAsync({ ...dto, programId: selectedProgramId } as CreateTopicDto);
+    }
     setIsCreateDialogOpen(false);
   };
 

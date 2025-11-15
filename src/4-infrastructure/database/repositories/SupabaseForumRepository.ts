@@ -332,20 +332,8 @@ export class SupabaseForumRepository implements IForumRepository {
         });
       }
 
-      // Sorting
-      const sortBy = filters.sortBy || 'lastReplyAt';
-      const sortColumn =
-        sortBy === 'lastReplyAt'
-          ? 'last_reply_at'
-          : sortBy === 'createdAt'
-            ? 'created_at'
-            : sortBy === 'replyCount'
-              ? 'reply_count'
-              : sortBy === 'viewCount'
-                ? 'view_count'
-                : 'like_count';
-
-      query = query.order(sortColumn, { ascending: filters.sortOrder === 'asc' });
+      // Sorting - default to lastReplyAt descending
+      query = query.order('last_reply_at', { ascending: false });
 
       // Pagination
       if (filters.limit) {
@@ -1013,7 +1001,7 @@ export class SupabaseForumRepository implements IForumRepository {
     try {
       const activityResult = await this.getActivity(undefined, companyId, programId);
       if (activityResult.isFailure) {
-        return activityResult;
+        return Result.fail(activityResult.error || 'İstatistikler alınamadı');
       }
 
       const activities = activityResult.value;

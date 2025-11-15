@@ -3,7 +3,7 @@
 import { use } from 'react';
 import { useTopicDetail, useReplies, useCreateReply, useLikeTopic, useUnlikeTopic, useMarkSolution } from '@/1-presentation/hooks/useForum';
 import { ReplyForm } from '@/1-presentation/components/features/forum/ReplyForm';
-import { CreateReplyDto } from '@/2-application/dtos/forum';
+import { CreateReplyDto, UpdateReplyDto } from '@/2-application/dtos/forum';
 import { Button } from '@/presentation/components/ui/atoms/button';
 import { Badge } from '@/presentation/components/ui/atoms/badge';
 import { Card, CardContent, CardHeader } from '@/presentation/components/ui/atoms/card';
@@ -31,8 +31,11 @@ export default function TopicDetailPage({
   const [isReplyFormOpen, setIsReplyFormOpen] = useState(false);
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
 
-  const handleCreateReply = async (dto: CreateReplyDto) => {
-    await createReply.mutateAsync({ topicId: id, dto });
+  const handleCreateReply = async (dto: CreateReplyDto | UpdateReplyDto) => {
+    // Type guard: ensure it's CreateReplyDto
+    if ('topicId' in dto || !('id' in dto)) {
+      await createReply.mutateAsync({ topicId: id, dto: dto as CreateReplyDto });
+    }
     setIsReplyFormOpen(false);
     setReplyingTo(null);
   };
@@ -93,7 +96,7 @@ export default function TopicDetailPage({
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2 mb-2 flex-wrap">
-            {topic.category && (
+            {topic.category && topic.category.color && (
               <Badge variant="outline" style={{ backgroundColor: topic.category.color + '20', borderColor: topic.category.color }}>
                 {topic.category.name}
               </Badge>

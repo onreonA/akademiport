@@ -39,7 +39,7 @@ export function TopicCard({
       <CardHeader>
         {/* Category, Status & Priority */}
         <div className="flex items-center gap-2 mb-2 flex-wrap">
-          {topic.category && (
+          {topic.category && topic.category.color && (
             <Badge variant="outline" style={{ backgroundColor: topic.category.color + '20', borderColor: topic.category.color }}>
               {topic.category.name}
             </Badge>

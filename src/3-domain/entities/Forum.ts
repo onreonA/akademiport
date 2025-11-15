@@ -96,29 +96,29 @@ export interface ForumActivity {
  * Forum Topic Entity with Business Logic
  */
 export class ForumTopicEntity implements ForumTopic {
-  id: string;
-  categoryId: string;
-  programId: string;
-  authorId: string;
-  companyId: string | null;
-  title: string;
-  slug: string;
-  content: string;
-  status: TopicStatus;
-  priority: TopicPriority;
-  isPinned: boolean;
-  isLocked: boolean;
-  isApproved: boolean;
-  solutionReplyId: string | null;
-  solvedAt: Date | null;
-  solvedBy: string | null;
-  viewCount: number;
-  replyCount: number;
-  likeCount: number;
-  lastReplyAt: Date | null;
-  lastReplyBy: string | null;
-  createdAt: Date;
-  updatedAt: Date;
+  id!: string;
+  categoryId!: string;
+  programId!: string;
+  authorId!: string;
+  companyId!: string | null;
+  title!: string;
+  slug!: string;
+  content!: string;
+  status!: TopicStatus;
+  priority!: TopicPriority;
+  isPinned!: boolean;
+  isLocked!: boolean;
+  isApproved!: boolean;
+  solutionReplyId!: string | null;
+  solvedAt!: Date | null;
+  solvedBy!: string | null;
+  viewCount!: number;
+  replyCount!: number;
+  likeCount!: number;
+  lastReplyAt!: Date | null;
+  lastReplyBy!: string | null;
+  createdAt!: Date;
+  updatedAt!: Date;
 
   constructor(data: ForumTopic) {
     Object.assign(this, data);
