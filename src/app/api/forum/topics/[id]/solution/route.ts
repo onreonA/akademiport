@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/4-infrastructure/database/supabase-server';
 import { SupabaseForumRepository } from '@/4-infrastructure/database/repositories/SupabaseForumRepository';
 import { MarkSolutionUseCase } from '@/2-application/use-cases/forum';
+import { AddLeaderboardScoreUseCase } from '@/2-application/use-cases/leaderboard';
+import { SupabaseLeaderboardRepository } from '@/4-infrastructure/database/repositories/SupabaseLeaderboardRepository';
+import { CompanyRepository } from '@/4-infrastructure/database/repositories/CompanyRepository';
 
 /**
  * POST /api/forum/topics/[id]/solution
@@ -58,7 +61,10 @@ export async function POST(
       }
     }
 
-    const useCase = new MarkSolutionUseCase(repository);
+    const leaderboardRepository = new SupabaseLeaderboardRepository();
+    const companyRepository = new CompanyRepository();
+    const addLeaderboardScore = new AddLeaderboardScoreUseCase(leaderboardRepository, companyRepository);
+    const useCase = new MarkSolutionUseCase(repository, addLeaderboardScore);
     const result = await useCase.execute(id, replyId, user.id);
 
     if (result.isFailure) {

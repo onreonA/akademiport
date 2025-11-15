@@ -1,18 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { TrainingProgressRepository } from '@/infrastructure/database/repositories/TrainingProgressRepository';
-import { CompanyRepository } from '@/infrastructure/database/repositories/CompanyRepository';
-import { TrainingRepository } from '@/infrastructure/database/repositories/TrainingRepository';
+import { TrainingProgressRepository } from '@/4-infrastructure/database/repositories/TrainingProgressRepository';
+import { CompanyRepository } from '@/4-infrastructure/database/repositories/CompanyRepository';
+import { TrainingRepository } from '@/4-infrastructure/database/repositories/TrainingRepository';
 import {
   GetTrainingProgressUseCase,
   UpdateTrainingProgressUseCase,
   CalculateTrainingProgressUseCase,
-} from '@/application/use-cases/training-progress';
-import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
-import { logger } from '@/shared/utils/logger';
+} from '@/2-application/use-cases/training-progress';
+import { getAuthenticatedUser } from '@/4-infrastructure/api/helpers/auth';
+import { AddLeaderboardScoreUseCase } from '@/2-application/use-cases/leaderboard';
+import { SupabaseLeaderboardRepository } from '@/4-infrastructure/database/repositories/SupabaseLeaderboardRepository';
+import { logger } from '@/5-shared/utils/logger';
 
 const trainingProgressRepository = new TrainingProgressRepository();
 const companyRepository = new CompanyRepository();
 const trainingRepository = new TrainingRepository();
+const leaderboardRepository = new SupabaseLeaderboardRepository();
+const addLeaderboardScore = new AddLeaderboardScoreUseCase(leaderboardRepository, companyRepository);
 
 /**
  * GET /api/companies/[id]/trainings/[trainingId]/progress
@@ -132,7 +136,8 @@ export async function POST(
     const updateProgressUseCase = new UpdateTrainingProgressUseCase(
       trainingProgressRepository,
       companyRepository,
-      trainingRepository
+      trainingRepository,
+      addLeaderboardScore
     );
     const result = await updateProgressUseCase.execute(id, trainingId, {
       companyId: id,

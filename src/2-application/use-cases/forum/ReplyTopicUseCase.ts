@@ -1,9 +1,14 @@
 import { Result } from '@/6-core/result/Result';
 import { IForumRepository } from '@/3-domain/interfaces/repositories/IForumRepository';
 import { CreateReplyDto } from '@/2-application/dtos/forum/CreateReplyDto';
+import { AddLeaderboardScoreUseCase } from '@/2-application/use-cases/leaderboard';
+import { ActivityType } from '@/3-domain/enums/LeaderboardEnums';
 
 export class ReplyTopicUseCase {
-  constructor(private forumRepository: IForumRepository) {}
+  constructor(
+    private forumRepository: IForumRepository,
+    private addLeaderboardScore?: AddLeaderboardScoreUseCase
+  ) {}
 
   async execute(
     dto: CreateReplyDto,
@@ -57,9 +62,7 @@ export class ReplyTopicUseCase {
         parentId: dto.parentId || null,
         content: dto.content.trim(),
         isApproved: true,
-        isEdited: false,
         isSolution: false,
-        likeCount: 0,
       });
 
       if (result.isFailure) {
@@ -75,6 +78,20 @@ export class ReplyTopicUseCase {
           type: 'new_reply',
           title: 'Konunuza yeni bir yanıt geldi',
           message: `"${topic.title}" konunuza yeni bir yanıt yazıldı.`,
+        });
+      }
+
+      // Add leaderboard score
+      if (this.addLeaderboardScore) {
+        await this.addLeaderboardScore.execute({
+          companyId,
+          activityType: ActivityType.FORUM_REPLY_CREATED,
+          activityId: result.value.id,
+          metadata: {
+            topicId: dto.topicId,
+            topicTitle: topic.title,
+            isNested: !!dto.parentId,
+          },
         });
       }
 

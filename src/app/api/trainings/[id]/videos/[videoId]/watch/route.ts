@@ -1,13 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { TrainingProgressRepository } from '@/infrastructure/database/repositories/TrainingProgressRepository';
-import { CompanyRepository } from '@/infrastructure/database/repositories/CompanyRepository';
-import { TrainingRepository } from '@/infrastructure/database/repositories/TrainingRepository';
-import { UpdateTrainingProgressUseCase } from '@/application/use-cases/training-progress';
-import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
+import { TrainingProgressRepository } from '@/4-infrastructure/database/repositories/TrainingProgressRepository';
+import { CompanyRepository } from '@/4-infrastructure/database/repositories/CompanyRepository';
+import { TrainingRepository } from '@/4-infrastructure/database/repositories/TrainingRepository';
+import { UpdateTrainingProgressUseCase } from '@/2-application/use-cases/training-progress';
+import { getAuthenticatedUser } from '@/4-infrastructure/api/helpers/auth';
+import { AddLeaderboardScoreUseCase } from '@/2-application/use-cases/leaderboard';
+import { SupabaseLeaderboardRepository } from '@/4-infrastructure/database/repositories/SupabaseLeaderboardRepository';
 
 const trainingProgressRepository = new TrainingProgressRepository();
 const companyRepository = new CompanyRepository();
 const trainingRepository = new TrainingRepository();
+const leaderboardRepository = new SupabaseLeaderboardRepository();
+const addLeaderboardScore = new AddLeaderboardScoreUseCase(leaderboardRepository, companyRepository);
 
 /**
  * POST /api/trainings/[id]/videos/[videoId]/watch
@@ -38,7 +42,8 @@ export async function POST(
     const updateProgressUseCase = new UpdateTrainingProgressUseCase(
       trainingProgressRepository,
       companyRepository,
-      trainingRepository
+      trainingRepository,
+      addLeaderboardScore
     );
 
     const progressPercentage = body.progressPercentage || 100;

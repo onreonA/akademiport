@@ -2,9 +2,14 @@ import { Result } from '@/6-core/result/Result';
 import { INewsRepository } from '@/3-domain/interfaces/repositories/INewsRepository';
 import { NewsRead } from '@/3-domain/entities/News';
 import { RecordReadDto } from '@/2-application/dtos/news/RecordReadDto';
+import { AddLeaderboardScoreUseCase } from '@/2-application/use-cases/leaderboard';
+import { ActivityType } from '@/3-domain/enums/LeaderboardEnums';
 
 export class RecordNewsReadUseCase {
-  constructor(private newsRepository: INewsRepository) {}
+  constructor(
+    private newsRepository: INewsRepository,
+    private addLeaderboardScore?: AddLeaderboardScoreUseCase
+  ) {}
 
   async execute(dto: RecordReadDto): Promise<Result<NewsRead>> {
     // Validate news exists
@@ -34,6 +39,25 @@ export class RecordNewsReadUseCase {
 
     if (result.isFailure) {
       return Result.fail(result.error || 'Okuma kaydı oluşturulamadı');
+    }
+
+    // Add leaderboard score
+    if (this.addLeaderboardScore) {
+      const activityType = completed
+        ? ActivityType.NEWS_READ_COMPLETED
+        : ActivityType.NEWS_READ;
+
+      await this.addLeaderboardScore.execute({
+        companyId: dto.companyId,
+        activityType,
+        activityId: dto.newsId,
+        metadata: {
+          newsId: dto.newsId,
+          readDuration: dto.readDuration,
+          scrollPercentage: dto.scrollPercentage,
+          completed,
+        },
+      });
     }
 
     return Result.ok(result.value);

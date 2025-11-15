@@ -1,8 +1,13 @@
 import { Result } from '@/6-core/result/Result';
 import { IForumRepository } from '@/3-domain/interfaces/repositories/IForumRepository';
+import { AddLeaderboardScoreUseCase } from '@/2-application/use-cases/leaderboard';
+import { ActivityType } from '@/3-domain/enums/LeaderboardEnums';
 
 export class MarkSolutionUseCase {
-  constructor(private forumRepository: IForumRepository) {}
+  constructor(
+    private forumRepository: IForumRepository,
+    private addLeaderboardScore?: AddLeaderboardScoreUseCase
+  ) {}
 
   async execute(topicId: string, replyId: string, userId: string): Promise<Result<void>> {
     try {
@@ -53,6 +58,20 @@ export class MarkSolutionUseCase {
           type: 'solution_marked',
           title: 'Yanıtınız çözüm olarak işaretlendi',
           message: `"${topic.title}" konusundaki yanıtınız çözüm olarak işaretlendi. +20 puan kazandınız!`,
+        });
+      }
+
+      // Add leaderboard score for reply author (solution marker)
+      if (this.addLeaderboardScore && reply.companyId) {
+        await this.addLeaderboardScore.execute({
+          companyId: reply.companyId,
+          activityType: ActivityType.FORUM_SOLUTION_MARKED,
+          activityId: replyId,
+          metadata: {
+            topicId,
+            topicTitle: topic.title,
+            markedBy: userId,
+          },
         });
       }
 

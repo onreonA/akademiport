@@ -3,6 +3,9 @@ import { createClient } from '@/4-infrastructure/database/supabase-server';
 import { SupabaseForumRepository } from '@/4-infrastructure/database/repositories/SupabaseForumRepository';
 import { ReplyTopicUseCase } from '@/2-application/use-cases/forum';
 import { CreateReplyDto } from '@/2-application/dtos/forum';
+import { AddLeaderboardScoreUseCase } from '@/2-application/use-cases/leaderboard';
+import { SupabaseLeaderboardRepository } from '@/4-infrastructure/database/repositories/SupabaseLeaderboardRepository';
+import { CompanyRepository } from '@/4-infrastructure/database/repositories/CompanyRepository';
 
 /**
  * GET /api/forum/topics/[id]/replies
@@ -85,7 +88,10 @@ export async function POST(
     };
 
     const repository = new SupabaseForumRepository();
-    const useCase = new ReplyTopicUseCase(repository);
+    const leaderboardRepository = new SupabaseLeaderboardRepository();
+    const companyRepository = new CompanyRepository();
+    const addLeaderboardScore = new AddLeaderboardScoreUseCase(leaderboardRepository, companyRepository);
+    const useCase = new ReplyTopicUseCase(repository, addLeaderboardScore);
     const result = await useCase.execute(dto, user.id, userData.company_id);
 
     if (result.isFailure) {

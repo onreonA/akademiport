@@ -3,6 +3,9 @@ import { createClient } from '@/4-infrastructure/database/supabase-server';
 import { SupabaseForumRepository } from '@/4-infrastructure/database/repositories/SupabaseForumRepository';
 import { CreateTopicUseCase, ListTopicsUseCase } from '@/2-application/use-cases/forum';
 import { CreateTopicDto, TopicFilterDto } from '@/2-application/dtos/forum';
+import { AddLeaderboardScoreUseCase } from '@/2-application/use-cases/leaderboard';
+import { SupabaseLeaderboardRepository } from '@/4-infrastructure/database/repositories/SupabaseLeaderboardRepository';
+import { CompanyRepository } from '@/4-infrastructure/database/repositories/CompanyRepository';
 
 /**
  * GET /api/forum/topics
@@ -30,7 +33,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Kullanıcı bilgileri bulunamadı' }, { status: 404 });
     }
 
-    const programId = userData.companies?.program_id;
+    const programId = userData.companies?.[0]?.program_id;
 
     // Get query params
     const searchParams = request.nextUrl.searchParams;
@@ -101,7 +104,7 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const dto: CreateTopicDto = {
-      programId: userData.companies.program_id,
+      programId: userData.companies?.[0]?.program_id || '',
       categoryId: body.categoryId,
       title: body.title,
       content: body.content,
@@ -109,7 +112,10 @@ export async function POST(request: NextRequest) {
     };
 
     const repository = new SupabaseForumRepository();
-    const useCase = new CreateTopicUseCase(repository);
+    const leaderboardRepository = new SupabaseLeaderboardRepository();
+    const companyRepository = new CompanyRepository();
+    const addLeaderboardScore = new AddLeaderboardScoreUseCase(leaderboardRepository, companyRepository);
+    const useCase = new CreateTopicUseCase(repository, addLeaderboardScore);
     const result = await useCase.execute(dto, user.id, userData.company_id);
 
     if (result.isFailure) {

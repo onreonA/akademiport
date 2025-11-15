@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Kullanıcı bilgileri bulunamadı' }, { status: 404 });
     }
 
-    const programId = request.nextUrl.searchParams.get('programId') || userData.companies?.program_id;
+    const programId = request.nextUrl.searchParams.get('programId') || userData.companies?.[0]?.program_id;
 
     if (!programId) {
       return NextResponse.json({ error: 'Program ID gereklidir' }, { status: 400 });
@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     
     // Generate slug from name
-    const slug = body.name
+    const slug: string = (body.name || '')
       .toLowerCase()
       .replace(/ğ/g, 'g')
       .replace(/ü/g, 'u')
@@ -92,20 +92,24 @@ export async function POST(request: NextRequest) {
     const dto: CreateCategoryDto = {
       programId: body.programId,
       name: body.name,
-      slug: body.slug || slug,
-      description: body.description,
-      icon: body.icon,
-      color: body.color,
+      description: body.description ?? null,
+      icon: body.icon ?? null,
+      color: body.color ?? null,
       orderIndex: body.orderIndex || 0,
       requireApproval: body.requireApproval || false,
     };
 
     const repository = new SupabaseForumRepository();
     const result = await repository.createCategory({
-      ...dto,
+      programId: dto.programId,
+      name: dto.name,
+      slug,
+      description: dto.description ?? null,
+      icon: dto.icon ?? null,
+      color: dto.color ?? null,
+      orderIndex: dto.orderIndex ?? 0,
       isActive: true,
-      topicCount: 0,
-      replyCount: 0,
+      requireApproval: dto.requireApproval ?? false,
       createdBy: user.id,
     });
 

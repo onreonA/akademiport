@@ -1,14 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { EventRepository } from '@/infrastructure/database/repositories/EventRepository';
+import { EventRepository } from '@/4-infrastructure/database/repositories/EventRepository';
 import {
   RegisterEventAttendanceUseCase,
   GetEventAttendeesUseCase,
-} from '@/application/use-cases/event';
-import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
-import { logger } from '@/shared/utils/logger';
-import { RegisterAttendanceDtoSchema } from '@/application/dto/event';
+} from '@/2-application/use-cases/event';
+import { getAuthenticatedUser } from '@/4-infrastructure/api/helpers/auth';
+import { AddLeaderboardScoreUseCase } from '@/2-application/use-cases/leaderboard';
+import { SupabaseLeaderboardRepository } from '@/4-infrastructure/database/repositories/SupabaseLeaderboardRepository';
+import { CompanyRepository } from '@/4-infrastructure/database/repositories/CompanyRepository';
+import { RegisterAttendanceDtoSchema } from '@/2-application/dtos/event/RegisterAttendanceDto';
+import { logger } from '@/5-shared/utils/logger';
 
 const eventRepository = new EventRepository();
+const leaderboardRepository = new SupabaseLeaderboardRepository();
+const companyRepository = new CompanyRepository();
+const addLeaderboardScore = new AddLeaderboardScoreUseCase(leaderboardRepository, companyRepository);
 
 /**
  * GET /api/events/[id]/attendance
@@ -81,7 +87,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       );
     }
 
-    const registerAttendanceUseCase = new RegisterEventAttendanceUseCase(eventRepository);
+    const registerAttendanceUseCase = new RegisterEventAttendanceUseCase(eventRepository, addLeaderboardScore);
     const result = await registerAttendanceUseCase.execute(
       validationResult.data.eventId,
       validationResult.data.userId,

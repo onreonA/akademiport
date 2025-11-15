@@ -3,9 +3,14 @@ import { IForumRepository } from '@/3-domain/interfaces/repositories/IForumRepos
 import { ForumTopic, ForumTopicEntity } from '@/3-domain/entities/Forum';
 import { TopicStatus, TopicPriority } from '@/3-domain/enums/ForumEnums';
 import { CreateTopicDto } from '@/2-application/dtos/forum/CreateTopicDto';
+import { AddLeaderboardScoreUseCase } from '@/2-application/use-cases/leaderboard';
+import { ActivityType } from '@/3-domain/enums/LeaderboardEnums';
 
 export class CreateTopicUseCase {
-  constructor(private forumRepository: IForumRepository) {}
+  constructor(
+    private forumRepository: IForumRepository,
+    private addLeaderboardScore?: AddLeaderboardScoreUseCase
+  ) {}
 
   async execute(
     dto: CreateTopicDto,
@@ -73,6 +78,19 @@ export class CreateTopicUseCase {
 
       if (result.isFailure) {
         return Result.fail(result.error || 'Konu oluşturulamadı');
+      }
+
+      // Add leaderboard score
+      if (this.addLeaderboardScore) {
+        await this.addLeaderboardScore.execute({
+          companyId,
+          activityType: ActivityType.FORUM_TOPIC_CREATED,
+          activityId: result.value.id,
+          metadata: {
+            topicTitle: dto.title,
+            categoryId: dto.categoryId,
+          },
+        });
       }
 
       return Result.ok({ id: result.value.id });

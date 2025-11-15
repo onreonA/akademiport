@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/infrastructure/database/supabase-server';
+import { createClient } from '@/4-infrastructure/database/supabase-server';
 import { SupabaseNewsRepository } from '@/4-infrastructure/database/repositories/SupabaseNewsRepository';
 import { RecordNewsReadUseCase } from '@/2-application/use-cases/news';
 import { RecordReadDto } from '@/2-application/dtos/news';
+import { AddLeaderboardScoreUseCase } from '@/2-application/use-cases/leaderboard';
+import { SupabaseLeaderboardRepository } from '@/4-infrastructure/database/repositories/SupabaseLeaderboardRepository';
+import { CompanyRepository } from '@/4-infrastructure/database/repositories/CompanyRepository';
 
 /**
  * POST /api/news/[id]/read
@@ -44,7 +47,10 @@ export async function POST(
     };
 
     const repository = new SupabaseNewsRepository();
-    const useCase = new RecordNewsReadUseCase(repository);
+    const leaderboardRepository = new SupabaseLeaderboardRepository();
+    const companyRepository = new CompanyRepository();
+    const addLeaderboardScore = new AddLeaderboardScoreUseCase(leaderboardRepository, companyRepository);
+    const useCase = new RecordNewsReadUseCase(repository, addLeaderboardScore);
     const result = await useCase.execute(dto);
 
     if (result.isFailure) {

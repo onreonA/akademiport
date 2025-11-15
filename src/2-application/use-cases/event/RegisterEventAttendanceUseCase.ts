@@ -2,9 +2,14 @@ import { IEventRepository } from '@/3-domain/interfaces/repositories/IEventRepos
 import { Result } from '@/6-core/result/Result';
 import { AppError } from '@/6-core/errors/AppError';
 import { EventEntity } from '@/3-domain/entities/Event';
+import { AddLeaderboardScoreUseCase } from '@/2-application/use-cases/leaderboard';
+import { ActivityType } from '@/3-domain/enums/LeaderboardEnums';
 
 export class RegisterEventAttendanceUseCase {
-  constructor(private eventRepository: IEventRepository) {}
+  constructor(
+    private eventRepository: IEventRepository,
+    private addLeaderboardScore?: AddLeaderboardScoreUseCase
+  ) {}
 
   async execute(
     eventId: string,
@@ -51,6 +56,19 @@ export class RegisterEventAttendanceUseCase {
         companyId,
         notes
       );
+
+      // Add leaderboard score
+      if (this.addLeaderboardScore) {
+        await this.addLeaderboardScore.execute({
+          companyId,
+          activityType: ActivityType.EVENT_ATTENDED,
+          activityId: eventId,
+          metadata: {
+            eventTitle: event.title,
+            eventDate: event.startTime.toISOString(),
+          },
+        });
+      }
 
       return Result.ok(attendance);
     } catch (error) {
