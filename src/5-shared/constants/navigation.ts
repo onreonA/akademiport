@@ -20,6 +20,7 @@ import {
   CalendarCheck,
   Clock,
   Newspaper,
+  MessageSquare,
   type LucideIcon,
 } from 'lucide-react';
 import { UserRole } from '@/domain/enums/UserRole';
@@ -192,6 +193,24 @@ export const MASTER_ADMIN_NAVIGATION: NavigationConfig = {
       ],
     },
     {
+      id: 'forum',
+      label: 'Forum',
+      icon: MessageSquare,
+      href: '/admin-dashboard/forum',
+      children: [
+        {
+          id: 'forum-topics',
+          label: 'Konular',
+          href: '/admin-dashboard/forum',
+        },
+        {
+          id: 'forum-categories',
+          label: 'Kategoriler',
+          href: '/admin-dashboard/forum/categories',
+        },
+      ],
+    },
+    {
       id: 'project-templates',
       label: 'Proje Şablonları',
       icon: FileStack,
@@ -304,6 +323,12 @@ export const CONSULTANT_NAVIGATION: NavigationConfig = {
       label: 'Haberler',
       icon: Newspaper,
       href: '/consultant-dashboard/news',
+    },
+    {
+      id: 'forum',
+      label: 'Forum',
+      icon: MessageSquare,
+      href: '/consultant-dashboard/forum',
     },
     {
       id: 'reports',
@@ -436,6 +461,12 @@ export const COMPANY_USER_NAVIGATION: NavigationConfig = {
       label: 'Haberler',
       icon: Newspaper,
       href: '/company-dashboard/news',
+    },
+    {
+      id: 'forum',
+      label: 'Forum',
+      icon: MessageSquare,
+      href: '/company-dashboard/forum',
     },
   ],
   bottom: [
