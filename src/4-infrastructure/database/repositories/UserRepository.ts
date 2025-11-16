@@ -4,19 +4,19 @@
  * Supabase implementation of IUserRepository
  */
 
-import { createClient, getSupabaseAdminClient } from '@/infrastructure/database/supabase-server';
-import { Result } from '@/core/result/Result';
-import { IUserRepository } from '@/domain/interfaces/IUserRepository';
-import { User } from '@/domain/entities/User';
-import { Program } from '@/domain/entities/Program';
-import { UserRole } from '@/domain/enums/UserRole';
-import { ProgramStatus } from '@/domain/enums/ProgramStatus';
+import { createClient, getSupabaseAdminClient } from '@/4-infrastructure/database/supabase-server';
+import { Result } from '@/6-core/result/Result';
+import { IUserRepository } from '@/3-domain/interfaces/IUserRepository';
+import { User } from '@/3-domain/entities/User';
+import { Program } from '@/3-domain/entities/Program';
+import { UserRole } from '@/3-domain/enums/UserRole';
+import { ProgramStatus } from '@/3-domain/enums/ProgramStatus';
 import {
   CreateUserDto,
   UpdateUserDto,
   UserFilterDto,
   UserFilterDefaults,
-} from '@/application/dto/user';
+} from '@/2-application/dto/user';
 
 export class UserRepository implements IUserRepository {
   private readonly tableName = 'users';

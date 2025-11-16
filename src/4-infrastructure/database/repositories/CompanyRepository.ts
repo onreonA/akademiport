@@ -3,16 +3,16 @@
  * Sprint 6: Updated with new DTOs and methods
  */
 
-import { createClient } from '@/infrastructure/database/supabase-server';
-import { Result } from '@/core/result/Result';
-import { ICompanyRepository } from '@/domain/interfaces/ICompanyRepository';
-import { Company } from '@/domain/entities/Company';
-import { User, UserRole } from '@/domain/entities/User';
+import { createClient } from '@/4-infrastructure/database/supabase-server';
+import { Result } from '@/6-core/result/Result';
+import { ICompanyRepository } from '@/3-domain/interfaces/ICompanyRepository';
+import { Company } from '@/3-domain/entities/Company';
+import { User, UserRole } from '@/3-domain/entities/User';
 import type {
   CreateCompanyDto,
   UpdateCompanyDto,
   CompanyFilterDto,
-} from '@/application/dto/company';
+} from '@/2-application/dtos/company';
 
 export class CompanyRepository implements ICompanyRepository {
   async findById(id: string): Promise<Result<Company | null>> {

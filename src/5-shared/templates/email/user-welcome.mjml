@@ -1,0 +1,31 @@
+<mjml>
+  <mj-head>
+    <mj-title>Akademi Port - Hoş Geldiniz</mj-title>
+    <mj-preview>Akademi Port platformuna kaydınız başarıyla tamamlandı.</mj-preview>
+  </mj-head>
+  <mj-body>
+    <mj-section background-color="#f4f4f4">
+      <mj-column>
+        <mj-image src="https://akademiport.com/logo.png" alt="Akademi Port" width="200px" />
+        <mj-divider border-color="#2563eb" />
+        <mj-text font-size="24px" color="#1f2937" font-weight="bold">
+          Hoş Geldiniz!
+        </mj-text>
+        <mj-text font-size="16px" color="#4b5563">
+          Merhaba {{user_name}},
+        </mj-text>
+        <mj-text font-size="16px" color="#4b5563">
+          Akademi Port platformuna kaydınız başarıyla tamamlandı. Artık platformun tüm özelliklerinden faydalanabilirsiniz.
+        </mj-text>
+        <mj-button href="{{dashboard_url}}" background-color="#2563eb" color="white">
+          Dashboard'a Git
+        </mj-button>
+        <mj-divider border-color="#e5e7eb" />
+        <mj-text font-size="14px" color="#6b7280">
+          Sorularınız için bizimle iletişime geçebilirsiniz.
+        </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
+

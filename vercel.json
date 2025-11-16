@@ -1,28 +1,8 @@
 {
   "crons": [
     {
-      "path": "/api/cron/send-event-reminders?type=1hour",
-      "schedule": "0 * * * *"
-    },
-    {
-      "path": "/api/cron/send-event-reminders?type=24hours",
-      "schedule": "0 9 * * *"
-    },
-    {
-      "path": "/api/cron/send-appointment-reminders?type=1hour",
-      "schedule": "0 * * * *"
-    },
-    {
-      "path": "/api/cron/send-appointment-reminders?type=24hours",
-      "schedule": "0 9 * * *"
-    },
-    {
-      "path": "/api/cron/leaderboard/refresh",
-      "schedule": "0 * * * *"
-    },
-    {
-      "path": "/api/cron/leaderboard/snapshot",
-      "schedule": "0 0 * * 0"
+      "path": "/api/cron/email-queue-processor",
+      "schedule": "*/1 * * * *"
     }
   ]
 }

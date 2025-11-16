@@ -22,6 +22,7 @@ import {
   Newspaper,
   MessageSquare,
   Trophy,
+  ShoppingCart,
   type LucideIcon,
 } from 'lucide-react';
 import { UserRole } from '@/domain/enums/UserRole';
@@ -230,6 +231,18 @@ export const MASTER_ADMIN_NAVIGATION: NavigationConfig = {
       ],
     },
     {
+      id: 'ecommerce',
+      label: 'E-ticaret',
+      icon: ShoppingCart,
+      href: '/admin-dashboard/ecommerce',
+    },
+    {
+      id: 'ministry',
+      label: 'Bakanlık Dashboard',
+      icon: BarChart3,
+      href: '/admin-dashboard/ministry',
+    },
+    {
       id: 'project-templates',
       label: 'Proje Şablonları',
       icon: FileStack,
@@ -356,6 +369,12 @@ export const CONSULTANT_NAVIGATION: NavigationConfig = {
       href: '/consultant-dashboard/leaderboard',
     },
     {
+      id: 'ecommerce',
+      label: 'E-ticaret',
+      icon: ShoppingCart,
+      href: '/consultant-dashboard/ecommerce',
+    },
+    {
       id: 'reports',
       label: 'Raporlarım',
       icon: BarChart3,
@@ -426,6 +445,12 @@ export const COMPANY_ADMIN_NAVIGATION: NavigationConfig = {
       label: 'Liderlik Tablosu',
       icon: Trophy,
       href: '/company-dashboard/leaderboard',
+    },
+    {
+      id: 'ecommerce',
+      label: 'E-ticaret Metrikleri',
+      icon: ShoppingCart,
+      href: '/company-dashboard/ecommerce',
     },
     {
       id: 'reports',

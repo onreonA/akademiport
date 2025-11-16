@@ -1,0 +1,40 @@
+<mjml>
+  <mj-head>
+    <mj-title>Akademi Port - E-ticaret Metrikleri Hatırlatması</mj-title>
+    <mj-preview>Aylık e-ticaret metriklerinizi girmeyi unutmayın.</mj-preview>
+  </mj-head>
+  <mj-body>
+    <mj-section background-color="#f4f4f4">
+      <mj-column>
+        <mj-image src="https://akademiport.com/logo.png" alt="Akademi Port" width="200px" />
+        <mj-divider border-color="#2563eb" />
+        <mj-text font-size="24px" color="#1f2937" font-weight="bold">
+          E-ticaret Metrikleri Hatırlatması
+        </mj-text>
+        <mj-text font-size="16px" color="#4b5563">
+          Merhaba {{company_name}},
+        </mj-text>
+        <mj-text font-size="16px" color="#4b5563">
+          {{period_month}}/{{period_year}} dönemi için e-ticaret metriklerinizi girmeyi unutmayın.
+        </mj-text>
+        <mj-text font-size="14px" color="#4b5563">
+          Lütfen aşağıdaki bilgileri doldurun:
+        </mj-text>
+        <mj-text font-size="14px" color="#4b5563">
+          • Platform ziyaretçi sayıları<br/>
+          • Ürün sayıları<br/>
+          • Sipariş sayıları<br/>
+          • Gelir bilgileri
+        </mj-text>
+        <mj-button href="{{metrics_url}}" background-color="#2563eb" color="white">
+          Metrikleri Gir
+        </mj-button>
+        <mj-divider border-color="#e5e7eb" />
+        <mj-text font-size="14px" color="#6b7280">
+          Metriklerinizi zamanında girmeniz, performans analiziniz için önemlidir.
+        </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
+

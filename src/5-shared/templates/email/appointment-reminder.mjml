@@ -1,0 +1,42 @@
+<mjml>
+  <mj-head>
+    <mj-title>Akademi Port - Randevu Hatırlatması</mj-title>
+    <mj-preview>Randevunuz yaklaşıyor.</mj-preview>
+  </mj-head>
+  <mj-body>
+    <mj-section background-color="#f4f4f4">
+      <mj-column>
+        <mj-image src="https://akademiport.com/logo.png" alt="Akademi Port" width="200px" />
+        <mj-divider border-color="#2563eb" />
+        <mj-text font-size="24px" color="#1f2937" font-weight="bold">
+          Randevu Hatırlatması
+        </mj-text>
+        <mj-text font-size="16px" color="#4b5563">
+          Merhaba {{user_name}},
+        </mj-text>
+        <mj-text font-size="16px" color="#4b5563">
+          {{appointment_date}} tarihinde randevunuz bulunmaktadır.
+        </mj-text>
+        <mj-text font-size="16px" color="#1f2937" font-weight="bold">
+          Randevu Detayları:
+        </mj-text>
+        <mj-text font-size="14px" color="#4b5563">
+          <strong>Tarih:</strong> {{appointment_date}}<br/>
+          <strong>Saat:</strong> {{appointment_time}}<br/>
+          <strong>Danışman:</strong> {{consultant_name}}<br/>
+          {{#if zoom_url}}
+          <strong>Zoom Link:</strong> <a href="{{zoom_url}}">{{zoom_url}}</a>
+          {{/if}}
+        </mj-text>
+        <mj-button href="{{appointment_url}}" background-color="#2563eb" color="white">
+          Randevu Detayları
+        </mj-button>
+        <mj-divider border-color="#e5e7eb" />
+        <mj-text font-size="14px" color="#6b7280">
+          Randevu saatinden 15 dakika önce hazır olmanızı öneririz.
+        </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
+
