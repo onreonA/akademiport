@@ -1,9 +1,11 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import { ThemeProvider } from '@/shared/providers/theme-provider';
-import { QueryProvider } from '@/shared/providers/query-provider';
-import { Toaster } from '@/presentation/components/ui/molecules/sonner';
+import { ThemeProvider } from '@/5-shared/providers/theme-provider';
+import { QueryProvider } from '@/5-shared/providers/query-provider';
+import { NotificationProvider } from '@/5-shared/contexts/NotificationContext';
+import { ServiceWorkerRegistration } from '@/1-presentation/components/features/notifications/ServiceWorkerRegistration';
+import { Toaster } from '@/1-presentation/components/ui/molecules/sonner';
 
 const inter = Inter({
   variable: '--font-inter',
@@ -30,8 +32,11 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            {children}
-            <Toaster />
+            <NotificationProvider>
+              <ServiceWorkerRegistration />
+              {children}
+              <Toaster />
+            </NotificationProvider>
           </ThemeProvider>
         </QueryProvider>
       </body>
