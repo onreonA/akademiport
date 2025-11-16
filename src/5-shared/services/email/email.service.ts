@@ -203,7 +203,6 @@ export class EmailService implements IEmailService {
         return Result.fail(new Error(`Queue item not found: ${queueId}`));
       }
 
-      const supabase = getSupabaseAdminClient();
       // Update status to sending
       await supabase.from('email_queue').update({ status: EmailStatus.SENDING }).eq('id', queueId);
 

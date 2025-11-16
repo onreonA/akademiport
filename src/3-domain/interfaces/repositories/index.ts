@@ -23,3 +23,4 @@ export * from './INewsRepository';
 export * from './IForumRepository';
 export * from './ILeaderboardRepository';
 export * from './IEcommerceRepository';
+export * from './INotificationRepository';

@@ -19,3 +19,6 @@ export * from './CompanyProjectAssignment';
 export * from './Event';
 export * from './Appointment';
 export * from './Leaderboard';
+export * from './Notification';
+export * from './NotificationPreferences';
+export * from './PushSubscription';
