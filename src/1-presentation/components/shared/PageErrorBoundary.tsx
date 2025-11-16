@@ -7,8 +7,8 @@
 
 import { ErrorBoundary } from './ErrorBoundary';
 import { AlertCircle } from 'lucide-react';
-import { Button } from '@/presentation/components/ui/atoms/button';
-import { Card, CardContent } from '@/presentation/components/ui/atoms/card';
+import { Button } from '@/1-presentation/components/ui/atoms/button';
+import { Card, CardContent } from '@/1-presentation/components/ui/atoms/card';
 
 interface PageErrorBoundaryProps {
   children: React.ReactNode;

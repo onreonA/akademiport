@@ -8,9 +8,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdminClient } from '@/4-infrastructure/database/supabase-server';
 
-export async function GET(request: NextRequest, { params }: { params: { token: string } }) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ token: string }> }
+) {
   try {
-    const { token } = params;
+    const { token } = await params;
 
     if (!token) {
       return NextResponse.json({ error: 'Missing token' }, { status: 400 });

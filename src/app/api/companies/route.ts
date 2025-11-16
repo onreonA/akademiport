@@ -20,7 +20,16 @@ const createCompanyUseCase = new CreateCompanyUseCase(companyRepository);
 export async function GET(request: NextRequest) {
   try {
     // Authentication
-    const user = await requireAuth(request);
+    let user;
+    try {
+      user = await requireAuth(request);
+    } catch (authError) {
+      return NextResponse.json(
+        { error: 'Unauthorized', message: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+
     const userId = user.id;
     const userRole = user.role as UserRole;
     const userCompanyId = user.companyId;
@@ -44,6 +53,7 @@ export async function GET(request: NextRequest) {
       limit: filter.limit,
     });
   } catch (error) {
+    console.error('Companies API error:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Firmalar alınamadı' },
       { status: 500 }

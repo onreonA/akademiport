@@ -6,15 +6,15 @@
 'use client';
 
 import React from 'react';
-import { cn } from '@/presentation/lib/utils';
-import { SidebarProvider, useSidebar } from '@/shared/contexts/SidebarContext';
+import { cn } from '@/5-shared/utils/cn';
+import { SidebarProvider, useSidebar } from '@/5-shared/contexts/SidebarContext';
 import { AppHeader } from './AppHeader';
 import { AppSidebar } from './AppSidebar';
 import { MobileSidebar } from './MobileSidebar';
 import { BottomNavigation } from './BottomNavigation';
 import { CommandPalette } from './CommandPalette';
 import { QuickActionsFAB } from './QuickActionsFAB';
-import { PageErrorBoundary } from '@/presentation/components/shared/PageErrorBoundary';
+import { PageErrorBoundary } from '@/1-presentation/components/shared/PageErrorBoundary';
 
 // =====================================================
 // TYPES

@@ -47,15 +47,35 @@ export default function CompaniesPage() {
       if (sector !== 'all') params.append('sector', sector);
       if (isActive !== 'all') params.append('isActive', isActive);
 
-      const response = await fetch(`/api/companies?${params}`);
+      const response = await fetch(`/api/companies?${params}`, {
+        credentials: 'include', // Include cookies for authentication
+      });
+
+      if (!response.ok) {
+        // If response is not ok, try to parse error message
+        const errorData = await response
+          .json()
+          .catch(() => ({ error: 'Failed to fetch companies' }));
+        console.error('Failed to fetch companies:', errorData);
+        setCompanies([]);
+        setTotal(0);
+        return;
+      }
+
       const data = await response.json();
 
       if (data.success) {
-        setCompanies(data.data);
-        setTotal(data.total);
+        setCompanies(data.data || []);
+        setTotal(data.total || 0);
+      } else {
+        console.error('API returned error:', data.error);
+        setCompanies([]);
+        setTotal(0);
       }
     } catch (error) {
       console.error('Failed to fetch companies:', error);
+      setCompanies([]);
+      setTotal(0);
     } finally {
       setLoading(false);
     }

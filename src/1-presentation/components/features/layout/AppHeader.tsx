@@ -9,11 +9,12 @@ import React from 'react';
 import Link from 'next/link';
 import { Menu, Moon, Sun, Bell, Search } from 'lucide-react';
 import { useTheme } from 'next-themes';
-import { Button } from '@/presentation/components/ui/atoms/button';
-import { Badge } from '@/presentation/components/ui/atoms/badge';
-import { useSidebar } from '@/shared/contexts/SidebarContext';
+import { Button } from '@/1-presentation/components/ui/atoms/button';
+import { Badge } from '@/1-presentation/components/ui/atoms/badge';
+import { useSidebar } from '@/5-shared/contexts/SidebarContext';
 import { Breadcrumbs } from './Breadcrumbs';
 import { UserMenu } from './UserMenu';
+import { NotificationCenter } from '@/1-presentation/components/features/notifications/NotificationCenter';
 
 // =====================================================
 // TYPES
@@ -29,7 +30,6 @@ interface AppHeaderProps {
 export function AppHeader({ showBreadcrumbs = true, showNotifications = true }: AppHeaderProps) {
   const { theme, setTheme } = useTheme();
   const { toggleMobileSidebar } = useSidebar();
-  const [notificationCount] = React.useState(3); // TODO: Connect to real notification system
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm">
@@ -87,24 +87,7 @@ export function AppHeader({ showBreadcrumbs = true, showNotifications = true }: 
           </Button>
 
           {/* Notifications */}
-          {showNotifications && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="relative h-9 w-9 rounded-lg transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-800"
-              title="Bildirimler"
-            >
-              <Bell className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-              {notificationCount > 0 && (
-                <Badge
-                  variant="destructive"
-                  className="absolute -right-1 -top-1 h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center"
-                >
-                  {notificationCount}
-                </Badge>
-              )}
-            </Button>
-          )}
+          {showNotifications && <NotificationCenter />}
 
           {/* Theme Toggle */}
           <Button
