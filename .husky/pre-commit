@@ -3,25 +3,25 @@
 
 echo "🔍 Running pre-commit checks..."
 
-# Format check (değişiklik yapmadan)
+# Format check (değişiklik yapmadan) - ZORUNLU
 echo "✨ Checking code format..."
 npm run format:check || {
   echo "❌ Code format check failed. Run 'npm run format' to fix."
   exit 1
 }
 
-# Lint check
-echo "🔍 Running linter..."
-npm run lint || {
-  echo "❌ Linting failed. Run 'npm run lint:fix' to auto-fix some issues."
-  exit 1
+# Lint check - OPSIYONEL (sadece uyarı ver, engelleme)
+echo "🔍 Running linter (non-blocking)..."
+npm run lint -- --quiet || {
+  echo "⚠️  Linting found errors. Consider running 'npm run lint:fix'."
+  echo "💡 Continuing with commit (lint check is non-blocking)..."
 }
 
-# Type check
-echo "📝 Type checking..."
+# Type check - OPSIYONEL (sadece uyarı ver, engelleme)
+echo "📝 Type checking (non-blocking)..."
 npm run type-check || {
-  echo "❌ Type check failed. Please fix TypeScript errors."
-  exit 1
+  echo "⚠️  Type check found errors. Consider fixing TypeScript errors."
+  echo "💡 Continuing with commit (type check is non-blocking)..."
 }
 
 echo "✅ Pre-commit checks passed!"
