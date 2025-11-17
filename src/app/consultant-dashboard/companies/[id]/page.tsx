@@ -41,6 +41,9 @@ import {
 } from '@/presentation/components/ui/atoms/dialog';
 import { UserForm, type UserFormData } from '@/presentation/components/features/users/UserForm';
 import { AssignTrainingModal, TrainingCard } from '@/presentation/components/features/trainings';
+import { CompanyRiskAnalysis } from '@/1-presentation/components/features/ai/CompanyRiskAnalysis';
+import { SuccessPrediction } from '@/1-presentation/components/features/ai/SuccessPrediction';
+import { TrendAnalysis } from '@/1-presentation/components/features/ai/TrendAnalysis';
 import { UserRole } from '@/domain/enums/UserRole';
 import { toast } from 'sonner';
 import type { Company } from '@/domain/entities/Company';
@@ -357,6 +360,15 @@ export default function CompanyDetailPage({ params }: CompanyDetailPageProps) {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
+          {/* AI Risk Analysis */}
+          <CompanyRiskAnalysis companyId={companyId} />
+
+          {/* AI Success Prediction */}
+          <SuccessPrediction companyId={companyId} />
+
+          {/* AI Trend Analysis */}
+          <TrendAnalysis companyId={companyId} />
+
           <Card>
             <CardHeader>
               <CardTitle>Firma Bilgileri</CardTitle>

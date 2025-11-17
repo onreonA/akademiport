@@ -3,9 +3,13 @@ import { Result } from '@/6-core/result/Result';
 import { AppError } from '@/6-core/errors/AppError';
 import { ZoomApiService } from '@/infrastructure/external/zoom-api.service';
 import { logger } from '@/shared/utils/logger';
+import { NotificationService } from '@/5-shared/services/notification';
 
 export class DeleteEventUseCase {
-  constructor(private eventRepository: IEventRepository) {}
+  constructor(
+    private eventRepository: IEventRepository,
+    private notificationService?: NotificationService
+  ) {}
 
   async execute(eventId: string, deleteZoomMeeting: boolean = true): Promise<Result<void>> {
     try {
@@ -33,8 +37,39 @@ export class DeleteEventUseCase {
         }
       }
 
+      // Get attendees before deleting (for notifications)
+      let attendees: Array<{ userId: string }> = [];
+      if (this.notificationService) {
+        try {
+          attendees = await this.eventRepository.getAttendees(eventId);
+        } catch (error) {
+          logger.warn('Failed to get attendees for notification', { error, eventId });
+        }
+      }
+
       // Delete event (soft delete)
       await this.eventRepository.delete(eventId);
+
+      // Send notification to all attendees if service is available
+      if (this.notificationService && attendees.length > 0) {
+        try {
+          const attendeeUserIds = attendees.map((a) => a.userId);
+          for (const userId of attendeeUserIds) {
+            try {
+              await this.notificationService.sendEventCancelled(userId, eventId, event.title);
+            } catch (error) {
+              logger.error('Failed to send event cancelled notification to user', {
+                error,
+                userId,
+                eventId,
+              });
+            }
+          }
+        } catch (error) {
+          // Log but don't fail the operation if notification fails
+          logger.error('Failed to send event cancelled notifications', { error, eventId });
+        }
+      }
 
       return Result.ok(undefined);
     } catch (error) {

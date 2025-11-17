@@ -3,9 +3,15 @@ import { Result } from '@/6-core/result/Result';
 import { AppError } from '@/6-core/errors/AppError';
 import { ZoomApiService } from '@/infrastructure/external/zoom-api.service';
 import { logger } from '@/shared/utils/logger';
+import { NotificationService } from '@/5-shared/services/notification';
+import { IUserRepository } from '@/3-domain/interfaces/IUserRepository';
 
 export class ApproveAppointmentUseCase {
-  constructor(private appointmentRepository: IAppointmentRepository) {}
+  constructor(
+    private appointmentRepository: IAppointmentRepository,
+    private notificationService?: NotificationService,
+    private userRepository?: IUserRepository
+  ) {}
 
   async execute(
     appointmentId: string,
@@ -80,6 +86,36 @@ export class ApproveAppointmentUseCase {
           error: zoomError instanceof Error ? zoomError.message : 'Unknown error',
         });
         // Continue without Zoom meeting - appointment is still approved
+      }
+
+      // Send notification to company user if service is available
+      if (this.notificationService) {
+        try {
+          // Get consultant name if userRepository is available
+          let consultantName = 'Danışman';
+          if (this.userRepository) {
+            const consultantResult = await this.userRepository.findById(
+              approvedAppointment.consultantId
+            );
+            if (consultantResult.isSuccess && consultantResult.value) {
+              consultantName = consultantResult.value.fullName || consultantName;
+            }
+          }
+
+          // Send notification to company user (requestedBy)
+          await this.notificationService.sendAppointmentConfirmed(
+            approvedAppointment.requestedBy,
+            approvedAppointment.id,
+            consultantName,
+            approvedAppointment.startTime
+          );
+        } catch (error) {
+          // Log but don't fail the operation if notification fails
+          logger.error('Failed to send appointment confirmed notification', {
+            error,
+            appointmentId: approvedAppointment.id,
+          });
+        }
       }
 
       logger.info('Appointment approved successfully', {

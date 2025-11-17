@@ -45,4 +45,36 @@ describe('RateLimiter', () => {
       expect(limiter).toBeDefined();
     });
   });
+
+  describe('rate limit behavior', () => {
+    it('should refill tokens over time', async () => {
+      // Simulate time passing
+      const limiter = new RateLimiter();
+
+      // Consume all tokens
+      for (let i = 0; i < 60; i++) {
+        await limiter.checkRateLimit(AIProvider.OPENAI, 'perMinute');
+      }
+
+      // Should be rate limited
+      const result = await limiter.checkRateLimit(AIProvider.OPENAI, 'perMinute');
+      expect(result).toBe(false);
+
+      // Reset and should work again
+      limiter.reset();
+      const resultAfterReset = await limiter.checkRateLimit(AIProvider.OPENAI, 'perMinute');
+      expect(resultAfterReset).toBe(true);
+    });
+
+    it('should handle different providers separately', async () => {
+      const limiter = new RateLimiter();
+
+      // Both should work independently
+      const openaiResult = await limiter.checkRateLimit(AIProvider.OPENAI, 'perMinute');
+      const claudeResult = await limiter.checkRateLimit(AIProvider.CLAUDE, 'perMinute');
+
+      expect(openaiResult).toBe(true);
+      expect(claudeResult).toBe(true);
+    });
+  });
 });

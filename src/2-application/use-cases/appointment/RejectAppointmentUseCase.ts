@@ -2,9 +2,15 @@ import { IAppointmentRepository } from '@/3-domain/interfaces/repositories/IAppo
 import { Result } from '@/6-core/result/Result';
 import { AppError } from '@/6-core/errors/AppError';
 import { logger } from '@/shared/utils/logger';
+import { NotificationService } from '@/5-shared/services/notification';
+import { IUserRepository } from '@/3-domain/interfaces/IUserRepository';
 
 export class RejectAppointmentUseCase {
-  constructor(private appointmentRepository: IAppointmentRepository) {}
+  constructor(
+    private appointmentRepository: IAppointmentRepository,
+    private notificationService?: NotificationService,
+    private userRepository?: IUserRepository
+  ) {}
 
   async execute(
     appointmentId: string,
@@ -39,6 +45,46 @@ export class RejectAppointmentUseCase {
         rejectedBy,
         reason
       );
+
+      // Send notification to company user if service is available
+      if (this.notificationService) {
+        try {
+          // Get consultant name if userRepository is available
+          let consultantName = 'Danışman';
+          if (this.userRepository) {
+            const consultantResult = await this.userRepository.findById(
+              rejectedAppointment.consultantId
+            );
+            if (consultantResult.isSuccess && consultantResult.value) {
+              consultantName = consultantResult.value.fullName || consultantName;
+            }
+          }
+
+          // Determine who cancelled (consultant or company)
+          const cancelledBy =
+            rejectedBy === rejectedAppointment.consultantId ? 'consultant' : 'company';
+
+          // Send notification to the other party
+          const notifyUserId =
+            cancelledBy === 'consultant'
+              ? rejectedAppointment.requestedBy
+              : rejectedAppointment.consultantId;
+
+          await this.notificationService.sendAppointmentCancelled(
+            notifyUserId,
+            rejectedAppointment.id,
+            consultantName,
+            rejectedAppointment.startTime,
+            cancelledBy
+          );
+        } catch (error) {
+          // Log but don't fail the operation if notification fails
+          logger.error('Failed to send appointment rejected notification', {
+            error,
+            appointmentId: rejectedAppointment.id,
+          });
+        }
+      }
 
       logger.info('Appointment rejected successfully', {
         appointmentId: rejectedAppointment.id,

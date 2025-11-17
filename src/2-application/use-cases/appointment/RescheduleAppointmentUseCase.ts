@@ -2,9 +2,15 @@ import { IAppointmentRepository } from '@/3-domain/interfaces/repositories/IAppo
 import { Result } from '@/6-core/result/Result';
 import { AppError } from '@/6-core/errors/AppError';
 import { logger } from '@/shared/utils/logger';
+import { NotificationService } from '@/5-shared/services/notification';
+import { IUserRepository } from '@/3-domain/interfaces/IUserRepository';
 
 export class RescheduleAppointmentUseCase {
-  constructor(private appointmentRepository: IAppointmentRepository) {}
+  constructor(
+    private appointmentRepository: IAppointmentRepository,
+    private notificationService?: NotificationService,
+    private userRepository?: IUserRepository
+  ) {}
 
   async execute(
     appointmentId: string,
@@ -82,6 +88,44 @@ export class RescheduleAppointmentUseCase {
         newEndTime,
         rescheduledBy
       );
+
+      // Send notification to both parties if service is available
+      if (this.notificationService) {
+        try {
+          // Get consultant name if userRepository is available
+          let consultantName = 'Danışman';
+          if (this.userRepository) {
+            const consultantResult = await this.userRepository.findById(appointment.consultantId);
+            if (consultantResult.isSuccess && consultantResult.value) {
+              consultantName = consultantResult.value.fullName || consultantName;
+            }
+          }
+
+          // Send notification to company user
+          await this.notificationService.sendAppointmentRescheduled(
+            appointment.requestedBy,
+            result.new.id,
+            consultantName,
+            appointment.startTime,
+            result.new.startTime
+          );
+
+          // Send notification to consultant
+          await this.notificationService.sendAppointmentRescheduled(
+            appointment.consultantId,
+            result.new.id,
+            consultantName,
+            appointment.startTime,
+            result.new.startTime
+          );
+        } catch (error) {
+          // Log but don't fail the operation if notification fails
+          logger.error('Failed to send appointment rescheduled notification', {
+            error,
+            appointmentId: result.new.id,
+          });
+        }
+      }
 
       logger.info('Appointment rescheduled successfully', {
         oldAppointmentId: result.old.id,

@@ -2,7 +2,7 @@
 
 **Tarih:** 15 Ocak 2025  
 **Sprint:** 20 / 28  
-**Durum:** 📋 Planlama Aşaması  
+**Durum:** ✅ Tamamlandı  
 **Öncelik:** 🔴 Yüksek (Kullanıcı deneyimi için kritik)  
 **Süre:** 1 hafta (~8 saat)
 
@@ -37,15 +37,15 @@
 - ✅ `users.settings` içinde notification preferences var
 - ✅ `forum_notifications` tablosu var (Sprint 13)
 
-### ❌ Eksik Özellikler
+### ✅ Tamamlanan Özellikler
 
-- ❌ Genel `notifications` tablosu yok
-- ❌ Real-time notification updates yok
-- ❌ Push notification sistemi yok
-- ❌ Notification service layer eksik
-- ❌ Notification center UI yok
-- ❌ Notification triggers yok
-- ❌ Email Service entegrasyonu eksik (NotificationService'te)
+- ✅ Genel `notifications` tablosu oluşturuldu
+- ✅ Real-time notification updates eklendi (Supabase Realtime)
+- ✅ Push notification sistemi eklendi (Web Push API)
+- ✅ Notification service layer eklendi
+- ✅ Notification center UI eklendi
+- ✅ Notification triggers eklendi (Task, Event, Appointment)
+- ✅ Email Service entegrasyonu tamamlandı
 
 ### 📋 Mevcut Notification İhtiyaçları
 
@@ -248,63 +248,70 @@ CREATE TYPE notification_channel AS ENUM (
 
 ### 1. Database Migration (1 saat)
 
-- [ ] `notification_priority` enum oluştur
-- [ ] `notification_channel` enum oluştur
-- [ ] `notifications` tablosu oluştur
-- [ ] `notification_preferences` tablosu oluştur
-- [ ] `push_subscriptions` tablosu oluştur
-- [ ] Indexes oluştur (user_id, is_read, created_at, type)
-- [ ] RLS policies oluştur
-- [ ] Triggers oluştur (updated_at, auto-cleanup expired)
+- [x] `notification_priority` enum oluştur
+- [x] `notification_channel` enum oluştur
+- [x] `notifications` tablosu oluştur
+- [x] `notification_preferences` tablosu oluştur
+- [x] `push_subscriptions` tablosu oluştur
+- [x] Indexes oluştur (user_id, is_read, created_at, type)
+- [x] RLS policies oluştur
+- [x] Triggers oluştur (updated_at, auto-cleanup expired)
 
 ### 2. Domain Layer (1 saat)
 
-- [ ] `Notification` entity oluştur
-- [ ] `NotificationPreferences` entity oluştur
-- [ ] `PushSubscription` entity oluştur
-- [ ] `NotificationEnums.ts` oluştur (extend existing)
-- [ ] `INotificationService` interface oluştur
-- [ ] `IPushNotificationService` interface oluştur
-- [ ] `INotificationRepository` interface oluştur
+- [x] `Notification` entity oluştur
+- [x] `NotificationPreferences` entity oluştur
+- [x] `PushSubscription` entity oluştur
+- [x] `NotificationEnums.ts` oluştur (extend existing)
+- [x] `INotificationService` interface oluştur
+- [x] `IPushNotificationService` interface oluştur
+- [x] `INotificationRepository` interface oluştur
 
 ### 3. Application Layer (1.5 saat)
 
-- [ ] DTOs oluştur
-- [ ] Use cases oluştur (8 use case)
-- [ ] Use case testleri yaz
+- [x] DTOs oluştur
+- [x] Use cases oluştur (9 use case)
+- [x] Use case testleri yaz
 
 ### 4. Infrastructure Layer (2 saat)
 
-- [ ] `NotificationRepository` implementasyonu
-- [ ] `NotificationService` refactor (Email Service entegrasyonu)
-- [ ] `PushNotificationService` implementasyonu
-- [ ] `notification.config.ts` oluştur (VAPID keys)
-- [ ] Repository testleri yaz
+- [x] `NotificationRepository` implementasyonu
+- [x] `NotificationService` refactor (Email Service entegrasyonu)
+- [x] `PushNotificationService` implementasyonu
+- [x] `notification.config.ts` oluştur (VAPID keys)
+- [x] Repository testleri yaz
 
 ### 5. API Routes (1 saat)
 
-- [ ] 9 API route oluştur
-- [ ] Authentication & authorization
-- [ ] Request validation
-- [ ] Error handling
-- [ ] API route testleri yaz
+- [x] 9 API route oluştur
+- [x] Authentication & authorization
+- [x] Request validation
+- [x] Error handling
+- [x] API route testleri yaz
 
 ### 6. Frontend Components (2 saat)
 
-- [ ] `NotificationCenter` component
-- [ ] `NotificationItem` component
-- [ ] `NotificationBadge` component
-- [ ] `NotificationPreferences` component
-- [ ] Real-time subscription (Supabase Realtime)
-- [ ] Push notification permission request
-- [ ] Service worker (Web Push)
+- [x] `NotificationCenter` component
+- [x] `NotificationItem` component
+- [x] `NotificationBadge` component
+- [x] `NotificationPreferences` component
+- [x] Real-time subscription (Supabase Realtime)
+- [x] Push notification permission request
+- [x] Service worker (Web Push)
 
 ### 7. Integration & Testing (0.5 saat)
 
-- [ ] Email Service entegrasyonu test
-- [ ] Push notification test
-- [ ] Real-time updates test
-- [ ] End-to-end test
+- [x] Email Service entegrasyonu test
+- [x] Push notification test
+- [x] Real-time updates test
+- [x] End-to-end test
+
+### 8. Notification Triggers (1 saat)
+
+- [x] NotificationService helper metodları ekle
+- [x] Task use case'lerine notification trigger'ları ekle
+- [x] Event use case'lerine notification trigger'ları ekle
+- [x] Appointment use case'lerine notification trigger'ları ekle
 
 ---
 

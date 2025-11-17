@@ -1,9 +1,14 @@
 import { ITaskRepository } from '@/3-domain/interfaces/repositories/ITaskRepository';
 import { Result } from '@/6-core/result/Result';
 import { AppError } from '@/6-core/errors/AppError';
+import { NotificationService } from '@/5-shared/services/notification';
+import { logger } from '@/5-shared/utils/logger';
 
 export class ApproveTaskUseCase {
-  constructor(private taskRepository: ITaskRepository) {}
+  constructor(
+    private taskRepository: ITaskRepository,
+    private notificationService?: NotificationService
+  ) {}
 
   async execute(taskId: string, approvedBy: string): Promise<Result<void>> {
     try {
@@ -25,6 +30,22 @@ export class ApproveTaskUseCase {
 
       // Approve task
       await this.taskRepository.approve(taskId, approvedBy);
+
+      // Send notification to task assignee if service is available
+      if (this.notificationService && task.assignedTo) {
+        try {
+          await this.notificationService.sendTaskApproved(
+            task.assignedTo,
+            taskId,
+            task.title,
+            undefined, // projectId
+            task.subProjectId
+          );
+        } catch (error) {
+          // Log but don't fail the operation if notification fails
+          logger.error('Failed to send task approved notification', { error, taskId });
+        }
+      }
 
       return Result.ok(undefined);
     } catch (error) {

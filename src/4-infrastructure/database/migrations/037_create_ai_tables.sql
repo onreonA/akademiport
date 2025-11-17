@@ -205,6 +205,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trigger_update_ai_prompts_updated_at ON ai_prompts;
 CREATE TRIGGER trigger_update_ai_prompts_updated_at
   BEFORE UPDATE ON ai_prompts
   FOR EACH ROW
@@ -219,6 +220,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trigger_update_ai_provider_configs_updated_at ON ai_provider_configs;
 CREATE TRIGGER trigger_update_ai_provider_configs_updated_at
   BEFORE UPDATE ON ai_provider_configs
   FOR EACH ROW
@@ -235,10 +237,12 @@ ALTER TABLE ai_provider_configs ENABLE ROW LEVEL SECURITY;
 
 -- ai_prompts policies
 -- Herkes okuyabilir, sadece admin yazabilir
+DROP POLICY IF EXISTS "ai_prompts_select" ON ai_prompts;
 CREATE POLICY "ai_prompts_select" ON ai_prompts
   FOR SELECT
   USING (true);
 
+DROP POLICY IF EXISTS "ai_prompts_insert" ON ai_prompts;
 CREATE POLICY "ai_prompts_insert" ON ai_prompts
   FOR INSERT
   WITH CHECK (
@@ -249,6 +253,7 @@ CREATE POLICY "ai_prompts_insert" ON ai_prompts
     )
   );
 
+DROP POLICY IF EXISTS "ai_prompts_update" ON ai_prompts;
 CREATE POLICY "ai_prompts_update" ON ai_prompts
   FOR UPDATE
   USING (
@@ -259,6 +264,7 @@ CREATE POLICY "ai_prompts_update" ON ai_prompts
     )
   );
 
+DROP POLICY IF EXISTS "ai_prompts_delete" ON ai_prompts;
 CREATE POLICY "ai_prompts_delete" ON ai_prompts
   FOR DELETE
   USING (
@@ -271,6 +277,7 @@ CREATE POLICY "ai_prompts_delete" ON ai_prompts
 
 -- ai_usage_logs policies
 -- Herkes kendi loglarını görebilir, admin tümünü görebilir
+DROP POLICY IF EXISTS "ai_usage_logs_select_own" ON ai_usage_logs;
 CREATE POLICY "ai_usage_logs_select_own" ON ai_usage_logs
   FOR SELECT
   USING (
@@ -282,10 +289,12 @@ CREATE POLICY "ai_usage_logs_select_own" ON ai_usage_logs
     )
   );
 
+DROP POLICY IF EXISTS "ai_usage_logs_insert" ON ai_usage_logs;
 CREATE POLICY "ai_usage_logs_insert" ON ai_usage_logs
   FOR INSERT
   WITH CHECK (true); -- System can insert logs
 
+DROP POLICY IF EXISTS "ai_usage_logs_delete" ON ai_usage_logs;
 CREATE POLICY "ai_usage_logs_delete" ON ai_usage_logs
   FOR DELETE
   USING (
@@ -298,10 +307,12 @@ CREATE POLICY "ai_usage_logs_delete" ON ai_usage_logs
 
 -- ai_provider_configs policies
 -- Herkes okuyabilir, sadece admin yazabilir
+DROP POLICY IF EXISTS "ai_provider_configs_select" ON ai_provider_configs;
 CREATE POLICY "ai_provider_configs_select" ON ai_provider_configs
   FOR SELECT
   USING (true);
 
+DROP POLICY IF EXISTS "ai_provider_configs_insert" ON ai_provider_configs;
 CREATE POLICY "ai_provider_configs_insert" ON ai_provider_configs
   FOR INSERT
   WITH CHECK (
@@ -312,6 +323,7 @@ CREATE POLICY "ai_provider_configs_insert" ON ai_provider_configs
     )
   );
 
+DROP POLICY IF EXISTS "ai_provider_configs_update" ON ai_provider_configs;
 CREATE POLICY "ai_provider_configs_update" ON ai_provider_configs
   FOR UPDATE
   USING (
@@ -343,16 +355,19 @@ BEGIN
     SELECT 1 FROM ai_prompts 
     WHERE use_case = 'task_description' AND is_active = true
   ) THEN
-    INSERT INTO ai_prompts (name, description, use_case, template, provider, model, version, is_active)
+    INSERT INTO ai_prompts (name, description, use_case, template, provider, model, version, is_active, temperature, max_tokens, top_p)
     VALUES (
       'Görev Açıklaması Üretimi',
       'Görev başlığından detaylı açıklama ve adımlar üretir',
       'task_description',
-      'Aşağıdaki görev başlığı için detaylı bir açıklama ve adım adım plan oluştur:\n\nGörev: {{task_title}}\n\nProgram: {{program_name}}\nFirma: {{company_name}}\n\nLütfen şunları içeren bir açıklama oluştur:\n1. Görevin amacı\n2. Adım adım plan\n3. Dikkat edilmesi gerekenler\n4. İlgili kaynaklar',
+      'Aşağıdaki görev başlığı için detaylı bir açıklama ve adım adım plan oluştur:\n\nGörev: {{task_title}}\nProgram: {{program_name}}\nFirma: {{company_name}}\nProje: {{project_name}}\nAlt Proje: {{sub_project_name}}\n\nLütfen şu formatta JSON yanıt ver:\n{\n  "description": "Görevin detaylı açıklaması",\n  "subTasks": [\n    {\n      "title": "Alt görev başlığı",\n      "description": "Alt görev açıklaması"\n    }\n  ],\n  "keyPoints": ["Anahtar nokta 1", "Anahtar nokta 2", ...],\n  "estimatedDuration": "Tahmini süre (opsiyonel)"\n}',
       'openai',
       'gpt-4',
       1,
-      true
+      true,
+      0.7,
+      2000,
+      1.0
     );
   END IF;
 
@@ -360,7 +375,7 @@ BEGIN
     SELECT 1 FROM ai_prompts 
     WHERE use_case = 'report_generation' AND is_active = true
   ) THEN
-    INSERT INTO ai_prompts (name, description, use_case, template, provider, model, version, is_active)
+    INSERT INTO ai_prompts (name, description, use_case, template, provider, model, version, is_active, temperature, max_tokens, top_p)
     VALUES (
       'Rapor Üretimi',
       'Firma ilerleme raporu için AI analizi',
@@ -369,7 +384,94 @@ BEGIN
       'claude',
       'claude-opus',
       1,
-      true
+      true,
+      0.7,
+      4000,
+      1.0
+    );
+  END IF;
+
+  -- Document Summary (Training Summary)
+  IF NOT EXISTS (
+    SELECT 1 FROM ai_prompts 
+    WHERE use_case = 'document_summary' AND is_active = true
+  ) THEN
+    INSERT INTO ai_prompts (name, description, use_case, template, provider, model, version, is_active, temperature, max_tokens, top_p)
+    VALUES (
+      'Eğitim Özeti',
+      'Eğitim içeriğinden özet ve anahtar kelimeler çıkarır',
+      'document_summary',
+      'Aşağıdaki eğitim içeriğini analiz edip detaylı bir özet oluştur:\n\nEğitim Adı: {{training_name}}\nEğitim Açıklaması: {{training_description}}\n\nİçerik:\n{{content_context}}\n\nVideo Sayısı: {{video_count}}\nDöküman Sayısı: {{document_count}}\n\nLütfen şu formatta JSON yanıt ver:\n{\n  "summary": "Eğitimin kapsamlı özeti",\n  "keyPoints": ["Anahtar nokta 1", "Anahtar nokta 2", ...],\n  "learningOutcomes": ["Öğrenme çıktısı 1", "Öğrenme çıktısı 2", ...],\n  "prerequisites": ["Ön koşul 1", "Ön koşul 2", ...],\n  "estimatedDuration": "Tahmini süre",\n  "difficulty": "beginner|intermediate|advanced"\n}',
+      'claude',
+      'claude-haiku',
+      1,
+      true,
+      0.5,
+      2000,
+      1.0
+    );
+  END IF;
+
+  -- Risk Analysis
+  IF NOT EXISTS (
+    SELECT 1 FROM ai_prompts 
+    WHERE use_case = 'risk_analysis' AND is_active = true
+  ) THEN
+    INSERT INTO ai_prompts (name, description, use_case, template, provider, model, version, is_active, temperature, max_tokens, top_p)
+    VALUES (
+      'Firma Risk Analizi',
+      'Firma verilerine göre risk analizi yapar',
+      'risk_analysis',
+      'Aşağıdaki firma verilerini analiz edip risk analizi yap:\n\nFirma: {{company_name}}\nE-posta: {{company_email}}\n\nProje Verileri:\n{{project_data}}\n\nEğitim Verileri:\n{{training_data}}\n\nEtkinlik Verileri:\n{{event_data}}\n\nGenel İstatistikler:\n{{overall_stats}}\n\nLütfen şu formatta JSON yanıt ver:\n{\n  "riskScore": 0-100 arası risk skoru,\n  "riskLevel": "low|medium|high|critical",\n  "analysis": "Detaylı analiz metni",\n  "factors": [\n    {\n      "name": "Faktör adı",\n      "impact": "positive|negative|neutral",\n      "description": "Açıklama",\n      "score": 0-100 arası skor\n    }\n  ],\n  "recommendations": ["Öneri 1", "Öneri 2", ...]\n}',
+      'claude',
+      'claude-opus',
+      1,
+      true,
+      0.6,
+      3000,
+      1.0
+    );
+  END IF;
+
+  -- Success Prediction
+  IF NOT EXISTS (
+    SELECT 1 FROM ai_prompts 
+    WHERE use_case = 'success_prediction' AND is_active = true
+  ) THEN
+    INSERT INTO ai_prompts (name, description, use_case, template, provider, model, version, is_active, temperature, max_tokens, top_p)
+    VALUES (
+      'Başarı Tahmini',
+      'Firma verilerine göre başarı olasılığı tahmin eder',
+      'success_prediction',
+      'Aşağıdaki firma verilerini analiz edip başarı tahmini yap:\n\nFirma: {{company_name}}\nE-posta: {{company_email}}\n\nProje Verileri:\n{{project_data}}\n\nEğitim Verileri:\n{{training_data}}\n\nEtkinlik Verileri:\n{{event_data}}\n\nGenel İstatistikler:\n{{overall_stats}}\n\nLütfen şu formatta JSON yanıt ver:\n{\n  "successProbability": 0-100 arası başarı olasılığı,\n  "successLevel": "low|medium|high|very_high",\n  "prediction": "Tahmin metni",\n  "factors": [\n    {\n      "name": "Faktör adı",\n      "impact": "positive|negative|neutral",\n      "description": "Açıklama",\n      "weight": 0-1 arası ağırlık\n    }\n  ],\n  "recommendations": ["Öneri 1", "Öneri 2", ...],\n  "historicalComparison": {\n    "averageSuccessRate": 0-100,\n    "percentile": 0-100\n  }\n}',
+      'claude',
+      'claude-opus',
+      1,
+      true,
+      0.6,
+      3000,
+      1.0
+    );
+  END IF;
+
+  -- Trend Analysis
+  IF NOT EXISTS (
+    SELECT 1 FROM ai_prompts 
+    WHERE use_case = 'trend_analysis' AND is_active = true
+  ) THEN
+    INSERT INTO ai_prompts (name, description, use_case, template, provider, model, version, is_active, temperature, max_tokens, top_p)
+    VALUES (
+      'Trend Analizi',
+      'Firma performans trendlerini analiz eder',
+      'trend_analysis',
+      'Aşağıdaki firma trend verilerini analiz edip trend analizi yap:\n\nFirma: {{company_name}}\nDönem: {{period}}\n\nTrend Verileri:\n{{trend_data}}\n\nLütfen şu formatta JSON yanıt ver:\n{\n  "trends": [\n    {\n      "category": "Kategori adı (örn: Proje İlerlemesi)",\n      "trend": "increasing|decreasing|stable",\n      "description": "Trend açıklaması",\n      "changePercentage": Değişim yüzdesi,\n      "dataPoints": [\n        {"date": "YYYY-MM-DD", "value": sayısal değer}\n      ]\n    }\n  ],\n  "insights": ["İçgörü 1", "İçgörü 2", ...],\n  "predictions": [\n    {\n      "metric": "Metrik adı",\n      "predictedValue": Tahmin edilen değer,\n      "confidence": 0-100 arası güven,\n      "timeframe": "Zaman çerçevesi"\n    }\n  ],\n  "recommendations": ["Öneri 1", "Öneri 2", ...]\n}',
+      'claude',
+      'claude-sonnet',
+      1,
+      true,
+      0.5,
+      3000,
+      1.0
     );
   END IF;
 END $$;

@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/presentation/components/ui/atoms/select';
+import { TaskDescriptionGenerator } from '@/1-presentation/components/features/ai/TaskDescriptionGenerator';
 
 interface SubProject {
   id: string;
@@ -36,6 +37,13 @@ export default function NewTaskPage() {
   const [loading, setLoading] = useState(false);
   const [subProjects, setSubProjects] = useState<SubProject[]>([]);
   const [companyUsers, setCompanyUsers] = useState<CompanyUser[]>([]);
+  const [projectData, setProjectData] = useState<{
+    name?: string;
+    companyId?: string;
+    companyName?: string;
+    programId?: string;
+    programName?: string;
+  }>({});
   const [formData, setFormData] = useState({
     sub_project_id: '',
     assigned_to: '',
@@ -49,6 +57,7 @@ export default function NewTaskPage() {
   useEffect(() => {
     fetchSubProjects();
     fetchCompanyUsers();
+    fetchProjectData();
   }, [projectId]);
 
   const fetchSubProjects = async () => {
@@ -60,6 +69,24 @@ export default function NewTaskPage() {
       setSubProjects(Array.isArray(data) ? data : data.data || data.subProjects || []);
     } catch (err) {
       console.error('Error fetching sub-projects:', err);
+    }
+  };
+
+  const fetchProjectData = async () => {
+    try {
+      const projectResponse = await fetch(`/api/projects/${projectId}`);
+      if (!projectResponse.ok) throw new Error('Failed to fetch project');
+      const project = await projectResponse.json();
+
+      setProjectData({
+        name: project.name,
+        companyId: project.companyId || project.company_id,
+        companyName: project.companyName || project.company?.name,
+        programId: project.programId || project.program_id,
+        programName: project.programName || project.program?.name,
+      });
+    } catch (err) {
+      console.error('Error fetching project data:', err);
     }
   };
 
@@ -127,6 +154,21 @@ export default function NewTaskPage() {
 
   const handleChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleAIGenerated = (result: {
+    description: string;
+    subTasks: Array<{ title: string; description: string }>;
+    keyPoints: string[];
+  }) => {
+    // Set description
+    setFormData((prev) => ({
+      ...prev,
+      description: result.description,
+    }));
+
+    // TODO: Show sub tasks and key points in a modal or expandable section
+    console.log('AI Generated:', result);
   };
 
   return (
@@ -200,7 +242,19 @@ export default function NewTaskPage() {
 
             {/* Description */}
             <div className="space-y-2">
-              <Label htmlFor="description">Açıklama</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="description">Açıklama</Label>
+                <TaskDescriptionGenerator
+                  taskTitle={formData.title}
+                  programName={projectData.programName}
+                  companyName={projectData.companyName}
+                  projectName={projectData.name}
+                  subProjectName={subProjects.find((sp) => sp.id === formData.sub_project_id)?.name}
+                  companyId={projectData.companyId}
+                  programId={projectData.programId}
+                  onGenerated={handleAIGenerated}
+                />
+              </div>
               <Textarea
                 id="description"
                 value={formData.description}

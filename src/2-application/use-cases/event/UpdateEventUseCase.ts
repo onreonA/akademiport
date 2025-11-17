@@ -4,9 +4,13 @@ import { Result } from '@/6-core/result/Result';
 import { AppError } from '@/6-core/errors/AppError';
 import { ZoomApiService } from '@/infrastructure/external/zoom-api.service';
 import { logger } from '@/shared/utils/logger';
+import { NotificationService } from '@/5-shared/services/notification';
 
 export class UpdateEventUseCase {
-  constructor(private eventRepository: IEventRepository) {}
+  constructor(
+    private eventRepository: IEventRepository,
+    private notificationService?: NotificationService
+  ) {}
 
   async execute(eventId: string, data: UpdateEventDto): Promise<Result<any>> {
     try {
@@ -62,6 +66,30 @@ export class UpdateEventUseCase {
             });
             // Continue - event is still updated even if Zoom update fails
           }
+        }
+      }
+
+      // Send notification to all attendees if service is available
+      if (this.notificationService) {
+        try {
+          const attendees = await this.eventRepository.getAttendees(eventId);
+          const attendeeUserIds = attendees.map((a) => a.userId);
+
+          // Send notification to all attendees
+          for (const userId of attendeeUserIds) {
+            try {
+              await this.notificationService.sendEventUpdated(userId, eventId, updatedEvent.title);
+            } catch (error) {
+              logger.error('Failed to send event updated notification to user', {
+                error,
+                userId,
+                eventId,
+              });
+            }
+          }
+        } catch (error) {
+          // Log but don't fail the operation if notification fails
+          logger.error('Failed to send event updated notifications', { error, eventId });
         }
       }
 

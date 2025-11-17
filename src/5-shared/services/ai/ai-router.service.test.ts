@@ -60,6 +60,24 @@ describe('AIRouterService', () => {
       expect(result.isSuccess).toBe(true);
       expect(result.value).toBe(AIProvider.CLAUDE);
     });
+
+    it('should select OpenAI for chatbot', () => {
+      const result = router.selectProvider(AIUseCase.CHATBOT);
+      expect(result.isSuccess).toBe(true);
+      expect(result.value).toBe(AIProvider.OPENAI);
+    });
+
+    it('should select Claude for risk_analysis', () => {
+      const result = router.selectProvider(AIUseCase.RISK_ANALYSIS);
+      expect(result.isSuccess).toBe(true);
+      expect(result.value).toBe(AIProvider.CLAUDE);
+    });
+
+    it('should select Claude for document_summary', () => {
+      const result = router.selectProvider(AIUseCase.DOCUMENT_SUMMARY);
+      expect(result.isSuccess).toBe(true);
+      expect(result.value).toBe(AIProvider.CLAUDE);
+    });
   });
 
   describe('checkProviderHealth', () => {

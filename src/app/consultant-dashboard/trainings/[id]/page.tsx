@@ -18,6 +18,7 @@ import {
   TrainingVideoPlayer,
   TrainingDocumentViewer,
 } from '@/presentation/components/features/trainings';
+import { TrainingSummaryGenerator } from '@/1-presentation/components/features/ai/TrainingSummaryGenerator';
 import type { Training } from '@/domain/entities/Training';
 import type { TrainingVideo } from '@/domain/entities/TrainingVideo';
 import type { TrainingDocument } from '@/domain/entities/TrainingDocument';
@@ -217,6 +218,9 @@ export default function ConsultantTrainingDetailPage() {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
+          {/* AI Summary Generator */}
+          <TrainingSummaryGenerator trainingId={id} />
+
           <Card>
             <CardHeader>
               <CardTitle>Eğitim Bilgileri</CardTitle>

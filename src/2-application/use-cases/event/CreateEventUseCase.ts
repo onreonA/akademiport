@@ -5,9 +5,13 @@ import { AppError } from '@/6-core/errors/AppError';
 import { ZoomApiService } from '@/infrastructure/external/zoom-api.service';
 import { EventEntity } from '@/3-domain/entities/Event';
 import { logger } from '@/shared/utils/logger';
+import { NotificationService } from '@/5-shared/services/notification';
 
 export class CreateEventUseCase {
-  constructor(private eventRepository: IEventRepository) {}
+  constructor(
+    private eventRepository: IEventRepository,
+    private notificationService?: NotificationService
+  ) {}
 
   async execute(
     data: CreateEventDto,
@@ -70,6 +74,16 @@ export class CreateEventUseCase {
           });
           // Continue without Zoom meeting - event is still created
           // Note: In production, you might want to notify the user about this
+        }
+      }
+
+      // Send notification to creator if service is available
+      if (this.notificationService) {
+        try {
+          await this.notificationService.sendEventCreated(userId, event.id, event.title);
+        } catch (error) {
+          // Log but don't fail the operation if notification fails
+          logger.error('Failed to send event created notification', { error, eventId: event.id });
         }
       }
 

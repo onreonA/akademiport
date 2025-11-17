@@ -3,11 +3,14 @@ import { Result } from '@/6-core/result/Result';
 import { AppError } from '@/6-core/errors/AppError';
 import { AddLeaderboardScoreUseCase } from '@/2-application/use-cases/leaderboard';
 import { ActivityType } from '@/3-domain/enums/LeaderboardEnums';
+import { NotificationService } from '@/5-shared/services/notification';
+import { logger } from '@/5-shared/utils/logger';
 
 export class CompleteTaskUseCase {
   constructor(
     private taskRepository: ITaskRepository,
-    private addLeaderboardScore?: AddLeaderboardScoreUseCase
+    private addLeaderboardScore?: AddLeaderboardScoreUseCase,
+    private notificationService?: NotificationService
   ) {}
 
   async execute(taskId: string, companyId?: string, programId?: string): Promise<Result<void>> {
@@ -48,6 +51,22 @@ export class CompleteTaskUseCase {
             completedEarly: isEarly,
           },
         });
+      }
+
+      // Send notification to consultant/reviewer if service is available
+      if (this.notificationService && task.assignedTo) {
+        try {
+          await this.notificationService.sendTaskCompleted(
+            task.assignedTo,
+            taskId,
+            task.title,
+            undefined, // projectId
+            task.subProjectId
+          );
+        } catch (error) {
+          // Log but don't fail the operation if notification fails
+          logger.error('Failed to send task completed notification', { error, taskId });
+        }
       }
 
       return Result.ok(undefined);

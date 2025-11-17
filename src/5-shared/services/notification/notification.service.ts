@@ -155,4 +155,319 @@ export class NotificationService implements INotificationService {
   async getUnreadCount(userId: string): Promise<Result<number>> {
     return await this.getUnreadCountUseCase.execute(userId);
   }
+
+  // ============================================
+  // Notification Trigger Helpers
+  // ============================================
+
+  /**
+   * Send task assigned notification
+   */
+  async sendTaskAssigned(
+    userId: string,
+    taskId: string,
+    taskTitle: string,
+    projectId?: string,
+    subProjectId?: string
+  ): Promise<Result<Notification>> {
+    return await this.createNotification({
+      userId,
+      type: NotificationType.TASK_ASSIGNED,
+      title: 'Yeni Görev Atandı',
+      message: `"${taskTitle}" görevi size atandı.`,
+      actionUrl: `/dashboard/tasks/${taskId}`,
+      metadata: {
+        taskId,
+        taskTitle,
+        projectId,
+        subProjectId,
+      },
+      priority: NotificationPriority.NORMAL,
+      channels: [NotificationChannel.IN_APP, NotificationChannel.EMAIL],
+    });
+  }
+
+  /**
+   * Send task completed notification
+   */
+  async sendTaskCompleted(
+    userId: string,
+    taskId: string,
+    taskTitle: string,
+    projectId?: string,
+    subProjectId?: string
+  ): Promise<Result<Notification>> {
+    return await this.createNotification({
+      userId,
+      type: NotificationType.TASK_COMPLETED,
+      title: 'Görev Tamamlandı',
+      message: `"${taskTitle}" görevi tamamlandı ve inceleme için gönderildi.`,
+      actionUrl: `/dashboard/tasks/${taskId}`,
+      metadata: {
+        taskId,
+        taskTitle,
+        projectId,
+        subProjectId,
+      },
+      priority: NotificationPriority.NORMAL,
+      channels: [NotificationChannel.IN_APP],
+    });
+  }
+
+  /**
+   * Send task approved notification
+   */
+  async sendTaskApproved(
+    userId: string,
+    taskId: string,
+    taskTitle: string,
+    projectId?: string,
+    subProjectId?: string
+  ): Promise<Result<Notification>> {
+    return await this.createNotification({
+      userId,
+      type: NotificationType.TASK_APPROVED,
+      title: 'Görev Onaylandı',
+      message: `"${taskTitle}" görevi onaylandı.`,
+      actionUrl: `/dashboard/tasks/${taskId}`,
+      metadata: {
+        taskId,
+        taskTitle,
+        projectId,
+        subProjectId,
+      },
+      priority: NotificationPriority.NORMAL,
+      channels: [NotificationChannel.IN_APP, NotificationChannel.EMAIL],
+    });
+  }
+
+  /**
+   * Send task rejected notification
+   */
+  async sendTaskRejected(
+    userId: string,
+    taskId: string,
+    taskTitle: string,
+    reason?: string,
+    projectId?: string,
+    subProjectId?: string
+  ): Promise<Result<Notification>> {
+    return await this.createNotification({
+      userId,
+      type: NotificationType.TASK_REJECTED,
+      title: 'Görev Reddedildi',
+      message: reason
+        ? `"${taskTitle}" görevi reddedildi. Sebep: ${reason}`
+        : `"${taskTitle}" görevi reddedildi.`,
+      actionUrl: `/dashboard/tasks/${taskId}`,
+      metadata: {
+        taskId,
+        taskTitle,
+        reason,
+        projectId,
+        subProjectId,
+      },
+      priority: NotificationPriority.HIGH,
+      channels: [NotificationChannel.IN_APP, NotificationChannel.EMAIL],
+    });
+  }
+
+  /**
+   * Send event created notification
+   */
+  async sendEventCreated(
+    userId: string,
+    eventId: string,
+    eventTitle: string
+  ): Promise<Result<Notification>> {
+    return await this.createNotification({
+      userId,
+      type: NotificationType.INFO,
+      title: 'Yeni Etkinlik Oluşturuldu',
+      message: `"${eventTitle}" etkinliği oluşturuldu.`,
+      actionUrl: `/dashboard/events/${eventId}`,
+      metadata: {
+        eventId,
+        eventTitle,
+      },
+      priority: NotificationPriority.NORMAL,
+      channels: [NotificationChannel.IN_APP],
+    });
+  }
+
+  /**
+   * Send event updated notification
+   */
+  async sendEventUpdated(
+    userId: string,
+    eventId: string,
+    eventTitle: string
+  ): Promise<Result<Notification>> {
+    return await this.createNotification({
+      userId,
+      type: NotificationType.EVENT_UPDATED,
+      title: 'Etkinlik Güncellendi',
+      message: `"${eventTitle}" etkinliği güncellendi.`,
+      actionUrl: `/dashboard/events/${eventId}`,
+      metadata: {
+        eventId,
+        eventTitle,
+      },
+      priority: NotificationPriority.NORMAL,
+      channels: [NotificationChannel.IN_APP, NotificationChannel.EMAIL],
+    });
+  }
+
+  /**
+   * Send event cancelled notification
+   */
+  async sendEventCancelled(
+    userId: string,
+    eventId: string,
+    eventTitle: string
+  ): Promise<Result<Notification>> {
+    return await this.createNotification({
+      userId,
+      type: NotificationType.EVENT_CANCELLED,
+      title: 'Etkinlik İptal Edildi',
+      message: `"${eventTitle}" etkinliği iptal edildi.`,
+      actionUrl: `/dashboard/events/${eventId}`,
+      metadata: {
+        eventId,
+        eventTitle,
+      },
+      priority: NotificationPriority.HIGH,
+      channels: [NotificationChannel.IN_APP, NotificationChannel.EMAIL],
+    });
+  }
+
+  /**
+   * Send event reminder notification
+   */
+  async sendEventReminder(
+    userId: string,
+    eventId: string,
+    eventTitle: string,
+    eventDate: Date
+  ): Promise<Result<Notification>> {
+    return await this.createNotification({
+      userId,
+      type: NotificationType.EVENT_REMINDER,
+      title: 'Etkinlik Hatırlatması',
+      message: `"${eventTitle}" etkinliği ${eventDate.toLocaleDateString('tr-TR')} tarihinde gerçekleşecek.`,
+      actionUrl: `/dashboard/events/${eventId}`,
+      metadata: {
+        eventId,
+        eventTitle,
+        eventDate: eventDate.toISOString(),
+      },
+      priority: NotificationPriority.NORMAL,
+      channels: [NotificationChannel.IN_APP, NotificationChannel.EMAIL, NotificationChannel.PUSH],
+    });
+  }
+
+  /**
+   * Send appointment confirmed notification
+   */
+  async sendAppointmentConfirmed(
+    userId: string,
+    appointmentId: string,
+    consultantName: string,
+    appointmentDate: Date
+  ): Promise<Result<Notification>> {
+    return await this.createNotification({
+      userId,
+      type: NotificationType.APPOINTMENT_CONFIRMED,
+      title: 'Randevu Onaylandı',
+      message: `${consultantName} ile ${appointmentDate.toLocaleDateString('tr-TR')} tarihindeki randevunuz onaylandı.`,
+      actionUrl: `/dashboard/appointments/${appointmentId}`,
+      metadata: {
+        appointmentId,
+        consultantName,
+        appointmentDate: appointmentDate.toISOString(),
+      },
+      priority: NotificationPriority.NORMAL,
+      channels: [NotificationChannel.IN_APP, NotificationChannel.EMAIL],
+    });
+  }
+
+  /**
+   * Send appointment cancelled notification
+   */
+  async sendAppointmentCancelled(
+    userId: string,
+    appointmentId: string,
+    consultantName: string,
+    appointmentDate: Date,
+    cancelledBy: 'consultant' | 'company'
+  ): Promise<Result<Notification>> {
+    const cancelledByText = cancelledBy === 'consultant' ? 'Danışman' : 'Firma';
+    return await this.createNotification({
+      userId,
+      type: NotificationType.APPOINTMENT_CANCELLED,
+      title: 'Randevu İptal Edildi',
+      message: `${consultantName} ile ${appointmentDate.toLocaleDateString('tr-TR')} tarihindeki randevunuz ${cancelledByText} tarafından iptal edildi.`,
+      actionUrl: `/dashboard/appointments/${appointmentId}`,
+      metadata: {
+        appointmentId,
+        consultantName,
+        appointmentDate: appointmentDate.toISOString(),
+        cancelledBy,
+      },
+      priority: NotificationPriority.HIGH,
+      channels: [NotificationChannel.IN_APP, NotificationChannel.EMAIL],
+    });
+  }
+
+  /**
+   * Send appointment rescheduled notification
+   */
+  async sendAppointmentRescheduled(
+    userId: string,
+    appointmentId: string,
+    consultantName: string,
+    oldDate: Date,
+    newDate: Date
+  ): Promise<Result<Notification>> {
+    return await this.createNotification({
+      userId,
+      type: NotificationType.APPOINTMENT_RESCHEDULED,
+      title: 'Randevu Yeniden Planlandı',
+      message: `${consultantName} ile randevunuz ${oldDate.toLocaleDateString('tr-TR')} tarihinden ${newDate.toLocaleDateString('tr-TR')} tarihine taşındı.`,
+      actionUrl: `/dashboard/appointments/${appointmentId}`,
+      metadata: {
+        appointmentId,
+        consultantName,
+        oldDate: oldDate.toISOString(),
+        newDate: newDate.toISOString(),
+      },
+      priority: NotificationPriority.NORMAL,
+      channels: [NotificationChannel.IN_APP, NotificationChannel.EMAIL],
+    });
+  }
+
+  /**
+   * Send appointment reminder notification
+   */
+  async sendAppointmentReminder(
+    userId: string,
+    appointmentId: string,
+    consultantName: string,
+    appointmentDate: Date
+  ): Promise<Result<Notification>> {
+    return await this.createNotification({
+      userId,
+      type: NotificationType.APPOINTMENT_REMINDER,
+      title: 'Randevu Hatırlatması',
+      message: `${consultantName} ile ${appointmentDate.toLocaleDateString('tr-TR')} tarihindeki randevunuz yaklaşıyor.`,
+      actionUrl: `/dashboard/appointments/${appointmentId}`,
+      metadata: {
+        appointmentId,
+        consultantName,
+        appointmentDate: appointmentDate.toISOString(),
+      },
+      priority: NotificationPriority.NORMAL,
+      channels: [NotificationChannel.IN_APP, NotificationChannel.EMAIL, NotificationChannel.PUSH],
+    });
+  }
 }
