@@ -277,7 +277,7 @@ export class SupabaseChatbotRepository implements IChatbotRepository {
 
       const messagesResult = await this.findMessagesByConversationId(conversationId, 1000, 0);
       if (messagesResult.isFailure) {
-        return Result.fail(messagesResult.error);
+        return Result.fail(messagesResult.error || 'Mesajlar alınamadı');
       }
 
       return Result.ok({

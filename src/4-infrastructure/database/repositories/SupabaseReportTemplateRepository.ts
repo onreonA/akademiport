@@ -10,8 +10,8 @@ import {
   ReportTemplate,
   CreateReportTemplateDto,
   UpdateReportTemplateDto,
-  ReportType,
 } from '@/3-domain/entities/ReportTemplate';
+import { ReportType } from '@/3-domain/entities/ProgressReport';
 
 export class SupabaseReportTemplateRepository implements IReportTemplateRepository {
   private readonly tableName = 'report_templates';

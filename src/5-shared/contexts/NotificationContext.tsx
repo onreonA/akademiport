@@ -8,6 +8,7 @@
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { createBrowserClient } from '@supabase/ssr';
+import type { RealtimeChannel } from '@supabase/supabase-js';
 import { useQueryClient } from '@tanstack/react-query';
 import type { Notification } from '@/3-domain/entities/Notification';
 import { logger } from '@/5-shared/utils/logger';
@@ -47,7 +48,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
       }
 
       // Unsubscribe from existing channel if any (using ref to avoid dependency)
-      setChannel((currentChannel) => {
+      setChannel((currentChannel: RealtimeChannel | null) => {
         if (currentChannel) {
           supabase.removeChannel(currentChannel).catch(() => {
             // Silently fail

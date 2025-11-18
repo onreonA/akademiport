@@ -12,7 +12,7 @@ import type {
   CreateCompanyDto,
   UpdateCompanyDto,
   CompanyFilterDto,
-} from '@/2-application/dtos/company';
+} from '@/2-application/dto/company';
 
 export class CompanyRepository implements ICompanyRepository {
   async findById(id: string): Promise<Result<Company | null>> {

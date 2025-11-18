@@ -20,7 +20,9 @@ export class CostTrackerService implements ICostTracker {
   ): number {
     // Model string'ini AIModel enum'una çevir
     const modelEnum = this.mapStringToModel(model, provider);
-    const pricing = modelPricing[modelEnum];
+    const pricing = (modelPricing as Record<string, { inputPrice: number; outputPrice: number }>)[
+      modelEnum
+    ];
 
     if (!pricing) {
       logger.warn(`No pricing found for model: ${model}`);

@@ -8,7 +8,7 @@ export interface IEmailTemplateService {
   /**
    * Get template by name
    */
-  getTemplate(name: string, version?: number): Promise<Result<EmailTemplate, Error>>;
+  getTemplate(name: string, version?: number): Promise<Result<EmailTemplate>>;
 
   /**
    * Render template with variables
@@ -16,18 +16,15 @@ export interface IEmailTemplateService {
   renderTemplate(
     templateName: string,
     variables: Record<string, any>
-  ): Promise<Result<{ html: string; text?: string; subject: string }, Error>>;
+  ): Promise<Result<{ html: string; text?: string; subject: string }>>;
 
   /**
    * Compile MJML to HTML
    */
-  compileMJML(mjmlContent: string): Promise<Result<string, Error>>;
+  compileMJML(mjmlContent: string): Promise<Result<string>>;
 
   /**
    * Validate template variables
    */
-  validateVariables(
-    templateName: string,
-    variables: Record<string, any>
-  ): Promise<Result<boolean, Error>>;
+  validateVariables(templateName: string, variables: Record<string, any>): Promise<Result<boolean>>;
 }

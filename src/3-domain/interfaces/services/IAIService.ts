@@ -12,7 +12,7 @@ export interface IAIService {
   /**
    * Text completion (chat completion)
    */
-  complete(prompt: string, options?: AIRequestOptions): Promise<Result<AIResponse, AIError>>;
+  complete(prompt: string, options?: AIRequestOptions): Promise<Result<AIResponse>>;
 
   /**
    * Streaming text completion
@@ -21,7 +21,7 @@ export interface IAIService {
     prompt: string,
     options?: AIRequestOptions,
     onChunk?: (chunk: string) => void
-  ): Promise<Result<AIResponse, AIError>>;
+  ): Promise<Result<AIResponse>>;
 
   /**
    * Get provider name

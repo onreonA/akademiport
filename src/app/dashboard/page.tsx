@@ -8,6 +8,7 @@
 
 import * as React from 'react';
 import { useAuth } from '@/shared/hooks/useAuth';
+import { useDashboardStats } from '@/1-presentation/hooks/useDashboard';
 import { Button } from '@/presentation/components/ui/atoms/button';
 import {
   Card,
@@ -24,6 +25,12 @@ import { EmptyState } from '@/presentation/components/ui/atoms/empty-state';
 import { Badge } from '@/presentation/components/ui/atoms/badge';
 import { UserRoleLabels } from '@/domain/enums/UserRole';
 import {
+  UserGrowthChart,
+  ProgramActivityChart,
+  CompanyDistributionChart,
+  TaskCompletionChart,
+} from '@/1-presentation/components/features/analytics';
+import {
   Users,
   Building2,
   FolderKanban,
@@ -36,24 +43,40 @@ import {
   Calendar,
   ArrowRight,
   Activity,
+  Loader2,
 } from 'lucide-react';
+import { ExportButton } from '@/1-presentation/components/features/export';
 
 export default function DashboardPage() {
   const { user, loading, signOut } = useAuth();
-  const [stats, setStats] = React.useState({
-    totalPrograms: 12,
-    activeCompanies: 48,
-    totalUsers: 156,
-    completedTasks: 89,
-    pendingTasks: 23,
-    monthlyGrowth: 15.2,
-  });
+  const { data: dashboardData, isLoading: isLoadingStats } = useDashboardStats();
 
-  if (loading) {
+  const stats = React.useMemo(() => {
+    if (!dashboardData?.data) {
+      return {
+        totalPrograms: 0,
+        activeCompanies: 0,
+        totalUsers: 0,
+        completedTasks: 0,
+        pendingTasks: 0,
+        monthlyGrowth: 0,
+      };
+    }
+    return {
+      totalPrograms: dashboardData.data.totalPrograms,
+      activeCompanies: dashboardData.data.activeCompanies,
+      totalUsers: dashboardData.data.totalUsers,
+      completedTasks: dashboardData.data.completedTasks,
+      pendingTasks: dashboardData.data.pendingTasks,
+      monthlyGrowth: dashboardData.data.monthlyGrowth,
+    };
+  }, [dashboardData]);
+
+  if (loading || isLoadingStats) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center space-y-4">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+          <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />
           <div className="text-lg text-muted-foreground">Yükleniyor...</div>
         </div>
       </div>
@@ -90,6 +113,12 @@ export default function DashboardPage() {
               <Badge variant="secondary" className="text-center">
                 {UserRoleLabels[user.role]}
               </Badge>
+              <ExportButton
+                exportUrl="/api/dashboard/export"
+                filename="dashboard"
+                variant="outline"
+                size="sm"
+              />
               <Button variant="outline" size="sm" className="w-full sm:w-auto">
                 <Settings className="h-4 w-4 mr-2" />
                 Ayarlar
@@ -349,6 +378,24 @@ export default function DashboardPage() {
               </div>
             </div>
           </EnhancedCard>
+        </div>
+
+        {/* Charts Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {dashboardData?.data?.userGrowth && dashboardData.data.userGrowth.length > 0 && (
+            <UserGrowthChart data={dashboardData.data.userGrowth} />
+          )}
+          {dashboardData?.data?.programActivity &&
+            dashboardData.data.programActivity.length > 0 && (
+              <ProgramActivityChart data={dashboardData.data.programActivity} />
+            )}
+          {dashboardData?.data?.companyDistribution &&
+            dashboardData.data.companyDistribution.length > 0 && (
+              <CompanyDistributionChart data={dashboardData.data.companyDistribution} />
+            )}
+          {dashboardData?.data?.taskCompletion && dashboardData.data.taskCompletion.length > 0 && (
+            <TaskCompletionChart data={dashboardData.data.taskCompletion} />
+          )}
         </div>
 
         {/* Enhanced User Info Card */}

@@ -36,6 +36,13 @@ import {
   Activity,
   HelpCircle,
 } from 'lucide-react';
+import { useConsultantDashboardStats } from '@/1-presentation/hooks/useDashboard';
+import {
+  CompanyPerformanceChart,
+  ProjectProgressChart,
+  TrainingCompletionChart,
+} from '@/1-presentation/components/features/analytics';
+import { ExportButton } from '@/1-presentation/components/features/export';
 
 // =====================================================
 // MAIN COMPONENT (WITH PROVIDER)
@@ -59,6 +66,7 @@ function ConsultantDashboardContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [pendingQuestionsCount, setPendingQuestionsCount] = useState<number>(0);
+  const { data: statsData, isLoading: isLoadingStats } = useConsultantDashboardStats();
 
   useEffect(() => {
     fetchDashboardData();
@@ -138,12 +146,22 @@ function ConsultantDashboardContent() {
       <div className="max-w-7xl mx-auto p-4 md:p-6 space-y-6 md:space-y-8">
         {/* Header */}
         <div className="space-y-2">
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">
-            Danışman Paneli
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base lg:text-lg">
-            Atandığınız programları ve firmaları yönetin
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">
+                Danışman Paneli
+              </h1>
+              <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base lg:text-lg">
+                Atandığınız programları ve firmaları yönetin
+              </p>
+            </div>
+            <ExportButton
+              exportUrl="/api/consultant-dashboard/export"
+              filename="consultant-dashboard"
+              variant="outline"
+              size="sm"
+            />
+          </div>
         </div>
 
         {/* Program Selector */}
@@ -340,6 +358,23 @@ function ConsultantDashboardContent() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Charts Section */}
+            {statsData?.data && (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {statsData.data.companyPerformance &&
+                  statsData.data.companyPerformance.length > 0 && (
+                    <CompanyPerformanceChart data={statsData.data.companyPerformance} />
+                  )}
+                {statsData.data.projectProgress && statsData.data.projectProgress.length > 0 && (
+                  <ProjectProgressChart data={statsData.data.projectProgress} />
+                )}
+                {statsData.data.trainingCompletion &&
+                  statsData.data.trainingCompletion.length > 0 && (
+                    <TrainingCompletionChart data={statsData.data.trainingCompletion} />
+                  )}
+              </div>
+            )}
 
             {/* Companies List */}
             <ConsultantCompanyList onCompanyClick={handleCompanyClick} />

@@ -23,6 +23,8 @@ import {
   MessageSquare,
   Trophy,
   ShoppingCart,
+  Globe,
+  Image,
   type LucideIcon,
 } from 'lucide-react';
 import { UserRole } from '@/domain/enums/UserRole';
@@ -265,6 +267,29 @@ export const MASTER_ADMIN_NAVIGATION: NavigationConfig = {
       label: 'Raporlar',
       icon: BarChart3,
       href: '/dashboard/reports',
+    },
+    {
+      id: 'cms',
+      label: 'CMS',
+      icon: Globe,
+      href: '/dashboard/cms/pages',
+      children: [
+        {
+          id: 'cms-pages',
+          label: 'Sayfalar',
+          href: '/dashboard/cms/pages',
+        },
+        {
+          id: 'cms-media',
+          label: 'Medya',
+          href: '/dashboard/cms/media',
+        },
+        {
+          id: 'cms-settings',
+          label: 'Site Ayarları',
+          href: '/dashboard/cms/settings',
+        },
+      ],
     },
   ],
   bottom: [

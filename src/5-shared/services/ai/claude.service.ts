@@ -30,15 +30,11 @@ export class ClaudeService implements IAIService {
     this.defaultModel = defaultModel;
   }
 
-  async complete(prompt: string, options?: AIRequestOptions): Promise<Result<AIResponse, AIError>> {
+  async complete(prompt: string, options?: AIRequestOptions): Promise<Result<AIResponse>> {
     // Rate limit kontrolü
     const canProceed = await rateLimiter.checkAllRateLimits(AIProvider.CLAUDE);
     if (!canProceed) {
-      return Result.fail({
-        message: 'Rate limit exceeded',
-        code: 'RATE_LIMIT_EXCEEDED',
-        retryable: true,
-      });
+      return Result.fail('Rate limit exceeded');
     }
 
     const startTime = Date.now();
@@ -87,7 +83,7 @@ export class ClaudeService implements IAIService {
       logger.error('Claude API error:', error);
 
       const aiError = toAIError(error, this.isRetryableError(error));
-      return Result.fail(aiError);
+      return Result.fail(aiError.message);
     }
   }
 
@@ -95,7 +91,7 @@ export class ClaudeService implements IAIService {
     prompt: string,
     options?: AIRequestOptions,
     onChunk?: (chunk: string) => void
-  ): Promise<Result<AIResponse, AIError>> {
+  ): Promise<Result<AIResponse>> {
     const startTime = Date.now();
     const model = options?.metadata?.model || this.defaultModel;
     let fullText = '';
@@ -159,7 +155,7 @@ export class ClaudeService implements IAIService {
         retryable: this.isRetryableError(error),
       };
 
-      return Result.fail(aiError);
+      return Result.fail(aiError.message);
     }
   }
 

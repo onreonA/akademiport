@@ -11,6 +11,7 @@ import { ITokenTracker } from '@/3-domain/interfaces/services/ITokenTracker';
 import { IChatbotRepository } from '@/3-domain/interfaces/repositories/IChatbotRepository';
 import { ITrainingRepository } from '@/3-domain/interfaces/repositories/ITrainingRepository';
 import { AIUseCase } from '@/3-domain/enums/AIEnums';
+import { AIPrompt } from '@/3-domain/entities/AI';
 import { logger } from '@/5-shared/utils/logger';
 import { AppError } from '@/6-core/errors/AppError';
 import {
@@ -120,7 +121,7 @@ export class ChatbotConversationUseCase {
       const contextInfo = await this.buildContext(conversation, dto);
 
       // 6. Prompt'u render et
-      const systemPrompt = this.buildSystemPrompt(prompt.template, contextInfo, messages);
+      const systemPrompt = this.buildSystemPrompt(prompt, contextInfo, messages);
 
       // 7. AI'a gönder (streaming olmadan, normal completion)
       const aiResult = await this.aiRouter.complete(AIUseCase.CHATBOT, systemPrompt, {
@@ -231,12 +232,12 @@ export class ChatbotConversationUseCase {
    * System prompt oluştur
    */
   private buildSystemPrompt(
-    template: string,
+    prompt: AIPrompt,
     context: Record<string, any>,
     messages: ChatbotMessage[]
   ): string {
     // Template'i render et
-    let systemPrompt = this.promptManager.renderPrompt(template, {
+    let systemPrompt = this.promptManager.renderPrompt(prompt, {
       user_id: context.userId || 'Bilinmiyor',
       company_id: context.companyId || 'Yok',
       program_id: context.programId || 'Yok',

@@ -15,7 +15,7 @@ export class EmailTemplateService implements IEmailTemplateService {
   /**
    * Get template by name
    */
-  async getTemplate(name: string, version?: number): Promise<Result<EmailTemplate, Error>> {
+  async getTemplate(name: string, version?: number): Promise<Result<EmailTemplate>> {
     try {
       const supabase = getSupabaseAdminClient();
       let query = supabase
@@ -49,7 +49,7 @@ export class EmailTemplateService implements IEmailTemplateService {
   async renderTemplate(
     templateName: string,
     variables: Record<string, any>
-  ): Promise<Result<{ html: string; text?: string; subject: string }, Error>> {
+  ): Promise<Result<{ html: string; text?: string; subject: string }>> {
     try {
       const templateResult = await this.getTemplate(templateName);
       if (templateResult.isFailure) {
@@ -107,7 +107,7 @@ export class EmailTemplateService implements IEmailTemplateService {
   /**
    * Compile MJML to HTML
    */
-  async compileMJML(mjmlContent: string): Promise<Result<string, Error>> {
+  async compileMJML(mjmlContent: string): Promise<Result<string>> {
     try {
       const { html, errors } = mjml(mjmlContent, {
         validationLevel: 'soft',
@@ -130,7 +130,7 @@ export class EmailTemplateService implements IEmailTemplateService {
   async validateVariables(
     templateName: string,
     variables: Record<string, any>
-  ): Promise<Result<boolean, Error>> {
+  ): Promise<Result<boolean>> {
     try {
       const templateResult = await this.getTemplate(templateName);
       if (templateResult.isFailure) {

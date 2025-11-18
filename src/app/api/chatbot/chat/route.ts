@@ -82,10 +82,10 @@ export async function POST(request: NextRequest) {
       return new Response(
         JSON.stringify({
           error: result.error?.message || 'Mesaj gönderilemedi',
-          code: result.error?.code,
+          code: (result.error as any)?.code || undefined,
         }),
         {
-          status: result.error?.statusCode || 500,
+          status: (result.error as any)?.statusCode || 500,
           headers: { 'Content-Type': 'application/json' },
         }
       );
@@ -210,7 +210,7 @@ async function handleStreamingResponse(
         };
 
         // 6. System prompt oluştur
-        let systemPrompt = promptManager.renderPrompt(prompt.template, {
+        let systemPrompt = promptManager.renderPrompt(prompt, {
           user_id: context.userId || 'Bilinmiyor',
           company_id: context.companyId || 'Yok',
           program_id: context.programId || 'Yok',

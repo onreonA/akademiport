@@ -122,7 +122,7 @@ export class PredictCompanySuccessUseCase {
           costUsd: 0,
           status: AIRequestStatus.ERROR,
           errorMessage: aiResult.error?.message || 'Unknown error',
-          errorCode: aiResult.error?.code,
+          errorCode: (aiResult.error as any)?.code || null,
           durationMs: null,
           metadata: {
             companyId: dto.companyId,

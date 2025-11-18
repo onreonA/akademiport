@@ -14,6 +14,7 @@ import { IAIRouter } from '@/3-domain/interfaces/services/IAIRouter';
 import { IPromptManager } from '@/3-domain/interfaces/services/IPromptManager';
 import { ITokenTracker } from '@/3-domain/interfaces/services/ITokenTracker';
 import { AIUseCase, AIProvider } from '@/3-domain/enums/AIEnums';
+import { EcommercePlatformType } from '@/3-domain/enums/EcommerceEnums';
 import { ReportType, ReportStatus, AIAnalysis } from '@/3-domain/entities/ProgressReport';
 import { Result } from '@/6-core/result/Result';
 import { AppError } from '@/6-core/errors/AppError';
@@ -237,7 +238,7 @@ export class GenerateReportUseCase {
             dto.programId,
             dto.periodYear,
             dto.periodMonth,
-            'alibaba' // Default platform
+            EcommercePlatformType.ALIBABA // Default platform
           );
           if (metricsResult.isSuccess && metricsResult.value) {
             content.ecommerceMetrics = {
@@ -332,9 +333,9 @@ export class GenerateReportUseCase {
         temperature: prompt.temperature,
         maxTokens: prompt.maxTokens,
         topP: prompt.topP,
-        userId: dto.userId || null,
-        companyId: dto.companyId || null,
-        programId: dto.programId || null,
+        userId: dto.userId || undefined,
+        companyId: dto.companyId || undefined,
+        programId: dto.programId || undefined,
         metadata: {
           reportType: dto.reportType,
           promptId: prompt.id,

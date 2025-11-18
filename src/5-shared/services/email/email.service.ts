@@ -24,7 +24,7 @@ export class EmailService implements IEmailService {
   /**
    * Send email directly (synchronous)
    */
-  async send(options: EmailSendOptions): Promise<Result<EmailSendResult, Error>> {
+  async send(options: EmailSendOptions): Promise<Result<EmailSendResult>> {
     try {
       // Normalize recipients
       const toEmails = Array.isArray(options.to) ? options.to : [options.to];
@@ -91,7 +91,7 @@ export class EmailService implements IEmailService {
     to: string | string[],
     variables: Record<string, any>,
     options?: Partial<EmailSendOptions>
-  ): Promise<Result<EmailSendResult, Error>> {
+  ): Promise<Result<EmailSendResult>> {
     try {
       // Validate variables
       const validationResult = await this.templateService.validateVariables(
@@ -136,7 +136,7 @@ export class EmailService implements IEmailService {
   /**
    * Queue email for later sending
    */
-  async queue(options: EmailSendOptions): Promise<Result<string, Error>> {
+  async queue(options: EmailSendOptions): Promise<Result<string>> {
     try {
       const toEmails = Array.isArray(options.to) ? options.to : [options.to];
       const toNames = Array.isArray(options.toName)
@@ -189,7 +189,7 @@ export class EmailService implements IEmailService {
   /**
    * Send queued email
    */
-  async sendQueued(queueId: string): Promise<Result<EmailSendResult, Error>> {
+  async sendQueued(queueId: string): Promise<Result<EmailSendResult>> {
     try {
       const supabase = getSupabaseAdminClient();
       // Get queued email

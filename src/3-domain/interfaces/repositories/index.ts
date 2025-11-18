@@ -24,3 +24,6 @@ export * from './IForumRepository';
 export * from './ILeaderboardRepository';
 export * from './IEcommerceRepository';
 export * from './INotificationRepository';
+export * from './ICMSPageRepository';
+export * from './ICMSMediaRepository';
+export * from './ICMSSettingsRepository';

@@ -16,7 +16,7 @@ export interface IAIRouter {
     useCase: AIUseCase,
     prompt: string,
     options?: AIRequestOptions
-  ): Promise<Result<AIResponse, AIError>>;
+  ): Promise<Result<AIResponse>>;
 
   /**
    * Use case'e göre AI servisi ile streaming completion yap
@@ -26,7 +26,7 @@ export interface IAIRouter {
     prompt: string,
     options?: AIRequestOptions,
     onChunk?: (chunk: string) => void
-  ): Promise<Result<AIResponse, AIError>>;
+  ): Promise<Result<AIResponse>>;
 
   /**
    * Use case için provider seç

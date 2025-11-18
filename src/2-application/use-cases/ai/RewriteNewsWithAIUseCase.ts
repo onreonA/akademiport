@@ -10,7 +10,7 @@ import { IPromptManager } from '@/3-domain/interfaces/services/IPromptManager';
 import { ITokenTracker } from '@/3-domain/interfaces/services/ITokenTracker';
 import { IRSSFeedRepository } from '@/3-domain/interfaces/repositories/IRSSFeedRepository';
 import { RSSFeedItem } from '@/3-domain/entities/RSSFeed';
-import { AIUseCase } from '@/3-domain/enums/AIEnums';
+import { AIUseCase, AIRequestStatus } from '@/3-domain/enums/AIEnums';
 import { logger } from '@/5-shared/utils/logger';
 import { AppError } from '@/6-core/errors/AppError';
 
@@ -132,10 +132,26 @@ export class RewriteNewsWithAIUseCase {
 
       // 6. Token tracking
       if (aiResponse.totalTokens) {
-        await this.tokenTracker.trackUsage(AIUseCase.NEWS_REWRITE, {
-          promptTokens: aiResponse.promptTokens || 0,
-          completionTokens: aiResponse.completionTokens || 0,
+        await this.tokenTracker.logUsage({
+          provider: aiResponse.provider,
+          model: prompt.model,
+          useCase: AIUseCase.NEWS_REWRITE,
+          userId: null,
+          companyId: null,
+          programId: dto.targetProgramId || null,
+          promptId: prompt.id,
+          promptVersion: prompt.version,
+          requestText: renderedPrompt,
+          responseText: responseText,
+          requestTokens: aiResponse.requestTokens || 0,
+          responseTokens: aiResponse.responseTokens || 0,
           totalTokens: aiResponse.totalTokens,
+          costUsd: aiResponse.costUsd || 0,
+          status: AIRequestStatus.SUCCESS,
+          errorMessage: null,
+          errorCode: null,
+          durationMs: null,
+          metadata: null,
         });
       }
 

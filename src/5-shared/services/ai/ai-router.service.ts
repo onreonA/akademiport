@@ -14,8 +14,8 @@ import { ClaudeService } from './claude.service';
 import { logger } from '@/5-shared/utils/logger';
 
 export class AIRouterService implements IAIRouter {
-  private openaiService: OpenAIService;
-  private claudeService: ClaudeService;
+  private openaiService!: OpenAIService;
+  private claudeService!: ClaudeService;
   private providerHealthCache: Map<AIProvider, { isHealthy: boolean; lastCheck: number }> =
     new Map();
   private healthCheckTTL = 60000; // 1 minute
@@ -38,23 +38,17 @@ export class AIRouterService implements IAIRouter {
     useCase: AIUseCase,
     prompt: string,
     options?: AIRequestOptions
-  ): Promise<Result<AIResponse, AIError>> {
+  ): Promise<Result<AIResponse>> {
     const providerResult = this.selectProvider(useCase);
     if (providerResult.isFailure) {
-      return Result.fail({
-        message: providerResult.error?.message || 'Provider selection failed',
-        retryable: false,
-      });
+      return Result.fail(providerResult.error?.message || 'Provider selection failed');
     }
 
     const provider = providerResult.value;
     const service = this.getService(provider);
 
     if (!service) {
-      return Result.fail({
-        message: `Service not available for provider: ${provider}`,
-        retryable: false,
-      });
+      return Result.fail(`Service not available for provider: ${provider}`);
     }
 
     // Health check (cached)
@@ -92,23 +86,17 @@ export class AIRouterService implements IAIRouter {
     prompt: string,
     options?: AIRequestOptions,
     onChunk?: (chunk: string) => void
-  ): Promise<Result<AIResponse, AIError>> {
+  ): Promise<Result<AIResponse>> {
     const providerResult = this.selectProvider(useCase);
     if (providerResult.isFailure) {
-      return Result.fail({
-        message: providerResult.error?.message || 'Provider selection failed',
-        retryable: false,
-      });
+      return Result.fail(providerResult.error?.message || 'Provider selection failed');
     }
 
     const provider = providerResult.value;
     const service = this.getService(provider);
 
     if (!service) {
-      return Result.fail({
-        message: `Service not available for provider: ${provider}`,
-        retryable: false,
-      });
+      return Result.fail(`Service not available for provider: ${provider}`);
     }
 
     return service.stream(

@@ -71,7 +71,13 @@ export async function POST(request: NextRequest) {
     );
 
     // Get all active companies
-    const companiesResult = await companyRepository.findAll({ isActive: true });
+    const companiesResult = await companyRepository.findWithFilters({
+      isActive: true,
+      page: 1,
+      limit: 1000,
+      sortBy: 'name',
+      sortOrder: 'asc',
+    });
     if (companiesResult.isFailure) {
       logger.error('Failed to get companies:', companiesResult.error);
       return NextResponse.json(
@@ -83,7 +89,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const companies = companiesResult.value;
+    const companies = companiesResult.value?.companies || [];
     logger.info(`Found ${companies.length} active companies`);
 
     const results = {

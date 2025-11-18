@@ -6,8 +6,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { EmailService } from '@/5-shared/services/email';
-import { EmailSendOptions, EmailPriority } from '@/3-domain/entities/Email';
-import { EmailPriority as EmailPriorityEnum } from '@/3-domain/enums/EmailEnums';
+import { EmailSendOptions } from '@/3-domain/entities/Email';
+import { EmailPriority } from '@/3-domain/enums/EmailEnums';
 import { createClient } from '@/4-infrastructure/database/supabase-server';
 import { z } from 'zod';
 
@@ -18,7 +18,7 @@ const sendEmailSchema = z.object({
   html: z.string().optional(),
   text: z.string().optional(),
   templateName: z.string().optional(),
-  templateVariables: z.record(z.any()).optional(),
+  templateVariables: z.record(z.string(), z.any()).optional(),
   from: z.string().email().optional(),
   fromName: z.string().optional(),
   replyTo: z.string().email().optional(),
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
       from: data.from,
       fromName: data.fromName,
       replyTo: data.replyTo,
-      priority: data.priority as EmailPriorityEnum | undefined,
+      priority: data.priority as EmailPriority | undefined,
       scheduledAt: data.scheduledAt ? new Date(data.scheduledAt) : undefined,
       trackingEnabled: true,
     };

@@ -8,7 +8,7 @@ export interface IEmailService {
   /**
    * Send email directly (synchronous)
    */
-  send(options: EmailSendOptions): Promise<Result<EmailSendResult, Error>>;
+  send(options: EmailSendOptions): Promise<Result<EmailSendResult>>;
 
   /**
    * Send email using template
@@ -18,15 +18,15 @@ export interface IEmailService {
     to: string | string[],
     variables: Record<string, any>,
     options?: Partial<EmailSendOptions>
-  ): Promise<Result<EmailSendResult, Error>>;
+  ): Promise<Result<EmailSendResult>>;
 
   /**
    * Queue email for later sending
    */
-  queue(options: EmailSendOptions): Promise<Result<string, Error>>;
+  queue(options: EmailSendOptions): Promise<Result<string>>;
 
   /**
    * Send queued email
    */
-  sendQueued(queueId: string): Promise<Result<EmailSendResult, Error>>;
+  sendQueued(queueId: string): Promise<Result<EmailSendResult>>;
 }

@@ -8,9 +8,10 @@ import sgMail from '@sendgrid/mail';
 import { emailConfig, validateEmailConfig } from '@/4-infrastructure/config/email.config';
 import { logger } from '@/5-shared/utils/logger';
 
-// Initialize SendGrid
-validateEmailConfig();
-sgMail.setApiKey(emailConfig.sendgrid.apiKey);
+// Initialize SendGrid (only if API key is available)
+if (emailConfig.sendgrid.apiKey) {
+  sgMail.setApiKey(emailConfig.sendgrid.apiKey);
+}
 
 export interface SendGridMessage {
   to: string | string[];
@@ -50,10 +51,16 @@ export class SendGridClient {
     messageId: string;
     statusCode: number;
   }> {
+    // Validate config at runtime
+    if (!emailConfig.sendgrid.apiKey) {
+      throw new Error('SENDGRID_API_KEY is not set');
+    }
+    sgMail.setApiKey(emailConfig.sendgrid.apiKey);
     try {
-      const [response] = await sgMail.send({
+      const mailData: any = {
         ...message,
         from: message.from || emailConfig.sendgrid.fromEmail,
+        text: message.text || message.html?.replace(/<[^>]*>/g, '') || '',
         trackingSettings: {
           clickTracking: {
             enable: emailConfig.tracking.clickTracking,
@@ -65,7 +72,8 @@ export class SendGridClient {
             enable: true,
           },
         },
-      });
+      };
+      const [response] = await sgMail.send(mailData);
 
       return {
         messageId: response.headers['x-message-id'] as string,
@@ -84,11 +92,17 @@ export class SendGridClient {
     messageIds: string[];
     statusCode: number;
   }> {
+    // Validate config at runtime
+    if (!emailConfig.sendgrid.apiKey) {
+      throw new Error('SENDGRID_API_KEY is not set');
+    }
+    sgMail.setApiKey(emailConfig.sendgrid.apiKey);
     try {
       const responses = await sgMail.send(
         messages.map((msg) => ({
           ...msg,
           from: msg.from || emailConfig.sendgrid.fromEmail,
+          text: msg.text || msg.html?.replace(/<[^>]*>/g, '') || '',
           trackingSettings: {
             clickTracking: {
               enable: emailConfig.tracking.clickTracking,
@@ -103,7 +117,9 @@ export class SendGridClient {
         }))
       );
 
-      const messageIds = responses.map((response) => response.headers['x-message-id'] as string);
+      const messageIds = responses.map(
+        (response: any) => (response.headers?.['x-message-id'] as string) || ''
+      );
 
       return {
         messageIds,

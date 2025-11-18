@@ -25,6 +25,10 @@ export interface UpdateRSSFeedDto {
   isActive?: boolean;
   autoPublish?: boolean;
   checkIntervalMinutes?: number;
+  lastCheckedAt?: Date | null;
+  lastError?: string | null;
+  errorCount?: number;
+  successCount?: number;
   updatedBy?: string | null;
 }
 

@@ -8,8 +8,8 @@ import {
   ReportTemplate,
   CreateReportTemplateDto,
   UpdateReportTemplateDto,
-  ReportType,
 } from '@/3-domain/entities/ReportTemplate';
+import { ReportType } from '@/3-domain/entities/ProgressReport';
 
 export interface IReportTemplateRepository {
   /**

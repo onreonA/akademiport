@@ -70,6 +70,10 @@ export class SupabaseRSSFeedRepository implements IRSSFeedRepository {
       if (dto.autoPublish !== undefined) updateData.auto_publish = dto.autoPublish;
       if (dto.checkIntervalMinutes !== undefined)
         updateData.check_interval_minutes = dto.checkIntervalMinutes;
+      if (dto.lastCheckedAt !== undefined) updateData.last_checked_at = dto.lastCheckedAt;
+      if (dto.lastError !== undefined) updateData.last_error = dto.lastError;
+      if (dto.errorCount !== undefined) updateData.error_count = dto.errorCount;
+      if (dto.successCount !== undefined) updateData.success_count = dto.successCount;
       if (dto.updatedBy !== undefined) updateData.updated_by = dto.updatedBy;
 
       const { data, error } = await supabase

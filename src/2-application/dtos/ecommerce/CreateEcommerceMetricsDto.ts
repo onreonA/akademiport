@@ -8,7 +8,7 @@ export const CreateEcommerceMetricsDtoSchema = z
     periodYear: z.number().int().min(2020).max(2100, 'Geçerli bir yıl giriniz (2020-2100)'),
     periodMonth: z.number().int().min(1).max(12, 'Geçerli bir ay giriniz (1-12)'),
     platformType: z.nativeEnum(EcommercePlatformType, {
-      errorMap: () => ({ message: 'Geçerli bir platform tipi seçiniz' }),
+      message: 'Geçerli bir platform tipi seçiniz',
     }),
 
     // Alibaba (B2B) Metrikleri

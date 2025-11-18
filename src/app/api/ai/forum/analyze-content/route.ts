@@ -64,9 +64,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error: result.error?.message || 'Failed to analyze content',
-          code: result.error?.code,
+          code: (result.error as any)?.code || undefined,
         },
-        { status: result.error?.statusCode || 500 }
+        { status: (result.error as any)?.statusCode || 500 }
       );
     }
 

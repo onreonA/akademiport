@@ -19,6 +19,12 @@ import {
   FolderKanban,
   GraduationCap,
 } from 'lucide-react';
+import { useCompanyDashboardStats } from '@/1-presentation/hooks/useDashboard';
+import {
+  ProjectProgressChart,
+  EcommerceMetricsChart,
+} from '@/1-presentation/components/features/analytics';
+import { ExportButton } from '@/1-presentation/components/features/export';
 
 interface CompanyDashboardData {
   company: {
@@ -41,6 +47,8 @@ interface CompanyDashboardData {
 export default function CompanyDashboardPage() {
   const [data, setData] = React.useState<CompanyDashboardData | null>(null);
   const [loading, setLoading] = React.useState(true);
+  const companyId = data?.company?.id;
+  const { data: statsData, isLoading: isLoadingStats } = useCompanyDashboardStats(companyId);
 
   React.useEffect(() => {
     fetchDashboardData();
@@ -96,12 +104,22 @@ export default function CompanyDashboardPage() {
       <div className="max-w-7xl mx-auto p-4 md:p-6 space-y-6 md:space-y-8">
         {/* Header */}
         <div className="space-y-2">
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">
-            Firma Paneli
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base lg:text-lg">
-            {mockData.company.name} - {mockData.company.programName}
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">
+                Firma Paneli
+              </h1>
+              <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base lg:text-lg">
+                {mockData.company.name} - {mockData.company.programName}
+              </p>
+            </div>
+            <ExportButton
+              exportUrl="/api/company-dashboard/export"
+              filename="company-dashboard"
+              variant="outline"
+              size="sm"
+            />
+          </div>
         </div>
 
         {/* Stats Cards */}
@@ -260,6 +278,18 @@ export default function CompanyDashboardPage() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Charts Section */}
+        {statsData?.data && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {statsData.data.projectProgress && statsData.data.projectProgress.length > 0 && (
+              <ProjectProgressChart data={statsData.data.projectProgress} />
+            )}
+            {statsData.data.ecommerceMetrics && statsData.data.ecommerceMetrics.length > 0 && (
+              <EcommerceMetricsChart data={statsData.data.ecommerceMetrics} />
+            )}
+          </div>
+        )}
 
         {/* Info Card */}
         <Card className="border border-gray-200 dark:border-gray-800 shadow-sm">
