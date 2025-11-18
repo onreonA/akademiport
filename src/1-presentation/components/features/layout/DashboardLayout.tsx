@@ -15,6 +15,7 @@ import { BottomNavigation } from './BottomNavigation';
 import { CommandPalette } from './CommandPalette';
 import { QuickActionsFAB } from './QuickActionsFAB';
 import { PageErrorBoundary } from '@/1-presentation/components/shared/PageErrorBoundary';
+import { Chatbot } from '@/1-presentation/components/features/chatbot';
 
 // =====================================================
 // TYPES
@@ -82,6 +83,9 @@ function DashboardLayoutInner({
 
       {/* Quick Actions FAB */}
       <QuickActionsFAB />
+
+      {/* Chatbot - Global */}
+      <Chatbot />
     </div>
   );
 }
