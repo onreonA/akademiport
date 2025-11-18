@@ -12,3 +12,4 @@ export { CompanyPerformanceChart } from './CompanyPerformanceChart';
 export { ProjectProgressChart } from './ProjectProgressChart';
 export { TrainingCompletionChart } from './TrainingCompletionChart';
 export { EcommerceMetricsChart } from './EcommerceMetricsChart';
+export { AIInsightsWidget } from './AIInsightsWidget';

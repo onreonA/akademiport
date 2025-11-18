@@ -5,7 +5,7 @@
  * Supports email and WhatsApp notifications
  */
 
-import { logger } from '@/shared/utils/logger';
+import { logger } from '@/5-shared/utils/logger';
 import { WhatsAppApiService } from './whatsapp-api.service';
 
 export interface NotificationRecipient {

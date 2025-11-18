@@ -23,8 +23,10 @@ import { useCompanyDashboardStats } from '@/1-presentation/hooks/useDashboard';
 import {
   ProjectProgressChart,
   EcommerceMetricsChart,
+  AIInsightsWidget,
 } from '@/1-presentation/components/features/analytics';
 import { ExportButton } from '@/1-presentation/components/features/export';
+import { analyticsService } from '@/5-shared/services/analytics';
 
 interface CompanyDashboardData {
   company: {
@@ -49,6 +51,13 @@ export default function CompanyDashboardPage() {
   const [loading, setLoading] = React.useState(true);
   const companyId = data?.company?.id;
   const { data: statsData, isLoading: isLoadingStats } = useCompanyDashboardStats(companyId);
+
+  // Track dashboard view
+  React.useEffect(() => {
+    if (!loading) {
+      analyticsService.trackDashboardView('company');
+    }
+  }, [loading]);
 
   React.useEffect(() => {
     fetchDashboardData();
@@ -279,17 +288,24 @@ export default function CompanyDashboardPage() {
           </Card>
         </div>
 
-        {/* Charts Section */}
-        {statsData?.data && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {statsData.data.projectProgress && statsData.data.projectProgress.length > 0 && (
-              <ProjectProgressChart data={statsData.data.projectProgress} />
-            )}
-            {statsData.data.ecommerceMetrics && statsData.data.ecommerceMetrics.length > 0 && (
-              <EcommerceMetricsChart data={statsData.data.ecommerceMetrics} />
+        {/* AI Insights and Charts Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-1">
+            <AIInsightsWidget dashboardType="company" companyId={companyId} />
+          </div>
+          <div className="lg:col-span-2">
+            {statsData?.data && (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {statsData.data.projectProgress && statsData.data.projectProgress.length > 0 && (
+                  <ProjectProgressChart data={statsData.data.projectProgress} />
+                )}
+                {statsData.data.ecommerceMetrics && statsData.data.ecommerceMetrics.length > 0 && (
+                  <EcommerceMetricsChart data={statsData.data.ecommerceMetrics} />
+                )}
+              </div>
             )}
           </div>
-        )}
+        </div>
 
         {/* Info Card */}
         <Card className="border border-gray-200 dark:border-gray-800 shadow-sm">

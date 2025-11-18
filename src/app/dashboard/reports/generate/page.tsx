@@ -28,6 +28,7 @@ import {
 import { Input } from '@/presentation/components/ui/atoms/input';
 import { Label } from '@/presentation/components/ui/atoms/label';
 import { ArrowLeft, FileText, Loader2, Calendar, Building2, FolderKanban } from 'lucide-react';
+import { analyticsService } from '@/5-shared/services/analytics';
 
 const REPORT_TYPES = [
   { value: 'monthly', label: 'Aylık Rapor' },
@@ -98,6 +99,10 @@ export default function GenerateReportPage() {
       }
 
       const data = await response.json();
+
+      // Track report generation
+      analyticsService.trackReportGeneration(formData.reportType);
+
       toast.success('Rapor oluşturuluyor...');
       router.push(`/dashboard/reports/${data.reportId}`);
     } catch (error) {

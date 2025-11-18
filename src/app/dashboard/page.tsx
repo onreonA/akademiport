@@ -46,10 +46,20 @@ import {
   Loader2,
 } from 'lucide-react';
 import { ExportButton } from '@/1-presentation/components/features/export';
+import { AIInsightsWidget } from '@/1-presentation/components/features/analytics';
+import { analyticsService } from '@/5-shared/services/analytics';
+import { useEffect } from 'react';
 
 export default function DashboardPage() {
   const { user, loading, signOut } = useAuth();
   const { data: dashboardData, isLoading: isLoadingStats } = useDashboardStats();
+
+  // Track dashboard view
+  useEffect(() => {
+    if (!loading && user) {
+      analyticsService.trackDashboardView('master');
+    }
+  }, [loading, user]);
 
   const stats = React.useMemo(() => {
     if (!dashboardData?.data) {
@@ -380,22 +390,31 @@ export default function DashboardPage() {
           </EnhancedCard>
         </div>
 
-        {/* Charts Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {dashboardData?.data?.userGrowth && dashboardData.data.userGrowth.length > 0 && (
-            <UserGrowthChart data={dashboardData.data.userGrowth} />
-          )}
-          {dashboardData?.data?.programActivity &&
-            dashboardData.data.programActivity.length > 0 && (
-              <ProgramActivityChart data={dashboardData.data.programActivity} />
-            )}
-          {dashboardData?.data?.companyDistribution &&
-            dashboardData.data.companyDistribution.length > 0 && (
-              <CompanyDistributionChart data={dashboardData.data.companyDistribution} />
-            )}
-          {dashboardData?.data?.taskCompletion && dashboardData.data.taskCompletion.length > 0 && (
-            <TaskCompletionChart data={dashboardData.data.taskCompletion} />
-          )}
+        {/* AI Insights Widget */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-1">
+            <AIInsightsWidget dashboardType="master" />
+          </div>
+          <div className="lg:col-span-2">
+            {/* Charts Section */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {dashboardData?.data?.userGrowth && dashboardData.data.userGrowth.length > 0 && (
+                <UserGrowthChart data={dashboardData.data.userGrowth} />
+              )}
+              {dashboardData?.data?.programActivity &&
+                dashboardData.data.programActivity.length > 0 && (
+                  <ProgramActivityChart data={dashboardData.data.programActivity} />
+                )}
+              {dashboardData?.data?.companyDistribution &&
+                dashboardData.data.companyDistribution.length > 0 && (
+                  <CompanyDistributionChart data={dashboardData.data.companyDistribution} />
+                )}
+              {dashboardData?.data?.taskCompletion &&
+                dashboardData.data.taskCompletion.length > 0 && (
+                  <TaskCompletionChart data={dashboardData.data.taskCompletion} />
+                )}
+            </div>
+          </div>
         </div>
 
         {/* Enhanced User Info Card */}

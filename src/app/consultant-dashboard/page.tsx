@@ -41,8 +41,12 @@ import {
   CompanyPerformanceChart,
   ProjectProgressChart,
   TrainingCompletionChart,
+  AIInsightsWidget,
 } from '@/1-presentation/components/features/analytics';
 import { ExportButton } from '@/1-presentation/components/features/export';
+import { analyticsService } from '@/5-shared/services/analytics';
+import { useEffect } from 'react';
+import { useConsultantProgram } from '@/5-shared/contexts/ConsultantProgramContext';
 
 // =====================================================
 // MAIN COMPONENT (WITH PROVIDER)
@@ -62,11 +66,19 @@ export default function ConsultantDashboardPage() {
 
 function ConsultantDashboardContent() {
   const router = useRouter();
+  const { selectedProgramId } = useConsultantProgram();
   const [dashboardData, setDashboardData] = useState<ConsultantDashboardData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [pendingQuestionsCount, setPendingQuestionsCount] = useState<number>(0);
   const { data: statsData, isLoading: isLoadingStats } = useConsultantDashboardStats();
+
+  // Track dashboard view
+  useEffect(() => {
+    if (!isLoading) {
+      analyticsService.trackDashboardView('consultant');
+    }
+  }, [isLoading]);
 
   useEffect(() => {
     fetchDashboardData();
@@ -359,22 +371,33 @@ function ConsultantDashboardContent() {
               </CardContent>
             </Card>
 
-            {/* Charts Section */}
-            {statsData?.data && (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {statsData.data.companyPerformance &&
-                  statsData.data.companyPerformance.length > 0 && (
-                    <CompanyPerformanceChart data={statsData.data.companyPerformance} />
-                  )}
-                {statsData.data.projectProgress && statsData.data.projectProgress.length > 0 && (
-                  <ProjectProgressChart data={statsData.data.projectProgress} />
-                )}
-                {statsData.data.trainingCompletion &&
-                  statsData.data.trainingCompletion.length > 0 && (
-                    <TrainingCompletionChart data={statsData.data.trainingCompletion} />
-                  )}
+            {/* AI Insights and Charts Section */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-1">
+                <AIInsightsWidget
+                  dashboardType="consultant"
+                  programId={selectedProgramId || undefined}
+                />
               </div>
-            )}
+              <div className="lg:col-span-2">
+                {statsData?.data && (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {statsData.data.companyPerformance &&
+                      statsData.data.companyPerformance.length > 0 && (
+                        <CompanyPerformanceChart data={statsData.data.companyPerformance} />
+                      )}
+                    {statsData.data.projectProgress &&
+                      statsData.data.projectProgress.length > 0 && (
+                        <ProjectProgressChart data={statsData.data.projectProgress} />
+                      )}
+                    {statsData.data.trainingCompletion &&
+                      statsData.data.trainingCompletion.length > 0 && (
+                        <TrainingCompletionChart data={statsData.data.trainingCompletion} />
+                      )}
+                  </div>
+                )}
+              </div>
+            </div>
 
             {/* Companies List */}
             <ConsultantCompanyList onCompanyClick={handleCompanyClick} />

@@ -19,6 +19,7 @@ import { ReportType, ReportStatus, AIAnalysis } from '@/3-domain/entities/Progre
 import { Result } from '@/6-core/result/Result';
 import { AppError } from '@/6-core/errors/AppError';
 import { logger } from '@/5-shared/utils/logger';
+import { ReportPDFExportService } from '@/4-infrastructure/services/pdf/ReportPDFExportService';
 
 export interface GenerateReportDto {
   reportType: ReportType;
@@ -155,6 +156,11 @@ export class GenerateReportUseCase {
         // AI disabled, mark as completed
         await this.reportRepository.update(report.id, { status: 'completed' });
       }
+
+      // 9. Generate PDF automatically (async, don't wait)
+      this.generatePDFAsync(report.id).catch((error) => {
+        logger.error('Failed to generate PDF automatically', { error, reportId: report.id });
+      });
 
       return Result.ok({
         reportId: report.id,
@@ -385,6 +391,45 @@ export class GenerateReportUseCase {
       return Result.fail(
         new AppError(error instanceof Error ? error.message : 'AI analizi oluşturulamadı', 500)
       );
+    }
+  }
+
+  /**
+   * PDF oluştur (async, background)
+   */
+  private async generatePDFAsync(reportId: string): Promise<void> {
+    try {
+      // Get report
+      const reportResult = await this.reportRepository.findById(reportId);
+      if (reportResult.isFailure || !reportResult.value) {
+        logger.error('Report not found for PDF generation', { reportId });
+        return;
+      }
+
+      const report = reportResult.value;
+
+      // Check if PDF already exists
+      if (report.pdfUrl) {
+        logger.info('PDF already exists for report', { reportId });
+        return;
+      }
+
+      // Generate PDF
+      const pdfResult = await ReportPDFExportService.exportReportToPDF(report);
+      if (pdfResult.isFailure) {
+        logger.error('PDF generation failed', { error: pdfResult.error, reportId });
+        return;
+      }
+
+      // Update report with PDF URL
+      await this.reportRepository.update(reportId, {
+        pdfUrl: pdfResult.value.pdfUrl,
+        pdfGeneratedAt: new Date(),
+      });
+
+      logger.info('PDF generated successfully', { reportId, pdfUrl: pdfResult.value.pdfUrl });
+    } catch (error) {
+      logger.error('Error in generatePDFAsync', { error, reportId });
     }
   }
 }

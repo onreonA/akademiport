@@ -44,6 +44,7 @@ import {
 import { CustomReportBuilder } from '@/1-presentation/components/features/reports/CustomReportBuilder';
 import { Plus, MoreVertical, Edit, Trash2, FileText, Calendar, Clock } from 'lucide-react';
 import { format } from 'date-fns';
+import { analyticsService } from '@/5-shared/services/analytics';
 
 interface CustomReport {
   id: string;
@@ -114,6 +115,13 @@ export default function CustomReportsPage() {
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error || 'Rapor oluşturulamadı');
+      }
+
+      const data = await response.json();
+
+      // Track custom report creation
+      if (data.id) {
+        analyticsService.trackCustomReportCreated(data.id, formData.reportType);
       }
 
       toast.success('Rapor başarıyla oluşturuldu');

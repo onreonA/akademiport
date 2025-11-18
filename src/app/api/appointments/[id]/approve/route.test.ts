@@ -10,16 +10,28 @@ vi.mock('@/4-infrastructure/api/helpers/auth', () => ({
   getAuthenticatedUser: vi.fn(),
 }));
 
-// Mock use case with vi.fn() that returns a constructor
-const mockApproveAppointmentUseCase = vi.fn();
+// Mock AppointmentRepository
+const mockFindById = vi.fn();
+vi.mock('@/infrastructure/database/repositories/AppointmentRepository', () => ({
+  AppointmentRepository: class {
+    findById = mockFindById;
+  },
+}));
+
+// Mock use case - use class mock pattern
+const mockApproveAppointmentExecute = vi.fn();
 
 vi.mock('@/application/use-cases/appointment', () => ({
-  ApproveAppointmentUseCase: mockApproveAppointmentUseCase,
+  ApproveAppointmentUseCase: class {
+    execute = mockApproveAppointmentExecute;
+  },
 }));
 
 describe('POST /api/appointments/[id]/approve', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Reset repository mock
+    mockFindById.mockResolvedValue(null);
   });
 
   it('returns 401 when user is not authenticated', async () => {
@@ -68,6 +80,14 @@ describe('POST /api/appointments/[id]/approve', () => {
     const user = createMockUser({ role: UserRole.CONSULTANT, id: 'consultant-1' });
     vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
 
+    // Mock repository to return appointment
+    const mockAppointment = {
+      id: 'appointment-1',
+      consultantId: 'consultant-1',
+      status: 'pending' as const,
+    };
+    mockFindById.mockResolvedValue(mockAppointment);
+
     const approvedAppointment = {
       id: 'appointment-1',
       status: 'approved' as const,
@@ -75,17 +95,10 @@ describe('POST /api/appointments/[id]/approve', () => {
       zoomJoinUrl: 'https://zoom.us/j/123',
     };
 
-    const executeMock = vi.fn().mockResolvedValue({
+    mockApproveAppointmentExecute.mockResolvedValue({
       isFailure: false,
       value: approvedAppointment,
     });
-
-    mockApproveAppointmentUseCase.mockImplementation(
-      () =>
-        ({
-          execute: executeMock,
-        }) as any
-    );
 
     const { POST } = await import('./route');
     const request = createMockRequest(
@@ -107,20 +120,21 @@ describe('POST /api/appointments/[id]/approve', () => {
   it('handles use case failure', async () => {
     const { getAuthenticatedUser } = await import('@/4-infrastructure/api/helpers/auth');
 
-    const user = createMockUser({ role: UserRole.CONSULTANT });
+    const user = createMockUser({ role: UserRole.CONSULTANT, id: 'consultant-1' });
     vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
 
-    const executeMock = vi.fn().mockResolvedValue({
+    // Mock repository to return appointment
+    const mockAppointment = {
+      id: 'non-existent',
+      consultantId: 'consultant-1',
+      status: 'pending' as const,
+    };
+    mockFindById.mockResolvedValue(mockAppointment);
+
+    mockApproveAppointmentExecute.mockResolvedValue({
       isFailure: true,
       error: { message: 'Appointment not found', statusCode: 404 },
     });
-
-    mockApproveAppointmentUseCase.mockImplementation(
-      () =>
-        ({
-          execute: executeMock,
-        }) as any
-    );
 
     const { POST } = await import('./route');
     const request = createMockRequest(

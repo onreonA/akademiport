@@ -7,7 +7,7 @@
  * Note: Requires WhatsApp Business API credentials (Sprint 16)
  */
 
-import { logger } from '@/shared/utils/logger';
+import { logger } from '@/5-shared/utils/logger';
 
 export interface WhatsAppMessage {
   to: string; // Phone number in E.164 format (e.g., +905551234567)

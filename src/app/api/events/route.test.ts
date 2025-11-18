@@ -14,18 +14,35 @@ vi.mock('@/4-infrastructure/database/repositories/EventRepository', () => ({
   EventRepository: vi.fn(),
 }));
 
-// Mock use cases with vi.fn() that returns a constructor
-const mockCreateEventUseCase = vi.fn();
-const mockListEventsUseCase = vi.fn();
+// Mock UserRepository
+const mockGetPrograms = vi.fn();
+vi.mock('@/4-infrastructure/database/repositories/UserRepository', () => ({
+  UserRepository: class {
+    getPrograms = mockGetPrograms;
+  },
+}));
+
+// Mock use cases - use class mock pattern
+const mockCreateEventExecute = vi.fn();
+const mockListEventsExecute = vi.fn();
 
 vi.mock('@/application/use-cases/event', () => ({
-  CreateEventUseCase: mockCreateEventUseCase,
-  ListEventsUseCase: mockListEventsUseCase,
+  CreateEventUseCase: class {
+    execute = mockCreateEventExecute;
+  },
+  ListEventsUseCase: class {
+    execute = mockListEventsExecute;
+  },
 }));
 
 describe('GET /api/events', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Reset repository mocks
+    mockGetPrograms.mockResolvedValue({
+      isSuccess: true,
+      value: [],
+    });
   });
 
   it('returns 401 when user is not authenticated', async () => {
@@ -47,7 +64,13 @@ describe('GET /api/events', () => {
     const user = createMockUser({ role: UserRole.CONSULTANT });
     vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
 
-    const executeMock = vi.fn().mockResolvedValue({
+    // Mock UserRepository.getPrograms
+    mockGetPrograms.mockResolvedValue({
+      isSuccess: true,
+      value: [{ id: 'program-1' }],
+    });
+
+    mockListEventsExecute.mockResolvedValue({
       isFailure: false,
       value: {
         events: [],
@@ -57,13 +80,6 @@ describe('GET /api/events', () => {
         totalPages: 0,
       },
     });
-
-    mockListEventsUseCase.mockImplementation(
-      () =>
-        ({
-          execute: executeMock,
-        }) as any
-    );
 
     const { GET } = await import('./route');
     const request = createMockRequest('http://localhost:3000/api/events');
@@ -85,7 +101,7 @@ describe('GET /api/events', () => {
     (user as any).companyId = 'company-1';
     vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
 
-    const executeMock = vi.fn().mockResolvedValue({
+    mockListEventsExecute.mockResolvedValue({
       isFailure: false,
       value: {
         events: [],
@@ -95,13 +111,6 @@ describe('GET /api/events', () => {
         totalPages: 0,
       },
     });
-
-    mockListEventsUseCase.mockImplementation(
-      () =>
-        ({
-          execute: executeMock,
-        }) as any
-    );
 
     const { GET } = await import('./route');
     const request = createMockRequest('http://localhost:3000/api/events');
@@ -115,6 +124,12 @@ describe('GET /api/events', () => {
 
     const user = createMockUser({ role: UserRole.CONSULTANT });
     vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
+
+    // Mock UserRepository.getPrograms
+    mockGetPrograms.mockResolvedValue({
+      isSuccess: true,
+      value: [{ id: 'program-1' }],
+    });
 
     const executeMock = vi.fn().mockResolvedValue({
       isFailure: false,
@@ -215,17 +230,10 @@ describe('POST /api/events', () => {
       status: 'scheduled' as const,
     };
 
-    const executeMock = vi.fn().mockResolvedValue({
+    mockCreateEventExecute.mockResolvedValue({
       isFailure: false,
       value: mockEvent,
     });
-
-    mockCreateEventUseCase.mockImplementation(
-      () =>
-        ({
-          execute: executeMock,
-        }) as any
-    );
 
     const { POST } = await import('./route');
     const request = createMockRequest('http://localhost:3000/api/events', {
@@ -276,17 +284,10 @@ describe('POST /api/events', () => {
     });
     vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
 
-    const executeMock = vi.fn().mockResolvedValue({
+    mockCreateEventExecute.mockResolvedValue({
       isFailure: true,
       error: { message: 'Program not found', code: 404 },
     });
-
-    mockCreateEventUseCase.mockImplementation(
-      () =>
-        ({
-          execute: executeMock,
-        }) as any
-    );
 
     const { POST } = await import('./route');
     const request = createMockRequest('http://localhost:3000/api/events', {

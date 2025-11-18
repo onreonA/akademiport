@@ -5,6 +5,22 @@
 
 import { NextRequest } from 'next/server';
 import { UserRole } from '@/domain/enums/UserRole';
+import { vi } from 'vitest';
+
+// Mock Next.js cookies() function for tests
+vi.mock('next/headers', async () => {
+  const actual = await vi.importActual('next/headers');
+  return {
+    ...actual,
+    cookies: vi.fn(() => ({
+      get: vi.fn(),
+      set: vi.fn(),
+      getAll: vi.fn(() => []),
+      has: vi.fn(),
+      delete: vi.fn(),
+    })),
+  };
+});
 
 /**
  * Create a mock NextRequest for testing

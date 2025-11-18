@@ -7,6 +7,86 @@ import { resolve } from 'path';
 // Load environment variables from .env.local for integration tests
 config({ path: resolve(process.cwd(), '.env.local') });
 
+// Mock Next.js cookies() function for API route tests
+vi.mock('next/headers', async () => {
+  const actual = await vi.importActual<typeof import('next/headers')>('next/headers');
+  return {
+    ...actual,
+    cookies: vi.fn(async () => ({
+      get: vi.fn(),
+      set: vi.fn(),
+      getAll: vi.fn(() => []),
+      has: vi.fn(),
+      delete: vi.fn(),
+    })),
+  };
+});
+
+// Mock Supabase client creation for tests
+vi.mock('@/4-infrastructure/database/supabase-server', () => {
+  const mockSupabaseClient = {
+    from: vi.fn(() => ({
+      select: vi.fn().mockReturnThis(),
+      insert: vi.fn().mockReturnThis(),
+      update: vi.fn().mockReturnThis(),
+      delete: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      neq: vi.fn().mockReturnThis(),
+      gt: vi.fn().mockReturnThis(),
+      gte: vi.fn().mockReturnThis(),
+      lt: vi.fn().mockReturnThis(),
+      lte: vi.fn().mockReturnThis(),
+      like: vi.fn().mockReturnThis(),
+      ilike: vi.fn().mockReturnThis(),
+      is: vi.fn().mockReturnThis(),
+      in: vi.fn().mockReturnThis(),
+      contains: vi.fn().mockReturnThis(),
+      containedBy: vi.fn().mockReturnThis(),
+      rangeGt: vi.fn().mockReturnThis(),
+      rangeGte: vi.fn().mockReturnThis(),
+      rangeLt: vi.fn().mockReturnThis(),
+      rangeLte: vi.fn().mockReturnThis(),
+      rangeAdjacent: vi.fn().mockReturnThis(),
+      overlaps: vi.fn().mockReturnThis(),
+      textSearch: vi.fn().mockReturnThis(),
+      match: vi.fn().mockReturnThis(),
+      not: vi.fn().mockReturnThis(),
+      or: vi.fn().mockReturnThis(),
+      filter: vi.fn().mockReturnThis(),
+      order: vi.fn().mockReturnThis(),
+      limit: vi.fn().mockReturnThis(),
+      range: vi.fn().mockReturnThis(),
+      abortSignal: vi.fn().mockReturnThis(),
+      single: vi.fn().mockResolvedValue({ data: null, error: null }),
+      maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
+      csv: vi.fn().mockResolvedValue({ data: '', error: null }),
+      geojson: vi.fn().mockResolvedValue({ data: null, error: null }),
+      explain: vi.fn().mockResolvedValue({ data: null, error: null }),
+      rollback: vi.fn().mockReturnThis(),
+      returns: vi.fn().mockReturnThis(),
+      then: vi.fn().mockResolvedValue({ data: null, error: null }),
+    })),
+    auth: {
+      getUser: vi.fn().mockResolvedValue({ data: { user: null }, error: null }),
+      getSession: vi.fn().mockResolvedValue({ data: { session: null }, error: null }),
+    },
+    storage: {
+      from: vi.fn(() => ({
+        upload: vi.fn().mockResolvedValue({ data: null, error: null }),
+        download: vi.fn().mockResolvedValue({ data: null, error: null }),
+        list: vi.fn().mockResolvedValue({ data: [], error: null }),
+        remove: vi.fn().mockResolvedValue({ data: null, error: null }),
+        createSignedUrl: vi.fn().mockResolvedValue({ data: { signedUrl: '' }, error: null }),
+      })),
+    },
+  };
+
+  return {
+    createClient: vi.fn(async () => mockSupabaseClient),
+    getSupabaseAdminClient: vi.fn(() => mockSupabaseClient),
+  };
+});
+
 // Cleanup after each test
 afterEach(() => {
   cleanup();

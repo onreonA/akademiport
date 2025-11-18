@@ -5,6 +5,8 @@ import { ThemeProvider } from '@/5-shared/providers/theme-provider';
 import { QueryProvider } from '@/5-shared/providers/query-provider';
 import { NotificationProvider } from '@/5-shared/contexts/NotificationContext';
 import { ServiceWorkerRegistration } from '@/1-presentation/components/features/notifications/ServiceWorkerRegistration';
+import { AnalyticsProvider } from '@/5-shared/components/AnalyticsProvider';
+import { PerformanceTracker } from '@/1-presentation/components/shared/PerformanceTracker';
 import { Toaster } from '@/1-presentation/components/ui/molecules/sonner';
 
 const inter = Inter({
@@ -32,11 +34,14 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <NotificationProvider>
-              <ServiceWorkerRegistration />
-              {children}
-              <Toaster />
-            </NotificationProvider>
+            <AnalyticsProvider>
+              <PerformanceTracker />
+              <NotificationProvider>
+                <ServiceWorkerRegistration />
+                {children}
+                <Toaster />
+              </NotificationProvider>
+            </AnalyticsProvider>
           </ThemeProvider>
         </QueryProvider>
       </body>

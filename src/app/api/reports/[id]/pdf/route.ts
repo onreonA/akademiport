@@ -1,14 +1,14 @@
 /**
  * GET /api/reports/[id]/pdf
  *
- * Raporun PDF'ini indirir
- * TODO: PDF export servisi implementasyonu sonraya bırakıldı
+ * Raporun PDF'ini oluşturur ve indirir
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthenticatedUser } from '@/4-infrastructure/api/helpers/auth';
 import { GetReportUseCase } from '@/2-application/use-cases/report';
 import { SupabaseProgressReportRepository } from '@/4-infrastructure/database/repositories/SupabaseProgressReportRepository';
+import { ReportPDFExportService } from '@/4-infrastructure/services/pdf/ReportPDFExportService';
 import { AppError } from '@/6-core/errors/AppError';
 import { logger } from '@/5-shared/utils/logger';
 
@@ -42,19 +42,46 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     const report = result.value;
 
-    // Check if PDF exists
-    if (!report.pdfUrl) {
-      return NextResponse.json({ error: 'PDF henüz oluşturulmamış' }, { status: 404 });
+    // Check if report is completed
+    if (report.status !== 'completed') {
+      return NextResponse.json({ error: 'Rapor henüz tamamlanmadı' }, { status: 400 });
     }
 
-    // TODO: PDF export servisi implementasyonu sonraya bırakıldı
-    // Şimdilik PDF URL'ini döndürüyoruz
+    // Check if PDF already exists
+    if (report.pdfUrl) {
+      // PDF mevcut, URL'i döndür
+      return NextResponse.json(
+        {
+          success: true,
+          data: {
+            pdfUrl: report.pdfUrl,
+            pdfGeneratedAt: report.pdfGeneratedAt,
+          },
+        },
+        { status: 200 }
+      );
+    }
+
+    // PDF oluştur
+    const pdfResult = await ReportPDFExportService.exportReportToPDF(report);
+
+    if (pdfResult.isFailure) {
+      logger.error('Failed to export PDF:', pdfResult.error);
+      return NextResponse.json({ error: pdfResult.error || 'PDF oluşturulamadı' }, { status: 500 });
+    }
+
+    // PDF URL'ini rapor kaydına kaydet
+    await reportRepository.update(id, {
+      pdfUrl: pdfResult.value.pdfUrl,
+      pdfGeneratedAt: new Date(),
+    });
+
     return NextResponse.json(
       {
         success: true,
         data: {
-          pdfUrl: report.pdfUrl,
-          message: 'PDF export servisi henüz implement edilmedi',
+          pdfUrl: pdfResult.value.pdfUrl,
+          pdfGeneratedAt: new Date(),
         },
       },
       { status: 200 }

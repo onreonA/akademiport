@@ -17,6 +17,7 @@ import {
 } from '@/presentation/components/ui/atoms/dropdown-menu';
 import { Download, FileText, FileSpreadsheet, File, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { analyticsService } from '@/5-shared/services/analytics';
 
 export interface ExportButtonProps {
   exportUrl: string;
@@ -70,6 +71,10 @@ export function ExportButton({
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url_blob);
+
+      // Track export event
+      const exportType = exportUrl.includes('dashboard') ? 'dashboard' : 'report';
+      analyticsService.trackExport(exportType, format);
 
       toast.success(`${format.toUpperCase()} export başarılı`);
     } catch (error: any) {
