@@ -9,6 +9,42 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 
+/**
+ * Security headers ekle
+ */
+function addSecurityHeaders(response: NextResponse) {
+  response.headers.set('X-DNS-Prefetch-Control', 'on');
+  response.headers.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
+  response.headers.set('X-Frame-Options', 'SAMEORIGIN');
+  response.headers.set('X-Content-Type-Options', 'nosniff');
+  response.headers.set('X-XSS-Protection', '1; mode=block');
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  response.headers.set(
+    'Permissions-Policy',
+    'camera=(), microphone=(), geolocation=(), interest-cohort=()'
+  );
+
+  // Content Security Policy (CSP)
+  // Not: CSP çok katı olabilir, production'da test edilmeli
+  if (process.env.NODE_ENV === 'production') {
+    const csp = [
+      "default-src 'self'",
+      "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com https://cdn.mixpanel.com",
+      "style-src 'self' 'unsafe-inline'",
+      "img-src 'self' data: https: blob:",
+      "font-src 'self' data:",
+      "connect-src 'self' https://www.google-analytics.com https://api.mixpanel.com https://*.supabase.co",
+      "frame-src 'self' https://www.google.com",
+      "object-src 'none'",
+      "base-uri 'self'",
+      "form-action 'self'",
+      "frame-ancestors 'self'",
+      'upgrade-insecure-requests',
+    ].join('; ');
+    response.headers.set('Content-Security-Policy', csp);
+  }
+}
+
 export async function proxy(request: NextRequest) {
   // Public pages - authentication gerektirmez
   const isPublicPage =
@@ -21,7 +57,10 @@ export async function proxy(request: NextRequest) {
 
   // Public page ise direkt geç
   if (isPublicPage) {
-    return NextResponse.next();
+    const response = NextResponse.next();
+    // Security headers ekle
+    addSecurityHeaders(response);
+    return response;
   }
 
   let response = NextResponse.next({
@@ -29,6 +68,9 @@ export async function proxy(request: NextRequest) {
       headers: request.headers,
     },
   });
+
+  // Security headers ekle
+  addSecurityHeaders(response);
 
   try {
     const supabase = createServerClient(

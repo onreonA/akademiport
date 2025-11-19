@@ -39,7 +39,16 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       return NextResponse.json({ error: 'Bu randevuyu onaylama yetkiniz yok' }, { status: 403 });
     }
 
-    const body = await request.json();
+    // Parse request body (optional - notes field)
+    let body = {};
+    try {
+      const text = await request.text();
+      if (text) {
+        body = JSON.parse(text);
+      }
+    } catch (error) {
+      // Body is optional, continue with empty object
+    }
 
     // Validate request body
     const validationResult = ApproveAppointmentDtoSchema.safeParse(body);
@@ -54,7 +63,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const result = await approveAppointmentUseCase.execute(
       id,
       user.id,
-      validationResult.data.notes || undefined
+      validationResult.data?.notes || undefined
     );
 
     if (result.isFailure) {

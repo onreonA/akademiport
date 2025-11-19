@@ -51,10 +51,17 @@ export function createMockRequest(
     headers: requestHeaders,
   };
 
+  let parsedBody: any = null;
   if (body && method !== 'GET') {
     requestInit.body = typeof body === 'string' ? body : JSON.stringify(body);
     if (!requestHeaders.has('Content-Type')) {
       requestHeaders.set('Content-Type', 'application/json');
+    }
+    // Parse body for json() method
+    try {
+      parsedBody = typeof body === 'string' ? JSON.parse(body) : body;
+    } catch {
+      parsedBody = body;
     }
   }
 
@@ -63,7 +70,19 @@ export function createMockRequest(
   if (cleanedInit.signal === null) {
     delete cleanedInit.signal;
   }
-  return new NextRequest(url, cleanedInit as any);
+  const request = new NextRequest(url, cleanedInit as any);
+
+  // Mock json() method if body exists - use Object.defineProperty for better compatibility
+  if (parsedBody !== null && method !== 'GET') {
+    Object.defineProperty(request, 'json', {
+      value: vi.fn().mockResolvedValue(parsedBody),
+      writable: true,
+      configurable: true,
+      enumerable: false,
+    });
+  }
+
+  return request;
 }
 
 /**

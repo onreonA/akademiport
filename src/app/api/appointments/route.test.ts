@@ -13,17 +13,26 @@ vi.mock('@/4-infrastructure/api/helpers/auth', () => ({
   getAuthenticatedUser: vi.fn(),
 }));
 
-vi.mock('@/4-infrastructure/database/repositories/AppointmentRepository', () => ({
-  AppointmentRepository: vi.fn(),
-}));
+const mockFindById = vi.fn();
+vi.mock('@/4-infrastructure/database/repositories/AppointmentRepository', () => {
+  return {
+    AppointmentRepository: class {
+      findById = mockFindById;
+    },
+  };
+});
 
-// Mock use cases with vi.fn() that returns a constructor
-const mockCreateAppointmentUseCase = vi.fn();
-const mockListAppointmentsUseCase = vi.fn();
+// Mock use cases - use class mock pattern
+const mockCreateAppointmentExecute = vi.fn();
+const mockListAppointmentsExecute = vi.fn();
 
 vi.mock('@/application/use-cases/appointment', () => ({
-  CreateAppointmentUseCase: mockCreateAppointmentUseCase,
-  ListAppointmentsUseCase: mockListAppointmentsUseCase,
+  CreateAppointmentUseCase: class {
+    execute = mockCreateAppointmentExecute;
+  },
+  ListAppointmentsUseCase: class {
+    execute = mockListAppointmentsExecute;
+  },
 }));
 
 describe('GET /api/appointments', () => {
@@ -47,26 +56,21 @@ describe('GET /api/appointments', () => {
   it('returns appointments for consultant', async () => {
     const { getAuthenticatedUser } = await import('@/4-infrastructure/api/helpers/auth');
 
-    const user = createMockUser({ role: UserRole.CONSULTANT });
+    const user = createMockUser({
+      role: UserRole.CONSULTANT,
+      id: '550e8400-e29b-41d4-a716-446655440000', // Valid UUID
+    });
     vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
 
-    const executeMock = vi.fn().mockResolvedValue({
+    mockListAppointmentsExecute.mockResolvedValue({
       isFailure: false,
       value: {
-        appointments: [],
+        data: [],
         total: 0,
         page: 1,
         limit: 20,
-        totalPages: 0,
       },
     });
-
-    mockListAppointmentsUseCase.mockImplementation(
-      () =>
-        ({
-          execute: executeMock,
-        }) as any
-    );
 
     const { GET } = await import('./route');
     const request = createMockRequest('http://localhost:3000/api/appointments');
@@ -83,28 +87,20 @@ describe('GET /api/appointments', () => {
 
     const user = createMockUser({
       role: UserRole.COMPANY_USER,
-      id: 'company-user-1',
+      id: '550e8400-e29b-41d4-a716-446655440001', // Valid UUID
     });
-    (user as any).companyId = 'company-1';
+    (user as any).companyId = '550e8400-e29b-41d4-a716-446655440002'; // Valid UUID
     vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
 
-    const executeMock = vi.fn().mockResolvedValue({
+    mockListAppointmentsExecute.mockResolvedValue({
       isFailure: false,
       value: {
-        appointments: [],
+        data: [],
         total: 0,
         page: 1,
         limit: 20,
-        totalPages: 0,
       },
     });
-
-    mockListAppointmentsUseCase.mockImplementation(
-      () =>
-        ({
-          execute: executeMock,
-        }) as any
-    );
 
     const { GET } = await import('./route');
     const request = createMockRequest('http://localhost:3000/api/appointments');
@@ -134,26 +130,21 @@ describe('GET /api/appointments', () => {
   it('handles query parameters correctly', async () => {
     const { getAuthenticatedUser } = await import('@/4-infrastructure/api/helpers/auth');
 
-    const user = createMockUser({ role: UserRole.CONSULTANT });
+    const user = createMockUser({
+      role: UserRole.CONSULTANT,
+      id: '550e8400-e29b-41d4-a716-446655440000', // Valid UUID
+    });
     vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
 
-    const executeMock = vi.fn().mockResolvedValue({
+    mockListAppointmentsExecute.mockResolvedValue({
       isFailure: false,
       value: {
-        appointments: [],
+        data: [],
         total: 0,
         page: 2,
         limit: 10,
-        totalPages: 0,
       },
     });
-
-    mockListAppointmentsUseCase.mockImplementation(
-      () =>
-        ({
-          execute: executeMock,
-        }) as any
-    );
 
     const { GET } = await import('./route');
     const request = createMockRequest(
@@ -214,7 +205,7 @@ describe('POST /api/appointments', () => {
     const data = await response.json();
 
     expect(response.status).toBe(403);
-    expect(data.error).toBe('Forbidden');
+    expect(data.error).toContain('firma kullanıcıları');
   });
 
   it('creates appointment successfully for company user', async () => {
@@ -222,40 +213,72 @@ describe('POST /api/appointments', () => {
 
     const user = createMockUser({
       role: UserRole.COMPANY_USER,
-      id: 'company-user-1',
+      id: '550e8400-e29b-41d4-a716-446655440001', // Valid UUID
     });
-    (user as any).companyId = 'company-1';
+    (user as any).companyId = '550e8400-e29b-41d4-a716-446655440002'; // Valid UUID
     vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
 
-    const executeMock = vi.fn().mockResolvedValue({
+    const mockAppointment = {
+      id: '550e8400-e29b-41d4-a716-446655440003',
+      consultantId: '550e8400-e29b-41d4-a716-446655440004',
+      companyId: (user as any).companyId,
+      programId: null,
+      title: 'Test Appointment',
+      description: null,
+      status: 'pending' as const,
+      startTime: new Date('2025-02-01T10:00:00Z'),
+      endTime: new Date('2025-02-01T11:00:00Z'),
+      timezone: 'UTC',
+      requestedBy: user.id,
+      requestedAt: new Date(),
+      approvedAt: null,
+      approvedBy: null,
+      rejectedAt: null,
+      rejectedBy: null,
+      rejectionReason: null,
+      rescheduledFrom: null,
+      rescheduledAt: null,
+      rescheduledBy: null,
+      attendedAt: null,
+      zoomMeetingId: null,
+      zoomJoinUrl: null,
+      zoomStartUrl: null,
+      zoomPassword: null,
+      notes: null,
+      companyNotes: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    mockCreateAppointmentExecute.mockResolvedValue({
       isFailure: false,
       value: {
-        id: 'appointment-1',
+        id: mockAppointment.id,
       },
     });
 
-    mockCreateAppointmentUseCase.mockImplementation(
-      () =>
-        ({
-          execute: executeMock,
-        }) as any
-    );
+    // Mock repository.findById to return the appointment
+    mockFindById.mockResolvedValue(mockAppointment);
 
     const { POST } = await import('./route');
+    // Use future dates to pass validation
+    const futureStartTime = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(); // Tomorrow
+    const futureEndTime = new Date(Date.now() + 24 * 60 * 60 * 1000 + 60 * 60 * 1000).toISOString(); // Tomorrow + 1 hour
     const request = createMockRequest('http://localhost:3000/api/appointments', {
       method: 'POST',
       body: {
         title: 'Test Appointment',
-        consultantId: 'consultant-1',
-        startTime: '2025-02-01T10:00:00Z',
-        endTime: '2025-02-01T11:00:00Z',
+        consultantId: '550e8400-e29b-41d4-a716-446655440004', // Valid UUID
+        startTime: futureStartTime,
+        endTime: futureEndTime,
       },
     });
     const response = await POST(request);
     const data = await response.json();
 
     expect(response.status).toBe(201);
-    expect(data.id).toBe('appointment-1');
+    expect(data.appointment).toBeDefined();
+    expect(data.appointment.id).toBe(mockAppointment.id);
   });
 
   it('validates required fields', async () => {
@@ -287,30 +310,27 @@ describe('POST /api/appointments', () => {
 
     const user = createMockUser({
       role: UserRole.COMPANY_USER,
+      id: '550e8400-e29b-41d4-a716-446655440001', // Valid UUID
     });
-    (user as any).companyId = 'company-1';
+    (user as any).companyId = '550e8400-e29b-41d4-a716-446655440002'; // Valid UUID
     vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
 
-    const executeMock = vi.fn().mockResolvedValue({
+    mockCreateAppointmentExecute.mockResolvedValue({
       isFailure: true,
-      error: { message: 'Consultant is not available', code: 400 },
+      error: { message: 'Consultant is not available', statusCode: 400 },
     });
 
-    mockCreateAppointmentUseCase.mockImplementation(
-      () =>
-        ({
-          execute: executeMock,
-        }) as any
-    );
-
     const { POST } = await import('./route');
+    // Use future dates to pass validation
+    const futureStartTime = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(); // Tomorrow
+    const futureEndTime = new Date(Date.now() + 24 * 60 * 60 * 1000 + 60 * 60 * 1000).toISOString(); // Tomorrow + 1 hour
     const request = createMockRequest('http://localhost:3000/api/appointments', {
       method: 'POST',
       body: {
         title: 'Test Appointment',
-        consultantId: 'consultant-1',
-        startTime: '2025-02-01T10:00:00Z',
-        endTime: '2025-02-01T11:00:00Z',
+        consultantId: '550e8400-e29b-41d4-a716-446655440004', // Valid UUID
+        startTime: futureStartTime,
+        endTime: futureEndTime,
       },
     });
     const response = await POST(request);

@@ -131,7 +131,7 @@ describe('GET /api/events', () => {
       value: [{ id: 'program-1' }],
     });
 
-    const executeMock = vi.fn().mockResolvedValue({
+    mockListEventsExecute.mockResolvedValue({
       isFailure: false,
       value: {
         events: [],
@@ -141,13 +141,6 @@ describe('GET /api/events', () => {
         totalPages: 0,
       },
     });
-
-    mockListEventsUseCase.mockImplementation(
-      () =>
-        ({
-          execute: executeMock,
-        }) as any
-    );
 
     const { GET } = await import('./route');
     const request = createMockRequest(
@@ -216,7 +209,7 @@ describe('POST /api/events', () => {
 
     const user = createMockUser({
       role: UserRole.CONSULTANT,
-      id: 'consultant-1',
+      id: '550e8400-e29b-41d4-a716-446655440002', // Valid UUID format (version 4)
     });
     vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
 
@@ -240,9 +233,9 @@ describe('POST /api/events', () => {
       method: 'POST',
       body: {
         title: 'Test Event',
-        programId: 'program-1',
-        startTime: '2025-02-01T10:00:00Z',
-        endTime: '2025-02-01T12:00:00Z',
+        programId: '550e8400-e29b-41d4-a716-446655440001', // Valid UUID format
+        startTime: '2025-12-31T10:00:00Z', // Future date
+        endTime: '2025-12-31T12:00:00Z', // Future date
       },
     });
     const response = await POST(request);
@@ -281,12 +274,13 @@ describe('POST /api/events', () => {
 
     const user = createMockUser({
       role: UserRole.CONSULTANT,
+      id: '550e8400-e29b-41d4-a716-446655440002', // Valid UUID format (version 4)
     });
     vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
 
     mockCreateEventExecute.mockResolvedValue({
       isFailure: true,
-      error: { message: 'Program not found', code: 404 },
+      error: { message: 'Program not found', statusCode: 404 },
     });
 
     const { POST } = await import('./route');
@@ -294,9 +288,9 @@ describe('POST /api/events', () => {
       method: 'POST',
       body: {
         title: 'Test Event',
-        programId: 'non-existent',
-        startTime: '2025-02-01T10:00:00Z',
-        endTime: '2025-02-01T12:00:00Z',
+        programId: '550e8400-e29b-41d4-a716-446655440999', // Valid UUID format
+        startTime: '2025-12-31T10:00:00Z', // Future date
+        endTime: '2025-12-31T12:00:00Z', // Future date
       },
     });
     const response = await POST(request);

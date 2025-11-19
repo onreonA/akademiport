@@ -47,11 +47,10 @@ describe('RewriteNewsWithAIUseCase', () => {
     } as any;
 
     useCase = new RewriteNewsWithAIUseCase(
+      mockRSSFeedRepository,
       mockAIRouter,
       mockPromptManager,
-      mockTokenTracker,
-      mockRSSFeedRepository,
-      mockNewsRepository
+      mockTokenTracker
     );
   });
 
@@ -62,12 +61,15 @@ describe('RewriteNewsWithAIUseCase', () => {
         feedId: 'feed-1',
         title: 'Original Title',
         link: 'https://example.com/news',
-        pubDate: new Date(),
-        creator: 'Author',
+        description: 'Original description',
         content: 'Original content',
+        author: 'Author',
+        pubDate: new Date(),
         guid: 'guid-1',
         imageUrl: null,
+        categories: ['GENEL'],
         isProcessed: false,
+        processedAt: null,
         newsId: null,
         createdAt: new Date(),
         updatedAt: new Date(),

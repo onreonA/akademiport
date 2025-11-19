@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { SendReportEmailUseCase } from './SendReportEmailUseCase';
 import { IProgressReportRepository } from '@/3-domain/interfaces/repositories/IProgressReportRepository';
-import { INotificationService } from '@/3-domain/interfaces/services/INotificationService';
+import { IEmailService } from '@/3-domain/interfaces/services/IEmailService';
 import { Result } from '@/6-core/result/Result';
 import { AppError } from '@/6-core/errors/AppError';
 import { ProgressReport, ReportType, ReportStatus } from '@/3-domain/entities/ProgressReport';
@@ -15,9 +15,26 @@ vi.mock('@/5-shared/utils/logger', () => ({
   },
 }));
 
+// Mock EmailTemplateService
+const mockRenderTemplate = vi.fn().mockResolvedValue(
+  Result.ok({
+    html: '<html>Test</html>',
+    text: 'Test',
+    subject: 'Test Report',
+  })
+);
+
+vi.mock('@/5-shared/services/email/email-template.service', () => {
+  return {
+    EmailTemplateService: class {
+      renderTemplate = mockRenderTemplate;
+    },
+  };
+});
+
 describe('SendReportEmailUseCase', () => {
   let mockReportRepository: IProgressReportRepository;
-  let mockNotificationService: INotificationService;
+  let mockEmailService: IEmailService;
   let useCase: SendReportEmailUseCase;
 
   beforeEach(() => {
@@ -36,15 +53,11 @@ describe('SendReportEmailUseCase', () => {
       count: vi.fn(),
     } as any;
 
-    mockNotificationService = {
-      createNotification: vi.fn(),
-      markAsRead: vi.fn(),
-      deleteNotification: vi.fn(),
-      getUnreadCount: vi.fn(),
-      sendEmail: vi.fn(),
+    mockEmailService = {
+      send: vi.fn().mockResolvedValue(Result.ok(undefined)),
     } as any;
 
-    useCase = new SendReportEmailUseCase(mockReportRepository, mockNotificationService);
+    useCase = new SendReportEmailUseCase(mockReportRepository, mockEmailService);
   });
 
   const createMockReport = (overrides?: Partial<ProgressReport>): ProgressReport => ({

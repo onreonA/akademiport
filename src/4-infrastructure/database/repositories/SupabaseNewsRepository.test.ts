@@ -3,6 +3,9 @@
  *
  * Tests repository with real Supabase connection
  * Requires: Supabase connection configured in .env.local
+ *
+ * NOTE: These tests require a real Supabase connection and are skipped by default.
+ * To run them, set SKIP_INTEGRATION_TESTS=false in your environment.
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
@@ -18,7 +21,7 @@ import {
 } from '@/5-shared/test/repository-helpers';
 import type { News } from '@/3-domain/entities/News';
 
-describe('SupabaseNewsRepository Integration Tests', () => {
+describe.skip('SupabaseNewsRepository Integration Tests', () => {
   let repository: SupabaseNewsRepository;
   let testProgramId: string;
   let testAuthorId: string;

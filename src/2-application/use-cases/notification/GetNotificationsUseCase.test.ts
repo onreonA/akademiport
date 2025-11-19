@@ -1,130 +1,139 @@
 /**
- * Get Notifications Use Case Tests
- *
- * Unit tests for GetNotificationsUseCase
+ * Unit Tests for GetNotificationsUseCase
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { GetNotificationsUseCase } from './GetNotificationsUseCase';
-import { NotificationFilterDto } from '@/2-application/dtos/notification/NotificationFilterDto';
+import { INotificationRepository } from '@/3-domain/interfaces/repositories/INotificationRepository';
+import { Notification } from '@/3-domain/entities/Notification';
 import { NotificationType, NotificationPriority } from '@/3-domain/enums/NotificationEnums';
 import { Result } from '@/6-core/result';
-import { Notification } from '@/3-domain/entities/Notification';
 
 describe('GetNotificationsUseCase', () => {
+  let mockRepository: INotificationRepository;
   let useCase: GetNotificationsUseCase;
-  let mockRepository: any;
 
   beforeEach(() => {
     mockRepository = {
+      create: vi.fn(),
+      findById: vi.fn(),
       findMany: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
+      markAsRead: vi.fn(),
+      markAllAsRead: vi.fn(),
+      getUnreadCount: vi.fn(),
     };
 
     useCase = new GetNotificationsUseCase(mockRepository);
   });
 
-  const createMockNotification = (): Notification => ({
-    id: 'notif-123',
-    userId: 'user-123',
-    type: NotificationType.INFO,
-    title: 'Test Notification',
-    message: 'This is a test notification',
-    priority: NotificationPriority.NORMAL,
-    channels: [],
-    isRead: false,
-    emailSent: false,
-    pushSent: false,
-    metadata: {},
-    createdAt: new Date(),
+  const createMockNotification = (overrides?: Partial<Notification>): Notification => {
+    return {
+      id: 'notif-1',
+      userId: 'user-1',
+      type: NotificationType.INFO,
+      title: 'Test Notification',
+      message: 'Test Message',
+      priority: NotificationPriority.NORMAL,
+      channels: [],
+      isRead: false,
+      emailSent: false,
+      pushSent: false,
+      metadata: {},
+      createdAt: new Date(),
+      ...overrides,
+    };
+  };
+
+  it('should get notifications successfully', async () => {
+    const filter = {
+      userId: 'user-1',
+      limit: 10,
+      offset: 0,
+    };
+    const mockNotifications = [
+      createMockNotification({ id: 'notif-1' }),
+      createMockNotification({ id: 'notif-2' }),
+    ];
+
+    vi.mocked(mockRepository.findMany).mockResolvedValue(Result.ok(mockNotifications));
+
+    const result = await useCase.execute(filter);
+
+    expect(result.isSuccess).toBe(true);
+    expect(result.value).toEqual(mockNotifications);
+    expect(mockRepository.findMany).toHaveBeenCalledWith({
+      userId: filter.userId,
+      isRead: undefined,
+      type: undefined,
+      priority: undefined,
+      limit: filter.limit,
+      offset: filter.offset,
+      orderBy: undefined,
+      orderDirection: undefined,
+    });
   });
 
-  describe('execute', () => {
-    it('should get notifications successfully', async () => {
-      const filter: NotificationFilterDto = {
-        userId: 'user-123',
-        limit: 20,
-        offset: 0,
-        orderBy: 'created_at',
-        orderDirection: 'desc',
-      };
+  it('should apply filters correctly', async () => {
+    const filter = {
+      userId: 'user-1',
+      isRead: false,
+      type: NotificationType.INFO,
+      priority: NotificationPriority.HIGH,
+      limit: 20,
+      offset: 10,
+      orderBy: 'createdAt',
+      orderDirection: 'desc' as const,
+    };
+    const mockNotifications = [createMockNotification({ id: 'notif-1' })];
 
-      const mockNotifications = [createMockNotification(), createMockNotification()];
-      mockRepository.findMany.mockResolvedValue(Result.ok(mockNotifications));
+    vi.mocked(mockRepository.findMany).mockResolvedValue(Result.ok(mockNotifications));
 
-      const result = await useCase.execute(filter);
+    const result = await useCase.execute(filter);
 
-      expect(result.isSuccess).toBe(true);
-      expect(result.value).toEqual(mockNotifications);
-      expect(mockRepository.findMany).toHaveBeenCalledWith(
-        expect.objectContaining({
-          userId: 'user-123',
-          limit: 20,
-          offset: 0,
-        })
-      );
+    expect(result.isSuccess).toBe(true);
+    expect(mockRepository.findMany).toHaveBeenCalledWith({
+      userId: filter.userId,
+      isRead: false,
+      type: NotificationType.INFO,
+      priority: NotificationPriority.HIGH,
+      limit: 20,
+      offset: 10,
+      orderBy: 'createdAt',
+      orderDirection: 'desc',
     });
+  });
 
-    it('should filter by isRead status', async () => {
-      const filter: NotificationFilterDto = {
-        userId: 'user-123',
-        isRead: true,
-        limit: 20,
-        offset: 0,
-        orderBy: 'created_at',
-        orderDirection: 'desc',
-      };
+  it('should handle repository errors', async () => {
+    const filter = {
+      userId: 'user-1',
+      limit: 10,
+      offset: 0,
+    };
+    const errorMessage = 'Database error';
 
-      const mockNotifications = [createMockNotification()];
-      mockRepository.findMany.mockResolvedValue(Result.ok(mockNotifications));
+    vi.mocked(mockRepository.findMany).mockResolvedValue(Result.fail(new Error(errorMessage)));
 
-      const result = await useCase.execute(filter);
+    const result = await useCase.execute(filter);
 
-      expect(result.isSuccess).toBe(true);
-      expect(mockRepository.findMany).toHaveBeenCalledWith(
-        expect.objectContaining({
-          isRead: true,
-        })
-      );
-    });
+    expect(result.isFailure).toBe(true);
+    expect(result.error?.message).toBe(errorMessage);
+  });
 
-    it('should filter by type', async () => {
-      const filter: NotificationFilterDto = {
-        userId: 'user-123',
-        type: NotificationType.TASK_ASSIGNED,
-        limit: 20,
-        offset: 0,
-        orderBy: 'created_at',
-        orderDirection: 'desc',
-      };
+  it('should handle exceptions', async () => {
+    const filter = {
+      userId: 'user-1',
+      limit: 10,
+      offset: 0,
+    };
+    const errorMessage = 'Unexpected error';
 
-      const mockNotifications = [createMockNotification()];
-      mockRepository.findMany.mockResolvedValue(Result.ok(mockNotifications));
+    vi.mocked(mockRepository.findMany).mockRejectedValue(new Error(errorMessage));
 
-      const result = await useCase.execute(filter);
+    const result = await useCase.execute(filter);
 
-      expect(result.isSuccess).toBe(true);
-      expect(mockRepository.findMany).toHaveBeenCalledWith(
-        expect.objectContaining({
-          type: NotificationType.TASK_ASSIGNED,
-        })
-      );
-    });
-
-    it('should handle repository errors', async () => {
-      const filter: NotificationFilterDto = {
-        userId: 'user-123',
-        limit: 20,
-        offset: 0,
-        orderBy: 'created_at',
-        orderDirection: 'desc',
-      };
-
-      mockRepository.findMany.mockResolvedValue(Result.fail(new Error('Database error')));
-
-      const result = await useCase.execute(filter);
-
-      expect(result.isFailure).toBe(true);
-      expect(result.error?.message).toBe('Database error');
-    });
+    expect(result.isFailure).toBe(true);
+    expect(result.error?.message).toBe(errorMessage);
   });
 });

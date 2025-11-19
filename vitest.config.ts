@@ -30,7 +30,15 @@ export default defineConfig(({ mode }) => {
         ],
       },
       include: ['**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
-      exclude: ['node_modules', 'dist', '.next', 'out', '.storybook'],
+      exclude: [
+        'node_modules',
+        'dist',
+        '.next',
+        'out',
+        '.storybook',
+        'e2e/**', // E2E testleri Playwright ile çalışır, Vitest ile değil
+        '**/*.e2e.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
+      ],
     },
     resolve: {
       alias: {

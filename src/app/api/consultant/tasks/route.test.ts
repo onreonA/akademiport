@@ -26,11 +26,13 @@ vi.mock('@/4-infrastructure/database/repositories/SubProjectRepository', () => (
   SubProjectRepository: vi.fn(),
 }));
 
-// Mock use case with vi.fn() that returns a constructor
-const mockListConsultantTasksUseCase = vi.fn();
+// Mock use case - use class mock pattern
+const mockListConsultantTasksExecute = vi.fn();
 
 vi.mock('@/application/use-cases/task', () => ({
-  ListConsultantTasksUseCase: mockListConsultantTasksUseCase,
+  ListConsultantTasksUseCase: class {
+    execute = mockListConsultantTasksExecute;
+  },
 }));
 
 describe('GET /api/consultant/tasks', () => {
@@ -71,23 +73,16 @@ describe('GET /api/consultant/tasks', () => {
     const user = createMockUser({ role: UserRole.CONSULTANT });
     vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
 
-    const executeMock = vi.fn().mockResolvedValue({
+    mockListConsultantTasksExecute.mockResolvedValue({
       isFailure: false,
       value: {
-        tasks: [],
+        tasks: [], // Route expects 'tasks'
         total: 0,
         page: 1,
         limit: 12,
         totalPages: 0,
       },
     });
-
-    mockListConsultantTasksUseCase.mockImplementation(
-      () =>
-        ({
-          execute: executeMock,
-        }) as any
-    );
 
     const { GET } = await import('./route');
     const request = createMockRequest('http://localhost:3000/api/consultant/tasks');
@@ -102,7 +97,7 @@ describe('GET /api/consultant/tasks', () => {
     const user = createMockUser({ role: UserRole.MASTER_ADMIN });
     vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
 
-    const executeMock = vi.fn().mockResolvedValue({
+    mockListConsultantTasksExecute.mockResolvedValue({
       isFailure: false,
       value: {
         tasks: [],
@@ -112,13 +107,6 @@ describe('GET /api/consultant/tasks', () => {
         totalPages: 0,
       },
     });
-
-    mockListConsultantTasksUseCase.mockImplementation(
-      () =>
-        ({
-          execute: executeMock,
-        }) as any
-    );
 
     const { GET } = await import('./route');
     const request = createMockRequest('http://localhost:3000/api/consultant/tasks');
@@ -133,7 +121,7 @@ describe('GET /api/consultant/tasks', () => {
     const user = createMockUser({ role: UserRole.CONSULTANT });
     vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
 
-    const executeMock = vi.fn().mockResolvedValue({
+    mockListConsultantTasksExecute.mockResolvedValue({
       isFailure: false,
       value: {
         tasks: [],
@@ -143,13 +131,6 @@ describe('GET /api/consultant/tasks', () => {
         totalPages: 0,
       },
     });
-
-    mockListConsultantTasksUseCase.mockImplementation(
-      () =>
-        ({
-          execute: executeMock,
-        }) as any
-    );
 
     const { GET } = await import('./route');
     const request = createMockRequest(

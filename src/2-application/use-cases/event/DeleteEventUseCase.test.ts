@@ -5,102 +5,197 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { DeleteEventUseCase } from './DeleteEventUseCase';
 import { IEventRepository } from '@/3-domain/interfaces/repositories/IEventRepository';
+import { NotificationService } from '@/5-shared/services/notification';
 import { Event } from '@/3-domain/entities/Event';
+import type { EventStatus, EventCategory } from '@/3-domain/entities/Event';
+
+// Mock ZoomApiService
+vi.mock('@/infrastructure/external/zoom-api.service', () => ({
+  ZoomApiService: {
+    deleteMeeting: vi.fn(),
+  },
+}));
 
 describe('DeleteEventUseCase', () => {
-  let mockEventRepository: IEventRepository;
+  let mockRepository: IEventRepository;
+  let mockNotificationService: NotificationService;
   let useCase: DeleteEventUseCase;
 
   beforeEach(() => {
-    mockEventRepository = {
+    mockRepository = {
       create: vi.fn(),
       findById: vi.fn(),
       findAll: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
       findByDateRange: vi.fn(),
+      findByConsultantId: vi.fn(),
+      findByProgramId: vi.fn(),
       getAttendees: vi.fn(),
-      getStatistics: vi.fn(),
+      updateZoomMeeting: vi.fn(),
     };
 
-    useCase = new DeleteEventUseCase(mockEventRepository);
+    mockNotificationService = {
+      sendEventCancelled: vi.fn(),
+      sendEventUpdated: vi.fn(),
+      sendAppointmentCancelled: vi.fn(),
+      sendTaskApproved: vi.fn(),
+      sendTaskRejected: vi.fn(),
+      sendTaskCompleted: vi.fn(),
+    } as any;
+
+    useCase = new DeleteEventUseCase(mockRepository, mockNotificationService);
   });
 
-  it('should delete an event successfully', async () => {
-    const eventId = 'event-1';
+  const createMockEvent = (overrides?: Partial<Event>): Event => {
+    const futureDate = new Date();
+    futureDate.setMonth(futureDate.getMonth() + 2);
+    const startTime = new Date(futureDate);
+    startTime.setHours(10, 0, 0, 0);
+    const endTime = new Date(futureDate);
+    endTime.setHours(11, 0, 0, 0);
 
-    const existingEvent: Event = {
-      id: eventId,
-      title: 'Test Event',
+    return {
+      id: 'event-1',
       programId: 'program-1',
       consultantId: 'consultant-1',
-      startTime: new Date('2025-02-01T10:00:00Z'),
-      endTime: new Date('2025-02-01T12:00:00Z'),
-      timezone: 'Europe/Istanbul',
-      status: 'scheduled',
-      category: 'webinar',
-      description: null,
-      zoomMeetingId: 'zoom-123',
-      zoomJoinUrl: 'https://zoom.us/j/123',
-      zoomStartUrl: 'https://zoom.us/s/123',
-      zoomPassword: 'password123',
-      organizerName: null,
-      maxAttendees: null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    vi.mocked(mockEventRepository.findById).mockResolvedValue(existingEvent);
-    vi.mocked(mockEventRepository.delete).mockResolvedValue(undefined);
-
-    const result = await useCase.execute(eventId);
-
-    expect(result.isSuccess).toBe(true);
-    expect(mockEventRepository.delete).toHaveBeenCalledWith(eventId);
-  });
-
-  it('should fail when event not found', async () => {
-    const eventId = 'non-existent';
-
-    vi.mocked(mockEventRepository.findById).mockResolvedValue(null);
-
-    const result = await useCase.execute(eventId);
-
-    expect(result.isFailure).toBe(true);
-    expect(result.error?.message).toContain('not found');
-    expect(mockEventRepository.delete).not.toHaveBeenCalled();
-  });
-
-  it('should handle repository error', async () => {
-    const eventId = 'event-1';
-
-    const existingEvent: Event = {
-      id: eventId,
       title: 'Test Event',
-      programId: 'program-1',
-      consultantId: 'consultant-1',
-      startTime: new Date('2025-02-01T10:00:00Z'),
-      endTime: new Date('2025-02-01T12:00:00Z'),
+      description: 'Test Description',
+      startTime,
+      endTime,
       timezone: 'Europe/Istanbul',
-      status: 'scheduled',
-      category: 'webinar',
-      description: null,
+      location: null,
+      category: 'training' as EventCategory,
+      status: 'scheduled' as EventStatus,
+      maxAttendees: 50,
+      currentAttendees: 0,
       zoomMeetingId: null,
       zoomJoinUrl: null,
       zoomStartUrl: null,
       zoomPassword: null,
-      organizerName: null,
-      maxAttendees: null,
       createdAt: new Date(),
       updatedAt: new Date(),
+      ...overrides,
     };
+  };
 
-    vi.mocked(mockEventRepository.findById).mockResolvedValue(existingEvent);
-    vi.mocked(mockEventRepository.delete).mockRejectedValue(new Error('Database error'));
+  it('should delete event successfully', async () => {
+    const eventId = 'event-1';
+    const mockEvent = createMockEvent({ id: eventId });
+
+    vi.mocked(mockRepository.findById).mockResolvedValue(mockEvent);
+    vi.mocked(mockRepository.delete).mockResolvedValue(undefined);
+    vi.mocked(mockRepository.getAttendees).mockResolvedValue([]);
+
+    const result = await useCase.execute(eventId);
+
+    expect(result.isSuccess).toBe(true);
+    expect(mockRepository.findById).toHaveBeenCalledWith(eventId);
+    expect(mockRepository.delete).toHaveBeenCalledWith(eventId);
+  });
+
+  it('should delete Zoom meeting when event has zoomMeetingId', async () => {
+    const eventId = 'event-1';
+    const zoomMeetingId = 'zoom-123';
+    const mockEvent = createMockEvent({ id: eventId, zoomMeetingId });
+
+    const { ZoomApiService } = await import('@/infrastructure/external/zoom-api.service');
+    vi.mocked(ZoomApiService.deleteMeeting).mockResolvedValue(undefined);
+
+    vi.mocked(mockRepository.findById).mockResolvedValue(mockEvent);
+    vi.mocked(mockRepository.delete).mockResolvedValue(undefined);
+    vi.mocked(mockRepository.getAttendees).mockResolvedValue([]);
+
+    const result = await useCase.execute(eventId);
+
+    expect(result.isSuccess).toBe(true);
+    expect(ZoomApiService.deleteMeeting).toHaveBeenCalledWith(zoomMeetingId);
+  });
+
+  it('should continue even if Zoom deletion fails', async () => {
+    const eventId = 'event-1';
+    const zoomMeetingId = 'zoom-123';
+    const mockEvent = createMockEvent({ id: eventId, zoomMeetingId });
+
+    const { ZoomApiService } = await import('@/infrastructure/external/zoom-api.service');
+    vi.mocked(ZoomApiService.deleteMeeting).mockRejectedValue(new Error('Zoom API error'));
+
+    vi.mocked(mockRepository.findById).mockResolvedValue(mockEvent);
+    vi.mocked(mockRepository.delete).mockResolvedValue(undefined);
+    vi.mocked(mockRepository.getAttendees).mockResolvedValue([]);
+
+    const result = await useCase.execute(eventId);
+
+    expect(result.isSuccess).toBe(true);
+    expect(mockRepository.delete).toHaveBeenCalled();
+  });
+
+  it('should send notifications to attendees', async () => {
+    const eventId = 'event-1';
+    const mockEvent = createMockEvent({ id: eventId });
+    const attendees = [{ userId: 'user-1' }, { userId: 'user-2' }];
+
+    vi.mocked(mockRepository.findById).mockResolvedValue(mockEvent);
+    vi.mocked(mockRepository.delete).mockResolvedValue(undefined);
+    vi.mocked(mockRepository.getAttendees).mockResolvedValue(attendees);
+    vi.mocked(mockNotificationService.sendEventCancelled).mockResolvedValue(undefined);
+
+    const result = await useCase.execute(eventId);
+
+    expect(result.isSuccess).toBe(true);
+    expect(mockNotificationService.sendEventCancelled).toHaveBeenCalledTimes(2);
+  });
+
+  it('should continue even if notification fails', async () => {
+    const eventId = 'event-1';
+    const mockEvent = createMockEvent({ id: eventId });
+    const attendees = [{ userId: 'user-1' }];
+
+    vi.mocked(mockRepository.findById).mockResolvedValue(mockEvent);
+    vi.mocked(mockRepository.delete).mockResolvedValue(undefined);
+    vi.mocked(mockRepository.getAttendees).mockResolvedValue(attendees);
+    vi.mocked(mockNotificationService.sendEventCancelled).mockRejectedValue(
+      new Error('Notification failed')
+    );
+
+    const result = await useCase.execute(eventId);
+
+    expect(result.isSuccess).toBe(true);
+    expect(mockRepository.delete).toHaveBeenCalled();
+  });
+
+  it('should return error when event ID is empty', async () => {
+    const result = await useCase.execute('');
+
+    expect(result.isFailure).toBe(true);
+    expect(result.error?.message).toContain('Event ID is required');
+    expect(result.error?.statusCode).toBe(400);
+    expect(mockRepository.findById).not.toHaveBeenCalled();
+  });
+
+  it('should return error when event not found', async () => {
+    const eventId = 'non-existent';
+
+    vi.mocked(mockRepository.findById).mockResolvedValue(null);
 
     const result = await useCase.execute(eventId);
 
     expect(result.isFailure).toBe(true);
-    expect(result.error?.message).toContain('Database error');
+    expect(result.error?.message).toContain('Event not found');
+    expect(result.error?.statusCode).toBe(404);
+    expect(mockRepository.delete).not.toHaveBeenCalled();
+  });
+
+  it('should handle repository errors', async () => {
+    const eventId = 'event-1';
+    const errorMessage = 'Database error';
+
+    vi.mocked(mockRepository.findById).mockRejectedValue(new Error(errorMessage));
+
+    const result = await useCase.execute(eventId);
+
+    expect(result.isFailure).toBe(true);
+    expect(result.error?.message).toBe(errorMessage);
+    expect(result.error?.statusCode).toBe(500);
   });
 });

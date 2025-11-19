@@ -105,6 +105,7 @@ describe('POST /api/appointments/[id]/approve', () => {
       'http://localhost:3000/api/appointments/appointment-1/approve',
       {
         method: 'POST',
+        body: {}, // Empty body is valid (notes is optional)
       }
     );
     const response = await POST(request, {
@@ -141,6 +142,7 @@ describe('POST /api/appointments/[id]/approve', () => {
       'http://localhost:3000/api/appointments/non-existent/approve',
       {
         method: 'POST',
+        body: {}, // Empty body is valid (notes is optional)
       }
     );
     const response = await POST(request, {

@@ -14,9 +14,17 @@ vi.mock('@/4-infrastructure/database/repositories/ProjectRepository', () => ({
   ProjectRepository: vi.fn(),
 }));
 
+// Mock use cases - use class mock pattern
+const mockCreateProjectExecute = vi.fn();
+const mockListProjectsExecute = vi.fn();
+
 vi.mock('@/application/use-cases/project', () => ({
-  CreateProjectUseCase: vi.fn(),
-  ListProjectsUseCase: vi.fn(),
+  CreateProjectUseCase: class {
+    execute = mockCreateProjectExecute;
+  },
+  ListProjectsUseCase: class {
+    execute = mockListProjectsExecute;
+  },
 }));
 
 describe('GET /api/projects', () => {
@@ -43,23 +51,15 @@ describe('GET /api/projects', () => {
     const user = createMockUser({ role: UserRole.CONSULTANT });
     vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
 
-    const executeMock = vi.fn().mockResolvedValue({
+    mockListProjectsExecute.mockResolvedValue({
       isFailure: false,
       value: {
-        projects: [],
+        data: [], // Route expects 'data' not 'projects'
         total: 0,
         page: 1,
         limit: 20,
-        totalPages: 0,
       },
     });
-
-    mockListProjectsUseCase.mockImplementation(
-      () =>
-        ({
-          execute: executeMock,
-        }) as any
-    );
 
     const { GET } = await import('./route');
     const request = createMockRequest('http://localhost:3000/api/projects');
@@ -68,7 +68,9 @@ describe('GET /api/projects', () => {
     expect(response.status).toBe(200);
     const data = await response.json();
     expect(data.projects).toBeDefined();
-    expect(data.pagination).toBeDefined();
+    expect(data.total).toBeDefined();
+    expect(data.page).toBeDefined();
+    expect(data.limit).toBeDefined();
   });
 
   it('handles query parameters correctly', async () => {
@@ -77,23 +79,15 @@ describe('GET /api/projects', () => {
     const user = createMockUser({ role: UserRole.CONSULTANT });
     vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
 
-    const executeMock = vi.fn().mockResolvedValue({
+    mockListProjectsExecute.mockResolvedValue({
       isFailure: false,
       value: {
-        projects: [],
+        data: [], // Route expects 'data' not 'projects'
         total: 0,
         page: 2,
         limit: 10,
-        totalPages: 0,
       },
     });
-
-    mockListProjectsUseCase.mockImplementation(
-      () =>
-        ({
-          execute: executeMock,
-        }) as any
-    );
 
     const { GET } = await import('./route');
     const request = createMockRequest(
@@ -103,8 +97,8 @@ describe('GET /api/projects', () => {
     const data = await response.json();
 
     expect(response.status).toBe(200);
-    expect(data.pagination.page).toBe(2);
-    expect(data.pagination.limit).toBe(10);
+    expect(data.page).toBe(2);
+    expect(data.limit).toBe(10);
   });
 });
 
@@ -169,17 +163,10 @@ describe('POST /api/projects', () => {
       status: 'planning' as const,
     };
 
-    const executeMock = vi.fn().mockResolvedValue({
+    mockCreateProjectExecute.mockResolvedValue({
       isFailure: false,
       value: mockProject,
     });
-
-    mockCreateProjectUseCase.mockImplementation(
-      () =>
-        ({
-          execute: executeMock,
-        }) as any
-    );
 
     const { POST } = await import('./route');
     const request = createMockRequest('http://localhost:3000/api/projects', {
@@ -204,6 +191,12 @@ describe('POST /api/projects', () => {
       role: UserRole.CONSULTANT,
     });
     vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
+
+    // Mock use case to return validation error
+    mockCreateProjectExecute.mockResolvedValue({
+      isFailure: true,
+      error: { message: 'Proje adı gereklidir', statusCode: 400 },
+    });
 
     const { POST } = await import('./route');
     const request = createMockRequest('http://localhost:3000/api/projects', {

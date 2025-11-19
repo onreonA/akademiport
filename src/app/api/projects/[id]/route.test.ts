@@ -14,15 +14,21 @@ vi.mock('@/4-infrastructure/database/repositories/ProjectRepository', () => ({
   ProjectRepository: vi.fn(),
 }));
 
-// Mock use cases with vi.fn() that returns a constructor
-const mockGetProjectUseCase = vi.fn();
-const mockUpdateProjectUseCase = vi.fn();
-const mockDeleteProjectUseCase = vi.fn();
+// Mock use cases - use class mock pattern
+const mockGetProjectExecute = vi.fn();
+const mockUpdateProjectExecute = vi.fn();
+const mockDeleteProjectExecute = vi.fn();
 
 vi.mock('@/application/use-cases/project', () => ({
-  GetProjectUseCase: mockGetProjectUseCase,
-  UpdateProjectUseCase: mockUpdateProjectUseCase,
-  DeleteProjectUseCase: mockDeleteProjectUseCase,
+  GetProjectUseCase: class {
+    execute = mockGetProjectExecute;
+  },
+  UpdateProjectUseCase: class {
+    execute = mockUpdateProjectExecute;
+  },
+  DeleteProjectUseCase: class {
+    execute = mockDeleteProjectExecute;
+  },
 }));
 
 describe('GET /api/projects/[id]', () => {
@@ -57,16 +63,10 @@ describe('GET /api/projects/[id]', () => {
       name: 'Test Project',
     };
 
-    // Mock GetProjectUseCase constructor to return an instance with mocked execute
-    mockGetProjectUseCase.mockImplementation(
-      () =>
-        ({
-          execute: vi.fn().mockResolvedValue({
-            isFailure: false,
-            value: mockProject,
-          }),
-        }) as any
-    );
+    mockGetProjectExecute.mockResolvedValue({
+      isFailure: false,
+      value: mockProject,
+    });
 
     const { GET } = await import('./route');
     const request = createMockRequest('http://localhost:3000/api/projects/project-1');
@@ -77,6 +77,7 @@ describe('GET /api/projects/[id]', () => {
 
     expect(response.status).toBe(200);
     expect(data.id).toBe('project-1');
+    expect(data.name).toBe('Test Project');
   });
 
   it('returns 404 when project not found', async () => {
@@ -85,15 +86,10 @@ describe('GET /api/projects/[id]', () => {
     const user = createMockUser({ role: UserRole.CONSULTANT });
     vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
 
-    mockGetProjectUseCase.mockImplementation(
-      () =>
-        ({
-          execute: vi.fn().mockResolvedValue({
-            isFailure: true,
-            error: { message: 'Project not found', statusCode: 404 },
-          }),
-        }) as any
-    );
+    mockGetProjectExecute.mockResolvedValue({
+      isFailure: true,
+      error: { message: 'Project not found', statusCode: 404 },
+    });
 
     const { GET } = await import('./route');
     const request = createMockRequest('http://localhost:3000/api/projects/non-existent');
@@ -138,31 +134,16 @@ describe('PUT /api/projects/[id]', () => {
       consultantId: 'consultant-1',
     };
 
-    // Create shared execute mocks
-    const getProjectExecuteMock = vi.fn().mockResolvedValue({
-      isFailure: false,
-      value: updatedProject,
-    });
-
-    const updateProjectExecuteMock = vi.fn().mockResolvedValue({
-      isFailure: false,
-      value: updatedProject,
-    });
-
     // Mock GetProjectUseCase for permission check
-    mockGetProjectUseCase.mockImplementation(
-      () =>
-        ({
-          execute: getProjectExecuteMock,
-        }) as any
-    );
+    mockGetProjectExecute.mockResolvedValue({
+      isFailure: false,
+      value: updatedProject,
+    });
 
-    mockUpdateProjectUseCase.mockImplementation(
-      () =>
-        ({
-          execute: updateProjectExecuteMock,
-        }) as any
-    );
+    mockUpdateProjectExecute.mockResolvedValue({
+      isFailure: false,
+      value: updatedProject,
+    });
 
     const { PUT } = await import('./route');
     const request = createMockRequest('http://localhost:3000/api/projects/project-1', {
@@ -211,32 +192,16 @@ describe('DELETE /api/projects/[id]', () => {
       name: 'Test Project',
     };
 
-    // Create a shared execute mock for GetProjectUseCase
-    const getProjectExecuteMock = vi.fn().mockResolvedValue({
+    // Mock GetProjectUseCase for permission check
+    mockGetProjectExecute.mockResolvedValue({
       isFailure: false,
       value: mockProject,
     });
 
-    // Mock GetProjectUseCase to return the same instance with shared execute mock
-    mockGetProjectUseCase.mockImplementation(
-      () =>
-        ({
-          execute: getProjectExecuteMock,
-        }) as any
-    );
-
-    // Create a shared execute mock for DeleteProjectUseCase
-    const deleteProjectExecuteMock = vi.fn().mockResolvedValue({
+    mockDeleteProjectExecute.mockResolvedValue({
       isFailure: false,
       value: undefined,
     });
-
-    mockDeleteProjectUseCase.mockImplementation(
-      () =>
-        ({
-          execute: deleteProjectExecuteMock,
-        }) as any
-    );
 
     const { DELETE } = await import('./route');
     const request = createMockRequest('http://localhost:3000/api/projects/project-1', {

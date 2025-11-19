@@ -5,7 +5,10 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { ApproveAppointmentUseCase } from './ApproveAppointmentUseCase';
 import { IAppointmentRepository } from '@/3-domain/interfaces/repositories/IAppointmentRepository';
+import { NotificationService } from '@/5-shared/services/notification';
+import { IUserRepository } from '@/3-domain/interfaces/IUserRepository';
 import { Appointment } from '@/3-domain/entities/Appointment';
+import type { AppointmentStatus } from '@/3-domain/enums';
 
 // Mock ZoomApiService
 vi.mock('@/infrastructure/external/zoom-api.service', () => ({
@@ -15,11 +18,13 @@ vi.mock('@/infrastructure/external/zoom-api.service', () => ({
 }));
 
 describe('ApproveAppointmentUseCase', () => {
-  let mockAppointmentRepository: IAppointmentRepository;
+  let mockRepository: IAppointmentRepository;
+  let mockNotificationService: NotificationService;
+  let mockUserRepository: IUserRepository;
   let useCase: ApproveAppointmentUseCase;
 
   beforeEach(() => {
-    mockAppointmentRepository = {
+    mockRepository = {
       create: vi.fn(),
       findById: vi.fn(),
       findAll: vi.fn(),
@@ -35,14 +40,34 @@ describe('ApproveAppointmentUseCase', () => {
       updateZoomMeeting: vi.fn(),
     };
 
-    useCase = new ApproveAppointmentUseCase(mockAppointmentRepository);
+    mockNotificationService = {
+      sendAppointmentConfirmed: vi.fn(),
+      sendAppointmentCancelled: vi.fn(),
+      sendAppointmentRescheduled: vi.fn(),
+      sendEventCancelled: vi.fn(),
+      sendEventUpdated: vi.fn(),
+      sendTaskApproved: vi.fn(),
+      sendTaskRejected: vi.fn(),
+      sendTaskCompleted: vi.fn(),
+    } as any;
+
+    mockUserRepository = {
+      findById: vi.fn(),
+      findByEmail: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
+      findAll: vi.fn(),
+    } as any;
+
+    useCase = new ApproveAppointmentUseCase(
+      mockRepository,
+      mockNotificationService,
+      mockUserRepository
+    );
   });
 
-  it('should approve an appointment successfully', async () => {
-    const appointmentId = 'appointment-1';
-    const consultantId = 'consultant-1';
-
-    // Use future dates to avoid validation errors
+  const createMockAppointment = (overrides?: Partial<Appointment>): Appointment => {
     const futureDate = new Date();
     futureDate.setMonth(futureDate.getMonth() + 2);
     const startTime = new Date(futureDate);
@@ -50,202 +75,238 @@ describe('ApproveAppointmentUseCase', () => {
     const endTime = new Date(futureDate);
     endTime.setHours(11, 0, 0, 0);
 
-    const existingAppointment: Appointment = {
-      id: appointmentId,
-      title: 'Test Appointment',
-      consultantId,
+    return {
+      id: 'appointment-1',
+      consultantId: 'consultant-1',
       companyId: 'company-1',
       programId: 'program-1',
-      startTime: startTime,
-      endTime: endTime,
-      status: 'pending',
-      requestedBy: 'company-user-1',
-      notes: null,
+      title: 'Test Appointment',
+      description: 'Test Description',
+      startTime,
+      endTime,
+      timezone: 'Europe/Istanbul',
+      status: 'pending' as AppointmentStatus,
+      requestedBy: 'user-1',
+      requestedAt: new Date(),
+      approvedAt: null,
+      approvedBy: null,
+      rejectedAt: null,
+      rejectedBy: null,
+      rejectionReason: null,
+      rescheduledFrom: null,
+      rescheduledAt: null,
+      rescheduledBy: null,
       zoomMeetingId: null,
       zoomJoinUrl: null,
+      zoomStartUrl: null,
       zoomPassword: null,
-      timezone: 'Europe/Istanbul',
+      notes: null,
+      companyNotes: null,
+      attendedAt: null,
       createdAt: new Date(),
       updatedAt: new Date(),
+      deletedAt: null,
+      ...overrides,
     };
+  };
 
-    const approvedAppointment: Appointment = {
-      ...existingAppointment,
+  it('should approve appointment successfully', async () => {
+    const appointmentId = 'appointment-1';
+    const approvedBy = 'consultant-1';
+    const mockAppointment = createMockAppointment({ id: appointmentId, status: 'pending' });
+    const approvedAppointment = createMockAppointment({
+      id: appointmentId,
       status: 'approved',
-      zoomMeetingId: 'zoom-123',
-      zoomJoinUrl: 'https://zoom.us/j/123',
-      zoomPassword: 'password123',
-    };
+      approvedBy,
+      approvedAt: new Date(),
+    });
 
-    vi.mocked(mockAppointmentRepository.findById).mockResolvedValue(existingAppointment);
-    vi.mocked(mockAppointmentRepository.approve).mockResolvedValue(approvedAppointment);
+    vi.mocked(mockRepository.findById).mockResolvedValue(mockAppointment);
+    vi.mocked(mockRepository.approve).mockResolvedValue(approvedAppointment);
+    vi.mocked(mockUserRepository.findById).mockResolvedValue({
+      isSuccess: true,
+      value: { id: 'consultant-1', fullName: 'Test Consultant' },
+    } as any);
 
-    // Mock ZoomApiService
     const { ZoomApiService } = await import('@/infrastructure/external/zoom-api.service');
-    vi.mocked(ZoomApiService.createMeeting).mockResolvedValue({
+    vi.mocked(ZoomApiService.createMeeting).mockResolvedValue(null); // No Zoom meeting
+
+    const result = await useCase.execute(appointmentId, approvedBy);
+
+    expect(result.isSuccess).toBe(true);
+    expect(result.value?.id).toBe(appointmentId);
+    expect(mockRepository.findById).toHaveBeenCalledWith(appointmentId);
+    expect(mockRepository.approve).toHaveBeenCalledWith(appointmentId, approvedBy, undefined);
+  });
+
+  it('should create Zoom meeting when approving', async () => {
+    const appointmentId = 'appointment-1';
+    const approvedBy = 'consultant-1';
+    const mockAppointment = createMockAppointment({ id: appointmentId, status: 'pending' });
+    const approvedAppointment = createMockAppointment({
+      id: appointmentId,
+      status: 'approved',
+      approvedBy,
+      approvedAt: new Date(),
+    });
+    const zoomMeeting = {
       id: 'zoom-123',
       joinUrl: 'https://zoom.us/j/123',
       startUrl: 'https://zoom.us/s/123',
-      password: 'password123',
-    });
+      password: 'pass123',
+    };
 
-    // Mock updateZoomMeeting
-    mockAppointmentRepository.updateZoomMeeting = vi.fn().mockResolvedValue(undefined);
+    vi.mocked(mockRepository.findById).mockResolvedValue(mockAppointment);
+    vi.mocked(mockRepository.approve).mockResolvedValue(approvedAppointment);
+    vi.mocked(mockUserRepository.findById).mockResolvedValue({
+      isSuccess: true,
+      value: { id: 'consultant-1', fullName: 'Test Consultant' },
+    } as any);
 
-    const result = await useCase.execute(appointmentId, consultantId);
+    const { ZoomApiService } = await import('@/infrastructure/external/zoom-api.service');
+    vi.mocked(ZoomApiService.createMeeting).mockResolvedValue(zoomMeeting);
+    vi.mocked(mockRepository.updateZoomMeeting).mockResolvedValue(approvedAppointment);
+
+    const result = await useCase.execute(appointmentId, approvedBy);
 
     expect(result.isSuccess).toBe(true);
-    expect(result.value).toBeDefined();
-    expect(result.value?.zoomMeetingId).toBeDefined();
-    expect(mockAppointmentRepository.approve).toHaveBeenCalled();
+    expect(result.value?.zoomMeetingId).toBe('zoom-123');
+    expect(ZoomApiService.createMeeting).toHaveBeenCalled();
+    expect(mockRepository.updateZoomMeeting).toHaveBeenCalledWith(
+      appointmentId,
+      zoomMeeting.id,
+      zoomMeeting.joinUrl,
+      zoomMeeting.startUrl,
+      zoomMeeting.password
+    );
   });
 
-  it('should fail when appointment not found', async () => {
+  it('should continue even if Zoom meeting creation fails', async () => {
+    const appointmentId = 'appointment-1';
+    const approvedBy = 'consultant-1';
+    const mockAppointment = createMockAppointment({ id: appointmentId, status: 'pending' });
+    const approvedAppointment = createMockAppointment({
+      id: appointmentId,
+      status: 'approved',
+      approvedBy,
+      approvedAt: new Date(),
+    });
+
+    vi.mocked(mockRepository.findById).mockResolvedValue(mockAppointment);
+    vi.mocked(mockRepository.approve).mockResolvedValue(approvedAppointment);
+    vi.mocked(mockUserRepository.findById).mockResolvedValue({
+      isSuccess: true,
+      value: { id: 'consultant-1', fullName: 'Test Consultant' },
+    } as any);
+
+    const { ZoomApiService } = await import('@/infrastructure/external/zoom-api.service');
+    vi.mocked(ZoomApiService.createMeeting).mockRejectedValue(new Error('Zoom API error'));
+
+    const result = await useCase.execute(appointmentId, approvedBy);
+
+    expect(result.isSuccess).toBe(true);
+    expect(mockRepository.approve).toHaveBeenCalled();
+  });
+
+  it('should send notification when approving', async () => {
+    const appointmentId = 'appointment-1';
+    const approvedBy = 'consultant-1';
+    const mockAppointment = createMockAppointment({ id: appointmentId, status: 'pending' });
+    const approvedAppointment = createMockAppointment({
+      id: appointmentId,
+      status: 'approved',
+      approvedBy,
+      approvedAt: new Date(),
+    });
+
+    vi.mocked(mockRepository.findById).mockResolvedValue(mockAppointment);
+    vi.mocked(mockRepository.approve).mockResolvedValue(approvedAppointment);
+    vi.mocked(mockUserRepository.findById).mockResolvedValue({
+      isSuccess: true,
+      value: { id: 'consultant-1', fullName: 'Test Consultant' },
+    } as any);
+
+    const { ZoomApiService } = await import('@/infrastructure/external/zoom-api.service');
+    vi.mocked(ZoomApiService.createMeeting).mockResolvedValue(null);
+
+    const result = await useCase.execute(appointmentId, approvedBy);
+
+    expect(result.isSuccess).toBe(true);
+    expect(mockNotificationService.sendAppointmentConfirmed).toHaveBeenCalled();
+  });
+
+  it('should return error when appointment ID is empty', async () => {
+    const result = await useCase.execute('', 'consultant-1');
+
+    expect(result.isFailure).toBe(true);
+    expect(result.error?.message).toContain('Appointment ID is required');
+    expect(result.error?.statusCode).toBe(400);
+  });
+
+  it('should return error when approvedBy is empty', async () => {
+    const result = await useCase.execute('appointment-1', '');
+
+    expect(result.isFailure).toBe(true);
+    expect(result.error?.message).toContain('Approver ID is required');
+    expect(result.error?.statusCode).toBe(400);
+  });
+
+  it('should return error when appointment not found', async () => {
     const appointmentId = 'non-existent';
-    const consultantId = 'consultant-1';
+    const approvedBy = 'consultant-1';
 
-    vi.mocked(mockAppointmentRepository.findById).mockResolvedValue(null);
+    vi.mocked(mockRepository.findById).mockResolvedValue(null);
 
-    const result = await useCase.execute(appointmentId, consultantId);
+    const result = await useCase.execute(appointmentId, approvedBy);
 
     expect(result.isFailure).toBe(true);
-    expect(result.error?.message).toContain('not found');
-    expect(mockAppointmentRepository.update).not.toHaveBeenCalled();
+    expect(result.error?.message).toContain('Appointment not found');
+    expect(result.error?.statusCode).toBe(404);
+    expect(mockRepository.approve).not.toHaveBeenCalled();
   });
 
-  it('should fail when consultant does not own the appointment', async () => {
+  it('should return error when appointment is not pending', async () => {
     const appointmentId = 'appointment-1';
-    const consultantId = 'consultant-1';
+    const approvedBy = 'consultant-1';
+    const mockAppointment = createMockAppointment({ id: appointmentId, status: 'approved' });
 
-    // Use future dates to avoid validation errors
-    const futureDate = new Date();
-    futureDate.setMonth(futureDate.getMonth() + 2);
-    const startTime = new Date(futureDate);
-    startTime.setHours(10, 0, 0, 0);
-    const endTime = new Date(futureDate);
-    endTime.setHours(11, 0, 0, 0);
+    vi.mocked(mockRepository.findById).mockResolvedValue(mockAppointment);
 
-    const existingAppointment: Appointment = {
+    const result = await useCase.execute(appointmentId, approvedBy);
+
+    expect(result.isFailure).toBe(true);
+    expect(result.error?.message).toContain('Appointment cannot be approved');
+    expect(result.error?.statusCode).toBe(400);
+    expect(mockRepository.approve).not.toHaveBeenCalled();
+  });
+
+  it('should continue even if notification fails', async () => {
+    const appointmentId = 'appointment-1';
+    const approvedBy = 'consultant-1';
+    const mockAppointment = createMockAppointment({ id: appointmentId, status: 'pending' });
+    const approvedAppointment = createMockAppointment({
       id: appointmentId,
-      title: 'Test Appointment',
-      consultantId: 'consultant-2', // Different consultant
-      companyId: 'company-1',
-      programId: 'program-1',
-      startTime: startTime,
-      endTime: endTime,
-      status: 'pending',
-      requestedBy: 'company-user-1',
-      notes: null,
-      zoomMeetingId: null,
-      zoomJoinUrl: null,
-      zoomPassword: null,
-      timezone: 'Europe/Istanbul',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    const approvedAppointment: Appointment = {
-      ...existingAppointment,
       status: 'approved',
-    };
-
-    vi.mocked(mockAppointmentRepository.findById).mockResolvedValue(existingAppointment);
-    vi.mocked(mockAppointmentRepository.approve).mockResolvedValue(approvedAppointment);
-
-    // Mock ZoomApiService
-    const { ZoomApiService } = await import('@/infrastructure/external/zoom-api.service');
-    vi.mocked(ZoomApiService.createMeeting).mockResolvedValue({
-      id: 'zoom-123',
-      joinUrl: 'https://zoom.us/j/123',
-      startUrl: 'https://zoom.us/s/123',
-      password: 'password123',
+      approvedBy,
+      approvedAt: new Date(),
     });
 
-    // Note: Use case doesn't check consultant ownership, it just approves
-    // This test should verify that appointment is approved regardless of consultant
-    const result = await useCase.execute(appointmentId, consultantId);
+    vi.mocked(mockRepository.findById).mockResolvedValue(mockAppointment);
+    vi.mocked(mockRepository.approve).mockResolvedValue(approvedAppointment);
+    vi.mocked(mockUserRepository.findById).mockResolvedValue({
+      isSuccess: true,
+      value: { id: 'consultant-1', fullName: 'Test Consultant' },
+    } as any);
+    vi.mocked(mockNotificationService.sendAppointmentConfirmed).mockRejectedValue(
+      new Error('Notification failed')
+    );
+
+    const { ZoomApiService } = await import('@/infrastructure/external/zoom-api.service');
+    vi.mocked(ZoomApiService.createMeeting).mockResolvedValue(null);
+
+    const result = await useCase.execute(appointmentId, approvedBy);
 
     expect(result.isSuccess).toBe(true);
-    expect(mockAppointmentRepository.approve).toHaveBeenCalled();
-  });
-
-  it('should fail when appointment is already approved', async () => {
-    const appointmentId = 'appointment-1';
-    const consultantId = 'consultant-1';
-
-    // Use future dates to avoid validation errors
-    const futureDate = new Date();
-    futureDate.setMonth(futureDate.getMonth() + 2);
-    const startTime = new Date(futureDate);
-    startTime.setHours(10, 0, 0, 0);
-    const endTime = new Date(futureDate);
-    endTime.setHours(11, 0, 0, 0);
-
-    const existingAppointment: Appointment = {
-      id: appointmentId,
-      title: 'Test Appointment',
-      consultantId,
-      companyId: 'company-1',
-      programId: 'program-1',
-      startTime: startTime,
-      endTime: endTime,
-      status: 'approved', // Already approved
-      requestedBy: 'company-user-1',
-      notes: null,
-      zoomMeetingId: 'zoom-123',
-      zoomJoinUrl: 'https://zoom.us/j/123',
-      zoomPassword: 'password123',
-      timezone: 'Europe/Istanbul',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    vi.mocked(mockAppointmentRepository.findById).mockResolvedValue(existingAppointment);
-
-    const result = await useCase.execute(appointmentId, consultantId);
-
-    expect(result.isFailure).toBe(true);
-    expect(result.error?.message).toContain('cannot be approved');
-    expect(mockAppointmentRepository.approve).not.toHaveBeenCalled();
-  });
-
-  it('should handle repository error', async () => {
-    const appointmentId = 'appointment-1';
-    const consultantId = 'consultant-1';
-
-    // Use future dates to avoid validation errors
-    const futureDate = new Date();
-    futureDate.setMonth(futureDate.getMonth() + 2);
-    const startTime = new Date(futureDate);
-    startTime.setHours(10, 0, 0, 0);
-    const endTime = new Date(futureDate);
-    endTime.setHours(11, 0, 0, 0);
-
-    const existingAppointment: Appointment = {
-      id: appointmentId,
-      title: 'Test Appointment',
-      consultantId,
-      companyId: 'company-1',
-      programId: 'program-1',
-      startTime: startTime,
-      endTime: endTime,
-      status: 'pending',
-      requestedBy: 'company-user-1',
-      notes: null,
-      zoomMeetingId: null,
-      zoomJoinUrl: null,
-      zoomPassword: null,
-      timezone: 'Europe/Istanbul',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    vi.mocked(mockAppointmentRepository.findById).mockResolvedValue(existingAppointment);
-    vi.mocked(mockAppointmentRepository.approve).mockRejectedValue(new Error('Database error'));
-
-    const result = await useCase.execute(appointmentId, consultantId);
-
-    expect(result.isFailure).toBe(true);
-    expect(result.error?.message).toContain('Database error');
+    expect(mockRepository.approve).toHaveBeenCalled();
   });
 });

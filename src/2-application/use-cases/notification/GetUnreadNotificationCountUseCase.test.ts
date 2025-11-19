@@ -1,59 +1,79 @@
 /**
- * Get Unread Notification Count Use Case Tests
- *
- * Unit tests for GetUnreadNotificationCountUseCase
+ * Unit Tests for GetUnreadNotificationCountUseCase
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { GetUnreadNotificationCountUseCase } from './GetUnreadNotificationCountUseCase';
+import { INotificationRepository } from '@/3-domain/interfaces/repositories/INotificationRepository';
 import { Result } from '@/6-core/result';
 
 describe('GetUnreadNotificationCountUseCase', () => {
+  let mockRepository: INotificationRepository;
   let useCase: GetUnreadNotificationCountUseCase;
-  let mockRepository: any;
 
   beforeEach(() => {
     mockRepository = {
+      create: vi.fn(),
+      findById: vi.fn(),
+      findMany: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
+      markAsRead: vi.fn(),
+      markAllAsRead: vi.fn(),
       getUnreadCount: vi.fn(),
     };
 
     useCase = new GetUnreadNotificationCountUseCase(mockRepository);
   });
 
-  describe('execute', () => {
-    it('should get unread count successfully', async () => {
-      const userId = 'user-123';
-      const mockCount = 5;
+  it('should get unread notification count successfully', async () => {
+    const userId = 'user-1';
+    const count = 5;
 
-      mockRepository.getUnreadCount.mockResolvedValue(Result.ok(mockCount));
+    vi.mocked(mockRepository.getUnreadCount).mockResolvedValue(Result.ok(count));
 
-      const result = await useCase.execute(userId);
+    const result = await useCase.execute(userId);
 
-      expect(result.isSuccess).toBe(true);
-      expect(result.value).toBe(mockCount);
-      expect(mockRepository.getUnreadCount).toHaveBeenCalledWith(userId);
-    });
+    expect(result.isSuccess).toBe(true);
+    expect(result.value).toBe(count);
+    expect(mockRepository.getUnreadCount).toHaveBeenCalledWith(userId);
+  });
 
-    it('should return zero if no unread notifications', async () => {
-      const userId = 'user-123';
+  it('should return zero when no unread notifications', async () => {
+    const userId = 'user-1';
+    const count = 0;
 
-      mockRepository.getUnreadCount.mockResolvedValue(Result.ok(0));
+    vi.mocked(mockRepository.getUnreadCount).mockResolvedValue(Result.ok(count));
 
-      const result = await useCase.execute(userId);
+    const result = await useCase.execute(userId);
 
-      expect(result.isSuccess).toBe(true);
-      expect(result.value).toBe(0);
-    });
+    expect(result.isSuccess).toBe(true);
+    expect(result.value).toBe(0);
+  });
 
-    it('should handle repository errors', async () => {
-      const userId = 'user-123';
+  it('should handle repository errors', async () => {
+    const userId = 'user-1';
+    const errorMessage = 'Database error';
 
-      mockRepository.getUnreadCount.mockResolvedValue(Result.fail(new Error('Database error')));
+    vi.mocked(mockRepository.getUnreadCount).mockResolvedValue(
+      Result.fail(new Error(errorMessage))
+    );
 
-      const result = await useCase.execute(userId);
+    const result = await useCase.execute(userId);
 
-      expect(result.isFailure).toBe(true);
-      expect(result.error?.message).toBe('Database error');
-    });
+    expect(result.isFailure).toBe(true);
+    expect(result.error?.message).toBe(errorMessage);
+  });
+
+  it('should handle exceptions', async () => {
+    const userId = 'user-1';
+    const errorMessage = 'Unexpected error';
+
+    vi.mocked(mockRepository.getUnreadCount).mockRejectedValue(new Error(errorMessage));
+
+    const result = await useCase.execute(userId);
+
+    expect(result.isFailure).toBe(true);
+    expect(result.error?.message).toBe(errorMessage);
   });
 });

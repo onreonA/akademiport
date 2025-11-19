@@ -5,14 +5,19 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { RejectAppointmentUseCase } from './RejectAppointmentUseCase';
 import { IAppointmentRepository } from '@/3-domain/interfaces/repositories/IAppointmentRepository';
+import { NotificationService } from '@/5-shared/services/notification';
+import { IUserRepository } from '@/3-domain/interfaces/IUserRepository';
 import { Appointment } from '@/3-domain/entities/Appointment';
+import type { AppointmentStatus } from '@/3-domain/enums';
 
 describe('RejectAppointmentUseCase', () => {
-  let mockAppointmentRepository: IAppointmentRepository;
+  let mockRepository: IAppointmentRepository;
+  let mockNotificationService: NotificationService;
+  let mockUserRepository: IUserRepository;
   let useCase: RejectAppointmentUseCase;
 
   beforeEach(() => {
-    mockAppointmentRepository = {
+    mockRepository = {
       create: vi.fn(),
       findById: vi.fn(),
       findAll: vi.fn(),
@@ -25,17 +30,37 @@ describe('RejectAppointmentUseCase', () => {
       approve: vi.fn(),
       reject: vi.fn(),
       reschedule: vi.fn(),
+      updateZoomMeeting: vi.fn(),
     };
 
-    useCase = new RejectAppointmentUseCase(mockAppointmentRepository);
+    mockNotificationService = {
+      sendAppointmentConfirmed: vi.fn(),
+      sendAppointmentCancelled: vi.fn(),
+      sendAppointmentRescheduled: vi.fn(),
+      sendEventCancelled: vi.fn(),
+      sendEventUpdated: vi.fn(),
+      sendTaskApproved: vi.fn(),
+      sendTaskRejected: vi.fn(),
+      sendTaskCompleted: vi.fn(),
+    } as any;
+
+    mockUserRepository = {
+      findById: vi.fn(),
+      findByEmail: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
+      findAll: vi.fn(),
+    } as any;
+
+    useCase = new RejectAppointmentUseCase(
+      mockRepository,
+      mockNotificationService,
+      mockUserRepository
+    );
   });
 
-  it('should reject an appointment successfully', async () => {
-    const appointmentId = 'appointment-1';
-    const consultantId = 'consultant-1';
-    const reason = 'Not available at this time';
-
-    // Use future dates to avoid validation errors
+  const createMockAppointment = (overrides?: Partial<Appointment>): Appointment => {
     const futureDate = new Date();
     futureDate.setMonth(futureDate.getMonth() + 2);
     const startTime = new Date(futureDate);
@@ -43,138 +68,208 @@ describe('RejectAppointmentUseCase', () => {
     const endTime = new Date(futureDate);
     endTime.setHours(11, 0, 0, 0);
 
-    const existingAppointment: Appointment = {
-      id: appointmentId,
-      title: 'Test Appointment',
-      consultantId,
+    return {
+      id: 'appointment-1',
+      consultantId: 'consultant-1',
       companyId: 'company-1',
       programId: 'program-1',
-      startTime: startTime,
-      endTime: endTime,
-      status: 'pending',
-      requestedBy: 'company-user-1',
-      notes: null,
+      title: 'Test Appointment',
+      description: 'Test Description',
+      startTime,
+      endTime,
+      timezone: 'Europe/Istanbul',
+      status: 'pending' as AppointmentStatus,
+      requestedBy: 'user-1',
+      requestedAt: new Date(),
+      approvedAt: null,
+      approvedBy: null,
+      rejectedAt: null,
+      rejectedBy: null,
+      rejectionReason: null,
+      rescheduledFrom: null,
+      rescheduledAt: null,
+      rescheduledBy: null,
       zoomMeetingId: null,
       zoomJoinUrl: null,
+      zoomStartUrl: null,
       zoomPassword: null,
-      timezone: 'Europe/Istanbul',
+      notes: null,
+      companyNotes: null,
+      attendedAt: null,
       createdAt: new Date(),
       updatedAt: new Date(),
+      deletedAt: null,
+      ...overrides,
     };
+  };
 
-    const rejectedAppointment: Appointment = {
-      ...existingAppointment,
+  it('should reject appointment successfully', async () => {
+    const appointmentId = 'appointment-1';
+    const rejectedBy = 'consultant-1';
+    const reason = 'Not available';
+    const mockAppointment = createMockAppointment({ id: appointmentId, status: 'pending' });
+    const rejectedAppointment = createMockAppointment({
+      id: appointmentId,
       status: 'rejected',
-      notes: reason,
-    };
+      rejectedBy,
+      rejectedAt: new Date(),
+      rejectionReason: reason,
+    });
 
-    vi.mocked(mockAppointmentRepository.findById).mockResolvedValue(existingAppointment);
-    vi.mocked(mockAppointmentRepository.reject).mockResolvedValue(rejectedAppointment);
+    vi.mocked(mockRepository.findById).mockResolvedValue(mockAppointment);
+    vi.mocked(mockRepository.reject).mockResolvedValue(rejectedAppointment);
+    vi.mocked(mockUserRepository.findById).mockResolvedValue({
+      isSuccess: true,
+      value: { id: 'consultant-1', fullName: 'Test Consultant' },
+    } as any);
 
-    const result = await useCase.execute(appointmentId, consultantId, reason);
+    const result = await useCase.execute(appointmentId, rejectedBy, reason);
 
     expect(result.isSuccess).toBe(true);
-    expect(result.value).toBeDefined();
-    expect(mockAppointmentRepository.reject).toHaveBeenCalled();
+    expect(result.value?.id).toBe(appointmentId);
+    expect(mockRepository.findById).toHaveBeenCalledWith(appointmentId);
+    expect(mockRepository.reject).toHaveBeenCalledWith(appointmentId, rejectedBy, reason);
   });
 
-  it('should fail when appointment not found', async () => {
+  it('should send notification to company user when consultant rejects', async () => {
+    const appointmentId = 'appointment-1';
+    const rejectedBy = 'consultant-1';
+    const mockAppointment = createMockAppointment({
+      id: appointmentId,
+      status: 'pending',
+      consultantId: 'consultant-1',
+      requestedBy: 'user-1',
+    });
+    const rejectedAppointment = createMockAppointment({
+      id: appointmentId,
+      status: 'rejected',
+      rejectedBy,
+      rejectedAt: new Date(),
+    });
+
+    vi.mocked(mockRepository.findById).mockResolvedValue(mockAppointment);
+    vi.mocked(mockRepository.reject).mockResolvedValue(rejectedAppointment);
+    vi.mocked(mockUserRepository.findById).mockResolvedValue({
+      isSuccess: true,
+      value: { id: 'consultant-1', fullName: 'Test Consultant' },
+    } as any);
+
+    const result = await useCase.execute(appointmentId, rejectedBy);
+
+    expect(result.isSuccess).toBe(true);
+    expect(mockNotificationService.sendAppointmentCancelled).toHaveBeenCalledWith(
+      'user-1',
+      appointmentId,
+      'Test Consultant',
+      expect.any(Date),
+      'consultant'
+    );
+  });
+
+  it('should send notification to consultant when company rejects', async () => {
+    const appointmentId = 'appointment-1';
+    const rejectedBy = 'user-1';
+    const mockAppointment = createMockAppointment({
+      id: appointmentId,
+      status: 'pending',
+      consultantId: 'consultant-1',
+      requestedBy: 'user-1',
+    });
+    const rejectedAppointment = createMockAppointment({
+      id: appointmentId,
+      status: 'rejected',
+      rejectedBy,
+      rejectedAt: new Date(),
+    });
+
+    vi.mocked(mockRepository.findById).mockResolvedValue(mockAppointment);
+    vi.mocked(mockRepository.reject).mockResolvedValue(rejectedAppointment);
+    vi.mocked(mockUserRepository.findById).mockResolvedValue({
+      isSuccess: true,
+      value: { id: 'consultant-1', fullName: 'Test Consultant' },
+    } as any);
+
+    const result = await useCase.execute(appointmentId, rejectedBy);
+
+    expect(result.isSuccess).toBe(true);
+    expect(mockNotificationService.sendAppointmentCancelled).toHaveBeenCalledWith(
+      'consultant-1',
+      appointmentId,
+      'Test Consultant',
+      expect.any(Date),
+      'company'
+    );
+  });
+
+  it('should return error when appointment ID is empty', async () => {
+    const result = await useCase.execute('', 'consultant-1');
+
+    expect(result.isFailure).toBe(true);
+    expect(result.error?.message).toContain('Appointment ID is required');
+    expect(result.error?.statusCode).toBe(400);
+  });
+
+  it('should return error when rejectedBy is empty', async () => {
+    const result = await useCase.execute('appointment-1', '');
+
+    expect(result.isFailure).toBe(true);
+    expect(result.error?.message).toContain('Rejector ID is required');
+    expect(result.error?.statusCode).toBe(400);
+  });
+
+  it('should return error when appointment not found', async () => {
     const appointmentId = 'non-existent';
-    const consultantId = 'consultant-1';
+    const rejectedBy = 'consultant-1';
 
-    vi.mocked(mockAppointmentRepository.findById).mockResolvedValue(null);
+    vi.mocked(mockRepository.findById).mockResolvedValue(null);
 
-    const result = await useCase.execute(appointmentId, consultantId);
+    const result = await useCase.execute(appointmentId, rejectedBy);
 
     expect(result.isFailure).toBe(true);
-    expect(result.error?.message).toContain('not found');
-    expect(mockAppointmentRepository.update).not.toHaveBeenCalled();
+    expect(result.error?.message).toContain('Appointment not found');
+    expect(result.error?.statusCode).toBe(404);
+    expect(mockRepository.reject).not.toHaveBeenCalled();
   });
 
-  it('should fail when consultant does not own the appointment', async () => {
+  it('should return error when appointment is not pending', async () => {
     const appointmentId = 'appointment-1';
-    const consultantId = 'consultant-1';
+    const rejectedBy = 'consultant-1';
+    const mockAppointment = createMockAppointment({ id: appointmentId, status: 'approved' });
 
-    // Use future dates to avoid validation errors
-    const futureDate = new Date();
-    futureDate.setMonth(futureDate.getMonth() + 2);
-    const startTime = new Date(futureDate);
-    startTime.setHours(10, 0, 0, 0);
-    const endTime = new Date(futureDate);
-    endTime.setHours(11, 0, 0, 0);
+    vi.mocked(mockRepository.findById).mockResolvedValue(mockAppointment);
 
-    const existingAppointment: Appointment = {
+    const result = await useCase.execute(appointmentId, rejectedBy);
+
+    expect(result.isFailure).toBe(true);
+    expect(result.error?.message).toContain('Appointment cannot be rejected');
+    expect(result.error?.statusCode).toBe(400);
+    expect(mockRepository.reject).not.toHaveBeenCalled();
+  });
+
+  it('should continue even if notification fails', async () => {
+    const appointmentId = 'appointment-1';
+    const rejectedBy = 'consultant-1';
+    const mockAppointment = createMockAppointment({ id: appointmentId, status: 'pending' });
+    const rejectedAppointment = createMockAppointment({
       id: appointmentId,
-      title: 'Test Appointment',
-      consultantId: 'consultant-2', // Different consultant
-      companyId: 'company-1',
-      programId: 'program-1',
-      startTime: startTime,
-      endTime: endTime,
-      status: 'pending',
-      requestedBy: 'company-user-1',
-      notes: null,
-      zoomMeetingId: null,
-      zoomJoinUrl: null,
-      zoomPassword: null,
-      timezone: 'Europe/Istanbul',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    const rejectedAppointment: Appointment = {
-      ...existingAppointment,
       status: 'rejected',
-    };
+      rejectedBy,
+      rejectedAt: new Date(),
+    });
 
-    vi.mocked(mockAppointmentRepository.findById).mockResolvedValue(existingAppointment);
-    vi.mocked(mockAppointmentRepository.reject).mockResolvedValue(rejectedAppointment);
+    vi.mocked(mockRepository.findById).mockResolvedValue(mockAppointment);
+    vi.mocked(mockRepository.reject).mockResolvedValue(rejectedAppointment);
+    vi.mocked(mockUserRepository.findById).mockResolvedValue({
+      isSuccess: true,
+      value: { id: 'consultant-1', fullName: 'Test Consultant' },
+    } as any);
+    vi.mocked(mockNotificationService.sendAppointmentCancelled).mockRejectedValue(
+      new Error('Notification failed')
+    );
 
-    // Note: Use case doesn't check consultant ownership, it just rejects
-    // This test should verify that appointment is rejected regardless of consultant
-    const result = await useCase.execute(appointmentId, consultantId);
+    const result = await useCase.execute(appointmentId, rejectedBy);
 
     expect(result.isSuccess).toBe(true);
-    expect(mockAppointmentRepository.reject).toHaveBeenCalled();
-  });
-
-  it('should fail when appointment is already rejected', async () => {
-    const appointmentId = 'appointment-1';
-    const consultantId = 'consultant-1';
-
-    // Use future dates to avoid validation errors
-    const futureDate = new Date();
-    futureDate.setMonth(futureDate.getMonth() + 2);
-    const startTime = new Date(futureDate);
-    startTime.setHours(10, 0, 0, 0);
-    const endTime = new Date(futureDate);
-    endTime.setHours(11, 0, 0, 0);
-
-    const existingAppointment: Appointment = {
-      id: appointmentId,
-      title: 'Test Appointment',
-      consultantId,
-      companyId: 'company-1',
-      programId: 'program-1',
-      startTime: startTime,
-      endTime: endTime,
-      status: 'rejected', // Already rejected
-      requestedBy: 'company-user-1',
-      notes: 'Previous rejection reason',
-      zoomMeetingId: null,
-      zoomJoinUrl: null,
-      zoomPassword: null,
-      timezone: 'Europe/Istanbul',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    vi.mocked(mockAppointmentRepository.findById).mockResolvedValue(existingAppointment);
-
-    const result = await useCase.execute(appointmentId, consultantId);
-
-    expect(result.isFailure).toBe(true);
-    expect(result.error?.message).toContain('cannot be rejected');
-    expect(mockAppointmentRepository.reject).not.toHaveBeenCalled();
+    expect(mockRepository.reject).toHaveBeenCalled();
   });
 });

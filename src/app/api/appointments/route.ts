@@ -53,18 +53,19 @@ export async function GET(request: NextRequest) {
     }
     // Admin and Program Manager can see all appointments
 
-    // Parse dates
+    // Build filters object - only include defined values
     const filters: any = {
-      consultantId: finalConsultantId || null,
-      companyId: finalCompanyId || null,
-      programId: programId || null,
-      status,
-      startDate: startDate || null,
-      endDate: endDate || null,
-      search,
       page,
       limit,
     };
+
+    if (finalConsultantId) filters.consultantId = finalConsultantId;
+    if (finalCompanyId) filters.companyId = finalCompanyId;
+    if (programId) filters.programId = programId;
+    if (status) filters.status = status;
+    if (startDate) filters.startDate = startDate;
+    if (endDate) filters.endDate = endDate;
+    if (search) filters.search = search;
 
     // Validate filters
     const validationResult = AppointmentFilterDtoSchema.safeParse(filters);

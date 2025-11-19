@@ -1,99 +1,151 @@
 /**
- * Mark Notification As Read Use Case Tests
- *
- * Unit tests for MarkNotificationAsReadUseCase
+ * Unit Tests for MarkNotificationAsReadUseCase
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { MarkNotificationAsReadUseCase } from './MarkNotificationAsReadUseCase';
-import { Result } from '@/6-core/result';
+import { INotificationRepository } from '@/3-domain/interfaces/repositories/INotificationRepository';
 import { Notification } from '@/3-domain/entities/Notification';
 import { NotificationType, NotificationPriority } from '@/3-domain/enums/NotificationEnums';
+import { Result } from '@/6-core/result';
 
 describe('MarkNotificationAsReadUseCase', () => {
+  let mockRepository: INotificationRepository;
   let useCase: MarkNotificationAsReadUseCase;
-  let mockRepository: any;
 
   beforeEach(() => {
     mockRepository = {
+      create: vi.fn(),
       findById: vi.fn(),
+      findMany: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
       markAsRead: vi.fn(),
+      markAllAsRead: vi.fn(),
+      getUnreadCount: vi.fn(),
     };
 
     useCase = new MarkNotificationAsReadUseCase(mockRepository);
   });
 
-  const createMockNotification = (): Notification => ({
-    id: 'notif-123',
-    userId: 'user-123',
-    type: NotificationType.INFO,
-    title: 'Test Notification',
-    message: 'This is a test notification',
-    priority: NotificationPriority.NORMAL,
-    channels: [],
-    isRead: false,
-    emailSent: false,
-    pushSent: false,
-    metadata: {},
-    createdAt: new Date(),
+  const createMockNotification = (overrides?: Partial<Notification>): Notification => {
+    return {
+      id: 'notif-1',
+      userId: 'user-1',
+      type: NotificationType.INFO,
+      title: 'Test Notification',
+      message: 'Test Message',
+      priority: NotificationPriority.NORMAL,
+      channels: [],
+      isRead: false,
+      emailSent: false,
+      pushSent: false,
+      metadata: {},
+      createdAt: new Date(),
+      ...overrides,
+    };
+  };
+
+  it('should mark notification as read successfully', async () => {
+    const notificationId = 'notif-1';
+    const userId = 'user-1';
+    const mockNotification = createMockNotification({ id: notificationId, userId, isRead: false });
+    const updatedNotification = createMockNotification({
+      id: notificationId,
+      userId,
+      isRead: true,
+    });
+
+    vi.mocked(mockRepository.findById).mockResolvedValue(Result.ok(mockNotification));
+    vi.mocked(mockRepository.markAsRead).mockResolvedValue(Result.ok(updatedNotification));
+
+    const result = await useCase.execute(notificationId, userId);
+
+    expect(result.isSuccess).toBe(true);
+    expect(result.value).toEqual(updatedNotification);
+    expect(mockRepository.findById).toHaveBeenCalledWith(notificationId);
+    expect(mockRepository.markAsRead).toHaveBeenCalledWith(notificationId, userId);
   });
 
-  describe('execute', () => {
-    it('should mark notification as read successfully', async () => {
-      const notificationId = 'notif-123';
-      const userId = 'user-123';
-      const mockNotification = createMockNotification();
+  it('should return notification if already read', async () => {
+    const notificationId = 'notif-1';
+    const userId = 'user-1';
+    const mockNotification = createMockNotification({ id: notificationId, userId, isRead: true });
 
-      mockRepository.findById.mockResolvedValue(Result.ok(mockNotification));
-      mockRepository.markAsRead.mockResolvedValue(
-        Result.ok({ ...mockNotification, isRead: true, readAt: new Date() })
-      );
+    vi.mocked(mockRepository.findById).mockResolvedValue(Result.ok(mockNotification));
 
-      const result = await useCase.execute(notificationId, userId);
+    const result = await useCase.execute(notificationId, userId);
 
-      expect(result.isSuccess).toBe(true);
-      expect(result.value?.isRead).toBe(true);
-      expect(result.value?.readAt).toBeInstanceOf(Date);
-      expect(mockRepository.markAsRead).toHaveBeenCalledWith(notificationId, userId);
-    });
+    expect(result.isSuccess).toBe(true);
+    expect(result.value).toEqual(mockNotification);
+    expect(mockRepository.markAsRead).not.toHaveBeenCalled();
+  });
 
-    it('should return error if notification not found', async () => {
-      const notificationId = 'notif-123';
-      const userId = 'user-123';
+  it('should return error when notification not found', async () => {
+    const notificationId = 'non-existent';
+    const userId = 'user-1';
 
-      mockRepository.findById.mockResolvedValue(Result.ok(null));
+    vi.mocked(mockRepository.findById).mockResolvedValue(Result.ok(null));
 
-      const result = await useCase.execute(notificationId, userId);
+    const result = await useCase.execute(notificationId, userId);
 
-      expect(result.isFailure).toBe(true);
-      expect(result.error?.message).toContain('not found');
-    });
+    expect(result.isFailure).toBe(true);
+    expect(result.error?.message).toContain('Notification not found');
+    expect(mockRepository.markAsRead).not.toHaveBeenCalled();
+  });
 
-    it('should return error if notification belongs to different user', async () => {
-      const notificationId = 'notif-123';
-      const userId = 'user-123';
-      const mockNotification = { ...createMockNotification(), userId: 'user-456' };
+  it('should return error when repository findById fails', async () => {
+    const notificationId = 'notif-1';
+    const userId = 'user-1';
 
-      mockRepository.findById.mockResolvedValue(Result.ok(mockNotification));
+    vi.mocked(mockRepository.findById).mockResolvedValue(Result.fail(new Error('Database error')));
 
-      const result = await useCase.execute(notificationId, userId);
+    const result = await useCase.execute(notificationId, userId);
 
-      expect(result.isFailure).toBe(true);
-      expect(result.error?.message).toContain('Unauthorized');
-    });
+    expect(result.isFailure).toBe(true);
+    expect(result.error?.message).toContain('Database error');
+    expect(mockRepository.markAsRead).not.toHaveBeenCalled();
+  });
 
-    it('should handle repository errors', async () => {
-      const notificationId = 'notif-123';
-      const userId = 'user-123';
-      const mockNotification = createMockNotification();
+  it('should return error when user tries to mark another user notification', async () => {
+    const notificationId = 'notif-1';
+    const userId = 'user-2';
+    const ownerId = 'user-1';
+    const mockNotification = createMockNotification({ id: notificationId, userId: ownerId });
 
-      mockRepository.findById.mockResolvedValue(Result.ok(mockNotification));
-      mockRepository.markAsRead.mockResolvedValue(Result.fail(new Error('Database error')));
+    vi.mocked(mockRepository.findById).mockResolvedValue(Result.ok(mockNotification));
 
-      const result = await useCase.execute(notificationId, userId);
+    const result = await useCase.execute(notificationId, userId);
 
-      expect(result.isFailure).toBe(true);
-      expect(result.error?.message).toBe('Database error');
-    });
+    expect(result.isFailure).toBe(true);
+    expect(result.error?.message).toContain('Unauthorized');
+    expect(mockRepository.markAsRead).not.toHaveBeenCalled();
+  });
+
+  it('should handle repository markAsRead errors', async () => {
+    const notificationId = 'notif-1';
+    const userId = 'user-1';
+    const mockNotification = createMockNotification({ id: notificationId, userId, isRead: false });
+
+    vi.mocked(mockRepository.findById).mockResolvedValue(Result.ok(mockNotification));
+    vi.mocked(mockRepository.markAsRead).mockResolvedValue(Result.fail(new Error('Mark failed')));
+
+    const result = await useCase.execute(notificationId, userId);
+
+    expect(result.isFailure).toBe(true);
+    expect(result.error?.message).toContain('Mark failed');
+  });
+
+  it('should handle exceptions', async () => {
+    const notificationId = 'notif-1';
+    const userId = 'user-1';
+    const errorMessage = 'Unexpected error';
+
+    vi.mocked(mockRepository.findById).mockRejectedValue(new Error(errorMessage));
+
+    const result = await useCase.execute(notificationId, userId);
+
+    expect(result.isFailure).toBe(true);
+    expect(result.error?.message).toBe(errorMessage);
   });
 });

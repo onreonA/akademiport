@@ -14,15 +14,21 @@ vi.mock('@/4-infrastructure/database/repositories/EventRepository', () => ({
   EventRepository: vi.fn(),
 }));
 
-// Mock use cases with vi.fn() that returns a constructor
-const mockGetEventUseCase = vi.fn();
-const mockUpdateEventUseCase = vi.fn();
-const mockDeleteEventUseCase = vi.fn();
+// Mock use cases - use class mock pattern
+const mockGetEventExecute = vi.fn();
+const mockUpdateEventExecute = vi.fn();
+const mockDeleteEventExecute = vi.fn();
 
 vi.mock('@/application/use-cases/event', () => ({
-  GetEventUseCase: mockGetEventUseCase,
-  UpdateEventUseCase: mockUpdateEventUseCase,
-  DeleteEventUseCase: mockDeleteEventUseCase,
+  GetEventUseCase: class {
+    execute = mockGetEventExecute;
+  },
+  UpdateEventUseCase: class {
+    execute = mockUpdateEventExecute;
+  },
+  DeleteEventUseCase: class {
+    execute = mockDeleteEventExecute;
+  },
 }));
 
 describe('GET /api/events/[id]', () => {
@@ -58,17 +64,10 @@ describe('GET /api/events/[id]', () => {
       title: 'Test Event',
     };
 
-    const executeMock = vi.fn().mockResolvedValue({
+    mockGetEventExecute.mockResolvedValue({
       isFailure: false,
       value: mockEvent,
     });
-
-    mockGetEventUseCase.mockImplementation(
-      () =>
-        ({
-          execute: executeMock,
-        }) as any
-    );
 
     const { GET } = await import('./route');
     const request = createMockRequest('http://localhost:3000/api/events/event-1');
@@ -78,7 +77,8 @@ describe('GET /api/events/[id]', () => {
     const data = await response.json();
 
     expect(response.status).toBe(200);
-    expect(data.id).toBe('event-1');
+    expect(data.success).toBe(true);
+    expect(data.event.id).toBe('event-1');
   });
 
   it('returns 404 when event not found', async () => {
@@ -87,17 +87,10 @@ describe('GET /api/events/[id]', () => {
     const user = createMockUser({ role: UserRole.CONSULTANT });
     vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
 
-    const executeMock = vi.fn().mockResolvedValue({
+    mockGetEventExecute.mockResolvedValue({
       isFailure: true,
       error: { message: 'Event not found', statusCode: 404 },
     });
-
-    mockGetEventUseCase.mockImplementation(
-      () =>
-        ({
-          execute: executeMock,
-        }) as any
-    );
 
     const { GET } = await import('./route');
     const request = createMockRequest('http://localhost:3000/api/events/non-existent');
@@ -142,17 +135,10 @@ describe('PUT /api/events/[id]', () => {
       consultantId: 'consultant-1',
     };
 
-    const executeMock = vi.fn().mockResolvedValue({
+    mockUpdateEventExecute.mockResolvedValue({
       isFailure: false,
       value: updatedEvent,
     });
-
-    mockUpdateEventUseCase.mockImplementation(
-      () =>
-        ({
-          execute: executeMock,
-        }) as any
-    );
 
     const { PUT } = await import('./route');
     const request = createMockRequest('http://localhost:3000/api/events/event-1', {
@@ -165,7 +151,8 @@ describe('PUT /api/events/[id]', () => {
     const data = await response.json();
 
     expect(response.status).toBe(200);
-    expect(data.title).toBe('Updated Title');
+    expect(data.success).toBe(true);
+    expect(data.event.title).toBe('Updated Title');
   });
 });
 
@@ -195,17 +182,10 @@ describe('DELETE /api/events/[id]', () => {
     const user = createMockUser({ role: UserRole.CONSULTANT, id: 'consultant-1' });
     vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
 
-    const executeMock = vi.fn().mockResolvedValue({
+    mockDeleteEventExecute.mockResolvedValue({
       isFailure: false,
       value: undefined,
     });
-
-    mockDeleteEventUseCase.mockImplementation(
-      () =>
-        ({
-          execute: executeMock,
-        }) as any
-    );
 
     const { DELETE } = await import('./route');
     const request = createMockRequest('http://localhost:3000/api/events/event-1', {
@@ -215,6 +195,8 @@ describe('DELETE /api/events/[id]', () => {
       params: Promise.resolve({ id: 'event-1' }),
     });
 
-    expect(response.status).toBe(204);
+    expect(response.status).toBe(200);
+    const data = await response.json();
+    expect(data.success).toBe(true);
   });
 });
