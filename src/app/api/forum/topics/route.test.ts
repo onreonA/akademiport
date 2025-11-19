@@ -11,19 +11,10 @@ import { Result } from '@/6-core/result/Result';
 import type { ForumTopic } from '@/3-domain/entities/Forum';
 
 // Mock Supabase client
-const mockGetUser = vi.fn();
-const mockFrom = vi.fn();
-const mockSelect = vi.fn();
-const mockEq = vi.fn();
-const mockSingle = vi.fn();
+const mockCreateClient = vi.fn();
 
 vi.mock('@/4-infrastructure/database/supabase-server', () => ({
-  createClient: vi.fn(() => ({
-    auth: {
-      getUser: mockGetUser,
-    },
-    from: mockFrom,
-  })),
+  createClient: mockCreateClient,
 }));
 
 // Mock repository
@@ -59,22 +50,22 @@ vi.mock('@/2-application/use-cases/forum', () => ({
 describe('GET /api/forum/topics', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockFrom.mockReturnValue({
-      select: mockSelect,
-    });
-    mockSelect.mockReturnValue({
-      eq: mockEq,
-    });
-    mockEq.mockReturnValue({
-      single: mockSingle,
-    });
   });
 
   it('returns 401 when user is not authenticated', async () => {
-    mockGetUser.mockResolvedValue({
-      data: { user: null },
-      error: null,
-    } as any);
+    const mockFrom = vi.fn().mockReturnValue({
+      select: vi.fn(),
+    });
+
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        getUser: vi.fn().mockResolvedValue({
+          data: { user: null },
+          error: null,
+        }),
+      },
+      from: mockFrom,
+    });
 
     const { GET } = await import('./route');
     const request = createMockRequest('http://localhost:3000/api/forum/topics');
@@ -87,18 +78,45 @@ describe('GET /api/forum/topics', () => {
 
   it('returns topics list successfully', async () => {
     const mockUser = { id: 'user-1', email: 'test@example.com' };
-    mockGetUser.mockResolvedValue({
-      data: { user: mockUser },
-      error: null,
-    } as any);
 
-    mockSingle.mockResolvedValue({
+    // Create mock functions for users chain with companies join
+    const mockSingleUsers = vi.fn().mockResolvedValue({
       data: {
-        company_id: 'company-1',
-        companies: { program_id: 'program-1' },
+        company_id: '123e4567-e89b-12d3-a456-426614174000',
+        companies: [{ program_id: '123e4567-e89b-12d3-a456-426614174001' }],
         role: 'company_user',
       },
       error: null,
+    });
+
+    const mockEqUsers = vi.fn().mockReturnValue({
+      single: mockSingleUsers,
+    });
+
+    const mockSelectUsers = vi.fn().mockReturnValue({
+      eq: mockEqUsers,
+    });
+
+    // Mock from() to handle 'users' calls with inner join
+    const mockFrom = vi.fn().mockImplementation((table: string) => {
+      if (table === 'users') {
+        return {
+          select: mockSelectUsers,
+        };
+      }
+      return {
+        select: vi.fn(),
+      };
+    });
+
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        getUser: vi.fn().mockResolvedValue({
+          data: { user: mockUser },
+          error: null,
+        }),
+      },
+      from: mockFrom,
     });
 
     const mockTopics = {
@@ -146,14 +164,41 @@ describe('GET /api/forum/topics', () => {
 
   it('returns 404 when user data not found', async () => {
     const mockUser = { id: 'user-1', email: 'test@example.com' };
-    mockGetUser.mockResolvedValue({
-      data: { user: mockUser },
-      error: null,
-    } as any);
 
-    mockSingle.mockResolvedValue({
+    // Create mock functions for users chain - return null data
+    const mockSingleUsers = vi.fn().mockResolvedValue({
       data: null,
       error: null,
+    });
+
+    const mockEqUsers = vi.fn().mockReturnValue({
+      single: mockSingleUsers,
+    });
+
+    const mockSelectUsers = vi.fn().mockReturnValue({
+      eq: mockEqUsers,
+    });
+
+    // Mock from() to handle 'users' calls
+    const mockFrom = vi.fn().mockImplementation((table: string) => {
+      if (table === 'users') {
+        return {
+          select: mockSelectUsers,
+        };
+      }
+      return {
+        select: vi.fn(),
+      };
+    });
+
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        getUser: vi.fn().mockResolvedValue({
+          data: { user: mockUser },
+          error: null,
+        }),
+      },
+      from: mockFrom,
     });
 
     const { GET } = await import('./route');
@@ -167,18 +212,45 @@ describe('GET /api/forum/topics', () => {
 
   it('filters topics by isApproved for company users', async () => {
     const mockUser = { id: 'user-1', email: 'test@example.com' };
-    mockGetUser.mockResolvedValue({
-      data: { user: mockUser },
-      error: null,
-    } as any);
 
-    mockSingle.mockResolvedValue({
+    // Create mock functions for users chain with companies join
+    const mockSingleUsers = vi.fn().mockResolvedValue({
       data: {
-        company_id: 'company-1',
-        companies: { program_id: 'program-1' },
+        company_id: '123e4567-e89b-12d3-a456-426614174000',
+        companies: [{ program_id: '123e4567-e89b-12d3-a456-426614174001' }],
         role: 'company_user',
       },
       error: null,
+    });
+
+    const mockEqUsers = vi.fn().mockReturnValue({
+      single: mockSingleUsers,
+    });
+
+    const mockSelectUsers = vi.fn().mockReturnValue({
+      eq: mockEqUsers,
+    });
+
+    // Mock from() to handle 'users' calls with inner join
+    const mockFrom = vi.fn().mockImplementation((table: string) => {
+      if (table === 'users') {
+        return {
+          select: mockSelectUsers,
+        };
+      }
+      return {
+        select: vi.fn(),
+      };
+    });
+
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        getUser: vi.fn().mockResolvedValue({
+          data: { user: mockUser },
+          error: null,
+        }),
+      },
+      from: mockFrom,
     });
 
     mockListTopicsUseCaseExecute.mockResolvedValue(Result.ok({ topics: [], total: 0 }));
@@ -199,32 +271,32 @@ describe('GET /api/forum/topics', () => {
 describe('POST /api/forum/topics', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockFrom.mockReturnValue({
-      select: mockSelect,
-    });
-    mockSelect.mockReturnValue({
-      eq: mockEq,
-    });
-    mockEq.mockReturnValue({
-      single: mockSingle,
-    });
   });
 
   it('returns 401 when user is not authenticated', async () => {
-    mockGetUser.mockResolvedValue({
-      data: { user: null },
-      error: null,
-    } as any);
+    const mockFrom = vi.fn().mockReturnValue({
+      select: vi.fn(),
+    });
+
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        getUser: vi.fn().mockResolvedValue({
+          data: { user: null },
+          error: null,
+        }),
+      },
+      from: mockFrom,
+    });
 
     const { POST } = await import('./route');
     const request = createMockRequest('http://localhost:3000/api/forum/topics', {
       method: 'POST',
-      body: JSON.stringify({
+      body: {
         categoryId: 'category-1',
         title: 'Test Topic',
         content: 'Test content',
         priority: TopicPriority.NORMAL,
-      }),
+      },
     });
     const response = await POST(request);
     const data = await response.json();
@@ -235,17 +307,44 @@ describe('POST /api/forum/topics', () => {
 
   it('creates topic successfully', async () => {
     const mockUser = { id: 'user-1', email: 'test@example.com' };
-    mockGetUser.mockResolvedValue({
-      data: { user: mockUser },
-      error: null,
-    } as any);
 
-    mockSingle.mockResolvedValue({
+    // Create mock functions for users chain with companies join
+    const mockSingleUsers = vi.fn().mockResolvedValue({
       data: {
-        company_id: 'company-1',
-        companies: { program_id: 'program-1' },
+        company_id: '123e4567-e89b-12d3-a456-426614174000',
+        companies: [{ program_id: '123e4567-e89b-12d3-a456-426614174001' }],
       },
       error: null,
+    });
+
+    const mockEqUsers = vi.fn().mockReturnValue({
+      single: mockSingleUsers,
+    });
+
+    const mockSelectUsers = vi.fn().mockReturnValue({
+      eq: mockEqUsers,
+    });
+
+    // Mock from() to handle 'users' calls with inner join
+    const mockFrom = vi.fn().mockImplementation((table: string) => {
+      if (table === 'users') {
+        return {
+          select: mockSelectUsers,
+        };
+      }
+      return {
+        select: vi.fn(),
+      };
+    });
+
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        getUser: vi.fn().mockResolvedValue({
+          data: { user: mockUser },
+          error: null,
+        }),
+      },
+      from: mockFrom,
     });
 
     mockCreateTopicUseCaseExecute.mockResolvedValue(Result.ok({ id: 'topic-1' }));
@@ -253,12 +352,12 @@ describe('POST /api/forum/topics', () => {
     const { POST } = await import('./route');
     const request = createMockRequest('http://localhost:3000/api/forum/topics', {
       method: 'POST',
-      body: JSON.stringify({
+      body: {
         categoryId: 'category-1',
         title: 'Test Topic',
         content: 'Test content',
         priority: TopicPriority.NORMAL,
-      }),
+      },
     });
     const response = await POST(request);
     const data = await response.json();
@@ -267,29 +366,56 @@ describe('POST /api/forum/topics', () => {
     expect(data.id).toBe('topic-1');
     expect(mockCreateTopicUseCaseExecute).toHaveBeenCalledWith(
       expect.objectContaining({
-        programId: 'program-1',
+        programId: '123e4567-e89b-12d3-a456-426614174001',
         categoryId: 'category-1',
         title: 'Test Topic',
         content: 'Test content',
       }),
       mockUser.id,
-      'company-1'
+      '123e4567-e89b-12d3-a456-426614174000'
     );
   });
 
   it('returns 400 when use case fails', async () => {
     const mockUser = { id: 'user-1', email: 'test@example.com' };
-    mockGetUser.mockResolvedValue({
-      data: { user: mockUser },
-      error: null,
-    } as any);
 
-    mockSingle.mockResolvedValue({
+    // Create mock functions for users chain with companies join
+    const mockSingleUsers = vi.fn().mockResolvedValue({
       data: {
-        company_id: 'company-1',
-        companies: { program_id: 'program-1' },
+        company_id: '123e4567-e89b-12d3-a456-426614174000',
+        companies: [{ program_id: '123e4567-e89b-12d3-a456-426614174001' }],
       },
       error: null,
+    });
+
+    const mockEqUsers = vi.fn().mockReturnValue({
+      single: mockSingleUsers,
+    });
+
+    const mockSelectUsers = vi.fn().mockReturnValue({
+      eq: mockEqUsers,
+    });
+
+    // Mock from() to handle 'users' calls with inner join
+    const mockFrom = vi.fn().mockImplementation((table: string) => {
+      if (table === 'users') {
+        return {
+          select: mockSelectUsers,
+        };
+      }
+      return {
+        select: vi.fn(),
+      };
+    });
+
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        getUser: vi.fn().mockResolvedValue({
+          data: { user: mockUser },
+          error: null,
+        }),
+      },
+      from: mockFrom,
     });
 
     mockCreateTopicUseCaseExecute.mockResolvedValue(Result.fail('Kategori bulunamadı'));
@@ -297,12 +423,12 @@ describe('POST /api/forum/topics', () => {
     const { POST } = await import('./route');
     const request = createMockRequest('http://localhost:3000/api/forum/topics', {
       method: 'POST',
-      body: JSON.stringify({
+      body: {
         categoryId: 'category-1',
         title: 'Test Topic',
         content: 'Test content',
         priority: TopicPriority.NORMAL,
-      }),
+      },
     });
     const response = await POST(request);
     const data = await response.json();
@@ -313,12 +439,9 @@ describe('POST /api/forum/topics', () => {
 
   it('returns 404 when company not found', async () => {
     const mockUser = { id: 'user-1', email: 'test@example.com' };
-    mockGetUser.mockResolvedValue({
-      data: { user: mockUser },
-      error: null,
-    } as any);
 
-    mockSingle.mockResolvedValue({
+    // Create mock functions for users chain - return null company
+    const mockSingleUsers = vi.fn().mockResolvedValue({
       data: {
         company_id: null,
         companies: null,
@@ -326,15 +449,45 @@ describe('POST /api/forum/topics', () => {
       error: null,
     });
 
+    const mockEqUsers = vi.fn().mockReturnValue({
+      single: mockSingleUsers,
+    });
+
+    const mockSelectUsers = vi.fn().mockReturnValue({
+      eq: mockEqUsers,
+    });
+
+    // Mock from() to handle 'users' calls
+    const mockFrom = vi.fn().mockImplementation((table: string) => {
+      if (table === 'users') {
+        return {
+          select: mockSelectUsers,
+        };
+      }
+      return {
+        select: vi.fn(),
+      };
+    });
+
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        getUser: vi.fn().mockResolvedValue({
+          data: { user: mockUser },
+          error: null,
+        }),
+      },
+      from: mockFrom,
+    });
+
     const { POST } = await import('./route');
     const request = createMockRequest('http://localhost:3000/api/forum/topics', {
       method: 'POST',
-      body: JSON.stringify({
+      body: {
         categoryId: 'category-1',
         title: 'Test Topic',
         content: 'Test content',
         priority: TopicPriority.NORMAL,
-      }),
+      },
     });
     const response = await POST(request);
     const data = await response.json();

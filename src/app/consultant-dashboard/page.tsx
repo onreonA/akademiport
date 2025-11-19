@@ -45,7 +45,6 @@ import {
 } from '@/1-presentation/components/features/analytics';
 import { ExportButton } from '@/1-presentation/components/features/export';
 import { analyticsService } from '@/5-shared/services/analytics';
-import { useEffect } from 'react';
 import { useConsultantProgram } from '@/5-shared/contexts/ConsultantProgramContext';
 
 // =====================================================
@@ -66,7 +65,8 @@ export default function ConsultantDashboardPage() {
 
 function ConsultantDashboardContent() {
   const router = useRouter();
-  const { selectedProgramId } = useConsultantProgram();
+  const { selectedProgram } = useConsultantProgram();
+  const selectedProgramId = selectedProgram?.id;
   const [dashboardData, setDashboardData] = useState<ConsultantDashboardData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

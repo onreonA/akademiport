@@ -6,17 +6,29 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuthenticatedUser } from '@/4-infrastructure/api/helpers/auth';
-import {
-  CreateCustomReportUseCase,
-  ListCustomReportsUseCase,
-} from '@/2-application/use-cases/custom-report';
-import { SupabaseCustomReportRepository } from '@/4-infrastructure/database/repositories/SupabaseCustomReportRepository';
-import { CustomReportFilterDto, CreateCustomReportDto } from '@/3-domain/entities/CustomReport';
 import { logger } from '@/5-shared/utils/logger';
+import type {
+  CustomReportFilterDto,
+  CreateCustomReportDto,
+} from '@/3-domain/entities/CustomReport';
 
 export async function GET(request: NextRequest) {
   try {
+    // Skip execution during build time
+    if (
+      process.env.NEXT_PHASE === 'phase-production-build' ||
+      (process.env.NODE_ENV === 'production' && !process.env.VERCEL)
+    ) {
+      return NextResponse.json({ reports: [], total: 0, page: 1, limit: 10 }, { status: 200 });
+    }
+
+    // Lazy import to avoid build-time execution
+    const { getAuthenticatedUser } = await import('@/4-infrastructure/api/helpers/auth');
+    const { ListCustomReportsUseCase } = await import('@/2-application/use-cases/custom-report');
+    const { SupabaseCustomReportRepository } = await import(
+      '@/4-infrastructure/database/repositories/SupabaseCustomReportRepository'
+    );
+
     const user = await getAuthenticatedUser(request);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -67,6 +79,21 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    // Skip execution during build time
+    if (
+      process.env.NEXT_PHASE === 'phase-production-build' ||
+      (process.env.NODE_ENV === 'production' && !process.env.VERCEL)
+    ) {
+      return NextResponse.json({ error: 'Skipped during build' }, { status: 200 });
+    }
+
+    // Lazy import to avoid build-time execution
+    const { getAuthenticatedUser } = await import('@/4-infrastructure/api/helpers/auth');
+    const { CreateCustomReportUseCase } = await import('@/2-application/use-cases/custom-report');
+    const { SupabaseCustomReportRepository } = await import(
+      '@/4-infrastructure/database/repositories/SupabaseCustomReportRepository'
+    );
+
     const user = await getAuthenticatedUser(request);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

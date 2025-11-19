@@ -388,7 +388,15 @@ export function EventForm({
               <Input
                 id="organizerEmail"
                 type="email"
-                {...register('organizerEmail')}
+                {...register('organizerEmail', {
+                  setValueAs: (value) => {
+                    // Convert empty string to null for schema validation
+                    if (value === '' || value === null || value === undefined) {
+                      return null;
+                    }
+                    return value;
+                  },
+                })}
                 placeholder="organizator@example.com"
                 className={errors.organizerEmail ? 'border-destructive' : ''}
               />

@@ -6,10 +6,30 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { EmailAnalyticsService } from '@/5-shared/services/email';
+
+// Force dynamic rendering to avoid build-time execution
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
+    // Skip execution during build time
+    if (
+      process.env.NEXT_PHASE === 'phase-production-build' ||
+      (process.env.NODE_ENV === 'production' && !process.env.VERCEL)
+    ) {
+      // Return 1x1 transparent pixel during build
+      const pixel = Buffer.from(
+        'R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
+        'base64'
+      );
+      return new NextResponse(pixel, {
+        headers: {
+          'Content-Type': 'image/gif',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+        },
+      });
+    }
+
     const searchParams = request.nextUrl.searchParams;
     const messageId = searchParams.get('messageId');
 
@@ -17,6 +37,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Missing messageId parameter' }, { status: 400 });
     }
 
+    // Lazy import to avoid build-time execution
+    const { EmailAnalyticsService } = await import('@/5-shared/services/email');
     const analyticsService = new EmailAnalyticsService();
     const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip');
     const userAgent = request.headers.get('user-agent');

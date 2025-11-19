@@ -171,10 +171,20 @@ describe('AvailabilityManagement', () => {
     render(<AvailabilityManagement />);
 
     // Wait for component to render and check for unavailable date reason
+    // "Tatil" appears in both the test data reason and component description
+    // Use a more specific selector - look for the reason in a card or specific container
     await waitFor(
       () => {
-        // Component might display the reason in various ways
-        const reasonText = screen.queryByText(/tatil/i);
+        // Find all "Tatil" texts
+        const allTatilTexts = screen.queryAllByText(/tatil/i);
+        // Filter to find the one that's likely the reason (not the description)
+        // The reason should be in a card or specific container
+        const reasonText = allTatilTexts.find((el) => {
+          // Check if it's not in the description area
+          const parent = el.closest('[data-slot="card-description"]');
+          return !parent; // Reason is not in description
+        });
+
         if (reasonText) {
           expect(reasonText).toBeInTheDocument();
         } else {
@@ -220,9 +230,11 @@ describe('AvailabilityManagement', () => {
     await waitFor(
       () => {
         // Component shows "Müsaitlik kuralı yok" badge when no rules
-        const emptyBadge = screen.queryByText(/müsaitlik kuralı yok/i);
-        if (emptyBadge) {
-          expect(emptyBadge).toBeInTheDocument();
+        // There might be multiple badges, so check if at least one exists
+        const emptyBadges = screen.queryAllByText(/müsaitlik kuralı yok/i);
+        if (emptyBadges.length > 0) {
+          // At least one badge exists, which is what we expect
+          expect(emptyBadges.length).toBeGreaterThan(0);
         } else {
           // Or check for the day label (component renders days even when empty)
           // Component always renders day labels, so this is a valid check

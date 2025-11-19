@@ -6,31 +6,73 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuthenticatedUser } from '@/4-infrastructure/api/helpers/auth';
-import { GetCustomReportUseCase } from '@/2-application/use-cases/custom-report';
-import { SupabaseCustomReportRepository } from '@/4-infrastructure/database/repositories/SupabaseCustomReportRepository';
-import { GetDashboardStatsUseCase } from '@/2-application/use-cases/analytics/GetDashboardStatsUseCase';
-import { GetConsultantDashboardStatsUseCase } from '@/2-application/use-cases/analytics/GetConsultantDashboardStatsUseCase';
-import { GetCompanyDashboardStatsUseCase } from '@/2-application/use-cases/analytics/GetCompanyDashboardStatsUseCase';
-import { SupabaseUserRepository } from '@/4-infrastructure/database/repositories/SupabaseUserRepository';
-import { SupabaseCompanyRepository } from '@/4-infrastructure/database/repositories/CompanyRepository';
-import { SupabaseProgramRepository } from '@/4-infrastructure/database/repositories/SupabaseProgramRepository';
-import { SupabaseProjectRepository } from '@/4-infrastructure/database/repositories/SupabaseProjectRepository';
-import { SupabaseTaskRepository } from '@/4-infrastructure/database/repositories/SupabaseTaskRepository';
-import { SupabaseTrainingRepository } from '@/4-infrastructure/database/repositories/SupabaseTrainingRepository';
-import { SupabaseCompanyTrainingRepository } from '@/4-infrastructure/database/repositories/SupabaseCompanyTrainingRepository';
-import { SupabaseEventRepository } from '@/4-infrastructure/database/repositories/SupabaseEventRepository';
-import { SupabaseEcommerceRepository } from '@/4-infrastructure/database/repositories/SupabaseEcommerceRepository';
-import { PDFExportService, ExcelExportService, CSVExportService } from '@/5-shared/services/export';
 import { logger } from '@/5-shared/utils/logger';
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+// Force dynamic rendering to avoid build-time execution
+export const dynamic = 'force-dynamic';
+
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    // Skip execution during build time
+    if (
+      process.env.NEXT_PHASE === 'phase-production-build' ||
+      (process.env.NODE_ENV === 'production' && !process.env.VERCEL)
+    ) {
+      return NextResponse.json({ error: 'Skipped during build' }, { status: 200 });
+    }
+
+    // Lazy import to avoid build-time execution
+    const { getAuthenticatedUser } = await import('@/4-infrastructure/api/helpers/auth');
+    const { GetCustomReportUseCase } = await import('@/2-application/use-cases/custom-report');
+    const { SupabaseCustomReportRepository } = await import(
+      '@/4-infrastructure/database/repositories/SupabaseCustomReportRepository'
+    );
+    const { GetDashboardStatsUseCase } = await import(
+      '@/2-application/use-cases/analytics/GetDashboardStatsUseCase'
+    );
+    const { GetConsultantDashboardStatsUseCase } = await import(
+      '@/2-application/use-cases/analytics/GetConsultantDashboardStatsUseCase'
+    );
+    const { GetCompanyDashboardStatsUseCase } = await import(
+      '@/2-application/use-cases/analytics/GetCompanyDashboardStatsUseCase'
+    );
+    const { UserRepository } = await import(
+      '@/4-infrastructure/database/repositories/UserRepository'
+    );
+    const { CompanyRepository } = await import(
+      '@/4-infrastructure/database/repositories/CompanyRepository'
+    );
+    const { ProgramRepository } = await import(
+      '@/4-infrastructure/database/repositories/ProgramRepository'
+    );
+    const { ProjectRepository } = await import(
+      '@/4-infrastructure/database/repositories/ProjectRepository'
+    );
+    const { TaskRepository } = await import(
+      '@/4-infrastructure/database/repositories/TaskRepository'
+    );
+    const { TrainingRepository } = await import(
+      '@/4-infrastructure/database/repositories/TrainingRepository'
+    );
+    const { CompanyTrainingRepository } = await import(
+      '@/4-infrastructure/database/repositories/CompanyTrainingRepository'
+    );
+    const { EventRepository } = await import(
+      '@/4-infrastructure/database/repositories/EventRepository'
+    );
+    const { SupabaseEcommerceRepository } = await import(
+      '@/4-infrastructure/database/repositories/SupabaseEcommerceRepository'
+    );
+    const { PDFExportService, ExcelExportService, CSVExportService } = await import(
+      '@/5-shared/services/export'
+    );
+
     const user = await getAuthenticatedUser(request);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const { id } = await params;
     const searchParams = request.nextUrl.searchParams;
     const format = searchParams.get('format') || 'pdf';
 
@@ -46,7 +88,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     const useCase = new GetCustomReportUseCase(repository);
     const isAdmin = user.role === 'master_admin' || user.role === 'program_manager';
 
-    const result = await useCase.execute(params.id, user.id, isAdmin);
+    const result = await useCase.execute(id, user.id, isAdmin);
 
     if (result.isFailure) {
       logger.error('Failed to get custom report:', result.error);
@@ -62,11 +104,11 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     let stats: any;
 
     if (customReport.reportType === 'dashboard') {
-      const userRepository = new SupabaseUserRepository();
-      const companyRepository = new SupabaseCompanyRepository();
-      const programRepository = new SupabaseProgramRepository();
-      const projectRepository = new SupabaseProjectRepository();
-      const taskRepository = new SupabaseTaskRepository();
+      const userRepository = new UserRepository();
+      const companyRepository = new CompanyRepository();
+      const programRepository = new ProgramRepository();
+      const projectRepository = new ProjectRepository();
+      const taskRepository = new TaskRepository();
 
       const statsUseCase = new GetDashboardStatsUseCase(
         userRepository,
@@ -82,40 +124,38 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       }
       stats = statsResult.value;
     } else if (customReport.reportType === 'program' || customReport.reportType === 'custom') {
-      const userRepository = new SupabaseUserRepository();
-      const companyRepository = new SupabaseCompanyRepository();
-      const projectRepository = new SupabaseProjectRepository();
-      const taskRepository = new SupabaseTaskRepository();
-      const trainingRepository = new SupabaseTrainingRepository();
-      const companyTrainingRepository = new SupabaseCompanyTrainingRepository();
-      const eventRepository = new SupabaseEventRepository();
+      const userRepository = new UserRepository();
+      const companyRepository = new CompanyRepository();
+      const projectRepository = new ProjectRepository();
+      const trainingRepository = new TrainingRepository();
+      const companyTrainingRepository = new CompanyTrainingRepository();
+      const eventRepository = new EventRepository();
 
       const statsUseCase = new GetConsultantDashboardStatsUseCase(
         userRepository,
         companyRepository,
         projectRepository,
-        taskRepository,
         trainingRepository,
         companyTrainingRepository,
         eventRepository
       );
 
-      const statsResult = await statsUseCase.execute(user.id, customReport.programId || undefined);
+      const statsResult = await statsUseCase.execute(user.id);
       if (statsResult.isFailure) {
         return NextResponse.json({ error: 'Dashboard verileri alınamadı' }, { status: 500 });
       }
       stats = statsResult.value;
     } else if (customReport.reportType === 'company') {
-      const projectRepository = new SupabaseProjectRepository();
-      const companyTrainingRepository = new SupabaseCompanyTrainingRepository();
-      const trainingRepository = new SupabaseTrainingRepository();
-      const eventRepository = new SupabaseEventRepository();
+      const projectRepository = new ProjectRepository();
+      const companyTrainingRepository = new CompanyTrainingRepository();
+      const trainingRepository = new TrainingRepository();
+      const eventRepository = new EventRepository();
       const ecommerceRepository = new SupabaseEcommerceRepository();
 
       const statsUseCase = new GetCompanyDashboardStatsUseCase(
         projectRepository,
-        companyTrainingRepository,
         trainingRepository,
+        companyTrainingRepository,
         eventRepository,
         ecommerceRepository
       );

@@ -7,15 +7,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthenticatedUser } from '@/4-infrastructure/api/helpers/auth';
 import { GetConsultantDashboardStatsUseCase } from '@/2-application/use-cases/analytics/GetConsultantDashboardStatsUseCase';
-import { SupabaseUserRepository } from '@/4-infrastructure/database/repositories/SupabaseUserRepository';
-import { SupabaseCompanyRepository } from '@/4-infrastructure/database/repositories/CompanyRepository';
-import { SupabaseProjectRepository } from '@/4-infrastructure/database/repositories/SupabaseProjectRepository';
-import { SupabaseTaskRepository } from '@/4-infrastructure/database/repositories/SupabaseTaskRepository';
-import { SupabaseTrainingRepository } from '@/4-infrastructure/database/repositories/SupabaseTrainingRepository';
-import { SupabaseCompanyTrainingRepository } from '@/4-infrastructure/database/repositories/SupabaseCompanyTrainingRepository';
-import { SupabaseEventRepository } from '@/4-infrastructure/database/repositories/SupabaseEventRepository';
+import { UserRepository } from '@/4-infrastructure/database/repositories/UserRepository';
+import { CompanyRepository } from '@/4-infrastructure/database/repositories/CompanyRepository';
+import { ProjectRepository } from '@/4-infrastructure/database/repositories/ProjectRepository';
+import { TrainingRepository } from '@/4-infrastructure/database/repositories/TrainingRepository';
+import { CompanyTrainingRepository } from '@/4-infrastructure/database/repositories/CompanyTrainingRepository';
+import { EventRepository } from '@/4-infrastructure/database/repositories/EventRepository';
 import { PDFExportService, ExcelExportService, CSVExportService } from '@/5-shared/services/export';
 import { logger } from '@/5-shared/utils/logger';
+
+// Force dynamic rendering to avoid build-time execution
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
@@ -41,25 +43,23 @@ export async function GET(request: NextRequest) {
     }
 
     // Get consultant dashboard stats
-    const userRepository = new SupabaseUserRepository();
-    const companyRepository = new SupabaseCompanyRepository();
-    const projectRepository = new SupabaseProjectRepository();
-    const taskRepository = new SupabaseTaskRepository();
-    const trainingRepository = new SupabaseTrainingRepository();
-    const companyTrainingRepository = new SupabaseCompanyTrainingRepository();
-    const eventRepository = new SupabaseEventRepository();
+    const userRepository = new UserRepository();
+    const companyRepository = new CompanyRepository();
+    const projectRepository = new ProjectRepository();
+    const trainingRepository = new TrainingRepository();
+    const companyTrainingRepository = new CompanyTrainingRepository();
+    const eventRepository = new EventRepository();
 
     const useCase = new GetConsultantDashboardStatsUseCase(
       userRepository,
       companyRepository,
       projectRepository,
-      taskRepository,
       trainingRepository,
       companyTrainingRepository,
       eventRepository
     );
 
-    const result = await useCase.execute(user.id, programId || undefined);
+    const result = await useCase.execute(user.id);
 
     if (result.isFailure) {
       logger.error('Failed to get consultant dashboard stats:', result.error);

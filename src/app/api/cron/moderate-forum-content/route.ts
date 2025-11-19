@@ -18,6 +18,9 @@ import { TokenTrackerService } from '@/5-shared/services/ai/token-tracker.servic
 import { TopicStatus } from '@/3-domain/enums/ForumEnums';
 import { logger } from '@/5-shared/utils/logger';
 
+// Force dynamic rendering to avoid build-time execution
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     // Cron secret kontrolü

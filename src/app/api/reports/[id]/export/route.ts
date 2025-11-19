@@ -6,14 +6,31 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuthenticatedUser } from '@/4-infrastructure/api/helpers/auth';
-import { GetReportUseCase } from '@/2-application/use-cases/report';
-import { SupabaseProgressReportRepository } from '@/4-infrastructure/database/repositories/SupabaseProgressReportRepository';
-import { PDFExportService, ExcelExportService, CSVExportService } from '@/5-shared/services/export';
 import { logger } from '@/5-shared/utils/logger';
+
+// Force dynamic rendering to avoid build-time execution
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    // Skip execution during build time
+    if (
+      process.env.NEXT_PHASE === 'phase-production-build' ||
+      (process.env.NODE_ENV === 'production' && !process.env.VERCEL)
+    ) {
+      return NextResponse.json({ error: 'Skipped during build' }, { status: 200 });
+    }
+
+    // Lazy import to avoid build-time execution
+    const { getAuthenticatedUser } = await import('@/4-infrastructure/api/helpers/auth');
+    const { GetReportUseCase } = await import('@/2-application/use-cases/report');
+    const { SupabaseProgressReportRepository } = await import(
+      '@/4-infrastructure/database/repositories/SupabaseProgressReportRepository'
+    );
+    const { PDFExportService, ExcelExportService, CSVExportService } = await import(
+      '@/5-shared/services/export'
+    );
+
     const user = await getAuthenticatedUser(request);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -85,7 +102,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
               'Güçlü Yönler': report.aiAnalysis.strengths.join('; '),
               'Zayıf Yönler': report.aiAnalysis.weaknesses.join('; '),
               Öneriler: report.aiAnalysis.recommendations.join('; '),
-            },
+            } as any,
           ],
         });
       }

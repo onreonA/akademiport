@@ -173,7 +173,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     // Add consultantId for consultants if not provided
-    const isConsultant = user.role === 'consultant' || user.role === UserRole.CONSULTANT;
+    const isConsultant = user.role === 'consultant';
     const bodyWithConsultantId = {
       ...body,
       consultantId: body.consultantId || (isConsultant ? user.id : undefined),

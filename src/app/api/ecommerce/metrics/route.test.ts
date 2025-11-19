@@ -17,13 +17,10 @@ const mockSelect = vi.fn();
 const mockEq = vi.fn();
 const mockSingle = vi.fn();
 
+const mockCreateClient = vi.fn();
+
 vi.mock('@/4-infrastructure/database/supabase-server', () => ({
-  createClient: vi.fn(() => ({
-    auth: {
-      getUser: mockGetUser,
-    },
-    from: mockFrom,
-  })),
+  createClient: mockCreateClient,
 }));
 
 // Mock repository
@@ -72,10 +69,20 @@ describe('POST /api/ecommerce/metrics', () => {
   });
 
   it('returns 401 when user is not authenticated', async () => {
-    mockGetUser.mockResolvedValue({
-      data: { user: null },
-      error: null,
-    } as any);
+    // Mock from() to prevent errors if route tries to access it
+    const mockFrom = vi.fn().mockReturnValue({
+      select: vi.fn(),
+    });
+
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        getUser: vi.fn().mockResolvedValue({
+          data: { user: null },
+          error: null,
+        }),
+      },
+      from: mockFrom,
+    });
 
     const { POST } = await import('./route');
     const request = createMockRequest('http://localhost:3000/api/ecommerce/metrics', {
@@ -91,32 +98,71 @@ describe('POST /api/ecommerce/metrics', () => {
 
   it('creates metrics successfully', async () => {
     const mockUser = { id: 'user-1', email: 'test@example.com' };
-    mockGetUser.mockResolvedValue({
-      data: { user: mockUser },
-      error: null,
-    } as any);
 
-    mockFrom.mockReturnValue({
-      select: mockSelect,
-    });
-    mockSelect.mockReturnValue({
-      eq: mockEq,
-    });
-    mockEq.mockReturnValue({
-      single: mockSingle,
-    });
-    mockSingle.mockResolvedValue({
+    // Create mock functions for users chain
+    const mockSingleUsers = vi.fn().mockResolvedValue({
       data: {
-        company_id: 'company-1',
+        company_id: '123e4567-e89b-12d3-a456-426614174000',
         role: 'company_admin',
       },
       error: null,
     });
 
+    const mockEqUsers = vi.fn().mockReturnValue({
+      single: mockSingleUsers,
+    });
+
+    const mockSelectUsers = vi.fn().mockReturnValue({
+      eq: mockEqUsers,
+    });
+
+    // Create mock functions for companies chain (if needed)
+    const mockSingleCompanies = vi.fn().mockResolvedValue({
+      data: {
+        program_id: '123e4567-e89b-12d3-a456-426614174001',
+      },
+      error: null,
+    });
+
+    const mockEqCompanies = vi.fn().mockReturnValue({
+      single: mockSingleCompanies,
+    });
+
+    const mockSelectCompanies = vi.fn().mockReturnValue({
+      eq: mockEqCompanies,
+    });
+
+    // Mock from() to handle both 'users' and 'companies' calls
+    const mockFrom = vi.fn().mockImplementation((table: string) => {
+      if (table === 'users') {
+        return {
+          select: mockSelectUsers,
+        };
+      } else if (table === 'companies') {
+        return {
+          select: mockSelectCompanies,
+        };
+      }
+      return {
+        select: vi.fn(),
+      };
+    });
+
+    // Setup Supabase client mock
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        getUser: vi.fn().mockResolvedValue({
+          data: { user: mockUser },
+          error: null,
+        }),
+      },
+      from: mockFrom,
+    });
+
     const mockMetrics: EcommerceMetrics = {
       id: 'metric-1',
-      companyId: 'company-1',
-      programId: 'program-1',
+      companyId: '123e4567-e89b-12d3-a456-426614174000',
+      programId: '123e4567-e89b-12d3-a456-426614174001',
       periodYear: 2025,
       periodMonth: 11,
       platformType: EcommercePlatformType.ALIBABA,
@@ -146,8 +192,8 @@ describe('POST /api/ecommerce/metrics', () => {
     const request = createMockRequest('http://localhost:3000/api/ecommerce/metrics', {
       method: 'POST',
       body: {
-        companyId: 'company-1',
-        programId: 'program-1',
+        companyId: '123e4567-e89b-12d3-a456-426614174000',
+        programId: '123e4567-e89b-12d3-a456-426614174001',
         periodYear: 2025,
         periodMonth: 11,
         platformType: EcommercePlatformType.ALIBABA,
@@ -167,26 +213,37 @@ describe('POST /api/ecommerce/metrics', () => {
 
   it('returns 400 when validation fails', async () => {
     const mockUser = { id: 'user-1', email: 'test@example.com' };
-    mockGetUser.mockResolvedValue({
-      data: { user: mockUser },
-      error: null,
-    } as any);
 
-    mockFrom.mockReturnValue({
-      select: mockSelect,
-    });
-    mockSelect.mockReturnValue({
-      eq: mockEq,
-    });
-    mockEq.mockReturnValue({
-      single: mockSingle,
-    });
-    mockSingle.mockResolvedValue({
+    // Create mock functions for chain
+    const mockSingleUsers = vi.fn().mockResolvedValue({
       data: {
-        company_id: 'company-1',
+        company_id: '123e4567-e89b-12d3-a456-426614174000',
         role: 'company_admin',
       },
       error: null,
+    });
+
+    const mockEqUsers = vi.fn().mockReturnValue({
+      single: mockSingleUsers,
+    });
+
+    const mockSelectUsers = vi.fn().mockReturnValue({
+      eq: mockEqUsers,
+    });
+
+    const mockFromUsers = vi.fn().mockReturnValue({
+      select: mockSelectUsers,
+    });
+
+    // Setup Supabase client mock
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        getUser: vi.fn().mockResolvedValue({
+          data: { user: mockUser },
+          error: null,
+        }),
+      },
+      from: mockFromUsers,
     });
 
     const { POST } = await import('./route');
@@ -213,10 +270,14 @@ describe('GET /api/ecommerce/metrics', () => {
   });
 
   it('returns 401 when user is not authenticated', async () => {
-    mockGetUser.mockResolvedValue({
-      data: { user: null },
-      error: null,
-    } as any);
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        getUser: vi.fn().mockResolvedValue({
+          data: { user: null },
+          error: null,
+        }),
+      },
+    });
 
     const { GET } = await import('./route');
     const request = createMockRequest('http://localhost:3000/api/ecommerce/metrics');
@@ -229,33 +290,52 @@ describe('GET /api/ecommerce/metrics', () => {
 
   it('returns metrics list successfully', async () => {
     const mockUser = { id: 'user-1', email: 'test@example.com' };
-    mockGetUser.mockResolvedValue({
-      data: { user: mockUser },
-      error: null,
-    } as any);
 
-    mockFrom.mockReturnValue({
-      select: mockSelect,
-    });
-    mockSelect.mockReturnValue({
-      eq: mockEq,
-    });
-    mockEq.mockReturnValue({
-      single: mockSingle,
-    });
-    mockSingle.mockResolvedValue({
+    // Create mock functions for users chain
+    const mockSingleUsers = vi.fn().mockResolvedValue({
       data: {
-        company_id: 'company-1',
+        company_id: '123e4567-e89b-12d3-a456-426614174000',
         role: 'company_admin',
       },
       error: null,
     });
 
+    const mockEqUsers = vi.fn().mockReturnValue({
+      single: mockSingleUsers,
+    });
+
+    const mockSelectUsers = vi.fn().mockReturnValue({
+      eq: mockEqUsers,
+    });
+
+    // Mock from() to handle 'users' calls
+    const mockFrom = vi.fn().mockImplementation((table: string) => {
+      if (table === 'users') {
+        return {
+          select: mockSelectUsers,
+        };
+      }
+      return {
+        select: vi.fn(),
+      };
+    });
+
+    // Setup Supabase client mock
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        getUser: vi.fn().mockResolvedValue({
+          data: { user: mockUser },
+          error: null,
+        }),
+      },
+      from: mockFrom,
+    });
+
     const mockMetrics: EcommerceMetrics[] = [
       {
         id: 'metric-1',
-        companyId: 'company-1',
-        programId: 'program-1',
+        companyId: '123e4567-e89b-12d3-a456-426614174000',
+        programId: '123e4567-e89b-12d3-a456-426614174001',
         periodYear: 2025,
         periodMonth: 11,
         platformType: EcommercePlatformType.ALIBABA,
@@ -299,26 +379,45 @@ describe('GET /api/ecommerce/metrics', () => {
 
   it('applies filters correctly', async () => {
     const mockUser = { id: 'user-1', email: 'test@example.com' };
-    mockGetUser.mockResolvedValue({
-      data: { user: mockUser },
-      error: null,
-    } as any);
 
-    mockFrom.mockReturnValue({
-      select: mockSelect,
-    });
-    mockSelect.mockReturnValue({
-      eq: mockEq,
-    });
-    mockEq.mockReturnValue({
-      single: mockSingle,
-    });
-    mockSingle.mockResolvedValue({
+    // Create mock functions for users chain
+    const mockSingleUsers = vi.fn().mockResolvedValue({
       data: {
-        company_id: 'company-1',
+        company_id: '123e4567-e89b-12d3-a456-426614174000',
         role: 'company_admin',
       },
       error: null,
+    });
+
+    const mockEqUsers = vi.fn().mockReturnValue({
+      single: mockSingleUsers,
+    });
+
+    const mockSelectUsers = vi.fn().mockReturnValue({
+      eq: mockEqUsers,
+    });
+
+    // Mock from() to handle 'users' calls
+    const mockFrom = vi.fn().mockImplementation((table: string) => {
+      if (table === 'users') {
+        return {
+          select: mockSelectUsers,
+        };
+      }
+      return {
+        select: vi.fn(),
+      };
+    });
+
+    // Setup Supabase client mock
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        getUser: vi.fn().mockResolvedValue({
+          data: { user: mockUser },
+          error: null,
+        }),
+      },
+      from: mockFrom,
     });
 
     mockGetUseCaseExecute.mockResolvedValue(
@@ -330,7 +429,7 @@ describe('GET /api/ecommerce/metrics', () => {
 
     const { GET } = await import('./route');
     const request = createMockRequest(
-      'http://localhost:3000/api/ecommerce/metrics?companyId=company-1&programId=program-1&periodYear=2025&periodMonth=11'
+      'http://localhost:3000/api/ecommerce/metrics?companyId=123e4567-e89b-12d3-a456-426614174000&programId=123e4567-e89b-12d3-a456-426614174001&periodYear=2025&periodMonth=11'
     );
     const response = await GET(request);
     const data = await response.json();
@@ -338,8 +437,8 @@ describe('GET /api/ecommerce/metrics', () => {
     expect(response.status).toBe(200);
     expect(mockGetUseCaseExecute).toHaveBeenCalledWith(
       expect.objectContaining({
-        companyId: 'company-1',
-        programId: 'program-1',
+        companyId: '123e4567-e89b-12d3-a456-426614174000',
+        programId: '123e4567-e89b-12d3-a456-426614174001',
         periodYear: 2025,
         periodMonth: 11,
       })

@@ -22,6 +22,9 @@ import { logger } from '@/5-shared/utils/logger';
 import { Result } from '@/6-core/result/Result';
 import { RSSFeedEntity } from '@/3-domain/entities/RSSFeed';
 
+// Force dynamic rendering to avoid build-time execution
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     // Cron secret kontrolü

@@ -7,13 +7,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthenticatedUser } from '@/4-infrastructure/api/helpers/auth';
 import { GetCompanyDashboardStatsUseCase } from '@/2-application/use-cases/analytics/GetCompanyDashboardStatsUseCase';
-import { SupabaseProjectRepository } from '@/4-infrastructure/database/repositories/SupabaseProjectRepository';
-import { SupabaseCompanyTrainingRepository } from '@/4-infrastructure/database/repositories/SupabaseCompanyTrainingRepository';
-import { SupabaseTrainingRepository } from '@/4-infrastructure/database/repositories/SupabaseTrainingRepository';
-import { SupabaseEventRepository } from '@/4-infrastructure/database/repositories/SupabaseEventRepository';
+import { ProjectRepository } from '@/4-infrastructure/database/repositories/ProjectRepository';
+import { CompanyTrainingRepository } from '@/4-infrastructure/database/repositories/CompanyTrainingRepository';
+import { TrainingRepository } from '@/4-infrastructure/database/repositories/TrainingRepository';
+import { EventRepository } from '@/4-infrastructure/database/repositories/EventRepository';
 import { SupabaseEcommerceRepository } from '@/4-infrastructure/database/repositories/SupabaseEcommerceRepository';
 import { PDFExportService, ExcelExportService, CSVExportService } from '@/5-shared/services/export';
 import { logger } from '@/5-shared/utils/logger';
+
+// Force dynamic rendering to avoid build-time execution
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
@@ -43,16 +46,16 @@ export async function GET(request: NextRequest) {
     }
 
     // Get company dashboard stats
-    const projectRepository = new SupabaseProjectRepository();
-    const companyTrainingRepository = new SupabaseCompanyTrainingRepository();
-    const trainingRepository = new SupabaseTrainingRepository();
-    const eventRepository = new SupabaseEventRepository();
+    const projectRepository = new ProjectRepository();
+    const companyTrainingRepository = new CompanyTrainingRepository();
+    const trainingRepository = new TrainingRepository();
+    const eventRepository = new EventRepository();
     const ecommerceRepository = new SupabaseEcommerceRepository();
 
     const useCase = new GetCompanyDashboardStatsUseCase(
       projectRepository,
-      companyTrainingRepository,
       trainingRepository,
+      companyTrainingRepository,
       eventRepository,
       ecommerceRepository
     );

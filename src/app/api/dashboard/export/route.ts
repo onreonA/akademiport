@@ -8,13 +8,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthenticatedUser } from '@/4-infrastructure/api/helpers/auth';
 import { GetDashboardStatsUseCase } from '@/2-application/use-cases/analytics/GetDashboardStatsUseCase';
-import { SupabaseUserRepository } from '@/4-infrastructure/database/repositories/SupabaseUserRepository';
-import { SupabaseCompanyRepository } from '@/4-infrastructure/database/repositories/CompanyRepository';
-import { SupabaseProgramRepository } from '@/4-infrastructure/database/repositories/SupabaseProgramRepository';
-import { SupabaseProjectRepository } from '@/4-infrastructure/database/repositories/SupabaseProjectRepository';
-import { SupabaseTaskRepository } from '@/4-infrastructure/database/repositories/SupabaseTaskRepository';
+import { UserRepository } from '@/4-infrastructure/database/repositories/UserRepository';
+import { CompanyRepository } from '@/4-infrastructure/database/repositories/CompanyRepository';
+import { ProgramRepository } from '@/4-infrastructure/database/repositories/ProgramRepository';
+import { ProjectRepository } from '@/4-infrastructure/database/repositories/ProjectRepository';
+import { TaskRepository } from '@/4-infrastructure/database/repositories/TaskRepository';
 import { PDFExportService, ExcelExportService, CSVExportService } from '@/5-shared/services/export';
 import { logger } from '@/5-shared/utils/logger';
+
+// Force dynamic rendering to avoid build-time execution
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
@@ -39,11 +42,11 @@ export async function GET(request: NextRequest) {
     }
 
     // Get dashboard stats
-    const userRepository = new SupabaseUserRepository();
-    const companyRepository = new SupabaseCompanyRepository();
-    const programRepository = new SupabaseProgramRepository();
-    const projectRepository = new SupabaseProjectRepository();
-    const taskRepository = new SupabaseTaskRepository();
+    const userRepository = new UserRepository();
+    const companyRepository = new CompanyRepository();
+    const programRepository = new ProgramRepository();
+    const projectRepository = new ProjectRepository();
+    const taskRepository = new TaskRepository();
 
     const useCase = new GetDashboardStatsUseCase(
       userRepository,

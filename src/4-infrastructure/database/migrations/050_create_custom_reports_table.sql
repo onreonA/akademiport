@@ -136,10 +136,15 @@ CREATE POLICY "Consultants can view related reports"
           WHERE user_id = auth.uid()
           AND is_active = true
         )
-        OR custom_reports.company_id IN (
-          SELECT company_id FROM consultant_companies
-          WHERE consultant_id = auth.uid()
-          AND is_active = true
+        OR (
+          custom_reports.company_id IS NOT NULL
+          AND custom_reports.company_id IN (
+            SELECT c.id FROM companies c
+            INNER JOIN user_programs up ON up.program_id = c.program_id
+            WHERE up.user_id = auth.uid()
+            AND up.role_in_program = 'consultant'
+            AND up.is_active = true
+          )
         )
       )
     )

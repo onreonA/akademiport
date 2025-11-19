@@ -267,6 +267,28 @@ export const MASTER_ADMIN_NAVIGATION: NavigationConfig = {
       label: 'Raporlar',
       icon: BarChart3,
       href: '/dashboard/reports',
+      children: [
+        {
+          id: 'reports-all',
+          label: 'AI Raporlar',
+          href: '/dashboard/reports',
+        },
+        {
+          id: 'reports-generate',
+          label: 'Yeni Rapor Oluştur',
+          href: '/dashboard/reports/generate',
+        },
+        {
+          id: 'custom-reports-all',
+          label: 'Özel Raporlar',
+          href: '/dashboard/custom-reports',
+        },
+        {
+          id: 'custom-reports-new',
+          label: 'Yeni Özel Rapor',
+          href: '/dashboard/custom-reports/new',
+        },
+      ],
     },
     {
       id: 'cms',

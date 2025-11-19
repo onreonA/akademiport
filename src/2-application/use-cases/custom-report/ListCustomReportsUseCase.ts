@@ -39,7 +39,7 @@ export class ListCustomReportsUseCase {
       const limit = filter.limit || 10;
 
       return Result.ok({
-        reports: result.value.reports,
+        reports: result.value.reports.map((r) => new CustomReportEntity(r)),
         total: result.value.total,
         page,
         limit,

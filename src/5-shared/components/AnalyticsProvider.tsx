@@ -73,7 +73,8 @@ export function AnalyticsProvider({ children }: { children: React.ReactNode }) {
         email: user.email,
         role: user.role,
         companyId: user.companyId || undefined,
-        programId: user.programRoles?.[0]?.programId || undefined,
+        // TODO: Add programRoles to AuthUser type when user_programs relationship is implemented
+        programId: undefined,
       });
     }
   }, [user]);

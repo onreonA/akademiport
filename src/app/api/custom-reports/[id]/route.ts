@@ -7,28 +7,37 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuthenticatedUser } from '@/4-infrastructure/api/helpers/auth';
-import {
-  GetCustomReportUseCase,
-  UpdateCustomReportUseCase,
-  DeleteCustomReportUseCase,
-} from '@/2-application/use-cases/custom-report';
-import { SupabaseCustomReportRepository } from '@/4-infrastructure/database/repositories/SupabaseCustomReportRepository';
-import { UpdateCustomReportDto } from '@/3-domain/entities/CustomReport';
 import { logger } from '@/5-shared/utils/logger';
+import type { UpdateCustomReportDto } from '@/3-domain/entities/CustomReport';
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    // Skip execution during build time
+    if (
+      process.env.NEXT_PHASE === 'phase-production-build' ||
+      (process.env.NODE_ENV === 'production' && !process.env.VERCEL)
+    ) {
+      return NextResponse.json({ error: 'Skipped during build' }, { status: 200 });
+    }
+
+    // Lazy import to avoid build-time execution
+    const { getAuthenticatedUser } = await import('@/4-infrastructure/api/helpers/auth');
+    const { GetCustomReportUseCase } = await import('@/2-application/use-cases/custom-report');
+    const { SupabaseCustomReportRepository } = await import(
+      '@/4-infrastructure/database/repositories/SupabaseCustomReportRepository'
+    );
+
     const user = await getAuthenticatedUser(request);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const { id } = await params;
     const repository = new SupabaseCustomReportRepository();
     const useCase = new GetCustomReportUseCase(repository);
     const isAdmin = user.role === 'master_admin' || user.role === 'program_manager';
 
-    const result = await useCase.execute(params.id, user.id, isAdmin);
+    const result = await useCase.execute(id, user.id, isAdmin);
 
     if (result.isFailure) {
       logger.error('Get custom report failed:', result.error);
@@ -53,13 +62,29 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    // Skip execution during build time
+    if (
+      process.env.NEXT_PHASE === 'phase-production-build' ||
+      (process.env.NODE_ENV === 'production' && !process.env.VERCEL)
+    ) {
+      return NextResponse.json({ error: 'Skipped during build' }, { status: 200 });
+    }
+
+    // Lazy import to avoid build-time execution
+    const { getAuthenticatedUser } = await import('@/4-infrastructure/api/helpers/auth');
+    const { UpdateCustomReportUseCase } = await import('@/2-application/use-cases/custom-report');
+    const { SupabaseCustomReportRepository } = await import(
+      '@/4-infrastructure/database/repositories/SupabaseCustomReportRepository'
+    );
+
     const user = await getAuthenticatedUser(request);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const { id } = await params;
     const body = await request.json();
 
     const dto: UpdateCustomReportDto = {
@@ -84,7 +109,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     const repository = new SupabaseCustomReportRepository();
     const useCase = new UpdateCustomReportUseCase(repository);
 
-    const result = await useCase.execute(params.id, dto, user.id);
+    const result = await useCase.execute(id, dto, user.id);
 
     if (result.isFailure) {
       logger.error('Update custom report failed:', result.error);
@@ -109,17 +134,36 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
+    // Skip execution during build time
+    if (
+      process.env.NEXT_PHASE === 'phase-production-build' ||
+      (process.env.NODE_ENV === 'production' && !process.env.VERCEL)
+    ) {
+      return NextResponse.json({ error: 'Skipped during build' }, { status: 200 });
+    }
+
+    // Lazy import to avoid build-time execution
+    const { getAuthenticatedUser } = await import('@/4-infrastructure/api/helpers/auth');
+    const { DeleteCustomReportUseCase } = await import('@/2-application/use-cases/custom-report');
+    const { SupabaseCustomReportRepository } = await import(
+      '@/4-infrastructure/database/repositories/SupabaseCustomReportRepository'
+    );
+
     const user = await getAuthenticatedUser(request);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const { id } = await params;
     const repository = new SupabaseCustomReportRepository();
     const useCase = new DeleteCustomReportUseCase(repository);
 
-    const result = await useCase.execute(params.id, user.id);
+    const result = await useCase.execute(id, user.id);
 
     if (result.isFailure) {
       logger.error('Delete custom report failed:', result.error);

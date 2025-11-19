@@ -1,3 +1,4 @@
+
 -- =====================================================
 -- MIGRATION: 051_add_report_email_template
 -- Description: Rapor email template'i ekle

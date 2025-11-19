@@ -5,22 +5,48 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuthenticatedUser } from '@/4-infrastructure/api/helpers/auth';
-import { GenerateReportUseCase } from '@/2-application/use-cases/report';
-import { SupabaseProgressReportRepository } from '@/4-infrastructure/database/repositories/SupabaseProgressReportRepository';
-import { SupabaseReportTemplateRepository } from '@/4-infrastructure/database/repositories/SupabaseReportTemplateRepository';
-import { ProjectRepository } from '@/4-infrastructure/database/repositories/ProjectRepository';
-import { TrainingRepository } from '@/4-infrastructure/database/repositories/TrainingRepository';
-import { CompanyTrainingRepository } from '@/4-infrastructure/database/repositories/CompanyTrainingRepository';
-import { SupabaseEcommerceRepository } from '@/4-infrastructure/database/repositories/SupabaseEcommerceRepository';
-import { AIRouterService } from '@/5-shared/services/ai/ai-router.service';
-import { PromptManagerService } from '@/5-shared/services/ai/prompt-manager.service';
-import { TokenTrackerService } from '@/5-shared/services/ai/token-tracker.service';
-import { AppError } from '@/6-core/errors/AppError';
 import { logger } from '@/5-shared/utils/logger';
+import type { AppError } from '@/6-core/errors/AppError';
+
+// Force dynamic rendering to avoid build-time execution
+export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
   try {
+    // Skip execution during build time
+    if (
+      process.env.NEXT_PHASE === 'phase-production-build' ||
+      (process.env.NODE_ENV === 'production' && !process.env.VERCEL)
+    ) {
+      return NextResponse.json({ error: 'Skipped during build' }, { status: 200 });
+    }
+
+    // Lazy import to avoid build-time execution
+    const { getAuthenticatedUser } = await import('@/4-infrastructure/api/helpers/auth');
+    const { GenerateReportUseCase } = await import('@/2-application/use-cases/report');
+    const { SupabaseProgressReportRepository } = await import(
+      '@/4-infrastructure/database/repositories/SupabaseProgressReportRepository'
+    );
+    const { SupabaseReportTemplateRepository } = await import(
+      '@/4-infrastructure/database/repositories/SupabaseReportTemplateRepository'
+    );
+    const { ProjectRepository } = await import(
+      '@/4-infrastructure/database/repositories/ProjectRepository'
+    );
+    const { TrainingRepository } = await import(
+      '@/4-infrastructure/database/repositories/TrainingRepository'
+    );
+    const { CompanyTrainingRepository } = await import(
+      '@/4-infrastructure/database/repositories/CompanyTrainingRepository'
+    );
+    const { SupabaseEcommerceRepository } = await import(
+      '@/4-infrastructure/database/repositories/SupabaseEcommerceRepository'
+    );
+    const { AIRouterService } = await import('@/5-shared/services/ai/ai-router.service');
+    const { PromptManagerService } = await import('@/5-shared/services/ai/prompt-manager.service');
+    const { TokenTrackerService } = await import('@/5-shared/services/ai/token-tracker.service');
+    const { AppError } = await import('@/6-core/errors/AppError');
+
     const user = await getAuthenticatedUser(request);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

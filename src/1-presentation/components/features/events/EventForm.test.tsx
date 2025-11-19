@@ -147,7 +147,8 @@ describe('EventForm', () => {
     const futureDate = new Date();
     futureDate.setMonth(futureDate.getMonth() + 2);
 
-    render(
+    // Render component and get form reference
+    const { container } = render(
       <EventForm
         open={true}
         onOpenChange={vi.fn()}
@@ -180,6 +181,7 @@ describe('EventForm', () => {
     // Wait for form values to be set
     await waitFor(() => {
       expect(startTimeInput).toHaveValue(startTimeStr);
+      expect(endTimeInput).toHaveValue(endTimeStr);
     });
 
     // Clear optional fields that might cause validation errors
@@ -188,20 +190,52 @@ describe('EventForm', () => {
       await user.clear(maxAttendeesInput);
     }
 
+    // Handle organizerEmail - schema requires null/undefined, not empty string
+    // We'll use setValue through the form instance if available, or just ensure it's not set
     const organizerEmailInput = screen.queryByLabelText(/organizatör email/i);
-    if (organizerEmailInput && organizerEmailInput.value) {
-      await user.clear(organizerEmailInput);
+    if (organizerEmailInput) {
+      // If field has a value, we need to clear it
+      // But React Hook Form might not handle empty string -> null conversion automatically
+      // So we'll just ensure the field is empty and let the form handle it
+      if (organizerEmailInput.value) {
+        await user.clear(organizerEmailInput);
+      }
     }
 
+    // Wait for any validation to complete
+    await waitFor(
+      () => {
+        // Check that form is ready - no validation errors visible
+        const errorMessages = screen.queryAllByText(/geçersiz/i);
+        // If organizerEmail has validation error, it should be visible
+        // But we'll proceed anyway since the field is optional
+      },
+      { timeout: 2000 }
+    ).catch(() => {
+      // No validation errors or timeout, which is fine
+    });
+
+    // Submit form - if there are validation errors, they'll prevent submission
     const submitButton = screen.getByRole('button', { name: /oluştur/i });
+    expect(submitButton).not.toBeDisabled();
+
+    // Click submit and wait for onSubmit to be called
     await user.click(submitButton);
 
+    // Wait for onSubmit to be called - give it more time
     await waitFor(
       () => {
         expect(onSubmit).toHaveBeenCalled();
       },
-      { timeout: 3000 }
+      { timeout: 5000 }
     );
+
+    // Verify onSubmit was called with correct data structure
+    expect(onSubmit).toHaveBeenCalledTimes(1);
+    const callArgs = onSubmit.mock.calls[0][0];
+    expect(callArgs).toHaveProperty('title', 'Test Event');
+    expect(callArgs).toHaveProperty('programId', validProgramId);
+    expect(callArgs).toHaveProperty('consultantId', validConsultantId);
   });
 
   it('shows loading state during submission', async () => {

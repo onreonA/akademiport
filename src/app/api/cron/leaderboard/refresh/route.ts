@@ -5,6 +5,10 @@ import { SupabaseLeaderboardRepository } from '@/4-infrastructure/database/repos
  * POST /api/cron/leaderboard/refresh
  * Refresh leaderboard rankings (called by cron)
  */
+
+// Force dynamic rendering to avoid build-time execution
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: NextRequest) {
   try {
     // Verify cron secret

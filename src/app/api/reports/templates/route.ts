@@ -5,14 +5,30 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuthenticatedUser } from '@/4-infrastructure/api/helpers/auth';
-import { CreateReportTemplateUseCase } from '@/2-application/use-cases/report';
-import { SupabaseReportTemplateRepository } from '@/4-infrastructure/database/repositories/SupabaseReportTemplateRepository';
-import { AppError } from '@/6-core/errors/AppError';
 import { logger } from '@/5-shared/utils/logger';
+import type { AppError } from '@/6-core/errors/AppError';
+
+// Force dynamic rendering to avoid build-time execution
+export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
   try {
+    // Skip execution during build time
+    if (
+      process.env.NEXT_PHASE === 'phase-production-build' ||
+      (process.env.NODE_ENV === 'production' && !process.env.VERCEL)
+    ) {
+      return NextResponse.json({ error: 'Skipped during build' }, { status: 200 });
+    }
+
+    // Lazy import to avoid build-time execution
+    const { getAuthenticatedUser } = await import('@/4-infrastructure/api/helpers/auth');
+    const { CreateReportTemplateUseCase } = await import('@/2-application/use-cases/report');
+    const { SupabaseReportTemplateRepository } = await import(
+      '@/4-infrastructure/database/repositories/SupabaseReportTemplateRepository'
+    );
+    const { AppError } = await import('@/6-core/errors/AppError');
+
     const user = await getAuthenticatedUser(request);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

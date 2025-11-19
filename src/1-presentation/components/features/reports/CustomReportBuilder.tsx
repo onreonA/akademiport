@@ -82,7 +82,7 @@ const reportFormSchema = z
     dateRangeEnd: z.date().optional().nullable(),
     isScheduled: z.boolean().default(false),
     scheduleCron: z.string().optional().nullable(),
-    scheduleTimezone: z.string().default('Europe/Istanbul'),
+    scheduleTimezone: z.string().optional().nullable(),
   })
   .refine(
     (data) => {
@@ -128,7 +128,7 @@ export function CustomReportBuilder({
     formState: { errors },
     setValue,
     watch,
-  } = useForm<ReportFormValues>({
+  } = useForm({
     resolver: zodResolver(reportFormSchema),
     defaultValues: {
       name: initialData?.name || '',

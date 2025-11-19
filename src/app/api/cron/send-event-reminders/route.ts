@@ -21,6 +21,10 @@ const reminderRepository = new ReminderRepository();
  *
  * Authorization: Protected by Vercel Cron Secret
  */
+
+// Force dynamic rendering to avoid build-time execution
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: NextRequest) {
   try {
     // Verify cron secret (Vercel sets this header)

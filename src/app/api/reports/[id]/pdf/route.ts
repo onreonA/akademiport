@@ -5,15 +5,33 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuthenticatedUser } from '@/4-infrastructure/api/helpers/auth';
-import { GetReportUseCase } from '@/2-application/use-cases/report';
-import { SupabaseProgressReportRepository } from '@/4-infrastructure/database/repositories/SupabaseProgressReportRepository';
-import { ReportPDFExportService } from '@/4-infrastructure/services/pdf/ReportPDFExportService';
-import { AppError } from '@/6-core/errors/AppError';
 import { logger } from '@/5-shared/utils/logger';
+import type { AppError } from '@/6-core/errors/AppError';
+
+// Force dynamic rendering to avoid build-time execution
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    // Skip execution during build time
+    if (
+      process.env.NEXT_PHASE === 'phase-production-build' ||
+      (process.env.NODE_ENV === 'production' && !process.env.VERCEL)
+    ) {
+      return NextResponse.json({ error: 'Skipped during build' }, { status: 200 });
+    }
+
+    // Lazy import to avoid build-time execution
+    const { getAuthenticatedUser } = await import('@/4-infrastructure/api/helpers/auth');
+    const { GetReportUseCase } = await import('@/2-application/use-cases/report');
+    const { SupabaseProgressReportRepository } = await import(
+      '@/4-infrastructure/database/repositories/SupabaseProgressReportRepository'
+    );
+    const { ReportPDFExportService } = await import(
+      '@/4-infrastructure/services/pdf/ReportPDFExportService'
+    );
+    const { AppError } = await import('@/6-core/errors/AppError');
+
     const user = await getAuthenticatedUser(request);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

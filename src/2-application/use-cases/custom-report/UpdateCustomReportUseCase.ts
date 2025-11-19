@@ -3,7 +3,11 @@
  */
 
 import { ICustomReportRepository } from '@/3-domain/interfaces/repositories/ICustomReportRepository';
-import { UpdateCustomReportDto, CustomReportEntity } from '@/3-domain/entities/CustomReport';
+import {
+  UpdateCustomReportDto,
+  CustomReport,
+  CustomReportEntity,
+} from '@/3-domain/entities/CustomReport';
 import { Result } from '@/6-core/result/Result';
 import { AppError } from '@/6-core/errors/AppError';
 import { logger } from '@/5-shared/utils/logger';
@@ -61,7 +65,9 @@ export class UpdateCustomReportUseCase {
       }
 
       logger.info(`Custom report updated: ${id}`);
-      return Result.ok(result.value);
+      // Convert CustomReport to CustomReportEntity
+      const reportEntity = new CustomReportEntity(result.value);
+      return Result.ok(reportEntity);
     } catch (error) {
       logger.error('UpdateCustomReportUseCase error:', error);
       return Result.fail(error instanceof Error ? error.message : 'Custom report güncellenemedi');

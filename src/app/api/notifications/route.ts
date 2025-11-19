@@ -6,18 +6,12 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getSupabaseAdminClient } from '@/4-infrastructure/database/supabase-server';
-import { getAuthenticatedUser } from '@/4-infrastructure/api/helpers/auth';
-import { GetNotificationsUseCase } from '@/2-application/use-cases/notification/GetNotificationsUseCase';
-import { CreateNotificationUseCase } from '@/2-application/use-cases/notification/CreateNotificationUseCase';
-import { SupabaseNotificationRepository } from '@/4-infrastructure/database/repositories/SupabaseNotificationRepository';
-import { SupabaseNotificationPreferencesRepository } from '@/4-infrastructure/database/repositories/SupabaseNotificationPreferencesRepository';
-import { NotificationFilterDtoSchema } from '@/2-application/dtos/notification/NotificationFilterDto';
-import { CreateNotificationDtoSchema } from '@/2-application/dtos/notification/CreateNotificationDto';
-import { EmailService } from '@/5-shared/services/email/email.service';
-import { PushNotificationService } from '@/5-shared/services/notification/push-notification.service';
-import { SupabasePushSubscriptionRepository } from '@/4-infrastructure/database/repositories/SupabasePushSubscriptionRepository';
 import { logger } from '@/5-shared/utils/logger';
+import type { NotificationFilterDtoSchema } from '@/2-application/dtos/notification/NotificationFilterDto';
+import type { CreateNotificationDtoSchema } from '@/2-application/dtos/notification/CreateNotificationDto';
+
+// Force dynamic rendering to avoid build-time execution
+export const dynamic = 'force-dynamic';
 
 /**
  * GET /api/notifications
@@ -25,6 +19,29 @@ import { logger } from '@/5-shared/utils/logger';
  */
 export async function GET(request: NextRequest) {
   try {
+    // Skip execution during build time
+    if (
+      process.env.NEXT_PHASE === 'phase-production-build' ||
+      (process.env.NODE_ENV === 'production' && !process.env.VERCEL)
+    ) {
+      return NextResponse.json(
+        { notifications: [], total: 0, page: 1, limit: 20 },
+        { status: 200 }
+      );
+    }
+
+    // Lazy import to avoid build-time execution
+    const { getAuthenticatedUser } = await import('@/4-infrastructure/api/helpers/auth');
+    const { GetNotificationsUseCase } = await import(
+      '@/2-application/use-cases/notification/GetNotificationsUseCase'
+    );
+    const { SupabaseNotificationRepository } = await import(
+      '@/4-infrastructure/database/repositories/SupabaseNotificationRepository'
+    );
+    const { NotificationFilterDtoSchema } = await import(
+      '@/2-application/dtos/notification/NotificationFilterDto'
+    );
+
     const user = await getAuthenticatedUser(request);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -78,6 +95,36 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
+    // Skip execution during build time
+    if (
+      process.env.NEXT_PHASE === 'phase-production-build' ||
+      (process.env.NODE_ENV === 'production' && !process.env.VERCEL)
+    ) {
+      return NextResponse.json({ message: 'Skipped during build' }, { status: 200 });
+    }
+
+    // Lazy import to avoid build-time execution
+    const { getAuthenticatedUser } = await import('@/4-infrastructure/api/helpers/auth');
+    const { CreateNotificationUseCase } = await import(
+      '@/2-application/use-cases/notification/CreateNotificationUseCase'
+    );
+    const { SupabaseNotificationRepository } = await import(
+      '@/4-infrastructure/database/repositories/SupabaseNotificationRepository'
+    );
+    const { SupabaseNotificationPreferencesRepository } = await import(
+      '@/4-infrastructure/database/repositories/SupabaseNotificationPreferencesRepository'
+    );
+    const { CreateNotificationDtoSchema } = await import(
+      '@/2-application/dtos/notification/CreateNotificationDto'
+    );
+    const { EmailService } = await import('@/5-shared/services/email/email.service');
+    const { PushNotificationService } = await import(
+      '@/5-shared/services/notification/push-notification.service'
+    );
+    const { SupabasePushSubscriptionRepository } = await import(
+      '@/4-infrastructure/database/repositories/SupabasePushSubscriptionRepository'
+    );
+
     const user = await getAuthenticatedUser(request);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

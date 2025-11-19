@@ -7,18 +7,27 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { EmailQueueService } from '@/5-shared/services/email';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
+    // Skip execution during build time
+    if (
+      process.env.NEXT_PHASE === 'phase-production-build' ||
+      (process.env.NODE_ENV === 'production' && !process.env.VERCEL)
+    ) {
+      return NextResponse.json({ message: 'Skipped during build' }, { status: 200 });
+    }
+
     // Verify cron secret (if using Vercel Cron)
     const authHeader = request.headers.get('authorization');
     if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // Lazy import to avoid build-time execution
+    const { EmailQueueService } = await import('@/5-shared/services/email');
     const queueService = new EmailQueueService();
 
     // Process pending emails

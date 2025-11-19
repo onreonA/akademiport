@@ -9,21 +9,21 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/4-infrastructure/database/supabase-server';
-import { GenerateReportUseCase } from '@/2-application/use-cases/report';
-import { SupabaseProgressReportRepository } from '@/4-infrastructure/database/repositories/SupabaseProgressReportRepository';
-import { SupabaseReportTemplateRepository } from '@/4-infrastructure/database/repositories/SupabaseReportTemplateRepository';
-import { ProjectRepository } from '@/4-infrastructure/database/repositories/ProjectRepository';
-import { TrainingRepository } from '@/4-infrastructure/database/repositories/TrainingRepository';
-import { CompanyTrainingRepository } from '@/4-infrastructure/database/repositories/CompanyTrainingRepository';
-import { SupabaseEcommerceRepository } from '@/4-infrastructure/database/repositories/SupabaseEcommerceRepository';
-import { AIRouterService } from '@/5-shared/services/ai/ai-router.service';
-import { PromptManagerService } from '@/5-shared/services/ai/prompt-manager.service';
-import { TokenTrackerService } from '@/5-shared/services/ai/token-tracker.service';
 import { logger } from '@/5-shared/utils/logger';
+
+// Force dynamic rendering to avoid build-time execution
+export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
   try {
+    // Skip execution during build time
+    if (
+      process.env.NEXT_PHASE === 'phase-production-build' ||
+      (process.env.NODE_ENV === 'production' && !process.env.VERCEL)
+    ) {
+      return NextResponse.json({ message: 'Skipped during build' }, { status: 200 });
+    }
+
     // Verify cron secret (Vercel sets this header)
     const authHeader = request.headers.get('authorization');
     const cronSecret = process.env.CRON_SECRET;
@@ -34,6 +34,31 @@ export async function POST(request: NextRequest) {
     }
 
     logger.info('Starting report generation queue processing cron job');
+
+    // Lazy import to avoid build-time execution
+    const { createClient } = await import('@/4-infrastructure/database/supabase-server');
+    const { GenerateReportUseCase } = await import('@/2-application/use-cases/report');
+    const { SupabaseProgressReportRepository } = await import(
+      '@/4-infrastructure/database/repositories/SupabaseProgressReportRepository'
+    );
+    const { SupabaseReportTemplateRepository } = await import(
+      '@/4-infrastructure/database/repositories/SupabaseReportTemplateRepository'
+    );
+    const { ProjectRepository } = await import(
+      '@/4-infrastructure/database/repositories/ProjectRepository'
+    );
+    const { TrainingRepository } = await import(
+      '@/4-infrastructure/database/repositories/TrainingRepository'
+    );
+    const { CompanyTrainingRepository } = await import(
+      '@/4-infrastructure/database/repositories/CompanyTrainingRepository'
+    );
+    const { SupabaseEcommerceRepository } = await import(
+      '@/4-infrastructure/database/repositories/SupabaseEcommerceRepository'
+    );
+    const { AIRouterService } = await import('@/5-shared/services/ai/ai-router.service');
+    const { PromptManagerService } = await import('@/5-shared/services/ai/prompt-manager.service');
+    const { TokenTrackerService } = await import('@/5-shared/services/ai/token-tracker.service');
 
     const supabase = await createClient();
 

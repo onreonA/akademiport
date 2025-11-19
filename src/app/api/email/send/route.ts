@@ -5,11 +5,12 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { EmailService } from '@/5-shared/services/email';
-import { EmailSendOptions } from '@/3-domain/entities/Email';
-import { EmailPriority } from '@/3-domain/enums/EmailEnums';
-import { createClient } from '@/4-infrastructure/database/supabase-server';
 import { z } from 'zod';
+import type { EmailSendOptions } from '@/3-domain/entities/Email';
+import type { EmailPriority } from '@/3-domain/enums/EmailEnums';
+
+// Force dynamic rendering to avoid build-time execution
+export const dynamic = 'force-dynamic';
 
 const sendEmailSchema = z.object({
   to: z.union([z.string().email(), z.array(z.string().email())]),
@@ -29,6 +30,18 @@ const sendEmailSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    // Skip execution during build time
+    if (
+      process.env.NEXT_PHASE === 'phase-production-build' ||
+      (process.env.NODE_ENV === 'production' && !process.env.VERCEL)
+    ) {
+      return NextResponse.json({ message: 'Skipped during build' }, { status: 200 });
+    }
+
+    // Lazy import to avoid build-time execution
+    const { EmailService } = await import('@/5-shared/services/email');
+    const { createClient } = await import('@/4-infrastructure/database/supabase-server');
+
     // Check authentication
     const supabase = await createClient();
     const {

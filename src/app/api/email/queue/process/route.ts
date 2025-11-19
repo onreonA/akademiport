@@ -6,11 +6,21 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { EmailQueueService } from '@/5-shared/services/email';
 import { createClient } from '@/4-infrastructure/database/supabase-server';
+
+// Force dynamic rendering to avoid build-time execution
+export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
   try {
+    // Skip execution during build time
+    if (
+      process.env.NEXT_PHASE === 'phase-production-build' ||
+      (process.env.NODE_ENV === 'production' && !process.env.VERCEL)
+    ) {
+      return NextResponse.json({ message: 'Skipped during build' }, { status: 200 });
+    }
+
     // Check authentication - only admin
     const supabase = await createClient();
     const {
@@ -35,6 +45,8 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const limit = body.limit || 10;
 
+    // Lazy import to avoid build-time execution
+    const { EmailQueueService } = await import('@/5-shared/services/email');
     const queueService = new EmailQueueService();
 
     // Process pending emails

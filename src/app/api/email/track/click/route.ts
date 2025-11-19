@@ -6,10 +6,20 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { EmailAnalyticsService } from '@/5-shared/services/email';
+
+// Force dynamic rendering to avoid build-time execution
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
+    // Skip execution during build time
+    if (
+      process.env.NEXT_PHASE === 'phase-production-build' ||
+      (process.env.NODE_ENV === 'production' && !process.env.VERCEL)
+    ) {
+      return NextResponse.redirect('https://example.com'); // Dummy redirect during build
+    }
+
     const searchParams = request.nextUrl.searchParams;
     const messageId = searchParams.get('messageId');
     const url = searchParams.get('url');
@@ -18,6 +28,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Missing messageId or url parameter' }, { status: 400 });
     }
 
+    // Lazy import to avoid build-time execution
+    const { EmailAnalyticsService } = await import('@/5-shared/services/email');
     const analyticsService = new EmailAnalyticsService();
     const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip');
     const userAgent = request.headers.get('user-agent');

@@ -10,19 +10,10 @@ import { Result } from '@/6-core/result/Result';
 import type { EcommercePerformance } from '@/3-domain/entities/Ecommerce';
 
 // Mock Supabase client
-const mockGetUser = vi.fn();
-const mockFrom = vi.fn();
-const mockSelect = vi.fn();
-const mockEq = vi.fn();
-const mockSingle = vi.fn();
+const mockCreateClient = vi.fn();
 
 vi.mock('@/4-infrastructure/database/supabase-server', () => ({
-  createClient: vi.fn(() => ({
-    auth: {
-      getUser: mockGetUser,
-    },
-    from: mockFrom,
-  })),
+  createClient: mockCreateClient,
 }));
 
 // Mock use case
@@ -42,10 +33,19 @@ describe('GET /api/ecommerce/performance', () => {
   });
 
   it('returns 401 when user is not authenticated', async () => {
-    mockGetUser.mockResolvedValue({
-      data: { user: null },
-      error: null,
-    } as any);
+    const mockFrom = vi.fn().mockReturnValue({
+      select: vi.fn(),
+    });
+
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        getUser: vi.fn().mockResolvedValue({
+          data: { user: null },
+          error: null,
+        }),
+      },
+      from: mockFrom,
+    });
 
     const { GET } = await import('./route');
     const request = createMockRequest('http://localhost:3000/api/ecommerce/performance');
@@ -58,33 +58,51 @@ describe('GET /api/ecommerce/performance', () => {
 
   it('returns performance data successfully', async () => {
     const mockUser = { id: 'user-1', email: 'test@example.com' };
-    mockGetUser.mockResolvedValue({
-      data: { user: mockUser },
-      error: null,
-    } as any);
 
-    mockFrom.mockReturnValue({
-      select: mockSelect,
-    });
-    mockSelect.mockReturnValue({
-      eq: mockEq,
-    });
-    mockEq.mockReturnValue({
-      single: mockSingle,
-    });
-    mockSingle.mockResolvedValue({
+    // Create mock functions for users chain
+    const mockSingleUsers = vi.fn().mockResolvedValue({
       data: {
-        company_id: 'company-1',
+        company_id: '123e4567-e89b-12d3-a456-426614174000',
         role: 'company_admin',
       },
       error: null,
     });
 
+    const mockEqUsers = vi.fn().mockReturnValue({
+      single: mockSingleUsers,
+    });
+
+    const mockSelectUsers = vi.fn().mockReturnValue({
+      eq: mockEqUsers,
+    });
+
+    // Mock from() to handle 'users' calls
+    const mockFrom = vi.fn().mockImplementation((table: string) => {
+      if (table === 'users') {
+        return {
+          select: mockSelectUsers,
+        };
+      }
+      return {
+        select: vi.fn(),
+      };
+    });
+
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        getUser: vi.fn().mockResolvedValue({
+          data: { user: mockUser },
+          error: null,
+        }),
+      },
+      from: mockFrom,
+    });
+
     const mockPerformance: EcommercePerformance[] = [
       {
-        companyId: 'company-1',
+        companyId: '123e4567-e89b-12d3-a456-426614174000',
         companyName: 'Test Company',
-        programId: 'program-1',
+        programId: '123e4567-e89b-12d3-a456-426614174001',
         programName: 'Test Program',
         totalVisitorsAllTime: 10000,
         totalProductsAllTime: 500,
@@ -115,42 +133,60 @@ describe('GET /api/ecommerce/performance', () => {
     expect(response.status).toBe(200);
     expect(data.performance).toHaveLength(1);
     expect(data.performance[0]).toMatchObject({
-      companyId: 'company-1',
+      companyId: '123e4567-e89b-12d3-a456-426614174000',
       companyName: 'Test Company',
-      programId: 'program-1',
+      programId: '123e4567-e89b-12d3-a456-426614174001',
       totalRevenueAllTime: 500000,
     });
   });
 
   it('applies filters correctly', async () => {
     const mockUser = { id: 'user-1', email: 'test@example.com' };
-    mockGetUser.mockResolvedValue({
-      data: { user: mockUser },
-      error: null,
-    } as any);
 
-    mockFrom.mockReturnValue({
-      select: mockSelect,
-    });
-    mockSelect.mockReturnValue({
-      eq: mockEq,
-    });
-    mockEq.mockReturnValue({
-      single: mockSingle,
-    });
-    mockSingle.mockResolvedValue({
+    // Create mock functions for users chain
+    const mockSingleUsers = vi.fn().mockResolvedValue({
       data: {
-        company_id: 'company-1',
+        company_id: '123e4567-e89b-12d3-a456-426614174000',
         role: 'company_admin',
       },
       error: null,
+    });
+
+    const mockEqUsers = vi.fn().mockReturnValue({
+      single: mockSingleUsers,
+    });
+
+    const mockSelectUsers = vi.fn().mockReturnValue({
+      eq: mockEqUsers,
+    });
+
+    // Mock from() to handle 'users' calls
+    const mockFrom = vi.fn().mockImplementation((table: string) => {
+      if (table === 'users') {
+        return {
+          select: mockSelectUsers,
+        };
+      }
+      return {
+        select: vi.fn(),
+      };
+    });
+
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        getUser: vi.fn().mockResolvedValue({
+          data: { user: mockUser },
+          error: null,
+        }),
+      },
+      from: mockFrom,
     });
 
     mockGetPerformanceUseCaseExecute.mockResolvedValue(Result.ok([]));
 
     const { GET } = await import('./route');
     const request = createMockRequest(
-      'http://localhost:3000/api/ecommerce/performance?programId=program-1&minRevenue=100000'
+      'http://localhost:3000/api/ecommerce/performance?programId=123e4567-e89b-12d3-a456-426614174001&minRevenue=100000'
     );
     const response = await GET(request);
     const data = await response.json();
@@ -158,7 +194,7 @@ describe('GET /api/ecommerce/performance', () => {
     expect(response.status).toBe(200);
     expect(mockGetPerformanceUseCaseExecute).toHaveBeenCalledWith(
       expect.objectContaining({
-        programId: 'program-1',
+        programId: '123e4567-e89b-12d3-a456-426614174001',
         minRevenue: 100000,
       })
     );
@@ -166,26 +202,44 @@ describe('GET /api/ecommerce/performance', () => {
 
   it('returns 400 when use case fails', async () => {
     const mockUser = { id: 'user-1', email: 'test@example.com' };
-    mockGetUser.mockResolvedValue({
-      data: { user: mockUser },
-      error: null,
-    } as any);
 
-    mockFrom.mockReturnValue({
-      select: mockSelect,
-    });
-    mockSelect.mockReturnValue({
-      eq: mockEq,
-    });
-    mockEq.mockReturnValue({
-      single: mockSingle,
-    });
-    mockSingle.mockResolvedValue({
+    // Create mock functions for users chain
+    const mockSingleUsers = vi.fn().mockResolvedValue({
       data: {
-        company_id: 'company-1',
+        company_id: '123e4567-e89b-12d3-a456-426614174000',
         role: 'company_admin',
       },
       error: null,
+    });
+
+    const mockEqUsers = vi.fn().mockReturnValue({
+      single: mockSingleUsers,
+    });
+
+    const mockSelectUsers = vi.fn().mockReturnValue({
+      eq: mockEqUsers,
+    });
+
+    // Mock from() to handle 'users' calls
+    const mockFrom = vi.fn().mockImplementation((table: string) => {
+      if (table === 'users') {
+        return {
+          select: mockSelectUsers,
+        };
+      }
+      return {
+        select: vi.fn(),
+      };
+    });
+
+    mockCreateClient.mockResolvedValue({
+      auth: {
+        getUser: vi.fn().mockResolvedValue({
+          data: { user: mockUser },
+          error: null,
+        }),
+      },
+      from: mockFrom,
     });
 
     mockGetPerformanceUseCaseExecute.mockResolvedValue(
