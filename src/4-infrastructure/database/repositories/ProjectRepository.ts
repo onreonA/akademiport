@@ -324,6 +324,7 @@ export class ProjectRepository implements IProjectRepository {
       progress: data.progress,
       isTemplate: data.is_template,
       templateId: data.template_id,
+      deletedAt: data.deleted_at ? new Date(data.deleted_at) : null,
       createdAt: new Date(data.created_at),
       updatedAt: new Date(data.updated_at),
     };

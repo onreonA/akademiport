@@ -19,6 +19,7 @@ export interface Task {
   approvedAt: Date | null;
   approvedBy: string | null;
   orderIndex: number;
+  deletedAt: Date | null; // Soft delete için
   createdAt: Date;
   updatedAt: Date;
 }
@@ -60,6 +61,7 @@ export class TaskEntity implements Task {
   approvedAt: Date | null;
   approvedBy: string | null;
   orderIndex: number;
+  deletedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
 
@@ -76,6 +78,7 @@ export class TaskEntity implements Task {
     this.approvedAt = data.approvedAt;
     this.approvedBy = data.approvedBy;
     this.orderIndex = data.orderIndex;
+    this.deletedAt = data.deletedAt ?? null;
     this.createdAt = data.createdAt;
     this.updatedAt = data.updatedAt;
   }

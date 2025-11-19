@@ -12,6 +12,7 @@ describe('SubProject Entity', () => {
         status: 'in_progress',
         orderIndex: 1,
         progress: 30,
+        deletedAt: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -33,6 +34,7 @@ describe('SubProject Entity', () => {
         status: 'todo',
         orderIndex: 2,
         progress: 0,
+        deletedAt: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -53,6 +55,7 @@ describe('SubProject Entity', () => {
           status: status as SubProject['status'],
           orderIndex: 1,
           progress: 0,
+          deletedAt: null,
           createdAt: new Date(),
           updatedAt: new Date(),
         };
@@ -114,6 +117,7 @@ describe('SubProject Entity', () => {
         status: 'in_progress',
         orderIndex: 1,
         progress: 45,
+        deletedAt: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       };

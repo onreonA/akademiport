@@ -13,6 +13,7 @@ export interface SubProject {
   status: SubProjectStatus;
   orderIndex: number;
   progress: number; // 0-100
+  deletedAt: Date | null; // Soft delete için
   createdAt: Date;
   updatedAt: Date;
 }
@@ -44,6 +45,7 @@ export class SubProjectEntity implements SubProject {
   status: SubProjectStatus;
   orderIndex: number;
   progress: number;
+  deletedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
 
@@ -55,6 +57,7 @@ export class SubProjectEntity implements SubProject {
     this.status = data.status;
     this.orderIndex = data.orderIndex;
     this.progress = data.progress;
+    this.deletedAt = data.deletedAt ?? null;
     this.createdAt = data.createdAt;
     this.updatedAt = data.updatedAt;
   }

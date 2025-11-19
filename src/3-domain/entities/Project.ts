@@ -22,6 +22,7 @@ export interface Project {
   progress: number; // 0-100
   isTemplate: boolean;
   templateId: string | null;
+  deletedAt: Date | null; // Soft delete için
   createdAt: Date;
   updatedAt: Date;
 }
@@ -72,6 +73,7 @@ export class ProjectEntity implements Project {
   progress: number;
   isTemplate: boolean;
   templateId: string | null;
+  deletedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
 
@@ -91,6 +93,7 @@ export class ProjectEntity implements Project {
     this.progress = data.progress;
     this.isTemplate = data.isTemplate;
     this.templateId = data.templateId;
+    this.deletedAt = data.deletedAt ?? null;
     this.createdAt = data.createdAt;
     this.updatedAt = data.updatedAt;
   }

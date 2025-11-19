@@ -1,60 +1,49 @@
-# Scripts
+# 📊 Page Check Script
 
-Bu klasör proje için yardımcı script'leri içerir.
+Bu script, projedeki tüm sayfaları otomatik olarak kontrol eder ve detaylı bir rapor oluşturur.
 
-## Test Kullanıcıları Setup
+## 🚀 Hızlı Başlangıç
 
-### ⚠️ ÖNEMLİ: Manuel Setup Gerekli
+1. **Development sunucusunu başlatın:**
 
-SQL script'leri **otomatik çalıştırılamaz**. Bu script'leri **Supabase Dashboard** üzerinden manuel olarak çalıştırmanız gerekiyor.
+   ```bash
+   npm run dev
+   ```
 
-### `seed-test-users.sql`
+2. **Başka bir terminalde script'i çalıştırın:**
 
-E2E test'ler için test kullanıcılarını oluşturur.
+   ```bash
+   npm run check:pages
+   ```
 
-**Adım 1: Supabase Auth'da Kullanıcıları Oluştur**
+3. **HTML raporunu açın:**
+   ```bash
+   open page-check-results/page-check-*.html
+   ```
 
-1. Supabase Dashboard > Authentication > Users
-2. Her bir kullanıcıyı oluşturun:
-   - `admin@test.com` / `Test123!`
-   - `consultant@test.com` / `Test123!`
-   - `company@test.com` / `Test123!`
-3. **Auto Confirm User** seçeneğini işaretleyin
+## 📋 Ne Kontrol Edilir?
 
-**Adım 2: SQL Script'ini Çalıştır**
+- ✅ Tüm navigation linklerinin çalışıp çalışmadığı
+- ❌ 404 hataları
+- 📱 Sidebar'ın tüm sayfalarda render edilmesi
+- 🔝 Header'ın tüm sayfalarda render edilmesi
+- ✨ "Yeni" sayfalarının varlığı
+- ↪️ Yönlendirmeler
 
-1. Supabase Dashboard > SQL Editor
-2. `seed-test-users.sql` dosyasının içeriğini kopyalayın
-3. SQL Editor'e yapıştırın ve **Run** butonuna tıklayın
+## 📄 Çıktılar
 
-**Adım 3: Kontrol Script'ini Çalıştır**
+- **Konsol:** Özet bilgiler ve hata listesi
+- **HTML Rapor:** Detaylı, görsel rapor (`page-check-results/` klasöründe)
 
-1. `check-test-users.sql` dosyasının içeriğini kopyalayın
-2. SQL Editor'e yapıştırın ve çalıştırın
-3. Sonuçları kontrol edin - her kullanıcı için `✅ Tamam` görünmeli
+## ⚙️ Yapılandırma
 
-**Oluşturulan Kullanıcılar:**
+Environment variable ile:
 
-- `admin@test.com` - MASTER_ADMIN role
-- `consultant@test.com` - CONSULTANT role (program'a atanır)
-- `company@test.com` - COMPANY_USER role (company'ye atanır, company program'a atanır)
+```bash
+BASE_URL=http://localhost:3000 npm run check:pages
+```
 
-**Detaylı Rehber:**
+## 📚 Daha Fazla Bilgi
 
-👉 [Test Kullanıcıları Setup Rehberi](../docs/TEST-USERS-SETUP-GUIDE.md)
-
-### `check-test-users.sql`
-
-Test kullanıcılarının doğru şekilde oluşturulup oluşturulmadığını kontrol eder.
-
-**Kullanım:**
-
-1. Supabase Dashboard > SQL Editor
-2. Script'i çalıştırın
-3. Sonuçları kontrol edin
-
-**Beklenen Sonuçlar:**
-
-- Her kullanıcı için `durum` sütunu `✅ Tamam` olmalı
-- Consultant için `✅ Programa atanmış` olmalı
-- Company için `✅ Programa atanmış` olmalı
+- [Page Check Guide](../../docs/PAGE-CHECK-GUIDE.md) - Detaylı kullanım rehberi
+- [Manual Checklist](../../docs/MANUAL-CHECKLIST.md) - Manuel kontrol checklist'i

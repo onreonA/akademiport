@@ -12,9 +12,6 @@
 /playwright-report
 /playwright/.cache
 
-# husky
-.husky/_/
-
 # next.js
 /.next/
 /out/
@@ -42,16 +39,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# page check results
+/page-check-results/
+
 # storybook
 storybook-static
-
-# IDE
-.idea
-.vscode
-*.swp
-*.swo
-*~
-
-# OS
-.DS_Store
-Thumbs.db

@@ -313,6 +313,7 @@ export class TaskRepository implements ITaskRepository {
       approvedAt: data.approved_at ? new Date(data.approved_at) : null,
       approvedBy: data.approved_by,
       orderIndex: data.order_index,
+      deletedAt: data.deleted_at ? new Date(data.deleted_at) : null,
       createdAt: new Date(data.created_at),
       updatedAt: new Date(data.updated_at),
     };

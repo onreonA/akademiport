@@ -17,6 +17,7 @@ describe('Task Entity', () => {
         approvedAt: null,
         approvedBy: null,
         orderIndex: 1,
+        deletedAt: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -37,6 +38,7 @@ describe('Task Entity', () => {
         status: 'todo',
         priority: 'medium',
         orderIndex: 1,
+        deletedAt: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -54,6 +56,7 @@ describe('Task Entity', () => {
         status: 'todo',
         priority: 'medium',
         orderIndex: 1,
+        deletedAt: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -94,6 +97,7 @@ describe('Task Entity', () => {
         priority: 'medium',
         completedAt: new Date(),
         orderIndex: 1,
+        deletedAt: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -119,6 +123,7 @@ describe('Task Entity', () => {
         priority: 'medium',
         completedAt: new Date(),
         orderIndex: 1,
+        deletedAt: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -166,6 +171,7 @@ describe('Task Entity', () => {
         priority: 'high',
         dueDate,
         orderIndex: 1,
+        deletedAt: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -183,6 +189,7 @@ describe('Task Entity', () => {
         priority: 'high',
         dueDate: pastDate,
         orderIndex: 1,
+        deletedAt: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       };

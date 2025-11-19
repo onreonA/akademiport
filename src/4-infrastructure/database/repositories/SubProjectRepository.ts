@@ -188,6 +188,7 @@ export class SubProjectRepository implements ISubProjectRepository {
       status: data.status,
       orderIndex: data.order_index,
       progress: data.progress,
+      deletedAt: data.deleted_at ? new Date(data.deleted_at) : null,
       createdAt: new Date(data.created_at),
       updatedAt: new Date(data.updated_at),
     };

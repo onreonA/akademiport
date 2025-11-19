@@ -17,6 +17,7 @@ describe('Project Entity', () => {
         progress: 50,
         isTemplate: false,
         templateId: null,
+        deletedAt: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -44,6 +45,7 @@ describe('Project Entity', () => {
         progress: 0,
         isTemplate: true,
         templateId: null,
+        deletedAt: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -68,6 +70,7 @@ describe('Project Entity', () => {
         progress: 0,
         isTemplate: false,
         templateId: 'template-1',
+        deletedAt: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -93,6 +96,7 @@ describe('Project Entity', () => {
           progress: 0,
           isTemplate: false,
           templateId: null,
+          deletedAt: null,
           createdAt: new Date(),
           updatedAt: new Date(),
         };
@@ -138,6 +142,7 @@ describe('Project Entity', () => {
         progress: 75,
         isTemplate: false,
         templateId: null,
+        deletedAt: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
