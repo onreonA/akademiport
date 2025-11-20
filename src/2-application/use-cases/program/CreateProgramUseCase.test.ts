@@ -22,10 +22,13 @@ describe('CreateProgramUseCase', () => {
       update: vi.fn(),
       delete: vi.fn(),
       findByManagerId: vi.fn(),
-      findByConsultantId: vi.fn(),
       findByStatus: vi.fn(),
       findByCity: vi.fn(),
-    };
+      search: vi.fn(),
+      addConsultant: vi.fn(),
+      removeConsultant: vi.fn(),
+      getConsultants: vi.fn(),
+    } as any;
 
     useCase = new CreateProgramUseCase(mockRepository);
   });
@@ -35,10 +38,13 @@ describe('CreateProgramUseCase', () => {
       id: 'program-1',
       name: 'Test Program',
       description: 'Test Description',
+      slug: 'test-program',
       startDate: new Date('2025-01-01'),
       endDate: new Date('2025-12-31'),
-      isActive: true,
-      managerId: 'manager-1',
+      maxCompanies: 10,
+      currentCompanies: 0,
+      status: ProgramStatus.ACTIVE,
+      programManagerId: 'manager-1',
       createdAt: new Date(),
       updatedAt: new Date(),
       ...overrides,

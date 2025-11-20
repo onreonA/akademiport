@@ -121,8 +121,10 @@ describe('MarkSolutionUseCase', () => {
 
       vi.mocked(mockRepository.findTopicById).mockResolvedValue(Result.ok(mockTopic));
       vi.mocked(mockRepository.findReplyById).mockResolvedValue(Result.ok(mockReply));
-      vi.mocked(mockRepository.markSolution).mockResolvedValue(Result.ok(undefined));
-      vi.mocked(mockRepository.createNotification).mockResolvedValue(Result.ok(undefined));
+      vi.mocked(mockRepository.markSolution).mockResolvedValue(Result.ok(mockTopic));
+      vi.mocked(mockRepository.createNotification).mockResolvedValue(
+        Result.ok({ id: 'notification-1' } as any)
+      );
       vi.mocked(mockAddLeaderboardScore.execute).mockResolvedValue(Result.ok(undefined));
 
       const result = await useCase.execute(topicId, replyId, userId);
@@ -208,8 +210,10 @@ describe('MarkSolutionUseCase', () => {
 
       vi.mocked(mockRepository.findTopicById).mockResolvedValue(Result.ok(mockTopic));
       vi.mocked(mockRepository.findReplyById).mockResolvedValue(Result.ok(mockReply));
-      vi.mocked(mockRepository.markSolution).mockResolvedValue(Result.ok(undefined));
-      vi.mocked(mockRepository.createNotification).mockResolvedValue(Result.ok(undefined));
+      vi.mocked(mockRepository.markSolution).mockResolvedValue(Result.ok(mockTopic));
+      vi.mocked(mockRepository.createNotification).mockResolvedValue(
+        Result.ok({ id: 'notification-1' } as any)
+      );
       vi.mocked(mockAddLeaderboardScore.execute).mockResolvedValue(Result.ok(undefined));
 
       const result = await useCase.execute(topicId, replyId, userId);
@@ -238,8 +242,10 @@ describe('MarkSolutionUseCase', () => {
 
       vi.mocked(mockRepository.findTopicById).mockResolvedValue(Result.ok(mockTopic));
       vi.mocked(mockRepository.findReplyById).mockResolvedValue(Result.ok(mockReply));
-      vi.mocked(mockRepository.markSolution).mockResolvedValue(Result.ok(undefined));
-      vi.mocked(mockRepository.createNotification).mockResolvedValue(Result.ok(undefined));
+      vi.mocked(mockRepository.markSolution).mockResolvedValue(Result.ok(mockTopic));
+      vi.mocked(mockRepository.createNotification).mockResolvedValue(
+        Result.ok({ id: 'notification-1' } as any)
+      );
       vi.mocked(mockAddLeaderboardScore.execute).mockResolvedValue(Result.ok(undefined));
 
       const result = await useCase.execute(topicId, replyId, userId);

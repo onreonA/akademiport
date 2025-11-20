@@ -6,7 +6,7 @@
 
 import { ReactElement } from 'react';
 import { render, RenderOptions } from '@testing-library/react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider, UseQueryResult } from '@tanstack/react-query';
 // ReactQueryDevtools is optional and only needed in development
 // import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
@@ -199,4 +199,59 @@ export function setupWindowMocks() {
     ((id: number) => {
       clearTimeout(id);
     });
+}
+
+/**
+ * Create a mock UseQueryResult for testing
+ */
+export function createMockQueryResult<TData, TError = Error>(
+  data: TData | undefined,
+  options: {
+    isLoading?: boolean;
+    isError?: boolean;
+    isPending?: boolean;
+    error?: TError | null;
+    isSuccess?: boolean;
+    isFetching?: boolean;
+    isRefetching?: boolean;
+    refetch?: () => Promise<any>;
+    status?: 'pending' | 'error' | 'success';
+  } = {}
+): UseQueryResult<TData, TError> {
+  const {
+    isLoading = false,
+    isError = false,
+    isPending = false,
+    error = null,
+    isSuccess = data !== undefined && !isError,
+    isFetching = false,
+    isRefetching = false,
+    refetch = async () => ({ data, error: null }),
+    status = isSuccess ? 'success' : isError ? 'error' : 'pending',
+  } = options;
+
+  return {
+    data,
+    error: error as TError,
+    isLoading,
+    isError,
+    isPending,
+    isSuccess,
+    isFetching,
+    isRefetching,
+    isLoadingError: false,
+    isRefetchError: false,
+    isPaused: false,
+    status,
+    dataUpdatedAt: Date.now(),
+    errorUpdatedAt: isError ? Date.now() : 0,
+    failureCount: isError ? 1 : 0,
+    failureReason: error as TError | null,
+    fetchStatus: isFetching ? 'fetching' : 'idle',
+    isInitialLoading: isLoading && !data,
+    isPlaceholderData: false,
+    isStale: false,
+    refetch,
+    remove: () => {},
+  } as unknown as UseQueryResult<TData, TError>;
 }

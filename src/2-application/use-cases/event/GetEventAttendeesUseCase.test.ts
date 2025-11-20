@@ -5,7 +5,8 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { GetEventAttendeesUseCase } from './GetEventAttendeesUseCase';
 import { IEventRepository } from '@/3-domain/interfaces/repositories/IEventRepository';
-import { Event } from '@/3-domain/entities/Event';
+import { Event, EventAttendance } from '@/3-domain/entities/Event';
+import { AppError } from '@/6-core/errors/AppError';
 
 describe('GetEventAttendeesUseCase', () => {
   let mockRepository: IEventRepository;
@@ -19,8 +20,17 @@ describe('GetEventAttendeesUseCase', () => {
       update: vi.fn(),
       delete: vi.fn(),
       getAttendees: vi.fn(),
-      getStatistics: vi.fn(),
-    };
+      exists: vi.fn(),
+      registerAttendance: vi.fn(),
+      cancelAttendance: vi.fn(),
+      findByUserId: vi.fn(),
+      findByCompanyId: vi.fn(),
+      updateAttendeeCount: vi.fn(),
+      findByDateRange: vi.fn(),
+      findByConsultantId: vi.fn(),
+      findByProgramId: vi.fn(),
+      updateZoomMeeting: vi.fn(),
+    } as any;
 
     useCase = new GetEventAttendeesUseCase(mockRepository);
   });
@@ -60,9 +70,29 @@ describe('GetEventAttendeesUseCase', () => {
   it('should get event attendees successfully', async () => {
     const eventId = 'event-1';
     const mockEvent = createMockEvent({ id: eventId });
-    const mockAttendees = [
-      { userId: 'user-1', userName: 'User 1', registeredAt: new Date() },
-      { userId: 'user-2', userName: 'User 2', registeredAt: new Date() },
+    const mockAttendees: EventAttendance[] = [
+      {
+        id: 'attendance-1',
+        eventId: eventId,
+        userId: 'user-1',
+        userName: 'User 1',
+        companyId: 'company-1',
+        companyName: 'Company 1',
+        registeredAt: new Date(),
+        attendedAt: null,
+        notes: null,
+      },
+      {
+        id: 'attendance-2',
+        eventId: eventId,
+        userId: 'user-2',
+        userName: 'User 2',
+        companyId: 'company-2',
+        companyName: 'Company 2',
+        registeredAt: new Date(),
+        attendedAt: null,
+        notes: null,
+      },
     ];
 
     vi.mocked(mockRepository.findById).mockResolvedValue(mockEvent);
@@ -94,7 +124,7 @@ describe('GetEventAttendeesUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('Event ID is required');
-    expect(result.error?.statusCode).toBe(400);
+    expect((result.error as AppError)?.statusCode).toBe(400);
     expect(mockRepository.findById).not.toHaveBeenCalled();
   });
 
@@ -107,7 +137,7 @@ describe('GetEventAttendeesUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('Event not found');
-    expect(result.error?.statusCode).toBe(404);
+    expect((result.error as AppError)?.statusCode).toBe(404);
     expect(mockRepository.getAttendees).not.toHaveBeenCalled();
   });
 
@@ -121,7 +151,7 @@ describe('GetEventAttendeesUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toBe(errorMessage);
-    expect(result.error?.statusCode).toBe(500);
+    expect((result.error as AppError)?.statusCode).toBe(500);
   });
 
   it('should handle getAttendees errors', async () => {
@@ -136,6 +166,6 @@ describe('GetEventAttendeesUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toBe(errorMessage);
-    expect(result.error?.statusCode).toBe(500);
+    expect((result.error as AppError)?.statusCode).toBe(500);
   });
 });

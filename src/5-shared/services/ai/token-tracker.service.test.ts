@@ -3,20 +3,20 @@ import { TokenTrackerService } from './token-tracker.service';
 import { AIProvider, AIUseCase, AIRequestStatus, AIModel } from '@/3-domain/enums/AIEnums';
 
 // Mock Supabase client
+const mockSupabaseQuery = {
+  select: vi.fn(() => mockSupabaseQuery),
+  insert: vi.fn(() => mockSupabaseQuery),
+  eq: vi.fn(() => mockSupabaseQuery),
+  gte: vi.fn(() => mockSupabaseQuery),
+  lte: vi.fn(() => mockSupabaseQuery),
+  single: vi.fn(),
+};
+
+const mockSupabaseClient = {
+  from: vi.fn(() => mockSupabaseQuery),
+};
+
 vi.mock('@/4-infrastructure/database/supabase-server', () => {
-  const mockSupabaseQuery = {
-    select: vi.fn(() => mockSupabaseQuery),
-    insert: vi.fn(() => mockSupabaseQuery),
-    eq: vi.fn(() => mockSupabaseQuery),
-    gte: vi.fn(() => mockSupabaseQuery),
-    lte: vi.fn(() => mockSupabaseQuery),
-    single: vi.fn(),
-  };
-
-  const mockSupabaseClient = {
-    from: vi.fn(() => mockSupabaseQuery),
-  };
-
   return {
     createClient: vi.fn().mockResolvedValue(mockSupabaseClient),
   };
@@ -24,13 +24,9 @@ vi.mock('@/4-infrastructure/database/supabase-server', () => {
 
 describe('TokenTrackerService', () => {
   let service: TokenTrackerService;
-  let mockSupabaseQuery: any;
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    const { createClient } = await import('@/4-infrastructure/database/supabase-server');
-    const client = await createClient();
-    mockSupabaseQuery = client.from('ai_usage_logs');
     service = new TokenTrackerService();
   });
 
@@ -106,7 +102,10 @@ describe('TokenTrackerService', () => {
 
       // Mock the chain: first query (count with filters), second query (select)
       // First query chain: from().select().eq()... returns promise with { data, error, count }
-      const mockQueryChain1 = {
+      const mockQueryChain1: any = {
+        select: vi.fn(function (this: any) {
+          return this;
+        }),
         eq: vi.fn(function (this: any) {
           return this;
         }),
@@ -118,9 +117,6 @@ describe('TokenTrackerService', () => {
         }),
         then: vi.fn((resolve: any) => resolve({ data: null, error: null, count: 3 })),
       };
-      mockQueryChain1.select = vi.fn(function (this: any) {
-        return this;
-      });
 
       // Second query: from().select() returns promise with { data, error }
       const mockQueryChain2 = {
@@ -128,9 +124,7 @@ describe('TokenTrackerService', () => {
       };
 
       // Mock from() to return different chains for each call
-      const { createClient } = await import('@/4-infrastructure/database/supabase-server');
-      const client = await createClient();
-      client.from
+      vi.mocked(mockSupabaseClient.from)
         .mockReturnValueOnce(mockQueryChain1 as any)
         .mockReturnValueOnce(mockQueryChain2 as any);
 
@@ -145,10 +139,31 @@ describe('TokenTrackerService', () => {
     });
 
     it('should return 0 if no logs found', async () => {
-      mockSupabaseQuery.select.mockResolvedValue({
-        data: [],
-        error: null,
-      });
+      // Mock first query (count)
+      const mockQueryChain1: any = {
+        select: vi.fn(function (this: any) {
+          return this;
+        }),
+        eq: vi.fn(function (this: any) {
+          return this;
+        }),
+        gte: vi.fn(function (this: any) {
+          return this;
+        }),
+        lte: vi.fn(function (this: any) {
+          return this;
+        }),
+        then: vi.fn((resolve: any) => resolve({ data: null, error: null, count: 0 })),
+      };
+
+      // Mock second query (select)
+      const mockQueryChain2 = {
+        select: vi.fn().mockResolvedValue({ data: [], error: null }),
+      };
+
+      vi.mocked(mockSupabaseClient.from)
+        .mockReturnValueOnce(mockQueryChain1 as any)
+        .mockReturnValueOnce(mockQueryChain2 as any);
 
       const result = await service.getTotalTokens();
 
@@ -174,10 +189,21 @@ describe('TokenTrackerService', () => {
         },
       ];
 
-      mockSupabaseQuery.select.mockResolvedValue({
-        data: mockLogs,
-        error: null,
-      });
+      // Mock query chain
+      const mockQueryChain = {
+        select: vi.fn().mockResolvedValue({ data: mockLogs, error: null }),
+        eq: vi.fn(function (this: any) {
+          return this;
+        }),
+        gte: vi.fn(function (this: any) {
+          return this;
+        }),
+        lte: vi.fn(function (this: any) {
+          return this;
+        }),
+      };
+
+      vi.mocked(mockSupabaseClient.from).mockReturnValue(mockQueryChain as any);
 
       const result = await service.getUsageStats();
 

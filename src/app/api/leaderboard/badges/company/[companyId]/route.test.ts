@@ -81,7 +81,6 @@ describe('GET /api/leaderboard/badges/company/[companyId]', () => {
         companyId: 'company-1',
         badgeId: 'badge-1',
         earnedAt: new Date(),
-        badge: mockBadge,
       },
     ];
 

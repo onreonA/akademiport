@@ -84,8 +84,9 @@ describe('SupabaseCustomReportRepository', () => {
     it('should create custom report successfully', async () => {
       const createDto = {
         name: 'New Report',
-        reportType: 'progress',
-        dateRangeType: 'month',
+        reportType: 'custom' as const,
+        dateRangeType: 'last_30_days' as const,
+        selectedMetrics: [],
       };
 
       const mockCreatedReport = {

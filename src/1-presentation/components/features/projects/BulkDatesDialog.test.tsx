@@ -12,9 +12,13 @@ import type { ProjectAssignmentMatrixDTO } from '@/application/dto/project-assig
 
 describe('BulkDatesDialog', () => {
   const mockMatrix: ProjectAssignmentMatrixDTO = {
+    project: {
+      id: 'project-1',
+      name: 'Test Project',
+    },
     subProjects: [
-      { id: 'sub-1', name: 'Sub Project 1' },
-      { id: 'sub-2', name: 'Sub Project 2' },
+      { id: 'sub-1', name: 'Sub Project 1', status: 'in_progress', orderIndex: 0 },
+      { id: 'sub-2', name: 'Sub Project 2', status: 'in_progress', orderIndex: 1 },
     ],
     companies: [
       { id: 'company-1', name: 'Company 1', city: 'Istanbul' },
@@ -23,15 +27,19 @@ describe('BulkDatesDialog', () => {
     assignments: [
       {
         companyId: 'company-1',
+        projectId: 'project-1',
         subProjectId: 'sub-1',
         startDate: null,
         endDate: null,
+        isActive: true,
       },
       {
         companyId: 'company-2',
+        projectId: 'project-1',
         subProjectId: 'sub-1',
         startDate: null,
         endDate: null,
+        isActive: true,
       },
     ],
   };
@@ -200,111 +208,106 @@ describe('BulkDatesDialog', () => {
     });
   });
 
-  it(
-    'calls onOpenChange when cancel button is clicked',
-    { timeout: 15000 },
-    async () => {
-      const onOpenChange = vi.fn();
-      const user = userEvent.setup();
+  it('calls onOpenChange when cancel button is clicked', { timeout: 15000 }, async () => {
+    const onOpenChange = vi.fn();
+    const user = userEvent.setup();
 
-      render(
-        <BulkDatesDialog
-          open={true}
-          matrix={mockMatrix}
-          onOpenChange={onOpenChange}
-          onSubmit={vi.fn()}
-        />
-      );
+    render(
+      <BulkDatesDialog
+        open={true}
+        matrix={mockMatrix}
+        onOpenChange={onOpenChange}
+        onSubmit={vi.fn()}
+      />
+    );
 
-      // Wait for dialog to render (portal)
-      await waitFor(
-        () => {
-          expect(screen.getByText(/firma bazlı tarihleri/i)).toBeInTheDocument();
-        },
-        { timeout: 3000 }
-      );
+    // Wait for dialog to render (portal)
+    await waitFor(
+      () => {
+        expect(screen.getByText(/firma bazlı tarihleri/i)).toBeInTheDocument();
+      },
+      { timeout: 3000 }
+    );
 
-      // Wait for select to render
-      await waitFor(
-        () => {
-          const selectTrigger = screen.getByRole('combobox');
-          expect(selectTrigger).toBeInTheDocument();
-        },
-        { timeout: 3000 }
-      );
+    // Wait for select to render
+    await waitFor(
+      () => {
+        const selectTrigger = screen.getByRole('combobox');
+        expect(selectTrigger).toBeInTheDocument();
+      },
+      { timeout: 3000 }
+    );
 
-      // Wait for dialog content to fully render including DialogFooter
-      // The DialogFooter contains both cancel and submit buttons
-      // Give it more time for DialogFooter to render
-      await waitFor(
-        () => {
-          // Check for submit button first (it's always rendered)
-          const submitButton = screen.queryByRole('button', { name: /tarihleri kaydet/i });
-          expect(submitButton).toBeInTheDocument();
-          // Then check for cancel button - use multiple methods
-          const byRole = screen.queryByRole('button', { name: /iptal/i });
-          if (byRole) return true;
+    // Wait for dialog content to fully render including DialogFooter
+    // The DialogFooter contains both cancel and submit buttons
+    // Give it more time for DialogFooter to render
+    await waitFor(
+      () => {
+        // Check for submit button first (it's always rendered)
+        const submitButton = screen.queryByRole('button', { name: /tarihleri kaydet/i });
+        expect(submitButton).toBeInTheDocument();
+        // Then check for cancel button - use multiple methods
+        const byRole = screen.queryByRole('button', { name: /iptal/i });
+        if (byRole) return true;
 
-          // Fallback: find by text content
-          const buttons = screen.getAllByRole('button');
-          const found = buttons.some((btn) => {
-            const text = btn.textContent?.trim() || '';
-            return (
-              text.toLowerCase() === 'iptal' ||
-              text.toLowerCase().includes('iptal') ||
-              text === 'İptal' ||
-              text.includes('İptal')
-            );
-          });
-          return found;
-        },
-        { timeout: 10000 }
-      );
-
-      // Find cancel button - it should be in DialogFooter
-      let cancelButton: HTMLElement | null = null;
-
-      // Try getByRole first (most reliable)
-      try {
-        cancelButton = screen.getByRole('button', { name: /iptal/i });
-      } catch {
         // Fallback: find by text content
         const buttons = screen.getAllByRole('button');
-        cancelButton =
-          buttons.find((btn) => {
-            const text = btn.textContent?.trim() || '';
-            return (
-              text.toLowerCase() === 'iptal' ||
-              text.toLowerCase().includes('iptal') ||
-              text === 'İptal' ||
-              text.includes('İptal')
-            );
-          }) || null;
+        const found = buttons.some((btn) => {
+          const text = btn.textContent?.trim() || '';
+          return (
+            text.toLowerCase() === 'iptal' ||
+            text.toLowerCase().includes('iptal') ||
+            text === 'İptal' ||
+            text.includes('İptal')
+          );
+        });
+        return found;
+      },
+      { timeout: 10000 }
+    );
 
-        // Last resort: query by text and find closest button
-        if (!cancelButton) {
-          const textElement = screen.queryByText(/iptal/i);
-          if (textElement) {
-            cancelButton = textElement.closest('button') as HTMLElement;
-          }
+    // Find cancel button - it should be in DialogFooter
+    let cancelButton: HTMLElement | null = null;
+
+    // Try getByRole first (most reliable)
+    try {
+      cancelButton = screen.getByRole('button', { name: /iptal/i });
+    } catch {
+      // Fallback: find by text content
+      const buttons = screen.getAllByRole('button');
+      cancelButton =
+        buttons.find((btn) => {
+          const text = btn.textContent?.trim() || '';
+          return (
+            text.toLowerCase() === 'iptal' ||
+            text.toLowerCase().includes('iptal') ||
+            text === 'İptal' ||
+            text.includes('İptal')
+          );
+        }) || null;
+
+      // Last resort: query by text and find closest button
+      if (!cancelButton) {
+        const textElement = screen.queryByText(/iptal/i);
+        if (textElement) {
+          cancelButton = textElement.closest('button') as HTMLElement;
         }
       }
+    }
 
-      expect(cancelButton).toBeDefined();
-      expect(cancelButton).not.toBeNull();
-      expect(cancelButton).toBeInTheDocument();
-      expect(cancelButton).not.toBeDisabled();
-      await user.click(cancelButton!);
+    expect(cancelButton).toBeDefined();
+    expect(cancelButton).not.toBeNull();
+    expect(cancelButton).toBeInTheDocument();
+    expect(cancelButton).not.toBeDisabled();
+    await user.click(cancelButton!);
 
-      await waitFor(
-        () => {
-          expect(onOpenChange).toHaveBeenCalledWith(false);
-        },
-        { timeout: 3000 }
-      );
-    },
-    { timeout: 15000 }
-  );
+    await waitFor(
+      () => {
+        expect(onOpenChange).toHaveBeenCalledWith(false);
+      },
+      { timeout: 15000 }
+    );
+  });
 
   it('submits form with selected dates', async () => {
     const user = userEvent.setup();

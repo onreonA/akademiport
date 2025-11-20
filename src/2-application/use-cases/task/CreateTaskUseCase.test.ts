@@ -7,6 +7,7 @@ import { CreateTaskUseCase } from './CreateTaskUseCase';
 import { ITaskRepository } from '@/3-domain/interfaces/repositories/ITaskRepository';
 import { ISubProjectRepository } from '@/3-domain/interfaces/repositories/ISubProjectRepository';
 import { Task } from '@/3-domain/entities/Task';
+import { AppError } from '@/6-core/errors/AppError';
 
 describe('CreateTaskUseCase', () => {
   let mockTaskRepository: ITaskRepository;
@@ -17,28 +18,28 @@ describe('CreateTaskUseCase', () => {
     mockTaskRepository = {
       create: vi.fn(),
       findById: vi.fn(),
-      findAll: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
-      findBySubProject: vi.fn(),
-      findByAssignedUser: vi.fn(),
       findBySubProjectId: vi.fn(),
+      findBySubProjectIds: vi.fn(),
+      findByAssignedUserId: vi.fn(),
       complete: vi.fn(),
       approve: vi.fn(),
       reject: vi.fn(),
       assign: vi.fn(),
       exists: vi.fn(),
-    };
+      restore: vi.fn(),
+    } as any;
 
     mockSubProjectRepository = {
       create: vi.fn(),
       findById: vi.fn(),
-      findAll: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
       exists: vi.fn(),
       findByProjectId: vi.fn(),
-    };
+      restore: vi.fn(),
+    } as any;
 
     useCase = new CreateTaskUseCase(mockTaskRepository, mockSubProjectRepository);
   });
@@ -58,6 +59,11 @@ describe('CreateTaskUseCase', () => {
       id: 'task-1',
       ...dto,
       status: 'todo',
+      dueDate: null,
+      completedAt: null,
+      approvedAt: null,
+      approvedBy: null,
+      deletedAt: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -100,7 +106,7 @@ describe('CreateTaskUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('Sub-project not found');
-    expect(result.error?.statusCode).toBe(404);
+    expect((result.error as AppError)?.statusCode).toBe(404);
     expect(mockTaskRepository.create).not.toHaveBeenCalled();
   });
 
@@ -115,6 +121,6 @@ describe('CreateTaskUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toBe(errorMessage);
-    expect(result.error?.statusCode).toBe(500);
+    expect((result.error as AppError)?.statusCode).toBe(500);
   });
 });

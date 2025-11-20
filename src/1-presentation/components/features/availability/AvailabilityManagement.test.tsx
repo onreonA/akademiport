@@ -123,8 +123,9 @@ describe('AvailabilityManagement', () => {
 
   it('displays existing availability rules', async () => {
     const { useAvailability } = await import('@/shared/hooks/api/useAvailability');
-    vi.mocked(useAvailability).mockReturnValueOnce({
-      data: [
+    const { createMockQueryResult } = await import('@/shared/test/helpers');
+    vi.mocked(useAvailability).mockReturnValueOnce(
+      createMockQueryResult([
         {
           id: 'availability-1',
           consultantId: 'consultant-1',
@@ -133,11 +134,15 @@ describe('AvailabilityManagement', () => {
           endTime: '17:00',
           programId: 'program-1',
           isActive: true,
+          validFrom: null,
+          validUntil: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          createdBy: null,
+          updatedBy: null,
         },
-      ],
-      isLoading: false,
-      error: null,
-    });
+      ])
+    );
 
     render(<AvailabilityManagement />);
 
@@ -148,20 +153,24 @@ describe('AvailabilityManagement', () => {
 
   it('displays existing unavailable dates', async () => {
     // Mock useUnavailableDates hook
-    const mockUseUnavailableDates = vi.fn(() => ({
-      data: [
+    const { createMockQueryResult } = await import('@/shared/test/helpers');
+    const mockUseUnavailableDates = vi.fn(() =>
+      createMockQueryResult([
         {
           id: 'unavailable-1',
           consultantId: 'consultant-1',
           startTime: new Date('2025-02-05T00:00:00Z'),
           endTime: new Date('2025-02-05T23:59:59Z'),
           reason: 'Tatil',
+          notes: null,
           programId: 'program-1',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          createdBy: null,
+          updatedBy: null,
         },
-      ],
-      isLoading: false,
-      error: null,
-    }));
+      ])
+    );
 
     // Update the mock
     vi.mocked(
@@ -198,11 +207,10 @@ describe('AvailabilityManagement', () => {
 
   it('shows loading state', async () => {
     const { useAvailability } = await import('@/shared/hooks/api/useAvailability');
-    vi.mocked(useAvailability).mockReturnValueOnce({
-      data: null,
-      isLoading: true,
-      error: null,
-    });
+    const { createMockQueryResult } = await import('@/shared/test/helpers');
+    vi.mocked(useAvailability).mockReturnValueOnce(
+      createMockQueryResult<Availability[]>([], { isLoading: true })
+    );
 
     render(<AvailabilityManagement />);
 
@@ -213,11 +221,8 @@ describe('AvailabilityManagement', () => {
 
   it('shows empty state when no availability rules', async () => {
     // Mock useAvailability hook to return empty array
-    const mockUseAvailability = vi.fn(() => ({
-      data: [],
-      isLoading: false,
-      error: null,
-    }));
+    const { createMockQueryResult } = await import('@/shared/test/helpers');
+    const mockUseAvailability = vi.fn(() => createMockQueryResult([]));
 
     // Update the mock
     vi.mocked(

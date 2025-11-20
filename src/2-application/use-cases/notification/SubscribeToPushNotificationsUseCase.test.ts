@@ -15,13 +15,12 @@ describe('SubscribeToPushNotificationsUseCase', () => {
   beforeEach(() => {
     mockRepository = {
       create: vi.fn(),
-      findById: vi.fn(),
       findByUserId: vi.fn(),
       findByEndpoint: vi.fn(),
       delete: vi.fn(),
       deleteByEndpoint: vi.fn(),
       deleteByUserId: vi.fn(),
-    };
+    } as any;
 
     useCase = new SubscribeToPushNotificationsUseCase(mockRepository);
   });
@@ -35,6 +34,7 @@ describe('SubscribeToPushNotificationsUseCase', () => {
       auth: 'auth-key',
       userAgent: 'Mozilla/5.0',
       createdAt: new Date(),
+      updatedAt: new Date(),
       ...overrides,
     };
   };

@@ -21,8 +21,13 @@ describe('AssignCompanyProgramUseCase', () => {
       update: vi.fn(),
       delete: vi.fn(),
       findByProgramId: vi.fn(),
+      findByCity: vi.fn(),
+      search: vi.fn(),
+      findWithFilters: vi.fn(),
+      getCompanyUsers: vi.fn(),
+      addCompanyUser: vi.fn(),
       removeCompanyUser: vi.fn(),
-    };
+    } as any;
 
     useCase = new AssignCompanyProgramUseCase(mockRepository);
   });
@@ -30,11 +35,33 @@ describe('AssignCompanyProgramUseCase', () => {
   const createMockCompany = (overrides?: Partial<Company>): Company => {
     return {
       id: 'company-1',
-      name: 'Test Company',
       programId: 'program-1',
+      name: 'Test Company',
+      legalName: undefined,
+      taxNumber: undefined,
+      tradeRegistryNumber: undefined,
+      slug: 'test-company',
+      email: undefined,
+      phone: undefined,
+      website: undefined,
+      address: undefined,
+      city: undefined,
+      district: undefined,
+      postalCode: undefined,
+      country: 'Turkey',
+      sector: undefined,
+      subSector: undefined,
+      employeeCount: undefined,
+      foundationYear: undefined,
+      logoUrl: undefined,
       isActive: true,
+      maxUsers: 10,
+      currentUsers: 0,
+      settings: undefined,
       createdAt: new Date(),
       updatedAt: new Date(),
+      createdBy: undefined,
+      updatedBy: undefined,
       ...overrides,
     };
   };

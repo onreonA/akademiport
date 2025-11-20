@@ -94,6 +94,7 @@ export function createMockUser(
     email: string;
     role: UserRole;
     fullName: string;
+    companyId?: string;
   }>
 ) {
   return {
@@ -101,6 +102,7 @@ export function createMockUser(
     email: overrides?.email || 'test@example.com',
     role: overrides?.role || UserRole.MASTER_ADMIN,
     full_name: overrides?.fullName || 'Test User',
+    company_id: overrides?.companyId,
     ...overrides,
   };
 }

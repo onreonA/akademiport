@@ -9,7 +9,8 @@ import { ICompanyRepository } from '@/3-domain/interfaces/ICompanyRepository';
 import { Program } from '@/3-domain/entities/Program';
 import { Company } from '@/3-domain/entities/Company';
 import { UserRole } from '@/3-domain/enums/UserRole';
-import { Result } from '@/core/result/Result';
+import { ProgramStatus } from '@/3-domain/enums/ProgramStatus';
+import { Result } from '@/6-core/result/Result';
 
 describe('DeleteProgramUseCase', () => {
   let mockProgramRepository: IProgramRepository;
@@ -24,10 +25,13 @@ describe('DeleteProgramUseCase', () => {
       update: vi.fn(),
       delete: vi.fn(),
       findByManagerId: vi.fn(),
-      findByConsultantId: vi.fn(),
       findByStatus: vi.fn(),
       findByCity: vi.fn(),
-    };
+      search: vi.fn(),
+      addConsultant: vi.fn(),
+      removeConsultant: vi.fn(),
+      getConsultants: vi.fn(),
+    } as any;
 
     mockCompanyRepository = {
       create: vi.fn(),
@@ -36,9 +40,12 @@ describe('DeleteProgramUseCase', () => {
       update: vi.fn(),
       delete: vi.fn(),
       findByProgramId: vi.fn(),
-      findByConsultantId: vi.fn(),
-      findWithFilters: vi.fn(),
-    };
+      findByCity: vi.fn(),
+      search: vi.fn(),
+      getCompanyUsers: vi.fn(),
+      addCompanyUser: vi.fn(),
+      removeCompanyUser: vi.fn(),
+    } as any;
 
     useCase = new DeleteProgramUseCase(mockProgramRepository, mockCompanyRepository);
   });
@@ -48,10 +55,13 @@ describe('DeleteProgramUseCase', () => {
       id: 'program-1',
       name: 'Test Program',
       description: 'Test Description',
+      slug: 'test-program',
       startDate: new Date('2025-01-01'),
       endDate: new Date('2025-12-31'),
-      isActive: true,
-      managerId: 'manager-1',
+      maxCompanies: 10,
+      currentCompanies: 0,
+      status: ProgramStatus.ACTIVE,
+      programManagerId: 'manager-1',
       createdAt: new Date(),
       updatedAt: new Date(),
       ...overrides,
@@ -61,19 +71,33 @@ describe('DeleteProgramUseCase', () => {
   const createMockCompany = (overrides?: Partial<Company>): Company => {
     return {
       id: 'company-1',
+      programId: 'program-1',
       name: 'Test Company',
+      legalName: undefined,
       taxNumber: '1234567890',
+      tradeRegistryNumber: undefined,
+      slug: 'test-company',
       email: 'test@company.com',
       phone: '+905551234567',
+      website: undefined,
       address: 'Test Address',
       city: 'Istanbul',
+      district: undefined,
+      postalCode: undefined,
       country: 'Turkey',
+      sector: undefined,
+      subSector: undefined,
+      employeeCount: undefined,
+      foundationYear: undefined,
+      logoUrl: undefined,
       isActive: true,
-      programId: 'program-1',
       maxUsers: 10,
       currentUsers: 0,
+      settings: undefined,
       createdAt: new Date(),
       updatedAt: new Date(),
+      createdBy: undefined,
+      updatedBy: undefined,
       ...overrides,
     };
   };

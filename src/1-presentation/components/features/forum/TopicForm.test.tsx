@@ -7,10 +7,43 @@ import { render, screen, waitFor } from '@/shared/test/utils';
 import userEvent from '@testing-library/user-event';
 import { TopicForm } from './TopicForm';
 import { TopicPriority } from '@/3-domain/enums/ForumEnums';
+import { ForumCategory } from '@/3-domain/entities/Forum';
 
-const mockCategories = [
-  { id: 'cat-1', name: 'Category 1', programId: 'program-1' },
-  { id: 'cat-2', name: 'Category 2', programId: 'program-1' },
+const mockCategories: ForumCategory[] = [
+  {
+    id: 'cat-1',
+    name: 'Category 1',
+    slug: 'category-1',
+    programId: 'program-1',
+    description: null,
+    icon: null,
+    color: null,
+    orderIndex: 0,
+    isActive: true,
+    requireApproval: false,
+    topicCount: 0,
+    replyCount: 0,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    createdBy: null,
+  },
+  {
+    id: 'cat-2',
+    name: 'Category 2',
+    slug: 'category-2',
+    programId: 'program-1',
+    description: null,
+    icon: null,
+    color: null,
+    orderIndex: 1,
+    isActive: true,
+    requireApproval: false,
+    topicCount: 0,
+    replyCount: 0,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    createdBy: null,
+  },
 ];
 
 const mockOnSubmit = vi.fn();

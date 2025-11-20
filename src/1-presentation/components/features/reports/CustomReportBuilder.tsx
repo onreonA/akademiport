@@ -97,7 +97,7 @@ const reportFormSchema = z
     }
   );
 
-type ReportFormValues = z.infer<typeof reportFormSchema>;
+export type ReportFormValues = z.infer<typeof reportFormSchema>;
 
 export interface CustomReportBuilderProps {
   initialData?: Partial<ReportFormValues>;

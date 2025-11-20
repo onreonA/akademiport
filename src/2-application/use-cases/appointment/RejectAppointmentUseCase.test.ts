@@ -8,7 +8,9 @@ import { IAppointmentRepository } from '@/3-domain/interfaces/repositories/IAppo
 import { NotificationService } from '@/5-shared/services/notification';
 import { IUserRepository } from '@/3-domain/interfaces/IUserRepository';
 import { Appointment } from '@/3-domain/entities/Appointment';
-import type { AppointmentStatus } from '@/3-domain/enums';
+import { AppointmentStatus } from '@/3-domain/enums/AppointmentStatus';
+import { AppError } from '@/6-core/errors/AppError';
+import { Result } from '@/6-core/result/Result';
 
 describe('RejectAppointmentUseCase', () => {
   let mockRepository: IAppointmentRepository;
@@ -26,12 +28,17 @@ describe('RejectAppointmentUseCase', () => {
       findByDateRange: vi.fn(),
       findByConsultantId: vi.fn(),
       findByCompanyId: vi.fn(),
+      findByProgramId: vi.fn(),
+      findByStatus: vi.fn(),
       findConflictingAppointments: vi.fn(),
       approve: vi.fn(),
       reject: vi.fn(),
       reschedule: vi.fn(),
       updateZoomMeeting: vi.fn(),
-    };
+      exists: vi.fn(),
+      markAsCompleted: vi.fn(),
+      markAsAttended: vi.fn(),
+    } as any;
 
     mockNotificationService = {
       sendAppointmentConfirmed: vi.fn(),
@@ -206,7 +213,7 @@ describe('RejectAppointmentUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('Appointment ID is required');
-    expect(result.error?.statusCode).toBe(400);
+    expect((result.error as AppError)?.statusCode).toBe(400);
   });
 
   it('should return error when rejectedBy is empty', async () => {
@@ -214,7 +221,7 @@ describe('RejectAppointmentUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('Rejector ID is required');
-    expect(result.error?.statusCode).toBe(400);
+    expect((result.error as AppError)?.statusCode).toBe(400);
   });
 
   it('should return error when appointment not found', async () => {
@@ -227,7 +234,7 @@ describe('RejectAppointmentUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('Appointment not found');
-    expect(result.error?.statusCode).toBe(404);
+    expect((result.error as AppError)?.statusCode).toBe(404);
     expect(mockRepository.reject).not.toHaveBeenCalled();
   });
 
@@ -242,7 +249,7 @@ describe('RejectAppointmentUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('Appointment cannot be rejected');
-    expect(result.error?.statusCode).toBe(400);
+    expect((result.error as AppError)?.statusCode).toBe(400);
     expect(mockRepository.reject).not.toHaveBeenCalled();
   });
 

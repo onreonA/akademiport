@@ -93,7 +93,14 @@ describe('LikeTopicUseCase', () => {
 
       vi.mocked(mockRepository.findTopicById).mockResolvedValue(Result.ok(mockTopic));
       vi.mocked(mockRepository.isTopicLikedByUser).mockResolvedValue(Result.ok(false));
-      vi.mocked(mockRepository.likeTopic).mockResolvedValue(Result.ok(undefined));
+      const mockLike = {
+        id: 'like-1',
+        topicId: topicId,
+        replyId: null,
+        userId: userId,
+        createdAt: new Date(),
+      };
+      vi.mocked(mockRepository.likeTopic).mockResolvedValue(Result.ok(mockLike));
 
       const result = await useCase.execute(topicId, userId);
 

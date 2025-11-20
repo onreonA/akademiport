@@ -6,8 +6,10 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { DeleteEventUseCase } from './DeleteEventUseCase';
 import { IEventRepository } from '@/3-domain/interfaces/repositories/IEventRepository';
 import { NotificationService } from '@/5-shared/services/notification';
-import { Event } from '@/3-domain/entities/Event';
+import { Event, EventAttendance } from '@/3-domain/entities/Event';
 import type { EventStatus, EventCategory } from '@/3-domain/entities/Event';
+import { AppError } from '@/6-core/errors/AppError';
+import { Result } from '@/6-core/result/Result';
 
 // Mock ZoomApiService
 vi.mock('@/infrastructure/external/zoom-api.service', () => ({
@@ -33,7 +35,13 @@ describe('DeleteEventUseCase', () => {
       findByProgramId: vi.fn(),
       getAttendees: vi.fn(),
       updateZoomMeeting: vi.fn(),
-    };
+      exists: vi.fn(),
+      registerAttendance: vi.fn(),
+      cancelAttendance: vi.fn(),
+      findByUserId: vi.fn(),
+      findByCompanyId: vi.fn(),
+      updateAttendeeCount: vi.fn(),
+    } as any;
 
     mockNotificationService = {
       sendEventCancelled: vi.fn(),
@@ -64,17 +72,21 @@ describe('DeleteEventUseCase', () => {
       startTime,
       endTime,
       timezone: 'Europe/Istanbul',
-      location: null,
-      category: 'training' as EventCategory,
+      category: 'webinar' as EventCategory,
       status: 'scheduled' as EventStatus,
+      attendanceRequired: true,
       maxAttendees: 50,
       currentAttendees: 0,
+      organizerName: null,
+      organizerEmail: null,
+      isPublic: true,
       zoomMeetingId: null,
       zoomJoinUrl: null,
       zoomStartUrl: null,
       zoomPassword: null,
       createdAt: new Date(),
       updatedAt: new Date(),
+      createdBy: null,
       ...overrides,
     };
   };
@@ -100,7 +112,7 @@ describe('DeleteEventUseCase', () => {
     const mockEvent = createMockEvent({ id: eventId, zoomMeetingId });
 
     const { ZoomApiService } = await import('@/infrastructure/external/zoom-api.service');
-    vi.mocked(ZoomApiService.deleteMeeting).mockResolvedValue(undefined);
+    vi.mocked(ZoomApiService.deleteMeeting).mockResolvedValue(true);
 
     vi.mocked(mockRepository.findById).mockResolvedValue(mockEvent);
     vi.mocked(mockRepository.delete).mockResolvedValue(undefined);
@@ -133,12 +145,37 @@ describe('DeleteEventUseCase', () => {
   it('should send notifications to attendees', async () => {
     const eventId = 'event-1';
     const mockEvent = createMockEvent({ id: eventId });
-    const attendees = [{ userId: 'user-1' }, { userId: 'user-2' }];
+    const attendees: EventAttendance[] = [
+      {
+        id: 'attendance-1',
+        eventId: eventId,
+        userId: 'user-1',
+        companyId: 'company-1',
+        userName: 'User 1',
+        companyName: 'Company 1',
+        registeredAt: new Date(),
+        attendedAt: null,
+        notes: null,
+      },
+      {
+        id: 'attendance-2',
+        eventId: eventId,
+        userId: 'user-2',
+        companyId: 'company-2',
+        userName: 'User 2',
+        companyName: 'Company 2',
+        registeredAt: new Date(),
+        attendedAt: null,
+        notes: null,
+      },
+    ];
 
     vi.mocked(mockRepository.findById).mockResolvedValue(mockEvent);
     vi.mocked(mockRepository.delete).mockResolvedValue(undefined);
     vi.mocked(mockRepository.getAttendees).mockResolvedValue(attendees);
-    vi.mocked(mockNotificationService.sendEventCancelled).mockResolvedValue(undefined);
+    vi.mocked(mockNotificationService.sendEventCancelled).mockResolvedValue(
+      Result.ok(undefined as any)
+    );
 
     const result = await useCase.execute(eventId);
 
@@ -149,7 +186,19 @@ describe('DeleteEventUseCase', () => {
   it('should continue even if notification fails', async () => {
     const eventId = 'event-1';
     const mockEvent = createMockEvent({ id: eventId });
-    const attendees = [{ userId: 'user-1' }];
+    const attendees: EventAttendance[] = [
+      {
+        id: 'attendance-1',
+        eventId: eventId,
+        userId: 'user-1',
+        companyId: 'company-1',
+        userName: 'User 1',
+        companyName: 'Company 1',
+        registeredAt: new Date(),
+        attendedAt: null,
+        notes: null,
+      },
+    ];
 
     vi.mocked(mockRepository.findById).mockResolvedValue(mockEvent);
     vi.mocked(mockRepository.delete).mockResolvedValue(undefined);
@@ -169,7 +218,7 @@ describe('DeleteEventUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('Event ID is required');
-    expect(result.error?.statusCode).toBe(400);
+    expect((result.error as AppError)?.statusCode).toBe(400);
     expect(mockRepository.findById).not.toHaveBeenCalled();
   });
 
@@ -182,7 +231,7 @@ describe('DeleteEventUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('Event not found');
-    expect(result.error?.statusCode).toBe(404);
+    expect((result.error as AppError)?.statusCode).toBe(404);
     expect(mockRepository.delete).not.toHaveBeenCalled();
   });
 
@@ -196,6 +245,6 @@ describe('DeleteEventUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toBe(errorMessage);
-    expect(result.error?.statusCode).toBe(500);
+    expect((result.error as AppError)?.statusCode).toBe(500);
   });
 });

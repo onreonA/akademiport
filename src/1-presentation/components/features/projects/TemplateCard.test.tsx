@@ -6,9 +6,10 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@/shared/test/utils';
 import { TemplateCard } from './TemplateCard';
 import userEvent from '@testing-library/user-event';
+import type { Project } from '@/domain/entities/Project';
 
 describe('TemplateCard', () => {
-  const createMockTemplate = (overrides?: Partial<TemplateCardProps['template']>) => {
+  const createMockTemplate = (overrides?: Partial<Project>) => {
     return {
       id: 'template-1',
       name: 'Test Template',

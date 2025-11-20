@@ -79,7 +79,9 @@ describe('TaskRepository', () => {
       const createDto = {
         subProjectId: 'subproject-1',
         title: 'New Task',
-        status: 'todo',
+        status: 'todo' as const,
+        priority: 'medium' as const,
+        orderIndex: 0,
       };
 
       const mockCreatedTask = {

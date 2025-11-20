@@ -19,7 +19,11 @@ describe('ListCustomReportsUseCase', () => {
       findWithFilters: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
-    };
+      findByUserId: vi.fn(),
+      findScheduledReports: vi.fn(),
+      findReportsToGenerate: vi.fn(),
+      updateGenerationTime: vi.fn(),
+    } as any;
 
     useCase = new ListCustomReportsUseCase(mockRepository);
   });
@@ -32,7 +36,7 @@ describe('ListCustomReportsUseCase', () => {
       description: null,
       programId: null,
       companyId: null,
-      reportType: 'monthly',
+      reportType: 'custom',
       templateId: null,
       selectedMetrics: [],
       dateRangeStart: null,

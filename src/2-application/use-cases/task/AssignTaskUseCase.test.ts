@@ -7,6 +7,8 @@ import { AssignTaskUseCase } from './AssignTaskUseCase';
 import { ITaskRepository } from '@/3-domain/interfaces/repositories/ITaskRepository';
 import { NotificationService } from '@/5-shared/services/notification';
 import { Task } from '@/3-domain/entities/Task';
+import { AppError } from '@/6-core/errors/AppError';
+import { Result } from '@/6-core/result/Result';
 
 describe('AssignTaskUseCase', () => {
   let mockRepository: ITaskRepository;
@@ -17,18 +19,19 @@ describe('AssignTaskUseCase', () => {
     mockRepository = {
       create: vi.fn(),
       findById: vi.fn(),
-      findAll: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
-      findBySubProject: vi.fn(),
-      findByAssignedUser: vi.fn(),
+      findBySubProjectId: vi.fn(),
+      findBySubProjectIds: vi.fn(),
+      findByAssignedUserId: vi.fn(),
       complete: vi.fn(),
       approve: vi.fn(),
       reject: vi.fn(),
       assign: vi.fn(),
       assignTo: vi.fn(),
       exists: vi.fn(),
-    };
+      restore: vi.fn(),
+    } as any;
 
     mockNotificationService = {
       sendTaskAssigned: vi.fn(),
@@ -52,9 +55,14 @@ describe('AssignTaskUseCase', () => {
       assignedTo: null,
       title: 'Test Task',
       description: 'Test Description',
-      status: 'pending',
-      priority: 'normal',
+      status: 'todo',
+      priority: 'medium',
+      dueDate: null,
+      completedAt: null,
+      approvedAt: null,
+      approvedBy: null,
       orderIndex: 1,
+      deletedAt: null,
       createdAt: new Date(),
       updatedAt: new Date(),
       ...overrides,
@@ -69,7 +77,9 @@ describe('AssignTaskUseCase', () => {
     vi.mocked(mockRepository.exists).mockResolvedValue(true);
     vi.mocked(mockRepository.findById).mockResolvedValue(mockTask);
     vi.mocked(mockRepository.assignTo).mockResolvedValue(undefined);
-    vi.mocked(mockNotificationService.sendTaskAssigned).mockResolvedValue(undefined);
+    vi.mocked(mockNotificationService.sendTaskAssigned).mockResolvedValue(
+      Result.ok(undefined as any)
+    );
 
     const result = await useCase.execute(taskId, userId);
 
@@ -96,7 +106,7 @@ describe('AssignTaskUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('Task not found');
-    expect(result.error?.statusCode).toBe(404);
+    expect((result.error as AppError)?.statusCode).toBe(404);
     expect(mockRepository.assignTo).not.toHaveBeenCalled();
   });
 
@@ -111,7 +121,7 @@ describe('AssignTaskUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('Task not found');
-    expect(result.error?.statusCode).toBe(404);
+    expect((result.error as AppError)?.statusCode).toBe(404);
     expect(mockRepository.assignTo).not.toHaveBeenCalled();
   });
 
@@ -160,6 +170,6 @@ describe('AssignTaskUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toBe(errorMessage);
-    expect(result.error?.statusCode).toBe(500);
+    expect((result.error as AppError)?.statusCode).toBe(500);
   });
 });

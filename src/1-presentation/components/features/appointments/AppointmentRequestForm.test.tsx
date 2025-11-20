@@ -36,27 +36,29 @@ vi.mock('@/presentation/components/ui/atoms/select', async () => {
   const extractOptions = (children: any): React.ReactElement[] => {
     const options: React.ReactElement[] = [];
 
-    const processChild = (child: any) => {
+    const processChild = (child: React.ReactNode) => {
       if (!React.isValidElement(child)) return;
 
+      const props = child.props as { value?: string; children?: React.ReactNode };
+
       // Check if it's a SelectItem (has value prop)
-      if (child.props?.value !== undefined) {
+      if (props.value !== undefined) {
         options.push(
           React.createElement(
             'option',
             {
-              key: child.props.value || child.key,
-              value: child.props.value,
+              key: props.value || child.key,
+              value: props.value,
             },
-            child.props.children
+            props.children
           )
         );
         return;
       }
 
       // If it has children, recursively process them
-      if (child.props?.children) {
-        React.Children.forEach(child.props.children, processChild);
+      if (props.children) {
+        React.Children.forEach(props.children, processChild);
       }
     };
 
@@ -71,16 +73,19 @@ vi.mock('@/presentation/components/ui/atoms/select', async () => {
       let selectId = 'consultant'; // Default ID
 
       // Process children to find SelectContent and SelectTrigger
-      React.Children.forEach(children, (child: any) => {
+      React.Children.forEach(children, (child: React.ReactNode) => {
         if (React.isValidElement(child)) {
+          const props = child.props as { id?: string; children?: React.ReactNode };
+          const type = child.type as { displayName?: string };
+
           // Get ID from SelectTrigger
-          if (child.props?.id) {
-            selectId = child.props.id;
+          if (props.id) {
+            selectId = props.id;
           }
           // Check if it's SelectContent - it will have SelectItem children
           // SelectContent is typically the second child after SelectTrigger
-          if (child.type && (child.type.displayName === 'SelectContent' || child.props?.children)) {
-            const testOptions = extractOptions(child.props.children);
+          if (type && (type.displayName === 'SelectContent' || props.children)) {
+            const testOptions = extractOptions(props.children);
             if (testOptions.length > 0) {
               options = testOptions;
             }

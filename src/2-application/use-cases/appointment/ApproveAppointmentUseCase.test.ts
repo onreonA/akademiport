@@ -8,7 +8,8 @@ import { IAppointmentRepository } from '@/3-domain/interfaces/repositories/IAppo
 import { NotificationService } from '@/5-shared/services/notification';
 import { IUserRepository } from '@/3-domain/interfaces/IUserRepository';
 import { Appointment } from '@/3-domain/entities/Appointment';
-import type { AppointmentStatus } from '@/3-domain/enums';
+import { AppointmentStatus } from '@/3-domain/enums/AppointmentStatus';
+import { AppError } from '@/6-core/errors/AppError';
 
 // Mock ZoomApiService
 vi.mock('@/infrastructure/external/zoom-api.service', () => ({
@@ -33,12 +34,17 @@ describe('ApproveAppointmentUseCase', () => {
       findByDateRange: vi.fn(),
       findByConsultantId: vi.fn(),
       findByCompanyId: vi.fn(),
+      findByProgramId: vi.fn(),
+      findByStatus: vi.fn(),
       findConflictingAppointments: vi.fn(),
       approve: vi.fn(),
       reject: vi.fn(),
       reschedule: vi.fn(),
       updateZoomMeeting: vi.fn(),
-    };
+      exists: vi.fn(),
+      markAsCompleted: vi.fn(),
+      markAsAttended: vi.fn(),
+    } as any;
 
     mockNotificationService = {
       sendAppointmentConfirmed: vi.fn(),
@@ -154,7 +160,7 @@ describe('ApproveAppointmentUseCase', () => {
       joinUrl: 'https://zoom.us/j/123',
       startUrl: 'https://zoom.us/s/123',
       password: 'pass123',
-    };
+    } as any;
 
     vi.mocked(mockRepository.findById).mockResolvedValue(mockAppointment);
     vi.mocked(mockRepository.approve).mockResolvedValue(approvedAppointment);
@@ -165,7 +171,7 @@ describe('ApproveAppointmentUseCase', () => {
 
     const { ZoomApiService } = await import('@/infrastructure/external/zoom-api.service');
     vi.mocked(ZoomApiService.createMeeting).mockResolvedValue(zoomMeeting);
-    vi.mocked(mockRepository.updateZoomMeeting).mockResolvedValue(approvedAppointment);
+    vi.mocked(mockRepository.updateZoomMeeting).mockResolvedValue(undefined);
 
     const result = await useCase.execute(appointmentId, approvedBy);
 
@@ -240,7 +246,7 @@ describe('ApproveAppointmentUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('Appointment ID is required');
-    expect(result.error?.statusCode).toBe(400);
+    expect((result.error as AppError)?.statusCode).toBe(400);
   });
 
   it('should return error when approvedBy is empty', async () => {
@@ -248,7 +254,7 @@ describe('ApproveAppointmentUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('Approver ID is required');
-    expect(result.error?.statusCode).toBe(400);
+    expect((result.error as AppError)?.statusCode).toBe(400);
   });
 
   it('should return error when appointment not found', async () => {
@@ -261,7 +267,7 @@ describe('ApproveAppointmentUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('Appointment not found');
-    expect(result.error?.statusCode).toBe(404);
+    expect((result.error as AppError)?.statusCode).toBe(404);
     expect(mockRepository.approve).not.toHaveBeenCalled();
   });
 
@@ -276,7 +282,7 @@ describe('ApproveAppointmentUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('Appointment cannot be approved');
-    expect(result.error?.statusCode).toBe(400);
+    expect((result.error as AppError)?.statusCode).toBe(400);
     expect(mockRepository.approve).not.toHaveBeenCalled();
   });
 

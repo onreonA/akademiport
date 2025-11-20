@@ -6,11 +6,13 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@/shared/test/utils';
 import userEvent from '@testing-library/user-event';
 import { AppointmentList } from './AppointmentList';
+import { createMockQueryResult } from '@/shared/test/helpers';
+import { AppointmentListResponseDto, AppointmentResponseDto } from '@/application/dto/appointment';
 
 // Mock hooks
 vi.mock('@/shared/hooks/api/useAppointments', () => ({
-  useAppointments: vi.fn(() => ({
-    data: {
+  useAppointments: vi.fn(() =>
+    createMockQueryResult<AppointmentListResponseDto>({
       appointments: [
         {
           id: 'appointment-1',
@@ -20,9 +22,30 @@ vi.mock('@/shared/hooks/api/useAppointments', () => ({
           status: 'pending',
           companyId: 'company-1',
           consultantId: 'consultant-1',
-          consultant: { fullName: 'Test Consultant' },
-          company: { name: 'Test Company' },
-        },
+          programId: null,
+          description: null,
+          timezone: 'Europe/Istanbul',
+          requestedBy: 'user-1',
+          requestedAt: '2025-01-01T00:00:00Z',
+          approvedAt: null,
+          approvedBy: null,
+          rejectedAt: null,
+          rejectedBy: null,
+          rejectionReason: null,
+          rescheduledFrom: null,
+          rescheduledAt: null,
+          rescheduledBy: null,
+          zoomMeetingId: null,
+          zoomJoinUrl: null,
+          zoomStartUrl: null,
+          zoomPassword: null,
+          notes: null,
+          consultantNotes: null,
+          companyNotes: null,
+          attendedAt: null,
+          createdAt: '2025-01-01T00:00:00Z',
+          updatedAt: '2025-01-01T00:00:00Z',
+        } as AppointmentResponseDto,
       ],
       pagination: {
         page: 1,
@@ -30,10 +53,8 @@ vi.mock('@/shared/hooks/api/useAppointments', () => ({
         total: 1,
         totalPages: 1,
       },
-    },
-    isLoading: false,
-    error: null,
-  })),
+    })
+  ),
 }));
 
 describe('AppointmentList', () => {
@@ -57,11 +78,9 @@ describe('AppointmentList', () => {
 
   it('shows loading state', async () => {
     const { useAppointments } = await import('@/shared/hooks/api/useAppointments');
-    vi.mocked(useAppointments).mockReturnValueOnce({
-      data: undefined,
-      isLoading: true,
-      error: null,
-    } as any);
+    vi.mocked(useAppointments).mockReturnValueOnce(
+      createMockQueryResult<AppointmentListResponseDto>(undefined, { isLoading: true })
+    );
 
     render(<AppointmentList />);
 
@@ -71,8 +90,8 @@ describe('AppointmentList', () => {
 
   it('shows empty state when no appointments', async () => {
     const { useAppointments } = await import('@/shared/hooks/api/useAppointments');
-    vi.mocked(useAppointments).mockReturnValueOnce({
-      data: {
+    vi.mocked(useAppointments).mockReturnValueOnce(
+      createMockQueryResult<AppointmentListResponseDto>({
         appointments: [],
         pagination: {
           page: 1,
@@ -80,10 +99,8 @@ describe('AppointmentList', () => {
           total: 0,
           totalPages: 0,
         },
-      },
-      isLoading: false,
-      error: null,
-    });
+      })
+    );
 
     render(<AppointmentList />);
 
@@ -143,8 +160,8 @@ describe('AppointmentList', () => {
 
   it('handles pagination', async () => {
     const { useAppointments } = await import('@/shared/hooks/api/useAppointments');
-    vi.mocked(useAppointments).mockReturnValueOnce({
-      data: {
+    vi.mocked(useAppointments).mockReturnValueOnce(
+      createMockQueryResult<AppointmentListResponseDto>({
         appointments: [
           {
             id: 'appointment-1',
@@ -154,7 +171,30 @@ describe('AppointmentList', () => {
             status: 'pending',
             companyId: 'company-1',
             consultantId: 'consultant-1',
-          },
+            programId: null,
+            description: null,
+            timezone: 'Europe/Istanbul',
+            requestedBy: 'user-1',
+            requestedAt: '2025-01-01T00:00:00Z',
+            approvedAt: null,
+            approvedBy: null,
+            rejectedAt: null,
+            rejectedBy: null,
+            rejectionReason: null,
+            rescheduledFrom: null,
+            rescheduledAt: null,
+            rescheduledBy: null,
+            zoomMeetingId: null,
+            zoomJoinUrl: null,
+            zoomStartUrl: null,
+            zoomPassword: null,
+            notes: null,
+            consultantNotes: null,
+            companyNotes: null,
+            attendedAt: null,
+            createdAt: '2025-01-01T00:00:00Z',
+            updatedAt: '2025-01-01T00:00:00Z',
+          } as AppointmentResponseDto,
         ],
         pagination: {
           page: 1,
@@ -162,10 +202,8 @@ describe('AppointmentList', () => {
           total: 50,
           totalPages: 3,
         },
-      },
-      isLoading: false,
-      error: null,
-    });
+      })
+    );
 
     render(<AppointmentList />);
 

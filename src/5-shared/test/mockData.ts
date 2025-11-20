@@ -18,6 +18,7 @@ export const mockProject: Project = {
   progress: 50,
   isTemplate: false,
   templateId: null,
+  deletedAt: null,
   createdAt: new Date('2025-01-01'),
   updatedAt: new Date('2025-01-01'),
 };
@@ -36,6 +37,7 @@ export const mockTemplate: Project = {
   progress: 0,
   isTemplate: true,
   templateId: null,
+  deletedAt: null,
   createdAt: new Date('2025-01-01'),
   updatedAt: new Date('2025-01-01'),
 };
@@ -49,6 +51,7 @@ export const mockSubProject: SubProject = {
   status: 'in_progress',
   orderIndex: 1,
   progress: 30,
+  deletedAt: null,
   createdAt: new Date('2025-01-01'),
   updatedAt: new Date('2025-01-01'),
 };
@@ -67,6 +70,7 @@ export const mockTask: Task = {
   approvedAt: null,
   approvedBy: null,
   orderIndex: 1,
+  deletedAt: null,
   createdAt: new Date('2025-01-01'),
   updatedAt: new Date('2025-01-01'),
 };

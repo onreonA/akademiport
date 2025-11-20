@@ -146,6 +146,8 @@ describe('CompanyRepository', () => {
       const createDto = {
         name: 'New Company',
         programId: 'program-1',
+        country: 'Turkey',
+        maxUsers: 10,
         city: 'Istanbul',
         sector: 'Technology',
       };
@@ -176,6 +178,8 @@ describe('CompanyRepository', () => {
       const createDto = {
         name: 'New Company',
         programId: 'program-1',
+        country: 'Turkey',
+        maxUsers: 10,
       };
 
       mockSupabase.select.mockReturnThis();

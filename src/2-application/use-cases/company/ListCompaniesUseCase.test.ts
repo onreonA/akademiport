@@ -7,7 +7,8 @@ import { ListCompaniesUseCase } from './ListCompaniesUseCase';
 import { ICompanyRepository } from '@/3-domain/interfaces/ICompanyRepository';
 import { Company } from '@/3-domain/entities/Company';
 import { UserRole } from '@/3-domain/enums/UserRole';
-import { Result } from '@/core/result/Result';
+import { Result } from '@/6-core/result/Result';
+import type { CompanyFilterDto } from '@/2-application/dto/company';
 
 describe('ListCompaniesUseCase', () => {
   let mockRepository: ICompanyRepository;
@@ -21,9 +22,13 @@ describe('ListCompaniesUseCase', () => {
       update: vi.fn(),
       delete: vi.fn(),
       findByProgramId: vi.fn(),
-      findByConsultantId: vi.fn(),
+      findByCity: vi.fn(),
+      search: vi.fn(),
       findWithFilters: vi.fn(),
-    };
+      getCompanyUsers: vi.fn(),
+      addCompanyUser: vi.fn(),
+      removeCompanyUser: vi.fn(),
+    } as any;
 
     useCase = new ListCompaniesUseCase(mockRepository);
   });
@@ -32,14 +37,17 @@ describe('ListCompaniesUseCase', () => {
     return {
       id: 'company-1',
       name: 'Test Company',
+      slug: 'test-company',
+      country: 'Turkey',
       taxNumber: '1234567890',
       email: 'test@company.com',
       phone: '+905551234567',
       address: 'Test Address',
       city: 'Istanbul',
-      country: 'Turkey',
       isActive: true,
       programId: 'program-1',
+      maxUsers: 10,
+      currentUsers: 0,
       createdAt: new Date(),
       updatedAt: new Date(),
       ...overrides,
@@ -56,7 +64,11 @@ describe('ListCompaniesUseCase', () => {
       Result.ok({ companies: mockCompanies, total: 2 })
     );
 
-    const result = await useCase.execute({}, 'admin-1', UserRole.MASTER_ADMIN);
+    const result = await useCase.execute(
+      { page: 1, limit: 20, sortBy: 'name', sortOrder: 'asc' },
+      'admin-1',
+      UserRole.MASTER_ADMIN
+    );
 
     expect(result.isSuccess).toBe(true);
     expect(result.value?.companies).toEqual(mockCompanies);
@@ -71,7 +83,12 @@ describe('ListCompaniesUseCase', () => {
 
     vi.mocked(mockRepository.findById).mockResolvedValue(Result.ok(mockCompany));
 
-    const result = await useCase.execute({}, userId, UserRole.COMPANY_ADMIN, companyId);
+    const result = await useCase.execute(
+      { page: 1, limit: 20, sortBy: 'name', sortOrder: 'asc' },
+      userId,
+      UserRole.COMPANY_ADMIN,
+      companyId
+    );
 
     expect(result.isSuccess).toBe(true);
     expect(result.value?.companies).toEqual([mockCompany]);
@@ -82,7 +99,11 @@ describe('ListCompaniesUseCase', () => {
   it('should return error when COMPANY_ADMIN has no companyId', async () => {
     const userId = 'user-1';
 
-    const result = await useCase.execute({}, userId, UserRole.COMPANY_ADMIN);
+    const result = await useCase.execute(
+      { page: 1, limit: 20, sortBy: 'name', sortOrder: 'asc' },
+      userId,
+      UserRole.COMPANY_ADMIN
+    );
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message || result.error).toContain('Firma bilgisi bulunamadı');
@@ -94,7 +115,12 @@ describe('ListCompaniesUseCase', () => {
 
     vi.mocked(mockRepository.findById).mockResolvedValue(Result.ok(null));
 
-    const result = await useCase.execute({}, userId, UserRole.COMPANY_ADMIN, companyId);
+    const result = await useCase.execute(
+      { page: 1, limit: 20, sortBy: 'name', sortOrder: 'asc' },
+      userId,
+      UserRole.COMPANY_ADMIN,
+      companyId
+    );
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message || result.error).toContain('Firma bulunamadı');
@@ -103,7 +129,11 @@ describe('ListCompaniesUseCase', () => {
   it('should return error for unauthorized role', async () => {
     const userId = 'user-1';
 
-    const result = await useCase.execute({}, userId, 'unknown' as UserRole);
+    const result = await useCase.execute(
+      { page: 1, limit: 20, sortBy: 'name', sortOrder: 'asc' },
+      userId,
+      'unknown' as UserRole
+    );
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message || result.error).toContain('Bu işlem için yetkiniz yok');
@@ -114,7 +144,11 @@ describe('ListCompaniesUseCase', () => {
 
     vi.mocked(mockRepository.findWithFilters).mockResolvedValue(Result.fail(errorMessage));
 
-    const result = await useCase.execute({}, 'admin-1', UserRole.MASTER_ADMIN);
+    const result = await useCase.execute(
+      { page: 1, limit: 20, sortBy: 'name', sortOrder: 'asc' },
+      'admin-1',
+      UserRole.MASTER_ADMIN
+    );
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message || result.error).toBe(errorMessage);

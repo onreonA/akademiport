@@ -7,6 +7,7 @@ import { UpdateCustomReportUseCase } from './UpdateCustomReportUseCase';
 import { ICustomReportRepository } from '@/3-domain/interfaces/repositories/ICustomReportRepository';
 import { CustomReport } from '@/3-domain/entities/CustomReport';
 import { Result } from '@/6-core/result/Result';
+import { AppError } from '@/6-core/errors/AppError';
 
 describe('UpdateCustomReportUseCase', () => {
   let mockRepository: ICustomReportRepository;
@@ -36,7 +37,7 @@ describe('UpdateCustomReportUseCase', () => {
       description: null,
       programId: null,
       companyId: null,
-      reportType: 'monthly',
+      reportType: 'custom',
       templateId: null,
       selectedMetrics: [],
       dateRangeStart: null,
@@ -63,7 +64,7 @@ describe('UpdateCustomReportUseCase', () => {
     const updateDto = {
       name: 'Updated Report Name',
       selectedMetrics: ['metric-1', 'metric-2'],
-      reportType: 'monthly' as const,
+      reportType: 'custom' as const,
       dateRangeType: 'last_30_days' as const,
     };
     const existingReport = createMockReport({ id: reportId, userId });
@@ -96,7 +97,7 @@ describe('UpdateCustomReportUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('Custom report bulunamadı');
-    expect(result.error?.statusCode).toBe(404);
+    expect((result.error as AppError)?.statusCode).toBe(404);
     expect(mockRepository.update).not.toHaveBeenCalled();
   });
 
@@ -111,7 +112,7 @@ describe('UpdateCustomReportUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('Custom report bulunamadı');
-    expect(result.error?.statusCode).toBe(404);
+    expect((result.error as AppError)?.statusCode).toBe(404);
   });
 
   it('should return error when user tries to update another user report', async () => {
@@ -127,7 +128,7 @@ describe('UpdateCustomReportUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('Bu raporu güncelleme yetkiniz yok');
-    expect(result.error?.statusCode).toBe(403);
+    expect((result.error as AppError)?.statusCode).toBe(403);
     expect(mockRepository.update).not.toHaveBeenCalled();
   });
 
@@ -143,7 +144,7 @@ describe('UpdateCustomReportUseCase', () => {
     const result = await useCase.execute(reportId, updateDto, userId);
 
     expect(result.isFailure).toBe(true);
-    expect(result.error?.statusCode).toBe(400);
+    expect((result.error as AppError)?.statusCode).toBe(400);
     expect(mockRepository.update).not.toHaveBeenCalled();
   });
 

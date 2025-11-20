@@ -14,13 +14,12 @@ describe('UnsubscribeFromPushNotificationsUseCase', () => {
   beforeEach(() => {
     mockRepository = {
       create: vi.fn(),
-      findById: vi.fn(),
       findByUserId: vi.fn(),
       findByEndpoint: vi.fn(),
       delete: vi.fn(),
       deleteByEndpoint: vi.fn(),
       deleteByUserId: vi.fn(),
-    };
+    } as any;
 
     useCase = new UnsubscribeFromPushNotificationsUseCase(mockRepository);
   });
@@ -41,7 +40,7 @@ describe('UnsubscribeFromPushNotificationsUseCase', () => {
   it('should unsubscribe from all endpoints when endpoint not provided', async () => {
     const userId = 'user-1';
 
-    vi.mocked(mockRepository.deleteByUserId).mockResolvedValue(Result.ok(undefined));
+    vi.mocked(mockRepository.deleteByUserId).mockResolvedValue(Result.ok(1));
 
     const result = await useCase.execute(userId);
 

@@ -6,6 +6,7 @@ import { ICompanyProjectAssignmentRepository } from '@/3-domain/interfaces/repos
 import { Project } from '@/3-domain/entities/Project';
 import { SubProject } from '@/3-domain/entities/SubProject';
 import { CompanyProjectAssignment } from '@/3-domain/entities/CompanyProjectAssignment';
+import { AppError } from '@/6-core/errors/AppError';
 
 describe('BulkAssignDatesToCompanySubProjectsUseCase', () => {
   let mockProjectRepository: IProjectRepository;
@@ -44,7 +45,7 @@ describe('BulkAssignDatesToCompanySubProjectsUseCase', () => {
     const result = await useCase.execute(request);
 
     expect(result.isFailure).toBe(true);
-    expect(result.error?.code).toBe('PROJECT_ID_MISSING');
+    expect((result.error as AppError)?.code).toBe('PROJECT_ID_MISSING');
   });
 
   it('should return error when subProjectId is missing', async () => {
@@ -72,7 +73,7 @@ describe('BulkAssignDatesToCompanySubProjectsUseCase', () => {
     const result = await useCase.execute(request);
 
     expect(result.isFailure).toBe(true);
-    expect(result.error?.code).toBe('PROJECT_NOT_FOUND');
+    expect((result.error as AppError)?.code).toBe('PROJECT_NOT_FOUND');
   });
 
   it('should return error when sub-project not in project', async () => {
@@ -82,7 +83,7 @@ describe('BulkAssignDatesToCompanySubProjectsUseCase', () => {
       companyId: null,
       consultantId: null,
       programId: null,
-      status: 'active',
+      status: 'in_progress',
       priority: 'medium',
       description: null,
       startDate: null,
@@ -90,6 +91,7 @@ describe('BulkAssignDatesToCompanySubProjectsUseCase', () => {
       progress: 0,
       isTemplate: false,
       templateId: null,
+      deletedAt: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -99,9 +101,10 @@ describe('BulkAssignDatesToCompanySubProjectsUseCase', () => {
       projectId: 'different-project',
       name: 'Sub Project 1',
       description: null,
-      status: 'active',
+      status: 'in_progress',
       orderIndex: 0,
       progress: 0,
+      deletedAt: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -118,7 +121,7 @@ describe('BulkAssignDatesToCompanySubProjectsUseCase', () => {
     const result = await useCase.execute(request);
 
     expect(result.isFailure).toBe(true);
-    expect(result.error?.code).toBe('SUBPROJECT_NOT_IN_PROJECT');
+    expect((result.error as AppError)?.code).toBe('SUBPROJECT_NOT_IN_PROJECT');
   });
 
   it('should update dates for existing assignments', async () => {
@@ -128,7 +131,7 @@ describe('BulkAssignDatesToCompanySubProjectsUseCase', () => {
       companyId: null,
       consultantId: null,
       programId: null,
-      status: 'active',
+      status: 'in_progress',
       priority: 'medium',
       description: null,
       startDate: null,
@@ -136,6 +139,7 @@ describe('BulkAssignDatesToCompanySubProjectsUseCase', () => {
       progress: 0,
       isTemplate: false,
       templateId: null,
+      deletedAt: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -145,9 +149,10 @@ describe('BulkAssignDatesToCompanySubProjectsUseCase', () => {
       projectId: 'project-1',
       name: 'Sub Project 1',
       description: null,
-      status: 'active',
+      status: 'in_progress',
       orderIndex: 0,
       progress: 0,
+      deletedAt: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -195,7 +200,7 @@ describe('BulkAssignDatesToCompanySubProjectsUseCase', () => {
       companyId: null,
       consultantId: null,
       programId: null,
-      status: 'active',
+      status: 'in_progress',
       priority: 'medium',
       description: null,
       startDate: null,
@@ -203,6 +208,7 @@ describe('BulkAssignDatesToCompanySubProjectsUseCase', () => {
       progress: 0,
       isTemplate: false,
       templateId: null,
+      deletedAt: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -212,9 +218,10 @@ describe('BulkAssignDatesToCompanySubProjectsUseCase', () => {
       projectId: 'project-1',
       name: 'Sub Project 1',
       description: null,
-      status: 'active',
+      status: 'in_progress',
       orderIndex: 0,
       progress: 0,
+      deletedAt: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -249,7 +256,7 @@ describe('BulkAssignDatesToCompanySubProjectsUseCase', () => {
       companyId: null,
       consultantId: null,
       programId: null,
-      status: 'active',
+      status: 'in_progress',
       priority: 'medium',
       description: null,
       startDate: null,
@@ -257,6 +264,7 @@ describe('BulkAssignDatesToCompanySubProjectsUseCase', () => {
       progress: 0,
       isTemplate: false,
       templateId: null,
+      deletedAt: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -266,9 +274,10 @@ describe('BulkAssignDatesToCompanySubProjectsUseCase', () => {
       projectId: 'project-1',
       name: 'Sub Project 1',
       description: null,
-      status: 'active',
+      status: 'in_progress',
       orderIndex: 0,
       progress: 0,
+      deletedAt: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -315,7 +324,7 @@ describe('BulkAssignDatesToCompanySubProjectsUseCase', () => {
       companyId: null,
       consultantId: null,
       programId: null,
-      status: 'active',
+      status: 'in_progress',
       priority: 'medium',
       description: null,
       startDate: null,
@@ -323,6 +332,7 @@ describe('BulkAssignDatesToCompanySubProjectsUseCase', () => {
       progress: 0,
       isTemplate: false,
       templateId: null,
+      deletedAt: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -332,9 +342,10 @@ describe('BulkAssignDatesToCompanySubProjectsUseCase', () => {
       projectId: 'project-1',
       name: 'Sub Project 1',
       description: null,
-      status: 'active',
+      status: 'in_progress',
       orderIndex: 0,
       progress: 0,
+      deletedAt: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };

@@ -84,7 +84,10 @@ describe('EventRepository', () => {
         title: 'New Event',
         startTime: new Date(),
         endTime: new Date(Date.now() + 3600000),
-        category: 'webinar',
+        category: 'webinar' as const,
+        timezone: 'Europe/Istanbul',
+        attendanceRequired: false,
+        isPublic: true,
       };
 
       const mockCreatedEvent = {

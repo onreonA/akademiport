@@ -7,6 +7,7 @@ import { CreateTaskCommentUseCase } from './CreateTaskCommentUseCase';
 import { ITaskCommentRepository } from '@/3-domain/interfaces/repositories/ITaskCommentRepository';
 import { ITaskRepository } from '@/3-domain/interfaces/repositories/ITaskRepository';
 import { TaskComment } from '@/3-domain/entities/TaskComment';
+import { AppError } from '@/6-core/errors/AppError';
 
 describe('CreateTaskCommentUseCase', () => {
   let mockCommentRepository: ITaskCommentRepository;
@@ -18,26 +19,25 @@ describe('CreateTaskCommentUseCase', () => {
       create: vi.fn(),
       findById: vi.fn(),
       findByTaskId: vi.fn(),
-      update: vi.fn(),
       delete: vi.fn(),
-    };
+    } as any;
 
     mockTaskRepository = {
       create: vi.fn(),
       findById: vi.fn(),
-      findAll: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
-      findBySubProject: vi.fn(),
-      findByAssignedUser: vi.fn(),
+      findBySubProjectId: vi.fn(),
+      findBySubProjectIds: vi.fn(),
+      findByAssignedUserId: vi.fn(),
       complete: vi.fn(),
       approve: vi.fn(),
       reject: vi.fn(),
       assign: vi.fn(),
       assignTo: vi.fn(),
       exists: vi.fn(),
-      findBySubProjectIds: vi.fn(),
-    };
+      restore: vi.fn(),
+    } as any;
 
     useCase = new CreateTaskCommentUseCase(mockCommentRepository, mockTaskRepository);
   });
@@ -79,7 +79,7 @@ describe('CreateTaskCommentUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('Task not found');
-    expect(result.error?.statusCode).toBe(404);
+    expect((result.error as AppError)?.statusCode).toBe(404);
     expect(mockCommentRepository.create).not.toHaveBeenCalled();
   });
 
@@ -109,6 +109,6 @@ describe('CreateTaskCommentUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toBe(errorMessage);
-    expect(result.error?.statusCode).toBe(500);
+    expect((result.error as AppError)?.statusCode).toBe(500);
   });
 });

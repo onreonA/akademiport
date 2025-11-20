@@ -78,7 +78,10 @@ describe('TrainingRepository', () => {
       const createDto = {
         name: 'New Training',
         programId: 'program-1',
-        status: 'active',
+        status: 'active' as const,
+        priority: 'medium' as const,
+        isGlobal: false,
+        isLocked: false,
       };
 
       const mockCreatedTraining = {

@@ -21,9 +21,13 @@ describe('DeleteCompanyUseCase', () => {
       update: vi.fn(),
       delete: vi.fn(),
       findByProgramId: vi.fn(),
-      findByConsultantId: vi.fn(),
+      findByCity: vi.fn(),
+      search: vi.fn(),
       findWithFilters: vi.fn(),
-    };
+      getCompanyUsers: vi.fn(),
+      addCompanyUser: vi.fn(),
+      removeCompanyUser: vi.fn(),
+    } as any;
 
     useCase = new DeleteCompanyUseCase(mockRepository);
   });
@@ -31,18 +35,33 @@ describe('DeleteCompanyUseCase', () => {
   const createMockCompany = (overrides?: Partial<Company>): Company => {
     return {
       id: 'company-1',
+      programId: 'program-1',
       name: 'Test Company',
+      legalName: undefined,
       taxNumber: '1234567890',
+      tradeRegistryNumber: undefined,
+      slug: 'test-company',
       email: 'test@company.com',
       phone: '+905551234567',
+      website: undefined,
       address: 'Test Address',
       city: 'Istanbul',
+      district: undefined,
+      postalCode: undefined,
       country: 'Turkey',
+      sector: undefined,
+      subSector: undefined,
+      employeeCount: undefined,
+      foundationYear: undefined,
+      logoUrl: undefined,
       isActive: true,
-      programId: 'program-1',
+      maxUsers: 10,
+      currentUsers: 0,
+      settings: undefined,
       createdAt: new Date(),
       updatedAt: new Date(),
-      currentUsers: 0,
+      createdBy: undefined,
+      updatedBy: undefined,
       ...overrides,
     };
   };

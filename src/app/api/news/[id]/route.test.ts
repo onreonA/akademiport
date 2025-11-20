@@ -204,7 +204,7 @@ describe('PUT /api/news/[id]', () => {
 
   it('returns 403 when user is not admin or consultant', async () => {
     const { createClient } = await import('@/infrastructure/database/supabase-server');
-    const mockClient = createClient();
+    const mockClient = await createClient();
     const mockUser = { id: 'user-1', email: 'test@example.com' };
     vi.mocked(mockClient.auth.getUser).mockResolvedValue({
       data: { user: mockUser },
@@ -325,7 +325,7 @@ describe('DELETE /api/news/[id]', () => {
 
   it('returns 403 when user is not admin or consultant', async () => {
     const { createClient } = await import('@/infrastructure/database/supabase-server');
-    const mockClient = createClient();
+    const mockClient = await createClient();
     const mockUser = { id: 'user-1', email: 'test@example.com' };
     vi.mocked(mockClient.auth.getUser).mockResolvedValue({
       data: { user: mockUser },

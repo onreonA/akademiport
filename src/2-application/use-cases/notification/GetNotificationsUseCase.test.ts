@@ -16,14 +16,16 @@ describe('GetNotificationsUseCase', () => {
   beforeEach(() => {
     mockRepository = {
       create: vi.fn(),
+      createMany: vi.fn(),
       findById: vi.fn(),
       findMany: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
+      deleteExpired: vi.fn(),
       markAsRead: vi.fn(),
       markAllAsRead: vi.fn(),
       getUnreadCount: vi.fn(),
-    };
+    } as any;
 
     useCase = new GetNotificationsUseCase(mockRepository);
   });
@@ -51,6 +53,8 @@ describe('GetNotificationsUseCase', () => {
       userId: 'user-1',
       limit: 10,
       offset: 0,
+      orderBy: 'created_at' as const,
+      orderDirection: 'desc' as const,
     };
     const mockNotifications = [
       createMockNotification({ id: 'notif-1' }),
@@ -70,8 +74,8 @@ describe('GetNotificationsUseCase', () => {
       priority: undefined,
       limit: filter.limit,
       offset: filter.offset,
-      orderBy: undefined,
-      orderDirection: undefined,
+      orderBy: 'created_at',
+      orderDirection: 'desc',
     });
   });
 
@@ -83,7 +87,7 @@ describe('GetNotificationsUseCase', () => {
       priority: NotificationPriority.HIGH,
       limit: 20,
       offset: 10,
-      orderBy: 'createdAt',
+      orderBy: 'created_at' as const,
       orderDirection: 'desc' as const,
     };
     const mockNotifications = [createMockNotification({ id: 'notif-1' })];
@@ -100,7 +104,7 @@ describe('GetNotificationsUseCase', () => {
       priority: NotificationPriority.HIGH,
       limit: 20,
       offset: 10,
-      orderBy: 'createdAt',
+      orderBy: 'created_at',
       orderDirection: 'desc',
     });
   });
@@ -110,6 +114,8 @@ describe('GetNotificationsUseCase', () => {
       userId: 'user-1',
       limit: 10,
       offset: 0,
+      orderBy: 'created_at' as const,
+      orderDirection: 'desc' as const,
     };
     const errorMessage = 'Database error';
 
@@ -126,6 +132,8 @@ describe('GetNotificationsUseCase', () => {
       userId: 'user-1',
       limit: 10,
       offset: 0,
+      orderBy: 'created_at' as const,
+      orderDirection: 'desc' as const,
     };
     const errorMessage = 'Unexpected error';
 

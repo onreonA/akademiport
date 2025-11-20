@@ -58,7 +58,7 @@ describe('GET /api/custom-reports/[id]', () => {
 
     const { GET } = await import('./route');
     const request = createMockRequest('http://localhost:3000/api/custom-reports/report-1');
-    const response = await GET(request, { params: { id: 'report-1' } });
+    const response = await GET(request, { params: Promise.resolve({ id: 'report-1' }) });
     const data = await response.json();
 
     expect(response.status).toBe(401);
@@ -85,7 +85,7 @@ describe('GET /api/custom-reports/[id]', () => {
 
     const { GET } = await import('./route');
     const request = createMockRequest('http://localhost:3000/api/custom-reports/report-1');
-    const response = await GET(request, { params: { id: 'report-1' } });
+    const response = await GET(request, { params: Promise.resolve({ id: 'report-1' }) });
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -106,7 +106,7 @@ describe('GET /api/custom-reports/[id]', () => {
 
     const { GET } = await import('./route');
     const request = createMockRequest('http://localhost:3000/api/custom-reports/non-existent');
-    const response = await GET(request, { params: { id: 'non-existent' } });
+    const response = await GET(request, { params: Promise.resolve({ id: 'non-existent' }) });
     const data = await response.json();
 
     expect(response.status).toBe(404);
@@ -135,7 +135,7 @@ describe('PUT /api/custom-reports/[id]', () => {
       }),
     });
 
-    const response = await PUT(request, { params: { id: 'report-1' } });
+    const response = await PUT(request, { params: Promise.resolve({ id: 'report-1' }) });
     const data = await response.json();
 
     expect(response.status).toBe(401);
@@ -182,7 +182,7 @@ describe('PUT /api/custom-reports/[id]', () => {
       configurable: true,
     });
 
-    const response = await PUT(request, { params: { id: 'report-1' } });
+    const response = await PUT(request, { params: Promise.resolve({ id: 'report-1' }) });
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -223,7 +223,7 @@ describe('PUT /api/custom-reports/[id]', () => {
       configurable: true,
     });
 
-    const response = await PUT(request, { params: { id: 'report-1' } });
+    const response = await PUT(request, { params: Promise.resolve({ id: 'report-1' }) });
     const data = await response.json();
 
     expect(response.status).toBe(500);
@@ -244,7 +244,7 @@ describe('DELETE /api/custom-reports/[id]', () => {
     const request = createMockRequest('http://localhost:3000/api/custom-reports/report-1', {
       method: 'DELETE',
     });
-    const response = await DELETE(request, { params: { id: 'report-1' } });
+    const response = await DELETE(request, { params: Promise.resolve({ id: 'report-1' }) });
     const data = await response.json();
 
     expect(response.status).toBe(401);
@@ -266,7 +266,7 @@ describe('DELETE /api/custom-reports/[id]', () => {
     const request = createMockRequest('http://localhost:3000/api/custom-reports/report-1', {
       method: 'DELETE',
     });
-    const response = await DELETE(request, { params: { id: 'report-1' } });
+    const response = await DELETE(request, { params: Promise.resolve({ id: 'report-1' }) });
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -289,7 +289,7 @@ describe('DELETE /api/custom-reports/[id]', () => {
     const request = createMockRequest('http://localhost:3000/api/custom-reports/report-1', {
       method: 'DELETE',
     });
-    const response = await DELETE(request, { params: { id: 'report-1' } });
+    const response = await DELETE(request, { params: Promise.resolve({ id: 'report-1' }) });
     const data = await response.json();
 
     expect(response.status).toBe(500);

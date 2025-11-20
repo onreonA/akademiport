@@ -189,12 +189,7 @@ describe('GenerateTrainingSummaryUseCase', () => {
       mockTrainingDocumentRepository.findByTrainingId.mockResolvedValue([]);
       mockPromptManager.getActivePrompt.mockResolvedValue(Result.ok(mockPrompt));
       mockPromptManager.renderPrompt.mockReturnValue('Rendered prompt');
-      mockAIRouter.complete.mockResolvedValue(
-        Result.fail({
-          message: 'AI service error',
-          retryable: true,
-        })
-      );
+      mockAIRouter.complete.mockResolvedValue(Result.fail(new Error('AI service error')));
 
       const result = await useCase.execute({
         trainingId: 'training-1',

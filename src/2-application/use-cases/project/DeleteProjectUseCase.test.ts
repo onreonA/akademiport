@@ -20,8 +20,15 @@ describe('DeleteProjectUseCase', () => {
       delete: vi.fn(),
       findTemplates: vi.fn(),
       updateProgress: vi.fn(),
+      findByCompanyId: vi.fn(),
+      findByConsultantId: vi.fn(),
+      findByTemplateId: vi.fn(),
+      restore: vi.fn(),
+      findDeleted: vi.fn(),
+      findBySubProjectId: vi.fn(),
+      findByProgramId: vi.fn(),
       exists: vi.fn(),
-    };
+    } as any;
 
     useCase = new DeleteProjectUseCase(mockProjectRepository);
   });
@@ -36,13 +43,14 @@ describe('DeleteProjectUseCase', () => {
       companyId: 'company-1',
       programId: 'program-1',
       description: null,
-      status: 'active',
+      status: 'in_progress',
       priority: 'medium',
       startDate: new Date('2025-01-01'),
       endDate: new Date('2025-12-31'),
       progress: 0,
       isTemplate: false,
       templateId: null,
+      deletedAt: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -78,13 +86,14 @@ describe('DeleteProjectUseCase', () => {
       companyId: 'company-1',
       programId: 'program-1',
       description: null,
-      status: 'active',
+      status: 'in_progress',
       priority: 'medium',
       startDate: new Date('2025-01-01'),
       endDate: new Date('2025-12-31'),
       progress: 0,
       isTemplate: false,
       templateId: null,
+      deletedAt: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };

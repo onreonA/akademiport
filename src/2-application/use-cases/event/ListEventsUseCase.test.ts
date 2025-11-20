@@ -7,6 +7,7 @@ import { ListEventsUseCase } from './ListEventsUseCase';
 import { IEventRepository } from '@/3-domain/interfaces/repositories/IEventRepository';
 import { Event } from '@/3-domain/entities/Event';
 import type { EventStatus, EventCategory } from '@/3-domain/entities/Event';
+import { AppError } from '@/6-core/errors/AppError';
 
 describe('ListEventsUseCase', () => {
   let mockEventRepository: IEventRepository;
@@ -24,8 +25,13 @@ describe('ListEventsUseCase', () => {
       findByDateRange: vi.fn(),
       registerAttendance: vi.fn(),
       getAttendees: vi.fn(),
-      getStatistics: vi.fn(),
-    };
+      updateZoomMeeting: vi.fn(),
+      exists: vi.fn(),
+      cancelAttendance: vi.fn(),
+      findByUserId: vi.fn(),
+      findByCompanyId: vi.fn(),
+      updateAttendeeCount: vi.fn(),
+    } as any;
 
     useCase = new ListEventsUseCase(mockEventRepository);
   });
@@ -50,7 +56,16 @@ describe('ListEventsUseCase', () => {
       endTime,
       timezone: 'Europe/Istanbul',
       attendanceRequired: true,
+      isPublic: true,
       maxAttendees: 100,
+      currentAttendees: 0,
+      zoomMeetingId: null,
+      zoomJoinUrl: null,
+      zoomStartUrl: null,
+      zoomPassword: null,
+      organizerName: null,
+      organizerEmail: null,
+      createdBy: null,
       createdAt: new Date(),
       updatedAt: new Date(),
       ...overrides,
@@ -145,6 +160,6 @@ describe('ListEventsUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toBe(errorMessage);
-    expect(result.error?.statusCode).toBe(500);
+    expect((result.error as AppError)?.statusCode).toBe(500);
   });
 });

@@ -36,7 +36,6 @@ const createMockNews = (overrides?: Partial<NewsWithTags>): NewsWithTags => ({
   createdBy: 'author-1',
   updatedBy: 'author-1',
   tags: [],
-  totalCount: 1,
   ...overrides,
 });
 

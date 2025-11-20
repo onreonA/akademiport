@@ -7,6 +7,7 @@ import { GetCustomReportUseCase } from './GetCustomReportUseCase';
 import { ICustomReportRepository } from '@/3-domain/interfaces/repositories/ICustomReportRepository';
 import { CustomReport, CustomReportEntity } from '@/3-domain/entities/CustomReport';
 import { Result } from '@/6-core/result/Result';
+import { AppError } from '@/6-core/errors/AppError';
 
 describe('GetCustomReportUseCase', () => {
   let mockRepository: ICustomReportRepository;
@@ -19,7 +20,11 @@ describe('GetCustomReportUseCase', () => {
       findWithFilters: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
-    };
+      findByUserId: vi.fn(),
+      findScheduledReports: vi.fn(),
+      findReportsToGenerate: vi.fn(),
+      updateGenerationTime: vi.fn(),
+    } as any;
 
     useCase = new GetCustomReportUseCase(mockRepository);
   });
@@ -32,7 +37,7 @@ describe('GetCustomReportUseCase', () => {
       description: null,
       programId: null,
       companyId: null,
-      reportType: 'monthly',
+      reportType: 'custom',
       templateId: null,
       selectedMetrics: [],
       dateRangeStart: null,
@@ -90,7 +95,7 @@ describe('GetCustomReportUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('Custom report bulunamadı');
-    expect(result.error?.statusCode).toBe(404);
+    expect((result.error as AppError)?.statusCode).toBe(404);
   });
 
   it('should return error when repository returns null', async () => {
@@ -103,7 +108,7 @@ describe('GetCustomReportUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('Custom report bulunamadı');
-    expect(result.error?.statusCode).toBe(404);
+    expect((result.error as AppError)?.statusCode).toBe(404);
   });
 
   it('should return error when user tries to access another user report', async () => {
@@ -118,7 +123,7 @@ describe('GetCustomReportUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('Bu raporu görüntüleme yetkiniz yok');
-    expect(result.error?.statusCode).toBe(403);
+    expect((result.error as AppError)?.statusCode).toBe(403);
   });
 
   it('should handle repository errors', async () => {

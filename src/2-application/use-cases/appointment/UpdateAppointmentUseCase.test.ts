@@ -6,7 +6,8 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { UpdateAppointmentUseCase } from './UpdateAppointmentUseCase';
 import { IAppointmentRepository } from '@/3-domain/interfaces/repositories/IAppointmentRepository';
 import { Appointment } from '@/3-domain/entities/Appointment';
-import type { AppointmentStatus } from '@/3-domain/enums/AppointmentStatus';
+import { AppointmentStatus } from '@/3-domain/enums/AppointmentStatus';
+import { AppError } from '@/6-core/errors/AppError';
 
 describe('UpdateAppointmentUseCase', () => {
   let mockRepository: IAppointmentRepository;
@@ -22,12 +23,17 @@ describe('UpdateAppointmentUseCase', () => {
       findByDateRange: vi.fn(),
       findByConsultantId: vi.fn(),
       findByCompanyId: vi.fn(),
+      findByProgramId: vi.fn(),
+      findByStatus: vi.fn(),
       findConflictingAppointments: vi.fn(),
       approve: vi.fn(),
       reject: vi.fn(),
       reschedule: vi.fn(),
       updateZoomMeeting: vi.fn(),
-    };
+      exists: vi.fn(),
+      markAsCompleted: vi.fn(),
+      markAsAttended: vi.fn(),
+    } as any;
 
     useCase = new UpdateAppointmentUseCase(mockRepository);
   });
@@ -99,7 +105,7 @@ describe('UpdateAppointmentUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('Appointment ID is required');
-    expect(result.error?.statusCode).toBe(400);
+    expect((result.error as AppError)?.statusCode).toBe(400);
     expect(mockRepository.findById).not.toHaveBeenCalled();
   });
 
@@ -113,7 +119,7 @@ describe('UpdateAppointmentUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('Appointment not found');
-    expect(result.error?.statusCode).toBe(404);
+    expect((result.error as AppError)?.statusCode).toBe(404);
     expect(mockRepository.update).not.toHaveBeenCalled();
   });
 
@@ -166,7 +172,7 @@ describe('UpdateAppointmentUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('başka bir randevusu bulunmaktadır');
-    expect(result.error?.statusCode).toBe(409);
+    expect((result.error as AppError)?.statusCode).toBe(409);
     expect(mockRepository.update).not.toHaveBeenCalled();
   });
 
@@ -202,6 +208,6 @@ describe('UpdateAppointmentUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toBe(errorMessage);
-    expect(result.error?.statusCode).toBe(500);
+    expect((result.error as AppError)?.statusCode).toBe(500);
   });
 });

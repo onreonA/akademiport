@@ -6,6 +6,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { ListTaskCommentsUseCase } from './ListTaskCommentsUseCase';
 import { ITaskCommentRepository } from '@/3-domain/interfaces/repositories/ITaskCommentRepository';
 import { TaskComment } from '@/3-domain/entities/TaskComment';
+import { AppError } from '@/6-core/errors/AppError';
 
 describe('ListTaskCommentsUseCase', () => {
   let mockRepository: ITaskCommentRepository;
@@ -16,9 +17,10 @@ describe('ListTaskCommentsUseCase', () => {
       create: vi.fn(),
       findById: vi.fn(),
       findByTaskId: vi.fn(),
-      update: vi.fn(),
+      findByUserId: vi.fn(),
       delete: vi.fn(),
-    };
+      exists: vi.fn(),
+    } as any;
 
     useCase = new ListTaskCommentsUseCase(mockRepository);
   });
@@ -28,9 +30,9 @@ describe('ListTaskCommentsUseCase', () => {
       id: 'comment-1',
       taskId: 'task-1',
       userId: 'user-1',
-      content: 'Test comment',
+      comment: 'Test comment',
+      isQuestion: false,
       createdAt: new Date(),
-      updatedAt: new Date(),
       ...overrides,
     };
   };
@@ -72,6 +74,6 @@ describe('ListTaskCommentsUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toBe(errorMessage);
-    expect(result.error?.statusCode).toBe(500);
+    expect((result.error as AppError)?.statusCode).toBe(500);
   });
 });

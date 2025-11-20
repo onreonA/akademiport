@@ -9,6 +9,7 @@ import { SubProject } from '@/3-domain/entities/SubProject';
 import { Company } from '@/3-domain/entities/Company';
 import { CompanyProjectAssignment } from '@/3-domain/entities/CompanyProjectAssignment';
 import { Result } from '@/6-core/result/Result';
+import { AppError } from '@/6-core/errors/AppError';
 
 describe('BulkAssignSubProjectsToCompaniesUseCase', () => {
   let mockProjectRepository: IProjectRepository;
@@ -53,7 +54,7 @@ describe('BulkAssignSubProjectsToCompaniesUseCase', () => {
     const result = await useCase.execute(request);
 
     expect(result.isFailure).toBe(true);
-    expect(result.error?.code).toBe('PROJECT_ID_MISSING');
+    expect((result.error as AppError)?.code).toBe('PROJECT_ID_MISSING');
   });
 
   it('should return error when project not found', async () => {
@@ -67,7 +68,7 @@ describe('BulkAssignSubProjectsToCompaniesUseCase', () => {
     const result = await useCase.execute(request);
 
     expect(result.isFailure).toBe(true);
-    expect(result.error?.code).toBe('PROJECT_NOT_FOUND');
+    expect((result.error as AppError)?.code).toBe('PROJECT_NOT_FOUND');
   });
 
   it('should create new assignments', async () => {
@@ -77,7 +78,7 @@ describe('BulkAssignSubProjectsToCompaniesUseCase', () => {
       companyId: null,
       consultantId: null,
       programId: null,
-      status: 'active',
+      status: 'in_progress',
       priority: 'medium',
       description: null,
       startDate: null,
@@ -85,6 +86,7 @@ describe('BulkAssignSubProjectsToCompaniesUseCase', () => {
       progress: 0,
       isTemplate: false,
       templateId: null,
+      deletedAt: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -95,9 +97,10 @@ describe('BulkAssignSubProjectsToCompaniesUseCase', () => {
         projectId: 'project-1',
         name: 'Sub Project 1',
         description: null,
-        status: 'active',
+        status: 'in_progress',
         orderIndex: 0,
         progress: 0,
+        deletedAt: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -106,6 +109,8 @@ describe('BulkAssignSubProjectsToCompaniesUseCase', () => {
     const company: Company = {
       id: 'company-1',
       name: 'Company 1',
+      slug: 'company-1',
+      country: 'Turkey',
       city: 'Istanbul',
       sector: 'Technology',
       isActive: true,
@@ -159,7 +164,7 @@ describe('BulkAssignSubProjectsToCompaniesUseCase', () => {
       companyId: null,
       consultantId: null,
       programId: null,
-      status: 'active',
+      status: 'in_progress',
       priority: 'medium',
       description: null,
       startDate: null,
@@ -167,6 +172,7 @@ describe('BulkAssignSubProjectsToCompaniesUseCase', () => {
       progress: 0,
       isTemplate: false,
       templateId: null,
+      deletedAt: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -177,9 +183,10 @@ describe('BulkAssignSubProjectsToCompaniesUseCase', () => {
         projectId: 'project-1',
         name: 'Sub Project 1',
         description: null,
-        status: 'active',
+        status: 'in_progress',
         orderIndex: 0,
         progress: 0,
+        deletedAt: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -188,6 +195,8 @@ describe('BulkAssignSubProjectsToCompaniesUseCase', () => {
     const company: Company = {
       id: 'company-1',
       name: 'Company 1',
+      slug: 'company-1',
+      country: 'Turkey',
       city: 'Istanbul',
       sector: 'Technology',
       isActive: true,
@@ -241,7 +250,7 @@ describe('BulkAssignSubProjectsToCompaniesUseCase', () => {
       companyId: null,
       consultantId: null,
       programId: null,
-      status: 'active',
+      status: 'in_progress',
       priority: 'medium',
       description: null,
       startDate: null,
@@ -249,6 +258,7 @@ describe('BulkAssignSubProjectsToCompaniesUseCase', () => {
       progress: 0,
       isTemplate: false,
       templateId: null,
+      deletedAt: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -259,9 +269,10 @@ describe('BulkAssignSubProjectsToCompaniesUseCase', () => {
         projectId: 'project-1',
         name: 'Sub Project 1',
         description: null,
-        status: 'active',
+        status: 'in_progress',
         orderIndex: 0,
         progress: 0,
+        deletedAt: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -270,6 +281,8 @@ describe('BulkAssignSubProjectsToCompaniesUseCase', () => {
     const company: Company = {
       id: 'company-1',
       name: 'Company 1',
+      slug: 'company-1',
+      country: 'Turkey',
       city: 'Istanbul',
       sector: 'Technology',
       isActive: true,
@@ -309,7 +322,7 @@ describe('BulkAssignSubProjectsToCompaniesUseCase', () => {
       companyId: null,
       consultantId: null,
       programId: null,
-      status: 'active',
+      status: 'in_progress',
       priority: 'medium',
       description: null,
       startDate: null,
@@ -317,6 +330,7 @@ describe('BulkAssignSubProjectsToCompaniesUseCase', () => {
       progress: 0,
       isTemplate: false,
       templateId: null,
+      deletedAt: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };

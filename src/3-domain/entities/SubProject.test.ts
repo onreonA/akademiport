@@ -26,11 +26,12 @@ describe('SubProject Entity', () => {
       expect(subProject.progress).toBe(30);
     });
 
-    it('should create sub-project with optional description', () => {
+    it('should create sub-project with null description', () => {
       const subProject: SubProject = {
         id: 'subproject-2',
         projectId: 'project-1',
         name: 'SubProject without description',
+        description: null,
         status: 'todo',
         orderIndex: 2,
         progress: 0,
@@ -39,7 +40,7 @@ describe('SubProject Entity', () => {
         updatedAt: new Date(),
       };
 
-      expect(subProject.description).toBeUndefined();
+      expect(subProject.description).toBeNull();
     });
   });
 
@@ -52,6 +53,7 @@ describe('SubProject Entity', () => {
           id: 'subproject-1',
           projectId: 'project-1',
           name: 'Test SubProject',
+          description: null,
           status: status as SubProject['status'],
           orderIndex: 1,
           progress: 0,
@@ -72,9 +74,11 @@ describe('SubProject Entity', () => {
           id: 'subproject-1',
           projectId: 'project-1',
           name: 'First',
+          description: null,
           status: 'todo',
           orderIndex: 1,
           progress: 0,
+          deletedAt: null,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -82,9 +86,11 @@ describe('SubProject Entity', () => {
           id: 'subproject-2',
           projectId: 'project-1',
           name: 'Second',
+          description: null,
           status: 'todo',
           orderIndex: 2,
           progress: 0,
+          deletedAt: null,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -92,9 +98,11 @@ describe('SubProject Entity', () => {
           id: 'subproject-3',
           projectId: 'project-1',
           name: 'Third',
+          description: null,
           status: 'todo',
           orderIndex: 3,
           progress: 0,
+          deletedAt: null,
           createdAt: new Date(),
           updatedAt: new Date(),
         },

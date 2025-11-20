@@ -8,8 +8,9 @@ import { IAppointmentRepository } from '@/3-domain/interfaces/repositories/IAppo
 import { IUserRepository } from '@/3-domain/interfaces/IUserRepository';
 import { NotificationService } from '@/5-shared/services/notification';
 import { Appointment } from '@/3-domain/entities/Appointment';
-import type { AppointmentStatus } from '@/3-domain/enums/AppointmentStatus';
+import { AppointmentStatus } from '@/3-domain/enums/AppointmentStatus';
 import { Result } from '@/6-core/result/Result';
+import { AppError } from '@/6-core/errors/AppError';
 
 describe('DeleteAppointmentUseCase', () => {
   let mockRepository: IAppointmentRepository;
@@ -27,12 +28,17 @@ describe('DeleteAppointmentUseCase', () => {
       findByDateRange: vi.fn(),
       findByConsultantId: vi.fn(),
       findByCompanyId: vi.fn(),
+      findByProgramId: vi.fn(),
+      findByStatus: vi.fn(),
       findConflictingAppointments: vi.fn(),
       approve: vi.fn(),
       reject: vi.fn(),
       reschedule: vi.fn(),
       updateZoomMeeting: vi.fn(),
-    };
+      exists: vi.fn(),
+      markAsCompleted: vi.fn(),
+      markAsAttended: vi.fn(),
+    } as any;
 
     mockNotificationService = {
       sendAppointmentCancelled: vi.fn(),
@@ -111,7 +117,9 @@ describe('DeleteAppointmentUseCase', () => {
     vi.mocked(mockRepository.findById).mockResolvedValue(mockAppointment);
     vi.mocked(mockRepository.delete).mockResolvedValue(undefined);
     vi.mocked(mockUserRepository.findById).mockResolvedValue(Result.fail('Not found'));
-    vi.mocked(mockNotificationService.sendAppointmentCancelled).mockResolvedValue(undefined);
+    vi.mocked(mockNotificationService.sendAppointmentCancelled).mockResolvedValue(
+      Result.ok(undefined as any)
+    );
 
     const result = await useCase.execute(appointmentId);
 
@@ -126,7 +134,7 @@ describe('DeleteAppointmentUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('Appointment ID is required');
-    expect(result.error?.statusCode).toBe(400);
+    expect((result.error as AppError)?.statusCode).toBe(400);
     expect(mockRepository.findById).not.toHaveBeenCalled();
   });
 
@@ -139,7 +147,7 @@ describe('DeleteAppointmentUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('Appointment not found');
-    expect(result.error?.statusCode).toBe(404);
+    expect((result.error as AppError)?.statusCode).toBe(404);
     expect(mockRepository.delete).not.toHaveBeenCalled();
   });
 
@@ -151,7 +159,9 @@ describe('DeleteAppointmentUseCase', () => {
     vi.mocked(mockRepository.findById).mockResolvedValue(mockAppointment);
     vi.mocked(mockRepository.delete).mockResolvedValue(undefined);
     vi.mocked(mockUserRepository.findById).mockResolvedValue(Result.ok(mockUser as any));
-    vi.mocked(mockNotificationService.sendAppointmentCancelled).mockResolvedValue(undefined);
+    vi.mocked(mockNotificationService.sendAppointmentCancelled).mockResolvedValue(
+      Result.ok(undefined as any)
+    );
 
     const result = await useCase.execute(appointmentId);
 
@@ -193,6 +203,6 @@ describe('DeleteAppointmentUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toBe(errorMessage);
-    expect(result.error?.statusCode).toBe(500);
+    expect((result.error as AppError)?.statusCode).toBe(500);
   });
 });

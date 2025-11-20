@@ -7,6 +7,8 @@ import { ApproveTaskUseCase } from './ApproveTaskUseCase';
 import { ITaskRepository } from '@/3-domain/interfaces/repositories/ITaskRepository';
 import { Task } from '@/3-domain/entities/Task';
 import { NotificationService } from '@/5-shared/services/notification';
+import { AppError } from '@/6-core/errors/AppError';
+import { Result } from '@/6-core/result/Result';
 
 describe('ApproveTaskUseCase', () => {
   let mockRepository: ITaskRepository;
@@ -17,18 +19,18 @@ describe('ApproveTaskUseCase', () => {
     mockRepository = {
       create: vi.fn(),
       findById: vi.fn(),
-      findAll: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
-      findBySubProject: vi.fn(),
-      findByAssignedUser: vi.fn(),
       findBySubProjectId: vi.fn(),
+      findBySubProjectIds: vi.fn(),
+      findByAssignedUserId: vi.fn(),
       complete: vi.fn(),
       approve: vi.fn(),
       reject: vi.fn(),
       assign: vi.fn(),
       exists: vi.fn(),
-    };
+      restore: vi.fn(),
+    } as any;
 
     mockNotificationService = {
       sendTaskApproved: vi.fn(),
@@ -65,7 +67,9 @@ describe('ApproveTaskUseCase', () => {
 
     vi.mocked(mockRepository.findById).mockResolvedValue(mockTask);
     vi.mocked(mockRepository.approve).mockResolvedValue(undefined);
-    vi.mocked(mockNotificationService.sendTaskApproved).mockResolvedValue(undefined);
+    vi.mocked(mockNotificationService.sendTaskApproved).mockResolvedValue(
+      Result.ok(undefined as any)
+    );
 
     const result = await useCase.execute(taskId, approvedBy);
 
@@ -99,7 +103,7 @@ describe('ApproveTaskUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('Task not found');
-    expect(result.error?.statusCode).toBe(404);
+    expect((result.error as AppError)?.statusCode).toBe(404);
     expect(mockRepository.approve).not.toHaveBeenCalled();
   });
 
@@ -114,7 +118,7 @@ describe('ApproveTaskUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('must be in review or completed');
-    expect(result.error?.statusCode).toBe(400);
+    expect((result.error as AppError)?.statusCode).toBe(400);
     expect(mockRepository.approve).not.toHaveBeenCalled();
   });
 
@@ -133,7 +137,7 @@ describe('ApproveTaskUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('already approved');
-    expect(result.error?.statusCode).toBe(400);
+    expect((result.error as AppError)?.statusCode).toBe(400);
     expect(mockRepository.approve).not.toHaveBeenCalled();
   });
 
@@ -165,6 +169,6 @@ describe('ApproveTaskUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toBe(errorMessage);
-    expect(result.error?.statusCode).toBe(500);
+    expect((result.error as AppError)?.statusCode).toBe(500);
   });
 });

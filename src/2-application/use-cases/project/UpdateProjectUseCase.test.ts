@@ -6,6 +6,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { UpdateProjectUseCase } from './UpdateProjectUseCase';
 import { IProjectRepository } from '@/3-domain/interfaces/repositories/IProjectRepository';
 import { Project } from '@/3-domain/entities/Project';
+import { AppError } from '@/6-core/errors/AppError';
 
 describe('UpdateProjectUseCase', () => {
   let mockProjectRepository: IProjectRepository;
@@ -20,8 +21,14 @@ describe('UpdateProjectUseCase', () => {
       delete: vi.fn(),
       findTemplates: vi.fn(),
       updateProgress: vi.fn(),
-      exists: vi.fn(),
-    };
+      findByCompanyId: vi.fn(),
+      findByConsultantId: vi.fn(),
+      findByTemplateId: vi.fn(),
+      restore: vi.fn(),
+      findDeleted: vi.fn(),
+      findBySubProjectId: vi.fn(),
+      findByProgramId: vi.fn(),
+    } as any;
 
     useCase = new UpdateProjectUseCase(mockProjectRepository);
   });
@@ -40,13 +47,14 @@ describe('UpdateProjectUseCase', () => {
       companyId: 'company-1',
       programId: 'program-1',
       description: 'Original description',
-      status: 'active',
+      status: 'in_progress',
       priority: 'high',
       startDate: new Date('2025-01-01'),
       endDate: new Date('2025-12-31'),
       progress: 50,
       isTemplate: false,
       templateId: null,
+      deletedAt: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -57,7 +65,7 @@ describe('UpdateProjectUseCase', () => {
     };
 
     vi.mocked(mockProjectRepository.exists).mockResolvedValue(true);
-    vi.mocked(mockProjectRepository.update).mockResolvedValue(undefined);
+    vi.mocked(mockProjectRepository.update).mockResolvedValue(updatedProject);
 
     const result = await useCase.execute(projectId, updateData);
 
@@ -94,13 +102,14 @@ describe('UpdateProjectUseCase', () => {
       companyId: 'company-1',
       programId: 'program-1',
       description: null,
-      status: 'active',
+      status: 'in_progress',
       priority: 'medium',
       startDate: new Date('2025-01-01'),
       endDate: new Date('2025-12-31'),
       progress: 0,
       isTemplate: false,
       templateId: null,
+      deletedAt: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -127,13 +136,14 @@ describe('UpdateProjectUseCase', () => {
       companyId: 'company-1',
       programId: 'program-1',
       description: null,
-      status: 'active',
+      status: 'in_progress',
       priority: 'medium',
       startDate: new Date('2025-01-01'),
       endDate: new Date('2025-12-31'),
       progress: 0,
       isTemplate: false,
       templateId: null,
+      deletedAt: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };

@@ -6,6 +6,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { UpdateNotificationPreferencesUseCase } from './UpdateNotificationPreferencesUseCase';
 import { INotificationPreferencesRepository } from '@/3-domain/interfaces/repositories/INotificationRepository';
 import { NotificationPreferences } from '@/3-domain/entities/NotificationPreferences';
+import { NotificationType } from '@/3-domain/enums/NotificationEnums';
 import { Result } from '@/6-core/result';
 
 describe('UpdateNotificationPreferencesUseCase', () => {
@@ -34,8 +35,8 @@ describe('UpdateNotificationPreferencesUseCase', () => {
       inAppEnabled: true,
       typePreferences: {},
       quietHoursEnabled: false,
-      quietHoursStart: null,
-      quietHoursEnd: null,
+      quietHoursStart: undefined,
+      quietHoursEnd: undefined,
       createdAt: new Date(),
       updatedAt: new Date(),
       ...overrides,
@@ -93,22 +94,22 @@ describe('UpdateNotificationPreferencesUseCase', () => {
     const userId = 'user-1';
     const dto = {
       typePreferences: {
-        appointment: true,
-        task: false,
+        [NotificationType.APPOINTMENT_CONFIRMED]: { email: true, push: true, inApp: true },
+        [NotificationType.TASK_ASSIGNED]: { email: false, push: false, inApp: false },
       },
     };
     const existingPreferences = createMockPreferences({
       userId,
       typePreferences: {
-        appointment: false,
-        task: true,
+        [NotificationType.APPOINTMENT_CONFIRMED]: { email: false, push: false, inApp: false },
+        [NotificationType.TASK_ASSIGNED]: { email: true, push: true, inApp: true },
       },
     });
     const updatedPreferences = createMockPreferences({
       userId,
       typePreferences: {
-        appointment: true,
-        task: false,
+        [NotificationType.APPOINTMENT_CONFIRMED]: { email: true, push: true, inApp: true },
+        [NotificationType.TASK_ASSIGNED]: { email: false, push: false, inApp: false },
       },
     });
 
@@ -120,8 +121,8 @@ describe('UpdateNotificationPreferencesUseCase', () => {
     expect(result.isSuccess).toBe(true);
     expect(mockRepository.update).toHaveBeenCalledWith(userId, {
       typePreferences: {
-        appointment: true,
-        task: false,
+        [NotificationType.APPOINTMENT_CONFIRMED]: { email: true, push: true, inApp: true },
+        [NotificationType.TASK_ASSIGNED]: { email: false, push: false, inApp: false },
       },
     });
   });

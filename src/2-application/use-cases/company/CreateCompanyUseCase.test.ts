@@ -7,7 +7,7 @@ import { CreateCompanyUseCase } from './CreateCompanyUseCase';
 import { ICompanyRepository } from '@/3-domain/interfaces/ICompanyRepository';
 import { Company } from '@/3-domain/entities/Company';
 import { UserRole } from '@/3-domain/enums/UserRole';
-import { Result } from '@/core/result/Result';
+import { Result } from '@/6-core/result/Result';
 
 describe('CreateCompanyUseCase', () => {
   let mockRepository: ICompanyRepository;
@@ -21,36 +21,44 @@ describe('CreateCompanyUseCase', () => {
       update: vi.fn(),
       delete: vi.fn(),
       findByProgramId: vi.fn(),
-      findByConsultantId: vi.fn(),
+      findByCity: vi.fn(),
+      search: vi.fn(),
       findWithFilters: vi.fn(),
-    };
+      getCompanyUsers: vi.fn(),
+      addCompanyUser: vi.fn(),
+      removeCompanyUser: vi.fn(),
+    } as any;
 
     useCase = new CreateCompanyUseCase(mockRepository);
   });
 
   const createValidDto = () => ({
     name: 'Test Company',
+    programId: 'program-1',
+    country: 'Turkey',
+    maxUsers: 2,
     taxNumber: '1234567890',
     email: 'test@company.com',
     phone: '+905551234567',
     address: 'Test Address',
     city: 'Istanbul',
-    country: 'Turkey',
-    programId: 'program-1',
   });
 
   const createMockCompany = (overrides?: Partial<Company>): Company => {
     return {
       id: 'company-1',
       name: 'Test Company',
+      slug: 'test-company',
+      country: 'Turkey',
       taxNumber: '1234567890',
       email: 'test@company.com',
       phone: '+905551234567',
       address: 'Test Address',
       city: 'Istanbul',
-      country: 'Turkey',
       isActive: true,
       programId: 'program-1',
+      maxUsers: 2,
+      currentUsers: 0,
       createdAt: new Date(),
       updatedAt: new Date(),
       ...overrides,

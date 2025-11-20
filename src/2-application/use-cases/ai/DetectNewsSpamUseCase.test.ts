@@ -11,6 +11,8 @@ import { ITokenTracker } from '@/3-domain/interfaces/services/ITokenTracker';
 import { Result } from '@/6-core/result/Result';
 import { News } from '@/3-domain/entities/News';
 import { NewsStatus, NewsCategory } from '@/3-domain/enums/NewsEnums';
+import { AIPrompt, AIResponse } from '@/3-domain/entities/AI';
+import { AIProvider, AIUseCase, AIModel } from '@/3-domain/enums/AIEnums';
 
 describe('DetectNewsSpamUseCase', () => {
   let useCase: DetectNewsSpamUseCase;
@@ -79,17 +81,27 @@ describe('DetectNewsSpamUseCase', () => {
         updatedAt: new Date(),
       };
 
-      const mockPrompt = {
+      const mockPrompt: AIPrompt = {
         id: 'prompt-1',
-        name: 'Forum Moderation',
+        name: 'News Spam Detection',
+        description: null,
+        useCase: AIUseCase.FORUM_MODERATION,
         template: '{{content}}',
-        model: 'gpt-3.5-turbo',
+        variables: {},
+        version: 1,
+        isActive: true,
+        provider: AIProvider.OPENAI,
+        model: AIModel.GPT_3_5_TURBO,
         temperature: 0.5,
         maxTokens: 1500,
         topP: 1.0,
+        metadata: null,
+        createdBy: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
 
-      const mockAIResponse = {
+      const mockAIResponse: AIResponse = {
         text: JSON.stringify({
           spamScore: 80,
           isSpam: true,
@@ -97,8 +109,8 @@ describe('DetectNewsSpamUseCase', () => {
           recommendation: 'reject',
           factors: [{ name: 'Clickbait', score: 80, description: 'Clickbait title' }],
         }),
-        provider: 'openai' as any,
-        model: 'gpt-3.5-turbo',
+        provider: AIProvider.OPENAI,
+        model: AIModel.GPT_3_5_TURBO,
         requestTokens: 100,
         responseTokens: 50,
         totalTokens: 150,
@@ -124,25 +136,35 @@ describe('DetectNewsSpamUseCase', () => {
     });
 
     it('should detect spam for direct content', async () => {
-      const mockPrompt = {
+      const mockPrompt: AIPrompt = {
         id: 'prompt-1',
         name: 'Forum Moderation',
+        description: null,
+        useCase: AIUseCase.FORUM_MODERATION,
         template: '{{content}}',
-        model: 'gpt-3.5-turbo',
+        variables: {},
+        version: 1,
+        isActive: true,
+        provider: AIProvider.OPENAI,
+        model: AIModel.GPT_3_5_TURBO,
         temperature: 0.5,
         maxTokens: 1500,
         topP: 1.0,
+        metadata: null,
+        createdBy: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
 
-      const mockAIResponse = {
+      const mockAIResponse: AIResponse = {
         text: JSON.stringify({
           spamScore: 25,
           isSpam: false,
           recommendation: 'approve',
           factors: [],
         }),
-        provider: 'openai' as any,
-        model: 'gpt-3.5-turbo',
+        provider: AIProvider.OPENAI,
+        model: AIModel.GPT_3_5_TURBO,
         requestTokens: 100,
         responseTokens: 50,
         totalTokens: 150,

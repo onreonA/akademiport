@@ -73,9 +73,10 @@ describe('GET /api/custom-reports/[id]/export', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // Reset environment
-    delete process.env.NEXT_PHASE;
-    delete process.env.NODE_ENV;
-    delete process.env.VERCEL;
+    const env = process.env as any;
+    delete env.NEXT_PHASE;
+    delete env.NODE_ENV;
+    delete env.VERCEL;
   });
 
   it('returns 401 when user is not authenticated', async () => {

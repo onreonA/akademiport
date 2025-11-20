@@ -7,6 +7,8 @@ import { RejectTaskUseCase } from './RejectTaskUseCase';
 import { ITaskRepository } from '@/3-domain/interfaces/repositories/ITaskRepository';
 import { Task } from '@/3-domain/entities/Task';
 import { NotificationService } from '@/5-shared/services/notification';
+import { AppError } from '@/6-core/errors/AppError';
+import { Result } from '@/6-core/result/Result';
 
 describe('RejectTaskUseCase', () => {
   let mockRepository: ITaskRepository;
@@ -17,18 +19,18 @@ describe('RejectTaskUseCase', () => {
     mockRepository = {
       create: vi.fn(),
       findById: vi.fn(),
-      findAll: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
-      findBySubProject: vi.fn(),
-      findByAssignedUser: vi.fn(),
       findBySubProjectId: vi.fn(),
+      findBySubProjectIds: vi.fn(),
+      findByAssignedUserId: vi.fn(),
       complete: vi.fn(),
       approve: vi.fn(),
       reject: vi.fn(),
       assign: vi.fn(),
       exists: vi.fn(),
-    };
+      restore: vi.fn(),
+    } as any;
 
     mockNotificationService = {
       sendTaskApproved: vi.fn(),
@@ -51,7 +53,12 @@ describe('RejectTaskUseCase', () => {
       description: 'Test Description',
       status: 'review',
       priority: 'high',
+      dueDate: null,
+      completedAt: null,
+      approvedAt: null,
+      approvedBy: null,
       orderIndex: 1,
+      deletedAt: null,
       createdAt: new Date(),
       updatedAt: new Date(),
       ...overrides,
@@ -65,7 +72,9 @@ describe('RejectTaskUseCase', () => {
 
     vi.mocked(mockRepository.findById).mockResolvedValue(mockTask);
     vi.mocked(mockRepository.reject).mockResolvedValue(undefined);
-    vi.mocked(mockNotificationService.sendTaskRejected).mockResolvedValue(undefined);
+    vi.mocked(mockNotificationService.sendTaskRejected).mockResolvedValue(
+      Result.ok(undefined as any)
+    );
 
     const result = await useCase.execute(taskId, reason);
 
@@ -81,7 +90,9 @@ describe('RejectTaskUseCase', () => {
 
     vi.mocked(mockRepository.findById).mockResolvedValue(mockTask);
     vi.mocked(mockRepository.reject).mockResolvedValue(undefined);
-    vi.mocked(mockNotificationService.sendTaskRejected).mockResolvedValue(undefined);
+    vi.mocked(mockNotificationService.sendTaskRejected).mockResolvedValue(
+      Result.ok(undefined as any)
+    );
 
     const result = await useCase.execute(taskId);
 
@@ -98,7 +109,7 @@ describe('RejectTaskUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('Task not found');
-    expect(result.error?.statusCode).toBe(404);
+    expect((result.error as AppError)?.statusCode).toBe(404);
     expect(mockRepository.reject).not.toHaveBeenCalled();
   });
 
@@ -112,7 +123,7 @@ describe('RejectTaskUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('must be in review');
-    expect(result.error?.statusCode).toBe(400);
+    expect((result.error as AppError)?.statusCode).toBe(400);
     expect(mockRepository.reject).not.toHaveBeenCalled();
   });
 
@@ -142,6 +153,6 @@ describe('RejectTaskUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toBe(errorMessage);
-    expect(result.error?.statusCode).toBe(500);
+    expect((result.error as AppError)?.statusCode).toBe(500);
   });
 });

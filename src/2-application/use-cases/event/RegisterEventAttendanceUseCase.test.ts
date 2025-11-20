@@ -6,9 +6,10 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { RegisterEventAttendanceUseCase } from './RegisterEventAttendanceUseCase';
 import { IEventRepository } from '@/3-domain/interfaces/repositories/IEventRepository';
 import { AddLeaderboardScoreUseCase } from '@/2-application/use-cases/leaderboard';
-import { Event } from '@/3-domain/entities/Event';
+import { Event, EventAttendance } from '@/3-domain/entities/Event';
 import type { EventStatus, EventCategory } from '@/3-domain/entities/Event';
 import { ActivityType } from '@/3-domain/enums/LeaderboardEnums';
+import { AppError } from '@/6-core/errors/AppError';
 
 // Mock EventEntity
 vi.mock('@/3-domain/entities/Event', async () => {
@@ -46,7 +47,12 @@ describe('RegisterEventAttendanceUseCase', () => {
       getAttendees: vi.fn(),
       updateZoomMeeting: vi.fn(),
       registerAttendance: vi.fn(),
-    };
+      exists: vi.fn(),
+      cancelAttendance: vi.fn(),
+      findByUserId: vi.fn(),
+      findByCompanyId: vi.fn(),
+      updateAttendeeCount: vi.fn(),
+    } as any;
 
     mockAddLeaderboardScore = {
       execute: vi.fn(),
@@ -72,17 +78,21 @@ describe('RegisterEventAttendanceUseCase', () => {
       startTime,
       endTime,
       timezone: 'Europe/Istanbul',
-      location: null,
-      category: 'training' as EventCategory,
+      category: 'webinar' as EventCategory,
       status: 'scheduled' as EventStatus,
+      attendanceRequired: true,
       maxAttendees: 50,
       currentAttendees: 0,
+      organizerName: null,
+      organizerEmail: null,
+      isPublic: true,
       zoomMeetingId: null,
       zoomJoinUrl: null,
       zoomStartUrl: null,
       zoomPassword: null,
       createdAt: new Date(),
       updatedAt: new Date(),
+      createdBy: null,
       ...overrides,
     };
   };
@@ -97,7 +107,17 @@ describe('RegisterEventAttendanceUseCase', () => {
       maxAttendees: 50,
       currentAttendees: 0,
     });
-    const attendance = { id: 'attendance-1', eventId, userId, companyId };
+    const attendance: EventAttendance = {
+      id: 'attendance-1',
+      eventId,
+      userId,
+      companyId,
+      userName: 'Test User',
+      companyName: 'Test Company',
+      registeredAt: new Date(),
+      attendedAt: null,
+      notes: null,
+    };
 
     vi.mocked(mockRepository.findById).mockResolvedValue(mockEvent);
     vi.mocked(mockRepository.getAttendees).mockResolvedValue([]);
@@ -134,7 +154,7 @@ describe('RegisterEventAttendanceUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('Event ID is required');
-    expect(result.error?.statusCode).toBe(400);
+    expect((result.error as AppError)?.statusCode).toBe(400);
   });
 
   it('should return error when user ID is empty', async () => {
@@ -142,7 +162,7 @@ describe('RegisterEventAttendanceUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('User ID is required');
-    expect(result.error?.statusCode).toBe(400);
+    expect((result.error as AppError)?.statusCode).toBe(400);
   });
 
   it('should return error when company ID is empty', async () => {
@@ -150,7 +170,7 @@ describe('RegisterEventAttendanceUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('Company ID is required');
-    expect(result.error?.statusCode).toBe(400);
+    expect((result.error as AppError)?.statusCode).toBe(400);
   });
 
   it('should return error when event not found', async () => {
@@ -164,7 +184,7 @@ describe('RegisterEventAttendanceUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('Event not found');
-    expect(result.error?.statusCode).toBe(404);
+    expect((result.error as AppError)?.statusCode).toBe(404);
     expect(mockRepository.registerAttendance).not.toHaveBeenCalled();
   });
 
@@ -180,7 +200,7 @@ describe('RegisterEventAttendanceUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('Event registration is not available');
-    expect(result.error?.statusCode).toBe(400);
+    expect((result.error as AppError)?.statusCode).toBe(400);
     expect(mockRepository.registerAttendance).not.toHaveBeenCalled();
   });
 
@@ -191,13 +211,25 @@ describe('RegisterEventAttendanceUseCase', () => {
     const mockEvent = createMockEvent({ id: eventId, status: 'scheduled' });
 
     vi.mocked(mockRepository.findById).mockResolvedValue(mockEvent);
-    vi.mocked(mockRepository.getAttendees).mockResolvedValue([{ userId }]);
+    vi.mocked(mockRepository.getAttendees).mockResolvedValue([
+      {
+        id: 'attendance-1',
+        eventId: 'event-1',
+        userId,
+        companyId: 'company-1',
+        userName: 'Test User',
+        companyName: 'Test Company',
+        registeredAt: new Date(),
+        attendedAt: null,
+        notes: null,
+      },
+    ]);
 
     const result = await useCase.execute(eventId, userId, companyId);
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('User is already registered');
-    expect(result.error?.statusCode).toBe(400);
+    expect((result.error as AppError)?.statusCode).toBe(400);
     expect(mockRepository.registerAttendance).not.toHaveBeenCalled();
   });
 
@@ -206,7 +238,17 @@ describe('RegisterEventAttendanceUseCase', () => {
     const userId = 'user-1';
     const companyId = 'company-1';
     const mockEvent = createMockEvent({ id: eventId, status: 'scheduled' });
-    const attendance = { id: 'attendance-1', eventId, userId, companyId };
+    const attendance: EventAttendance = {
+      id: 'attendance-1',
+      eventId,
+      userId,
+      companyId,
+      userName: 'Test User',
+      companyName: 'Test Company',
+      registeredAt: new Date(),
+      attendedAt: null,
+      notes: null,
+    };
 
     vi.mocked(mockRepository.findById).mockResolvedValue(mockEvent);
     vi.mocked(mockRepository.getAttendees).mockResolvedValue([]);
@@ -227,7 +269,17 @@ describe('RegisterEventAttendanceUseCase', () => {
     const userId = 'user-1';
     const companyId = 'company-1';
     const mockEvent = createMockEvent({ id: eventId, status: 'scheduled' });
-    const attendance = { id: 'attendance-1', eventId, userId, companyId };
+    const attendance: EventAttendance = {
+      id: 'attendance-1',
+      eventId,
+      userId,
+      companyId,
+      userName: 'Test User',
+      companyName: 'Test Company',
+      registeredAt: new Date(),
+      attendedAt: null,
+      notes: null,
+    };
     const useCaseWithoutLeaderboard = new RegisterEventAttendanceUseCase(mockRepository);
 
     vi.mocked(mockRepository.findById).mockResolvedValue(mockEvent);
@@ -252,6 +304,6 @@ describe('RegisterEventAttendanceUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toBe(errorMessage);
-    expect(result.error?.statusCode).toBe(500);
+    expect((result.error as AppError)?.statusCode).toBe(500);
   });
 });

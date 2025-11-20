@@ -7,6 +7,7 @@ import { ListAppointmentsUseCase } from './ListAppointmentsUseCase';
 import { IAppointmentRepository } from '@/3-domain/interfaces/repositories/IAppointmentRepository';
 import { Appointment } from '@/3-domain/entities/Appointment';
 import type { AppointmentStatus } from '@/3-domain/enums/AppointmentStatus';
+import { AppError } from '@/6-core/errors/AppError';
 
 describe('ListAppointmentsUseCase', () => {
   let mockAppointmentRepository: IAppointmentRepository;
@@ -22,12 +23,17 @@ describe('ListAppointmentsUseCase', () => {
       findByDateRange: vi.fn(),
       findByConsultantId: vi.fn(),
       findByCompanyId: vi.fn(),
+      findByProgramId: vi.fn(),
+      findByStatus: vi.fn(),
+      exists: vi.fn(),
+      markAsCompleted: vi.fn(),
+      markAsAttended: vi.fn(),
       findConflictingAppointments: vi.fn(),
       approve: vi.fn(),
       reject: vi.fn(),
       reschedule: vi.fn(),
       updateZoomMeeting: vi.fn(),
-    };
+    } as any;
 
     useCase = new ListAppointmentsUseCase(mockAppointmentRepository);
   });
@@ -147,6 +153,6 @@ describe('ListAppointmentsUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toBe(errorMessage);
-    expect(result.error?.statusCode).toBe(500);
+    expect((result.error as AppError)?.statusCode).toBe(500);
   });
 });

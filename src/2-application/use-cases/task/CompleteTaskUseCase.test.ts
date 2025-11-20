@@ -11,16 +11,19 @@ describe('CompleteTaskUseCase', () => {
     mockRepository = {
       create: vi.fn(),
       findById: vi.fn(),
-      findAll: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
-      findBySubProject: vi.fn(),
-      findByAssignedUser: vi.fn(),
+      findBySubProjectId: vi.fn(),
+      findBySubProjectIds: vi.fn(),
+      findByAssignedUserId: vi.fn(),
       complete: vi.fn(),
       approve: vi.fn(),
       reject: vi.fn(),
       assign: vi.fn(),
-    };
+      assignTo: vi.fn(),
+      exists: vi.fn(),
+      restore: vi.fn(),
+    } as any;
     useCase = new CompleteTaskUseCase(mockRepository);
   });
 
@@ -30,9 +33,15 @@ describe('CompleteTaskUseCase', () => {
       subProjectId: 'subproject-1',
       assignedTo: 'user-1',
       title: 'Test Task',
+      description: null,
       status: 'in_progress',
       priority: 'high',
+      dueDate: null,
+      completedAt: null,
+      approvedAt: null,
+      approvedBy: null,
       orderIndex: 1,
+      deletedAt: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -60,10 +69,17 @@ describe('CompleteTaskUseCase', () => {
     const completedTask: Task = {
       id: 'task-2',
       subProjectId: 'subproject-1',
+      assignedTo: null,
       title: 'Completed Task',
+      description: null,
       status: 'done',
       priority: 'medium',
+      dueDate: null,
+      completedAt: new Date(),
+      approvedAt: null,
+      approvedBy: null,
       orderIndex: 1,
+      deletedAt: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -81,10 +97,17 @@ describe('CompleteTaskUseCase', () => {
     const cancelledTask: Task = {
       id: 'task-3',
       subProjectId: 'subproject-1',
+      assignedTo: null,
       title: 'Cancelled Task',
+      description: null,
       status: 'cancelled',
       priority: 'low',
+      dueDate: null,
+      completedAt: null,
+      approvedAt: null,
+      approvedBy: null,
       orderIndex: 1,
+      deletedAt: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };

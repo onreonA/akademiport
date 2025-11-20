@@ -6,6 +6,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { GetTaskUseCase } from './GetTaskUseCase';
 import { ITaskRepository } from '@/3-domain/interfaces/repositories/ITaskRepository';
 import { Task } from '@/3-domain/entities/Task';
+import { AppError } from '@/6-core/errors/AppError';
 
 describe('GetTaskUseCase', () => {
   let mockRepository: ITaskRepository;
@@ -15,17 +16,19 @@ describe('GetTaskUseCase', () => {
     mockRepository = {
       create: vi.fn(),
       findById: vi.fn(),
-      findAll: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
-      findBySubProject: vi.fn(),
-      findByAssignedUser: vi.fn(),
       findBySubProjectId: vi.fn(),
+      findBySubProjectIds: vi.fn(),
+      findByAssignedUserId: vi.fn(),
       complete: vi.fn(),
       approve: vi.fn(),
       reject: vi.fn(),
       assign: vi.fn(),
-    };
+      assignTo: vi.fn(),
+      exists: vi.fn(),
+      restore: vi.fn(),
+    } as any;
 
     useCase = new GetTaskUseCase(mockRepository);
   });
@@ -39,7 +42,12 @@ describe('GetTaskUseCase', () => {
       description: 'Test Description',
       status: 'todo',
       priority: 'high',
+      dueDate: null,
+      completedAt: null,
+      approvedAt: null,
+      approvedBy: null,
       orderIndex: 1,
+      deletedAt: null,
       createdAt: new Date(),
       updatedAt: new Date(),
       ...overrides,
@@ -68,7 +76,7 @@ describe('GetTaskUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('Task not found');
-    expect(result.error?.statusCode).toBe(404);
+    expect((result.error as AppError)?.statusCode).toBe(404);
     expect(mockRepository.findById).toHaveBeenCalledWith(taskId);
   });
 
@@ -82,6 +90,6 @@ describe('GetTaskUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toBe(errorMessage);
-    expect(result.error?.statusCode).toBe(500);
+    expect((result.error as AppError)?.statusCode).toBe(500);
   });
 });

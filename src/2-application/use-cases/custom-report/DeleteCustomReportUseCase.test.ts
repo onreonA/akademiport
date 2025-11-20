@@ -7,6 +7,7 @@ import { DeleteCustomReportUseCase } from './DeleteCustomReportUseCase';
 import { ICustomReportRepository } from '@/3-domain/interfaces/repositories/ICustomReportRepository';
 import { CustomReport } from '@/3-domain/entities/CustomReport';
 import { Result } from '@/6-core/result/Result';
+import { AppError } from '@/6-core/errors/AppError';
 
 describe('DeleteCustomReportUseCase', () => {
   let mockRepository: ICustomReportRepository;
@@ -19,7 +20,11 @@ describe('DeleteCustomReportUseCase', () => {
       findWithFilters: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
-    };
+      findByUserId: vi.fn(),
+      findScheduledReports: vi.fn(),
+      findReportsToGenerate: vi.fn(),
+      updateGenerationTime: vi.fn(),
+    } as any;
 
     useCase = new DeleteCustomReportUseCase(mockRepository);
   });
@@ -32,7 +37,7 @@ describe('DeleteCustomReportUseCase', () => {
       description: null,
       programId: null,
       companyId: null,
-      reportType: 'monthly',
+      reportType: 'custom',
       templateId: null,
       selectedMetrics: [],
       dateRangeStart: null,
@@ -77,7 +82,7 @@ describe('DeleteCustomReportUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('Custom report bulunamadı');
-    expect(result.error?.statusCode).toBe(404);
+    expect((result.error as AppError)?.statusCode).toBe(404);
     expect(mockRepository.delete).not.toHaveBeenCalled();
   });
 
@@ -91,7 +96,7 @@ describe('DeleteCustomReportUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('Custom report bulunamadı');
-    expect(result.error?.statusCode).toBe(404);
+    expect((result.error as AppError)?.statusCode).toBe(404);
     expect(mockRepository.delete).not.toHaveBeenCalled();
   });
 
@@ -107,7 +112,7 @@ describe('DeleteCustomReportUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('Bu raporu silme yetkiniz yok');
-    expect(result.error?.statusCode).toBe(403);
+    expect((result.error as AppError)?.statusCode).toBe(403);
     expect(mockRepository.delete).not.toHaveBeenCalled();
   });
 

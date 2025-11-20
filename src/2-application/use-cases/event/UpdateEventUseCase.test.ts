@@ -19,9 +19,17 @@ describe('UpdateEventUseCase', () => {
       update: vi.fn(),
       delete: vi.fn(),
       findByDateRange: vi.fn(),
+      findByProgramId: vi.fn(),
+      findByConsultantId: vi.fn(),
+      registerAttendance: vi.fn(),
       getAttendees: vi.fn(),
-      getStatistics: vi.fn(),
-    };
+      updateZoomMeeting: vi.fn(),
+      exists: vi.fn(),
+      cancelAttendance: vi.fn(),
+      findByUserId: vi.fn(),
+      findByCompanyId: vi.fn(),
+      updateAttendeeCount: vi.fn(),
+    } as any;
 
     useCase = new UpdateEventUseCase(mockEventRepository);
   });
@@ -57,7 +65,12 @@ describe('UpdateEventUseCase', () => {
       zoomStartUrl: null,
       zoomPassword: null,
       organizerName: null,
+      organizerEmail: null,
       maxAttendees: null,
+      currentAttendees: 0,
+      attendanceRequired: false,
+      isPublic: true,
+      createdBy: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -130,7 +143,12 @@ describe('UpdateEventUseCase', () => {
       zoomStartUrl: null,
       zoomPassword: null,
       organizerName: null,
+      organizerEmail: null,
       maxAttendees: null,
+      currentAttendees: 0,
+      attendanceRequired: false,
+      isPublic: true,
+      createdBy: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -177,7 +195,12 @@ describe('UpdateEventUseCase', () => {
       zoomStartUrl: null,
       zoomPassword: null,
       organizerName: null,
+      organizerEmail: null,
       maxAttendees: null,
+      currentAttendees: 0,
+      attendanceRequired: false,
+      isPublic: true,
+      createdBy: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };

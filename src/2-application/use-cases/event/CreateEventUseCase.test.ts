@@ -18,10 +18,18 @@ describe('CreateEventUseCase', () => {
       findAll: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
+      findByProgramId: vi.fn(),
+      findByConsultantId: vi.fn(),
       findByDateRange: vi.fn(),
+      registerAttendance: vi.fn(),
       getAttendees: vi.fn(),
-      getStatistics: vi.fn(),
-    };
+      updateZoomMeeting: vi.fn(),
+      exists: vi.fn(),
+      cancelAttendance: vi.fn(),
+      findByUserId: vi.fn(),
+      findByCompanyId: vi.fn(),
+      updateAttendeeCount: vi.fn(),
+    } as any;
 
     useCase = new CreateEventUseCase(mockEventRepository);
   });
@@ -50,12 +58,17 @@ describe('CreateEventUseCase', () => {
       id: 'event-1',
       ...eventData,
       status: 'scheduled',
+      attendanceRequired: false,
+      isPublic: true,
+      maxAttendees: null,
+      currentAttendees: 0,
       zoomMeetingId: null,
       zoomJoinUrl: null,
       zoomStartUrl: null,
       zoomPassword: null,
       organizerName: null,
-      maxAttendees: null,
+      organizerEmail: null,
+      createdBy: 'consultant-1',
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -80,7 +93,7 @@ describe('CreateEventUseCase', () => {
       // Missing required fields
     } as any;
 
-    const result = await useCase.execute(invalidData);
+    const result = await useCase.execute(invalidData, 'consultant-1');
 
     expect(result.isFailure).toBe(true);
     expect(result.error).toBeDefined();

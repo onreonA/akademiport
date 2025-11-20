@@ -13,8 +13,18 @@ describe('CheckAvailabilityUseCase', () => {
 
   beforeEach(() => {
     mockRepository = {
+      createAvailability: vi.fn(),
+      findAvailabilityById: vi.fn(),
+      findAvailabilityByConsultant: vi.fn(),
+      updateAvailability: vi.fn(),
+      deleteAvailability: vi.fn(),
+      createUnavailableDate: vi.fn(),
+      findUnavailableDateById: vi.fn(),
+      findUnavailableDatesByConsultant: vi.fn(),
+      updateUnavailableDate: vi.fn(),
+      deleteUnavailableDate: vi.fn(),
       checkAvailability: vi.fn(),
-    };
+    } as any;
 
     useCase = new CheckAvailabilityUseCase(mockRepository);
   });

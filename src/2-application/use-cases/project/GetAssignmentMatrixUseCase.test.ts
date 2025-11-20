@@ -9,6 +9,8 @@ import { Project } from '@/3-domain/entities/Project';
 import { SubProject } from '@/3-domain/entities/SubProject';
 import { Company } from '@/3-domain/entities/Company';
 import { CompanyProjectAssignment } from '@/3-domain/entities/CompanyProjectAssignment';
+import { Program } from '@/3-domain/entities/Program';
+import { ProgramStatus } from '@/3-domain/enums/ProgramStatus';
 import { Result } from '@/6-core/result/Result';
 
 describe('GetAssignmentMatrixUseCase', () => {
@@ -73,7 +75,7 @@ describe('GetAssignmentMatrixUseCase', () => {
       companyId: null,
       consultantId: 'consultant-1',
       programId: 'program-1',
-      status: 'active',
+      status: 'in_progress',
       priority: 'medium',
       description: null,
       startDate: null,
@@ -81,6 +83,7 @@ describe('GetAssignmentMatrixUseCase', () => {
       progress: 0,
       isTemplate: false,
       templateId: null,
+      deletedAt: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -91,9 +94,10 @@ describe('GetAssignmentMatrixUseCase', () => {
         projectId: 'project-1',
         name: 'Sub Project 1',
         description: 'Description 1',
-        status: 'active',
+        status: 'in_progress',
         orderIndex: 0,
         progress: 0,
+        deletedAt: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -103,6 +107,8 @@ describe('GetAssignmentMatrixUseCase', () => {
       {
         id: 'company-1',
         name: 'Company 1',
+        slug: 'company-1',
+        country: 'Turkey',
         city: 'Istanbul',
         sector: 'Technology',
         isActive: true,
@@ -152,7 +158,7 @@ describe('GetAssignmentMatrixUseCase', () => {
       companyId: null,
       consultantId: 'consultant-1',
       programId: null,
-      status: 'active',
+      status: 'in_progress',
       priority: 'medium',
       description: null,
       startDate: null,
@@ -160,6 +166,7 @@ describe('GetAssignmentMatrixUseCase', () => {
       progress: 0,
       isTemplate: false,
       templateId: null,
+      deletedAt: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -175,13 +182,15 @@ describe('GetAssignmentMatrixUseCase', () => {
         {
           id: 'program-1',
           name: 'Program 1',
-          status: 'active',
-          managerId: null,
-          startDate: null,
-          endDate: null,
+          slug: 'program-1',
+          status: ProgramStatus.ACTIVE,
+          startDate: new Date('2025-01-01'),
+          endDate: new Date('2025-12-31'),
+          maxCompanies: 10,
+          currentCompanies: 0,
           createdAt: new Date(),
           updatedAt: new Date(),
-        },
+        } as Program,
       ])
     );
     vi.mocked(mockCompanyRepository.findByProgramId).mockResolvedValue(Result.ok([]));
@@ -199,7 +208,7 @@ describe('GetAssignmentMatrixUseCase', () => {
       companyId: null,
       consultantId: 'consultant-1',
       programId: 'program-1',
-      status: 'active',
+      status: 'in_progress',
       priority: 'medium',
       description: null,
       startDate: null,
@@ -207,6 +216,7 @@ describe('GetAssignmentMatrixUseCase', () => {
       progress: 0,
       isTemplate: false,
       templateId: null,
+      deletedAt: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -229,6 +239,8 @@ describe('GetAssignmentMatrixUseCase', () => {
     const company2: Company = {
       id: 'company-2',
       name: 'Company 2',
+      slug: 'company-2',
+      country: 'Turkey',
       city: 'Ankara',
       sector: 'Finance',
       isActive: true,
@@ -259,7 +271,7 @@ describe('GetAssignmentMatrixUseCase', () => {
       companyId: null,
       consultantId: 'consultant-1',
       programId: 'program-1',
-      status: 'active',
+      status: 'in_progress',
       priority: 'medium',
       description: null,
       startDate: null,
@@ -267,6 +279,7 @@ describe('GetAssignmentMatrixUseCase', () => {
       progress: 0,
       isTemplate: false,
       templateId: null,
+      deletedAt: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -275,6 +288,8 @@ describe('GetAssignmentMatrixUseCase', () => {
       {
         id: 'company-2',
         name: 'Zebra Company',
+        slug: 'zebra-company',
+        country: 'Turkey',
         city: 'Istanbul',
         sector: 'Technology',
         isActive: true,
@@ -287,6 +302,8 @@ describe('GetAssignmentMatrixUseCase', () => {
       {
         id: 'company-1',
         name: 'Alpha Company',
+        slug: 'alpha-company',
+        country: 'Turkey',
         city: 'Istanbul',
         sector: 'Technology',
         isActive: true,

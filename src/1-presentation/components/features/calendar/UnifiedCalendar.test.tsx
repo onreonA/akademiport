@@ -6,6 +6,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@/shared/test/utils';
 import userEvent from '@testing-library/user-event';
 import { UnifiedCalendar } from './UnifiedCalendar';
+import { EventResponseDto } from '@/application/dto/event';
+import { AppointmentResponseDto } from '@/application/dto/appointment';
 
 // Mock FullCalendar
 vi.mock('@fullcalendar/react', () => ({
@@ -45,24 +47,66 @@ vi.mock('@fullcalendar/list', () => ({
 }));
 
 describe('UnifiedCalendar', () => {
-  const mockEvents = [
+  const mockEvents: EventResponseDto[] = [
     {
       id: 'event-1',
+      programId: 'program-1',
+      consultantId: 'consultant-1',
       title: 'Test Event',
-      startTime: '2025-02-01T10:00:00Z',
-      endTime: '2025-02-01T12:00:00Z',
+      description: null,
       category: 'webinar',
       status: 'scheduled',
+      startTime: '2025-02-01T10:00:00Z',
+      endTime: '2025-02-01T12:00:00Z',
+      timezone: 'Europe/Istanbul',
+      zoomMeetingId: null,
+      zoomJoinUrl: null,
+      zoomStartUrl: null,
+      zoomPassword: null,
+      attendanceRequired: false,
+      maxAttendees: null,
+      currentAttendees: 0,
+      organizerName: null,
+      organizerEmail: null,
+      isPublic: true,
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z',
+      createdBy: null,
     },
   ];
 
-  const mockAppointments = [
+  const mockAppointments: AppointmentResponseDto[] = [
     {
       id: 'appointment-1',
+      consultantId: 'consultant-1',
+      companyId: 'company-1',
+      programId: null,
       title: 'Test Appointment',
+      description: null,
+      status: 'approved',
       startTime: '2025-02-02T10:00:00Z',
       endTime: '2025-02-02T11:00:00Z',
-      status: 'approved',
+      timezone: 'Europe/Istanbul',
+      requestedBy: 'user-1',
+      requestedAt: '2025-01-01T00:00:00Z',
+      approvedAt: '2025-01-01T00:00:00Z',
+      approvedBy: 'consultant-1',
+      rejectedAt: null,
+      rejectedBy: null,
+      rejectionReason: null,
+      rescheduledFrom: null,
+      rescheduledAt: null,
+      rescheduledBy: null,
+      zoomMeetingId: null,
+      zoomJoinUrl: null,
+      zoomStartUrl: null,
+      zoomPassword: null,
+      notes: null,
+      consultantNotes: null,
+      companyNotes: null,
+      attendedAt: null,
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z',
     },
   ];
 

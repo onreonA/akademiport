@@ -34,16 +34,22 @@ describe('Task Entity', () => {
       const task: Task = {
         id: 'task-2',
         subProjectId: 'subproject-1',
+        assignedTo: null,
         title: 'Unassigned Task',
+        description: null,
         status: 'todo',
         priority: 'medium',
+        dueDate: null,
+        completedAt: null,
+        approvedAt: null,
+        approvedBy: null,
         orderIndex: 1,
         deletedAt: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
 
-      expect(task.assignedTo).toBeUndefined();
+      expect(task.assignedTo).toBeNull();
     });
   });
 
@@ -52,9 +58,15 @@ describe('Task Entity', () => {
       const task: Task = {
         id: 'task-1',
         subProjectId: 'subproject-1',
+        assignedTo: null,
         title: 'Test Task',
+        description: null,
         status: 'todo',
         priority: 'medium',
+        dueDate: null,
+        completedAt: null,
+        approvedAt: null,
+        approvedBy: null,
         orderIndex: 1,
         deletedAt: null,
         createdAt: new Date(),
@@ -70,21 +82,28 @@ describe('Task Entity', () => {
       const task: Task = {
         id: 'task-1',
         subProjectId: 'subproject-1',
+        assignedTo: null,
         title: 'Test Task',
+        description: null,
         status: 'in_progress',
         priority: 'medium',
+        dueDate: null,
+        completedAt: null,
+        approvedAt: null,
+        approvedBy: null,
         orderIndex: 1,
+        deletedAt: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
 
       const completedTask: Task = {
         ...task,
-        status: 'completed',
+        status: 'review',
         completedAt: new Date(),
       };
 
-      expect(completedTask.status).toBe('completed');
+      expect(completedTask.status).toBe('review');
       expect(completedTask.completedAt).toBeDefined();
     });
 
@@ -92,10 +111,15 @@ describe('Task Entity', () => {
       const completedTask: Task = {
         id: 'task-1',
         subProjectId: 'subproject-1',
+        assignedTo: null,
         title: 'Test Task',
-        status: 'completed',
+        description: null,
+        status: 'review',
         priority: 'medium',
+        dueDate: null,
         completedAt: new Date(),
+        approvedAt: null,
+        approvedBy: null,
         orderIndex: 1,
         deletedAt: null,
         createdAt: new Date(),
@@ -104,12 +128,12 @@ describe('Task Entity', () => {
 
       const approvedTask: Task = {
         ...completedTask,
-        status: 'approved',
+        status: 'done',
         approvedAt: new Date(),
         approvedBy: 'consultant-1',
       };
 
-      expect(approvedTask.status).toBe('approved');
+      expect(approvedTask.status).toBe('done');
       expect(approvedTask.approvedAt).toBeDefined();
       expect(approvedTask.approvedBy).toBe('consultant-1');
     });
@@ -118,10 +142,15 @@ describe('Task Entity', () => {
       const completedTask: Task = {
         id: 'task-1',
         subProjectId: 'subproject-1',
+        assignedTo: null,
         title: 'Test Task',
-        status: 'completed',
+        description: null,
+        status: 'review',
         priority: 'medium',
+        dueDate: null,
         completedAt: new Date(),
+        approvedAt: null,
+        approvedBy: null,
         orderIndex: 1,
         deletedAt: null,
         createdAt: new Date(),
@@ -141,16 +170,23 @@ describe('Task Entity', () => {
 
   describe('Priority', () => {
     it('should have valid priority values', () => {
-      const validPriorities = ['low', 'medium', 'high', 'critical'];
+      const validPriorities = ['low', 'medium', 'high', 'urgent'];
 
       validPriorities.forEach((priority) => {
         const task: Task = {
           id: 'task-1',
           subProjectId: 'subproject-1',
+          assignedTo: null,
           title: 'Test Task',
+          description: null,
           status: 'todo',
           priority: priority as Task['priority'],
+          dueDate: null,
+          completedAt: null,
+          approvedAt: null,
+          approvedBy: null,
           orderIndex: 1,
+          deletedAt: null,
           createdAt: new Date(),
           updatedAt: new Date(),
         };
@@ -166,10 +202,15 @@ describe('Task Entity', () => {
       const task: Task = {
         id: 'task-1',
         subProjectId: 'subproject-1',
+        assignedTo: null,
         title: 'Test Task',
+        description: null,
         status: 'todo',
         priority: 'high',
         dueDate,
+        completedAt: null,
+        approvedAt: null,
+        approvedBy: null,
         orderIndex: 1,
         deletedAt: null,
         createdAt: new Date(),
@@ -184,10 +225,15 @@ describe('Task Entity', () => {
       const task: Task = {
         id: 'task-1',
         subProjectId: 'subproject-1',
+        assignedTo: null,
         title: 'Overdue Task',
+        description: null,
         status: 'todo',
         priority: 'high',
         dueDate: pastDate,
+        completedAt: null,
+        approvedAt: null,
+        approvedBy: null,
         orderIndex: 1,
         deletedAt: null,
         createdAt: new Date(),
@@ -197,8 +243,8 @@ describe('Task Entity', () => {
       const isOverdue =
         task.dueDate &&
         task.dueDate < new Date() &&
-        task.status !== 'completed' &&
-        task.status !== 'approved';
+        task.status !== 'done' &&
+        task.status !== 'review';
 
       expect(isOverdue).toBe(true);
     });

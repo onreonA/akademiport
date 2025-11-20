@@ -7,6 +7,7 @@ import { CreateCustomReportUseCase } from './CreateCustomReportUseCase';
 import { ICustomReportRepository } from '@/3-domain/interfaces/repositories/ICustomReportRepository';
 import { CustomReport } from '@/3-domain/entities/CustomReport';
 import { Result } from '@/6-core/result/Result';
+import { AppError } from '@/6-core/errors/AppError';
 
 describe('CreateCustomReportUseCase', () => {
   let mockRepository: ICustomReportRepository;
@@ -36,7 +37,7 @@ describe('CreateCustomReportUseCase', () => {
       description: null,
       programId: null,
       companyId: null,
-      reportType: 'monthly',
+      reportType: 'custom',
       templateId: null,
       selectedMetrics: [],
       dateRangeStart: null,
@@ -58,7 +59,7 @@ describe('CreateCustomReportUseCase', () => {
 
   const createValidDto = () => ({
     name: 'Test Report',
-    reportType: 'monthly' as const,
+    reportType: 'custom' as const,
     selectedMetrics: ['metric-1', 'metric-2'],
     dateRangeType: 'last_30_days' as const,
     isScheduled: false,
@@ -83,7 +84,7 @@ describe('CreateCustomReportUseCase', () => {
     // Invalid DTO - missing required fields
     const dto = {
       name: '',
-      reportType: 'monthly' as const,
+      reportType: 'custom' as const,
       selectedMetrics: [],
       dateRangeType: 'last_30_days' as const,
     };
@@ -91,7 +92,7 @@ describe('CreateCustomReportUseCase', () => {
     const result = await useCase.execute(dto, userId);
 
     expect(result.isFailure).toBe(true);
-    expect(result.error?.statusCode).toBe(400);
+    expect((result.error as AppError)?.statusCode).toBe(400);
     expect(mockRepository.create).not.toHaveBeenCalled();
   });
 

@@ -5,6 +5,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { DeleteTaskUseCase } from './DeleteTaskUseCase';
 import { ITaskRepository } from '@/3-domain/interfaces/repositories/ITaskRepository';
+import { AppError } from '@/6-core/errors/AppError';
 
 describe('DeleteTaskUseCase', () => {
   let mockRepository: ITaskRepository;
@@ -14,18 +15,19 @@ describe('DeleteTaskUseCase', () => {
     mockRepository = {
       create: vi.fn(),
       findById: vi.fn(),
-      findAll: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
-      findBySubProject: vi.fn(),
-      findByAssignedUser: vi.fn(),
       findBySubProjectId: vi.fn(),
+      findBySubProjectIds: vi.fn(),
+      findByAssignedUserId: vi.fn(),
       complete: vi.fn(),
       approve: vi.fn(),
       reject: vi.fn(),
       assign: vi.fn(),
+      assignTo: vi.fn(),
       exists: vi.fn(),
-    };
+      restore: vi.fn(),
+    } as any;
 
     useCase = new DeleteTaskUseCase(mockRepository);
   });
@@ -52,7 +54,7 @@ describe('DeleteTaskUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('Task not found');
-    expect(result.error?.statusCode).toBe(404);
+    expect((result.error as AppError)?.statusCode).toBe(404);
     expect(mockRepository.delete).not.toHaveBeenCalled();
   });
 
@@ -67,6 +69,6 @@ describe('DeleteTaskUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toBe(errorMessage);
-    expect(result.error?.statusCode).toBe(500);
+    expect((result.error as AppError)?.statusCode).toBe(500);
   });
 });

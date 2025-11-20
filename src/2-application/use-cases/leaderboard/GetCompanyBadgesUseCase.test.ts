@@ -51,7 +51,6 @@ describe('GetCompanyBadgesUseCase', () => {
     companyId: 'company-1',
     badgeId: 'badge-1',
     earnedAt: new Date(),
-    badge: createMockBadge(),
   });
 
   describe('execute', () => {
@@ -97,11 +96,6 @@ describe('GetCompanyBadgesUseCase', () => {
           companyId: 'company-1',
           badgeId: 'badge-2',
           earnedAt: new Date(),
-          badge: {
-            ...createMockBadge(),
-            id: 'badge-2',
-            name: 'İkinci Adım',
-          },
         },
       ];
 

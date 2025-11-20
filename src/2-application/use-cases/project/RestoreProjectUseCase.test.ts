@@ -5,6 +5,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { RestoreProjectUseCase } from './RestoreProjectUseCase';
 import { IProjectRepository } from '@/3-domain/interfaces/repositories/IProjectRepository';
+import { AppError } from '@/6-core/errors/AppError';
 
 describe('RestoreProjectUseCase', () => {
   let mockRepository: IProjectRepository;
@@ -19,9 +20,15 @@ describe('RestoreProjectUseCase', () => {
       delete: vi.fn(),
       findTemplates: vi.fn(),
       updateProgress: vi.fn(),
+      findByCompanyId: vi.fn(),
+      findByConsultantId: vi.fn(),
+      findByTemplateId: vi.fn(),
+      findDeleted: vi.fn(),
+      findBySubProjectId: vi.fn(),
+      findByProgramId: vi.fn(),
       exists: vi.fn(),
       restore: vi.fn(),
-    };
+    } as any;
 
     useCase = new RestoreProjectUseCase(mockRepository);
   });
@@ -47,7 +54,7 @@ describe('RestoreProjectUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toBe(errorMessage);
-    expect(result.error?.statusCode).toBe(500);
+    expect((result.error as AppError)?.statusCode).toBe(500);
   });
 
   it('should handle exceptions', async () => {

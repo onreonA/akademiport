@@ -58,7 +58,32 @@ describe('PinTopicUseCase', () => {
     it('should pin topic successfully', async () => {
       const topicId = 'topic-1';
 
-      vi.mocked(mockRepository.pinTopic).mockResolvedValue(Result.ok(undefined));
+      const mockTopic = {
+        id: topicId,
+        programId: 'program-1',
+        categoryId: 'category-1',
+        authorId: 'user-1',
+        companyId: 'company-1',
+        title: 'Test Topic',
+        slug: 'test-topic',
+        content: 'Test content',
+        status: 'open' as const,
+        priority: 'normal' as const,
+        isPinned: true,
+        isLocked: false,
+        isApproved: true,
+        solutionReplyId: null,
+        solvedAt: null,
+        solvedBy: null,
+        viewCount: 0,
+        replyCount: 0,
+        likeCount: 0,
+        lastReplyAt: null,
+        lastReplyBy: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      vi.mocked(mockRepository.pinTopic).mockResolvedValue(Result.ok(mockTopic));
 
       const result = await useCase.execute(topicId);
 

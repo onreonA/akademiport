@@ -112,7 +112,6 @@ describe('NotificationPreferences Entity', () => {
           email: false, // Type-specific can disable even if global is enabled
           push: true,
           inApp: true,
-          sms: false,
         },
       };
 
@@ -135,7 +134,7 @@ describe('NotificationPreferences Entity', () => {
 
       // If global is disabled, type-specific cannot enable
       preferences.emailEnabled = false;
-      preferences.typePreferences[NotificationType.TASK_ASSIGNED].email = true;
+      preferences.typePreferences[NotificationType.TASK_ASSIGNED]!.email = true;
       expect(
         isNotificationEnabledForChannel(
           preferences,

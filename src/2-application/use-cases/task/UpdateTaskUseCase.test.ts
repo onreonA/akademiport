@@ -7,6 +7,7 @@ import { UpdateTaskUseCase } from './UpdateTaskUseCase';
 import { ITaskRepository } from '@/3-domain/interfaces/repositories/ITaskRepository';
 import { ITaskDependencyRepository } from '@/3-domain/interfaces/repositories/ITaskDependencyRepository';
 import { Task } from '@/3-domain/entities/Task';
+import { AppError } from '@/6-core/errors/AppError';
 
 describe('UpdateTaskUseCase', () => {
   let mockTaskRepository: ITaskRepository;
@@ -17,26 +18,26 @@ describe('UpdateTaskUseCase', () => {
     mockTaskRepository = {
       create: vi.fn(),
       findById: vi.fn(),
-      findAll: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
-      findBySubProject: vi.fn(),
-      findByAssignedUser: vi.fn(),
       findBySubProjectId: vi.fn(),
+      findBySubProjectIds: vi.fn(),
+      findByAssignedUserId: vi.fn(),
       complete: vi.fn(),
       approve: vi.fn(),
       reject: vi.fn(),
       assign: vi.fn(),
       exists: vi.fn(),
-    };
+      restore: vi.fn(),
+    } as any;
 
     mockTaskDependencyRepository = {
       create: vi.fn(),
       findDependenciesOfTask: vi.fn(),
-      findTasksThatDependOn: vi.fn(),
+      findTasksDependentOn: vi.fn(),
       delete: vi.fn(),
       exists: vi.fn(),
-    };
+    } as any;
 
     useCase = new UpdateTaskUseCase(mockTaskRepository, mockTaskDependencyRepository);
   });
@@ -50,7 +51,12 @@ describe('UpdateTaskUseCase', () => {
       description: 'Test Description',
       status: 'todo',
       priority: 'high',
+      dueDate: null,
+      completedAt: null,
+      approvedAt: null,
+      approvedBy: null,
       orderIndex: 1,
+      deletedAt: null,
       createdAt: new Date(),
       updatedAt: new Date(),
       ...overrides,
@@ -63,7 +69,7 @@ describe('UpdateTaskUseCase', () => {
     const mockTask = createMockTask({ id: taskId });
 
     vi.mocked(mockTaskRepository.findById).mockResolvedValue(mockTask);
-    vi.mocked(mockTaskRepository.update).mockResolvedValue(undefined);
+    vi.mocked(mockTaskRepository.update).mockResolvedValue({ ...mockTask, ...updateData });
 
     const result = await useCase.execute(taskId, updateData);
 
@@ -82,18 +88,18 @@ describe('UpdateTaskUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('Task not found');
-    expect(result.error?.statusCode).toBe(404);
+    expect((result.error as AppError)?.statusCode).toBe(404);
     expect(mockTaskRepository.update).not.toHaveBeenCalled();
   });
 
   it('should check dependencies when changing status to in_progress', async () => {
     const taskId = 'task-1';
-    const updateData = { status: 'in_progress' };
+    const updateData = { status: 'in_progress' as const };
     const mockTask = createMockTask({ id: taskId, status: 'todo' });
 
     vi.mocked(mockTaskRepository.findById).mockResolvedValue(mockTask);
     vi.mocked(mockTaskDependencyRepository.findDependenciesOfTask).mockResolvedValue([]);
-    vi.mocked(mockTaskRepository.update).mockResolvedValue(undefined);
+    vi.mocked(mockTaskRepository.update).mockResolvedValue({ ...mockTask, ...updateData });
 
     const result = await useCase.execute(taskId, updateData);
 
@@ -103,7 +109,7 @@ describe('UpdateTaskUseCase', () => {
 
   it('should fail when blocking dependencies are not completed', async () => {
     const taskId = 'task-1';
-    const updateData = { status: 'in_progress' };
+    const updateData = { status: 'in_progress' as const };
     const mockTask = createMockTask({ id: taskId, status: 'todo' });
     const blockingDependency = {
       id: 'dep-1',
@@ -120,19 +126,19 @@ describe('UpdateTaskUseCase', () => {
     vi.mocked(mockTaskDependencyRepository.findDependenciesOfTask).mockResolvedValue([
       blockingDependency,
     ]);
-    vi.mocked(mockTaskRepository.update).mockResolvedValue(undefined);
+    vi.mocked(mockTaskRepository.update).mockResolvedValue({ ...mockTask, ...updateData });
 
     const result = await useCase.execute(taskId, updateData);
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('tamamlanmamış bağımlı görevlere sahip');
-    expect(result.error?.statusCode).toBe(400);
+    expect((result.error as AppError)?.statusCode).toBe(400);
     expect(mockTaskRepository.update).not.toHaveBeenCalled();
   });
 
   it('should allow status change when all blocking dependencies are completed', async () => {
     const taskId = 'task-1';
-    const updateData = { status: 'in_progress' };
+    const updateData = { status: 'in_progress' as const };
     const mockTask = createMockTask({ id: taskId, status: 'todo' });
     const blockingDependency = {
       id: 'dep-1',
@@ -149,7 +155,7 @@ describe('UpdateTaskUseCase', () => {
     vi.mocked(mockTaskDependencyRepository.findDependenciesOfTask).mockResolvedValue([
       blockingDependency,
     ]);
-    vi.mocked(mockTaskRepository.update).mockResolvedValue(undefined);
+    vi.mocked(mockTaskRepository.update).mockResolvedValue({ ...mockTask, ...updateData });
 
     const result = await useCase.execute(taskId, updateData);
 
@@ -168,6 +174,6 @@ describe('UpdateTaskUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toBe(errorMessage);
-    expect(result.error?.statusCode).toBe(500);
+    expect((result.error as AppError)?.statusCode).toBe(500);
   });
 });

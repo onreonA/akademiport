@@ -9,8 +9,9 @@ import { IAIRouter } from '@/3-domain/interfaces/services/IAIRouter';
 import { IPromptManager } from '@/3-domain/interfaces/services/IPromptManager';
 import { ITokenTracker } from '@/3-domain/interfaces/services/ITokenTracker';
 import { Result } from '@/6-core/result/Result';
-import { AIUseCase } from '@/3-domain/enums/AIEnums';
+import { AIUseCase, AIProvider, AIModel } from '@/3-domain/enums/AIEnums';
 import { ForumTopic, ForumReply } from '@/3-domain/entities/Forum';
+import { AIPrompt, AIResponse } from '@/3-domain/entities/AI';
 
 describe('DetectSpamUseCase', () => {
   let useCase: DetectSpamUseCase;
@@ -78,17 +79,27 @@ describe('DetectSpamUseCase', () => {
         updatedAt: new Date(),
       };
 
-      const mockPrompt = {
+      const mockPrompt: AIPrompt = {
         id: 'prompt-1',
         name: 'Forum Moderation',
+        description: null,
+        useCase: AIUseCase.FORUM_MODERATION,
         template: '{{content}}',
-        model: 'gpt-3.5-turbo',
+        variables: {},
+        version: 1,
+        isActive: true,
+        provider: AIProvider.OPENAI,
+        model: AIModel.GPT_3_5_TURBO,
         temperature: 0.5,
         maxTokens: 1500,
         topP: 1.0,
+        metadata: null,
+        createdBy: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
 
-      const mockAIResponse = {
+      const mockAIResponse: AIResponse = {
         text: JSON.stringify({
           spamScore: 75,
           isSpam: true,
@@ -96,8 +107,8 @@ describe('DetectSpamUseCase', () => {
           recommendation: 'reject',
           factors: [{ name: 'Link Spam', score: 75, description: 'Too many links' }],
         }),
-        provider: 'openai' as any,
-        model: 'gpt-3.5-turbo',
+        provider: AIProvider.OPENAI,
+        model: AIModel.GPT_3_5_TURBO,
         requestTokens: 100,
         responseTokens: 50,
         totalTokens: 150,
@@ -139,25 +150,35 @@ describe('DetectSpamUseCase', () => {
         updatedAt: new Date(),
       };
 
-      const mockPrompt = {
+      const mockPrompt: AIPrompt = {
         id: 'prompt-1',
         name: 'Forum Moderation',
+        description: null,
+        useCase: AIUseCase.FORUM_MODERATION,
         template: '{{content}}',
-        model: 'gpt-3.5-turbo',
+        variables: {},
+        version: 1,
+        isActive: true,
+        provider: AIProvider.OPENAI,
+        model: AIModel.GPT_3_5_TURBO,
         temperature: 0.5,
         maxTokens: 1500,
         topP: 1.0,
+        metadata: null,
+        createdBy: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
 
-      const mockAIResponse = {
+      const mockAIResponse: AIResponse = {
         text: JSON.stringify({
           spamScore: 30,
           isSpam: false,
           recommendation: 'approve',
           factors: [],
         }),
-        provider: 'openai' as any,
-        model: 'gpt-3.5-turbo',
+        provider: AIProvider.OPENAI,
+        model: AIModel.GPT_3_5_TURBO,
         requestTokens: 100,
         responseTokens: 50,
         totalTokens: 150,
@@ -204,14 +225,24 @@ describe('DetectSpamUseCase', () => {
     });
 
     it('should handle AI router failure', async () => {
-      const mockPrompt = {
+      const mockPrompt: AIPrompt = {
         id: 'prompt-1',
         name: 'Forum Moderation',
+        description: null,
+        useCase: AIUseCase.FORUM_MODERATION,
         template: '{{content}}',
-        model: 'gpt-3.5-turbo',
+        variables: {},
+        version: 1,
+        isActive: true,
+        provider: AIProvider.OPENAI,
+        model: AIModel.GPT_3_5_TURBO,
         temperature: 0.5,
         maxTokens: 1500,
         topP: 1.0,
+        metadata: null,
+        createdBy: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
 
       vi.mocked(mockPromptManager.getActivePrompt).mockResolvedValue(Result.ok(mockPrompt));

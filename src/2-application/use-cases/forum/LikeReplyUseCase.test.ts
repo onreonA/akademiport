@@ -59,7 +59,14 @@ describe('LikeReplyUseCase', () => {
       const replyId = 'reply-1';
       const userId = 'user-1';
 
-      vi.mocked(mockRepository.likeReply).mockResolvedValue(Result.ok(undefined));
+      const mockLike = {
+        id: 'like-1',
+        topicId: null,
+        replyId: replyId,
+        userId: userId,
+        createdAt: new Date(),
+      };
+      vi.mocked(mockRepository.likeReply).mockResolvedValue(Result.ok(mockLike));
 
       const result = await useCase.execute(replyId, userId);
 

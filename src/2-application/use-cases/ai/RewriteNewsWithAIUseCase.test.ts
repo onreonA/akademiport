@@ -12,6 +12,8 @@ import { ITokenTracker } from '@/3-domain/interfaces/services/ITokenTracker';
 import { Result } from '@/6-core/result/Result';
 import { RSSFeedItem } from '@/3-domain/entities/RSSFeed';
 import { NewsCategory } from '@/3-domain/enums/NewsEnums';
+import { AIPrompt, AIResponse } from '@/3-domain/entities/AI';
+import { AIProvider, AIUseCase, AIModel } from '@/3-domain/enums/AIEnums';
 
 describe('RewriteNewsWithAIUseCase', () => {
   let useCase: RewriteNewsWithAIUseCase;
@@ -75,17 +77,27 @@ describe('RewriteNewsWithAIUseCase', () => {
         updatedAt: new Date(),
       };
 
-      const mockPrompt = {
+      const mockPrompt: AIPrompt = {
         id: 'prompt-1',
         name: 'News Rewrite',
+        description: null,
+        useCase: AIUseCase.NEWS_REWRITE,
         template: '{{original_title}}',
-        model: 'gpt-4-turbo',
+        variables: {},
+        version: 1,
+        isActive: true,
+        provider: AIProvider.OPENAI,
+        model: AIModel.GPT_4_TURBO,
         temperature: 0.7,
         maxTokens: 4000,
         topP: 1.0,
+        metadata: null,
+        createdBy: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
 
-      const mockAIResponse = {
+      const mockAIResponse: AIResponse = {
         text: JSON.stringify({
           title: 'Rewritten Title',
           summary: 'Rewritten summary',
@@ -97,8 +109,8 @@ describe('RewriteNewsWithAIUseCase', () => {
           metaDescription: 'Meta description',
           metaKeywords: ['keyword1', 'keyword2'],
         }),
-        provider: 'openai' as any,
-        model: 'gpt-4-turbo',
+        provider: AIProvider.OPENAI,
+        model: AIModel.GPT_4_TURBO,
         requestTokens: 200,
         responseTokens: 300,
         totalTokens: 500,
@@ -140,12 +152,15 @@ describe('RewriteNewsWithAIUseCase', () => {
         feedId: 'feed-1',
         title: 'Title',
         link: 'https://example.com',
-        pubDate: new Date(),
-        creator: 'Author',
+        description: null,
         content: 'Content',
+        author: 'Author',
+        pubDate: new Date(),
         guid: 'guid-1',
         imageUrl: null,
+        categories: [],
         isProcessed: false,
+        processedAt: null,
         newsId: null,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -169,25 +184,38 @@ describe('RewriteNewsWithAIUseCase', () => {
         feedId: 'feed-1',
         title: 'Title',
         link: 'https://example.com',
-        pubDate: new Date(),
-        creator: 'Author',
+        description: null,
         content: 'Content',
+        author: 'Author',
+        pubDate: new Date(),
         guid: 'guid-1',
         imageUrl: null,
+        categories: [],
         isProcessed: false,
+        processedAt: null,
         newsId: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
 
-      const mockPrompt = {
+      const mockPrompt: AIPrompt = {
         id: 'prompt-1',
         name: 'News Rewrite',
+        description: null,
+        useCase: AIUseCase.NEWS_REWRITE,
         template: '{{original_title}}',
-        model: 'gpt-4-turbo',
+        variables: {},
+        version: 1,
+        isActive: true,
+        provider: AIProvider.OPENAI,
+        model: AIModel.GPT_4_TURBO,
         temperature: 0.7,
         maxTokens: 4000,
         topP: 1.0,
+        metadata: null,
+        createdBy: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
 
       vi.mocked(mockRSSFeedRepository.findFeedItemById).mockResolvedValue(Result.ok(mockFeedItem));

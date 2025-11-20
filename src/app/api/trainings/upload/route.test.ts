@@ -88,7 +88,7 @@ describe('POST /api/trainings/upload', () => {
     });
     formData.append('file', largeFile);
 
-    const request = new Request('http://localhost:3000/api/trainings/upload', {
+    const request = createMockRequest('http://localhost:3000/api/trainings/upload', {
       method: 'POST',
       body: formData,
       headers: {
@@ -117,7 +117,7 @@ describe('POST /api/trainings/upload', () => {
     const formData = new FormData();
     formData.append('file', new File(['test'], 'test.exe', { type: 'application/x-msdownload' }));
 
-    const request = new Request('http://localhost:3000/api/trainings/upload', {
+    const request = createMockRequest('http://localhost:3000/api/trainings/upload', {
       method: 'POST',
       body: formData,
       headers: {
@@ -161,7 +161,7 @@ describe('POST /api/trainings/upload', () => {
     const formData = new FormData();
     formData.append('file', new File(['test'], 'test.pdf', { type: 'application/pdf' }));
 
-    const request = new Request('http://localhost:3000/api/trainings/upload', {
+    const request = createMockRequest('http://localhost:3000/api/trainings/upload', {
       method: 'POST',
       body: formData,
       headers: {

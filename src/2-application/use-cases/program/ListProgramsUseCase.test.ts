@@ -7,7 +7,8 @@ import { ListProgramsUseCase } from './ListProgramsUseCase';
 import { IProgramRepository } from '@/3-domain/interfaces/IProgramRepository';
 import { Program } from '@/3-domain/entities/Program';
 import { UserRole } from '@/3-domain/enums/UserRole';
-import { Result } from '@/core/result/Result';
+import { ProgramStatus } from '@/3-domain/enums/ProgramStatus';
+import { Result } from '@/6-core/result/Result';
 
 describe('ListProgramsUseCase', () => {
   let mockRepository: IProgramRepository;
@@ -21,10 +22,13 @@ describe('ListProgramsUseCase', () => {
       update: vi.fn(),
       delete: vi.fn(),
       findByManagerId: vi.fn(),
-      findByConsultantId: vi.fn(),
       findByStatus: vi.fn(),
       findByCity: vi.fn(),
-    };
+      search: vi.fn(),
+      addConsultant: vi.fn(),
+      removeConsultant: vi.fn(),
+      getConsultants: vi.fn(),
+    } as any;
 
     useCase = new ListProgramsUseCase(mockRepository);
   });
@@ -34,10 +38,13 @@ describe('ListProgramsUseCase', () => {
       id: 'program-1',
       name: 'Test Program',
       description: 'Test Description',
+      slug: 'test-program',
       startDate: new Date('2025-01-01'),
       endDate: new Date('2025-12-31'),
-      isActive: true,
-      managerId: 'manager-1',
+      maxCompanies: 10,
+      currentCompanies: 0,
+      status: ProgramStatus.ACTIVE,
+      programManagerId: 'manager-1',
       createdAt: new Date(),
       updatedAt: new Date(),
       ...overrides,
@@ -63,7 +70,7 @@ describe('ListProgramsUseCase', () => {
 
   it('should filter programs by PROGRAM_MANAGER', async () => {
     const userId = 'manager-1';
-    const mockPrograms = [createMockProgram({ id: 'program-1', managerId: userId })];
+    const mockPrograms = [createMockProgram({ id: 'program-1', programManagerId: userId })];
 
     vi.mocked(mockRepository.findByManagerId).mockResolvedValue(Result.ok(mockPrograms));
 
@@ -84,7 +91,7 @@ describe('ListProgramsUseCase', () => {
 
     const result = await useCase.execute({
       userRole: UserRole.MASTER_ADMIN,
-      status: 'active',
+      status: ProgramStatus.ACTIVE,
     });
 
     expect(result.isSuccess).toBe(true);

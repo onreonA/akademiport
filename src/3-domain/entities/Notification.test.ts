@@ -26,6 +26,7 @@ describe('Notification Entity', () => {
     message: 'This is a test notification',
     priority: NotificationPriority.NORMAL,
     channels: [NotificationChannel.IN_APP],
+    metadata: {},
   };
 
   describe('createNotification', () => {

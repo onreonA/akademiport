@@ -6,6 +6,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { GetEventUseCase } from './GetEventUseCase';
 import { IEventRepository } from '@/3-domain/interfaces/repositories/IEventRepository';
 import { Event } from '@/3-domain/entities/Event';
+import { AppError } from '@/6-core/errors/AppError';
 // EventStatus and EventCategory are types, not enums - use string literals
 
 describe('GetEventUseCase', () => {
@@ -24,8 +25,13 @@ describe('GetEventUseCase', () => {
       findByDateRange: vi.fn(),
       registerAttendance: vi.fn(),
       getAttendees: vi.fn(),
-      getStatistics: vi.fn(),
-    };
+      exists: vi.fn(),
+      cancelAttendance: vi.fn(),
+      findByUserId: vi.fn(),
+      findByCompanyId: vi.fn(),
+      updateAttendeeCount: vi.fn(),
+      updateZoomMeeting: vi.fn(),
+    } as any;
 
     useCase = new GetEventUseCase(mockEventRepository);
   });
@@ -51,8 +57,17 @@ describe('GetEventUseCase', () => {
       timezone: 'Europe/Istanbul',
       attendanceRequired: true,
       maxAttendees: 100,
+      currentAttendees: 0,
+      zoomMeetingId: null,
+      zoomJoinUrl: null,
+      zoomStartUrl: null,
+      zoomPassword: null,
+      organizerName: null,
+      organizerEmail: null,
+      isPublic: true,
       createdAt: new Date(),
       updatedAt: new Date(),
+      createdBy: null,
       ...overrides,
     };
   };
@@ -75,7 +90,7 @@ describe('GetEventUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('Event ID is required');
-    expect(result.error?.statusCode).toBe(400);
+    expect((result.error as AppError)?.statusCode).toBe(400);
     expect(mockEventRepository.findById).not.toHaveBeenCalled();
   });
 
@@ -84,7 +99,7 @@ describe('GetEventUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('Event ID is required');
-    expect(result.error?.statusCode).toBe(400);
+    expect((result.error as AppError)?.statusCode).toBe(400);
     expect(mockEventRepository.findById).not.toHaveBeenCalled();
   });
 
@@ -97,7 +112,7 @@ describe('GetEventUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('Event not found');
-    expect(result.error?.statusCode).toBe(404);
+    expect((result.error as AppError)?.statusCode).toBe(404);
     expect(mockEventRepository.findById).toHaveBeenCalledWith(eventId);
   });
 
@@ -111,6 +126,6 @@ describe('GetEventUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toBe(errorMessage);
-    expect(result.error?.statusCode).toBe(500);
+    expect((result.error as AppError)?.statusCode).toBe(500);
   });
 });

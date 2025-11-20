@@ -54,7 +54,6 @@ const createMockNews = (overrides?: Partial<NewsWithTags>): NewsWithTags => ({
   createdBy: 'author-1',
   updatedBy: 'author-1',
   tags: [],
-  totalCount: 1,
   ...overrides,
 });
 
@@ -145,7 +144,6 @@ describe('NewsCard', () => {
           slug: 'tag-1',
           usageCount: 1,
           createdAt: new Date(),
-          updatedAt: new Date(),
         },
         {
           id: 'tag-2',
@@ -153,7 +151,6 @@ describe('NewsCard', () => {
           slug: 'tag-2',
           usageCount: 1,
           createdAt: new Date(),
-          updatedAt: new Date(),
         },
       ],
     });
@@ -172,7 +169,6 @@ describe('NewsCard', () => {
           slug: 'tag-1',
           usageCount: 1,
           createdAt: new Date(),
-          updatedAt: new Date(),
         },
         {
           id: 'tag-2',
@@ -180,7 +176,6 @@ describe('NewsCard', () => {
           slug: 'tag-2',
           usageCount: 1,
           createdAt: new Date(),
-          updatedAt: new Date(),
         },
         {
           id: 'tag-3',
@@ -188,7 +183,6 @@ describe('NewsCard', () => {
           slug: 'tag-3',
           usageCount: 1,
           createdAt: new Date(),
-          updatedAt: new Date(),
         },
         {
           id: 'tag-4',
@@ -196,7 +190,6 @@ describe('NewsCard', () => {
           slug: 'tag-4',
           usageCount: 1,
           createdAt: new Date(),
-          updatedAt: new Date(),
         },
       ],
     });

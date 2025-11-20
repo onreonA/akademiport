@@ -6,6 +6,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { GetProjectUseCase } from './GetProjectUseCase';
 import { IProjectRepository } from '@/3-domain/interfaces/repositories/IProjectRepository';
 import { Project } from '@/3-domain/entities/Project';
+import { AppError } from '@/6-core/errors/AppError';
 
 describe('GetProjectUseCase', () => {
   let mockProjectRepository: IProjectRepository;
@@ -39,13 +40,14 @@ describe('GetProjectUseCase', () => {
       programId: 'program-1',
       name: 'Test Project',
       description: 'Test Description',
-      status: 'planning',
+      status: 'todo',
       priority: 'high',
       progress: 0,
       isTemplate: false,
       templateId: null,
       startDate: new Date('2025-01-01'),
       endDate: new Date('2025-12-31'),
+      deletedAt: null,
       createdAt: new Date(),
       updatedAt: new Date(),
       ...overrides,
@@ -72,7 +74,7 @@ describe('GetProjectUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('Project not found');
-    expect(result.error?.statusCode).toBe(404);
+    expect((result.error as AppError)?.statusCode).toBe(404);
   });
 
   it('should return error when project not found', async () => {
@@ -84,7 +86,7 @@ describe('GetProjectUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toContain('Project not found');
-    expect(result.error?.statusCode).toBe(404);
+    expect((result.error as AppError)?.statusCode).toBe(404);
     expect(mockProjectRepository.findById).toHaveBeenCalledWith(projectId);
   });
 
@@ -98,6 +100,6 @@ describe('GetProjectUseCase', () => {
 
     expect(result.isFailure).toBe(true);
     expect(result.error?.message).toBe(errorMessage);
-    expect(result.error?.statusCode).toBe(500);
+    expect((result.error as AppError)?.statusCode).toBe(500);
   });
 });

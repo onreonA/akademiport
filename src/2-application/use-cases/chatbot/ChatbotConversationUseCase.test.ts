@@ -257,7 +257,7 @@ describe('ChatbotConversationUseCase', () => {
       expect(result.isFailure).toBe(true);
       if (result.isFailure) {
         expect(result.error).toBeInstanceOf(AppError);
-        expect(result.error?.statusCode).toBe(404);
+        expect((result.error as AppError)?.statusCode).toBe(404);
       }
     });
 
@@ -287,7 +287,7 @@ describe('ChatbotConversationUseCase', () => {
       expect(result.isFailure).toBe(true);
       if (result.isFailure) {
         expect(result.error).toBeInstanceOf(AppError);
-        expect(result.error?.statusCode).toBe(404);
+        expect((result.error as AppError)?.statusCode).toBe(404);
       }
     });
 
@@ -309,7 +309,7 @@ describe('ChatbotConversationUseCase', () => {
       mockFindMessagesByConversationId.mockResolvedValue(Result.ok({ data: [], total: 0 }));
       mockGetActivePrompt.mockResolvedValue(Result.ok(mockPrompt));
       mockRenderPrompt.mockReturnValue('Rendered prompt');
-      mockComplete.mockResolvedValue(Result.fail({ message: 'AI error', retryable: false }));
+      mockComplete.mockResolvedValue(Result.fail(new AppError('AI error', 500)));
 
       const result = await useCase.sendMessage({
         message: 'Hello',

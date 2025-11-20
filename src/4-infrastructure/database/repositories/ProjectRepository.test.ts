@@ -81,7 +81,8 @@ describe('ProjectRepository', () => {
       const createDto = {
         name: 'New Project',
         companyId: 'company-1',
-        status: 'active',
+        status: 'todo' as const,
+        priority: 'medium' as const,
       };
 
       const mockCreatedProject = {

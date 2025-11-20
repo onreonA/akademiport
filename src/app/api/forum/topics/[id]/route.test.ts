@@ -55,7 +55,7 @@ describe('GET /api/forum/topics/[id]', () => {
 
     const { GET } = await import('./route');
     const request = createMockRequest('http://localhost:3000/api/forum/topics/topic-1');
-    const response = await GET(request, { params: { id: 'topic-1' } });
+    const response = await GET(request, { params: Promise.resolve({ id: 'topic-1' }) });
     const data = await response.json();
 
     expect(response.status).toBe(401);
@@ -88,7 +88,7 @@ describe('GET /api/forum/topics/[id]', () => {
 
     const { GET } = await import('./route');
     const request = createMockRequest('http://localhost:3000/api/forum/topics/topic-1');
-    const response = await GET(request, { params: { id: 'topic-1' } });
+    const response = await GET(request, { params: Promise.resolve({ id: 'topic-1' }) });
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -107,7 +107,7 @@ describe('GET /api/forum/topics/[id]', () => {
 
     const { GET } = await import('./route');
     const request = createMockRequest('http://localhost:3000/api/forum/topics/topic-1');
-    const response = await GET(request, { params: { id: 'topic-1' } });
+    const response = await GET(request, { params: Promise.resolve({ id: 'topic-1' }) });
     const data = await response.json();
 
     expect(response.status).toBe(404);
@@ -134,7 +134,7 @@ describe('PUT /api/forum/topics/[id]', () => {
         content: 'Updated content',
       }),
     });
-    const response = await PUT(request, { params: { id: 'topic-1' } });
+    const response = await PUT(request, { params: Promise.resolve({ id: 'topic-1' }) });
     const data = await response.json();
 
     expect(response.status).toBe(401);
@@ -183,7 +183,7 @@ describe('PUT /api/forum/topics/[id]', () => {
         content: 'Updated content',
       }),
     });
-    const response = await PUT(request, { params: { id: 'topic-1' } });
+    const response = await PUT(request, { params: Promise.resolve({ id: 'topic-1' }) });
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -226,7 +226,7 @@ describe('PUT /api/forum/topics/[id]', () => {
         content: 'Updated content',
       }),
     });
-    const response = await PUT(request, { params: { id: 'topic-1' } });
+    const response = await PUT(request, { params: Promise.resolve({ id: 'topic-1' }) });
     const data = await response.json();
 
     expect(response.status).toBe(400);
@@ -249,7 +249,7 @@ describe('DELETE /api/forum/topics/[id]', () => {
     const request = createMockRequest('http://localhost:3000/api/forum/topics/topic-1', {
       method: 'DELETE',
     });
-    const response = await DELETE(request, { params: { id: 'topic-1' } });
+    const response = await DELETE(request, { params: Promise.resolve({ id: 'topic-1' }) });
     const data = await response.json();
 
     expect(response.status).toBe(401);
@@ -288,7 +288,7 @@ describe('DELETE /api/forum/topics/[id]', () => {
     const request = createMockRequest('http://localhost:3000/api/forum/topics/topic-1', {
       method: 'DELETE',
     });
-    const response = await DELETE(request, { params: { id: 'topic-1' } });
+    const response = await DELETE(request, { params: Promise.resolve({ id: 'topic-1' }) });
 
     expect(response.status).toBe(200);
     const data = await response.json();
@@ -327,7 +327,7 @@ describe('DELETE /api/forum/topics/[id]', () => {
     const request = createMockRequest('http://localhost:3000/api/forum/topics/topic-1', {
       method: 'DELETE',
     });
-    const response = await DELETE(request, { params: { id: 'topic-1' } });
+    const response = await DELETE(request, { params: Promise.resolve({ id: 'topic-1' }) });
     const data = await response.json();
 
     expect(response.status).toBe(400);

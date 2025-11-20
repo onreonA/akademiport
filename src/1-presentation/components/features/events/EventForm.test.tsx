@@ -185,14 +185,18 @@ describe('EventForm', () => {
     });
 
     // Clear optional fields that might cause validation errors
-    const maxAttendeesInput = screen.queryByLabelText(/maksimum katılımcı/i);
+    const maxAttendeesInput = screen.queryByLabelText(
+      /maksimum katılımcı/i
+    ) as HTMLInputElement | null;
     if (maxAttendeesInput && maxAttendeesInput.value) {
       await user.clear(maxAttendeesInput);
     }
 
     // Handle organizerEmail - schema requires null/undefined, not empty string
     // We'll use setValue through the form instance if available, or just ensure it's not set
-    const organizerEmailInput = screen.queryByLabelText(/organizatör email/i);
+    const organizerEmailInput = screen.queryByLabelText(
+      /organizatör email/i
+    ) as HTMLInputElement | null;
     if (organizerEmailInput) {
       // If field has a value, we need to clear it
       // But React Hook Form might not handle empty string -> null conversion automatically
@@ -290,12 +294,16 @@ describe('EventForm', () => {
     await new Promise((resolve) => setTimeout(resolve, 100));
 
     // Clear optional fields that might cause validation errors
-    const maxAttendeesInput = screen.queryByLabelText(/maksimum katılımcı/i);
+    const maxAttendeesInput = screen.queryByLabelText(
+      /maksimum katılımcı/i
+    ) as HTMLInputElement | null;
     if (maxAttendeesInput && maxAttendeesInput.value) {
       await user.clear(maxAttendeesInput);
     }
 
-    const organizerEmailInput = screen.queryByLabelText(/organizatör email/i);
+    const organizerEmailInput = screen.queryByLabelText(
+      /organizatör email/i
+    ) as HTMLInputElement | null;
     if (organizerEmailInput && organizerEmailInput.value) {
       await user.clear(organizerEmailInput);
     }

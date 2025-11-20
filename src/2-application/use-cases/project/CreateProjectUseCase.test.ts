@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { CreateProjectUseCase } from './CreateProjectUseCase';
 import { IProjectRepository } from '@/3-domain/interfaces/repositories/IProjectRepository';
 import { Project } from '@/3-domain/entities/Project';
+import { AppError } from '@/6-core/errors/AppError';
 
 describe('CreateProjectUseCase', () => {
   let mockRepository: IProjectRepository;
@@ -11,12 +12,17 @@ describe('CreateProjectUseCase', () => {
     mockRepository = {
       create: vi.fn(),
       findById: vi.fn(),
-      findAll: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
       findTemplates: vi.fn(),
       updateProgress: vi.fn(),
-    };
+      findByCompanyId: vi.fn(),
+      findByConsultantId: vi.fn(),
+      findByTemplateId: vi.fn(),
+      restore: vi.fn(),
+      findBySubProjectId: vi.fn(),
+      findByProgramId: vi.fn(),
+    } as any;
     useCase = new CreateProjectUseCase(mockRepository);
   });
 
@@ -26,7 +32,7 @@ describe('CreateProjectUseCase', () => {
       consultantId: 'consultant-1',
       name: 'New Project',
       description: 'Project description',
-      status: 'planning' as const,
+      status: 'todo' as const,
       priority: 'high' as const,
       startDate: new Date('2025-01-01'),
       endDate: new Date('2025-12-31'),
@@ -35,9 +41,11 @@ describe('CreateProjectUseCase', () => {
     const createdProject: Project = {
       id: 'project-1',
       ...projectData,
+      programId: null,
       progress: 0,
       isTemplate: false,
       templateId: null,
+      deletedAt: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -57,7 +65,7 @@ describe('CreateProjectUseCase', () => {
       consultantId: 'consultant-1',
       name: 'Project Template',
       description: 'Template description',
-      status: 'planning' as const,
+      status: 'todo' as const,
       priority: 'medium' as const,
       isTemplate: true,
     };
@@ -85,7 +93,7 @@ describe('CreateProjectUseCase', () => {
       companyId: 'company-1',
       consultantId: 'consultant-1',
       name: 'New Project',
-      status: 'planning' as const,
+      status: 'todo' as const,
       priority: 'high' as const,
     };
 
