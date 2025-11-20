@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { TrainingRepository } from '@/infrastructure/database/repositories/TrainingRepository';
-import { ListTrainingsUseCase } from '@/application/use-cases/training';
-import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
-import { logger } from '@/shared/utils/logger';
-import type { TrainingStatus } from '@/domain/entities/Training';
+import { TrainingRepository } from '@/4-infrastructure/database/repositories/TrainingRepository';
+import { ListTrainingsUseCase } from '@/2-application/use-cases/training';
+import { getAuthenticatedUser } from '@/4-infrastructure/api/helpers/auth';
+import { logger } from '@/5-shared/utils/logger';
+import type { TrainingStatus } from '@/3-domain/entities/Training';
+
+export const dynamic = 'force-dynamic';
 
 const trainingRepository = new TrainingRepository();
 

@@ -45,7 +45,21 @@ function ConsultantProgramDetailContent({ programId }: { programId: string }) {
   const [program, setProgram] = React.useState<Program | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
-  const [companies, setCompanies] = React.useState<any[]>([]);
+  const [companies, setCompanies] = React.useState<
+    Array<{
+      id: string;
+      name: string;
+      legalName?: string;
+      currentUsers?: number;
+      maxUsers?: number;
+      usersCount?: number;
+      tasksCount?: number;
+      completedTasksCount?: number;
+      trainingsCount?: number;
+      completedTrainingsCount?: number;
+      lastActivityAt?: string;
+    }>
+  >([]);
   const [loadingCompanies, setLoadingCompanies] = React.useState(false);
 
   React.useEffect(() => {
@@ -72,21 +86,41 @@ function ConsultantProgramDetailContent({ programId }: { programId: string }) {
     fetchProgram();
   }, [programId]);
 
-  const fetchCompanies = async () => {
+  const fetchCompanies = React.useCallback(async () => {
     try {
       setLoadingCompanies(true);
       const response = await fetch(`/api/consultant/programs/${programId}/companies?limit=100`);
       const data = await response.json();
 
-      if (data.success) {
-        setCompanies(data.data || []);
+      if (data.success && Array.isArray(data.data)) {
+        // API returns ConsultantCompanyWithStats[], extract company objects
+        const companyList = data.data.map((item: any) => ({
+          ...item.company,
+          usersCount: item.usersCount,
+          tasksCount: item.tasksCount,
+          completedTasksCount: item.completedTasksCount,
+          trainingsCount: item.trainingsCount,
+          completedTrainingsCount: item.completedTrainingsCount,
+          lastActivityAt: item.lastActivityAt,
+        }));
+        setCompanies(companyList);
+      } else {
+        setCompanies([]);
       }
     } catch (err) {
       console.error('Failed to fetch companies:', err);
+      setCompanies([]);
     } finally {
       setLoadingCompanies(false);
     }
-  };
+  }, [programId]);
+
+  React.useEffect(() => {
+    // Fetch companies when programId is available
+    if (programId) {
+      fetchCompanies();
+    }
+  }, [programId, fetchCompanies]);
 
   const formatDate = (date: Date) => {
     return new Date(date).toLocaleDateString('tr-TR', {
@@ -342,30 +376,40 @@ function ConsultantProgramDetailContent({ programId }: { programId: string }) {
                   />
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {companies.map((company) => (
-                      <Card
-                        key={company.id}
-                        className="border border-gray-200 dark:border-gray-800 hover:shadow-md transition-shadow cursor-pointer"
-                        onClick={() => router.push(`/consultant-dashboard/companies/${company.id}`)}
-                      >
-                        <CardHeader>
-                          <CardTitle className="text-base text-gray-900 dark:text-white">
-                            {company.name}
-                          </CardTitle>
-                          <CardDescription className="text-gray-600 dark:text-gray-400">
-                            {company.legalName}
-                          </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                            <Users className="w-4 h-4" />
-                            <span>
-                              {company.currentUsers || 0} / {company.maxUsers} kullanıcı
-                            </span>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
+                    {companies.map((company) => {
+                      if (!company?.id) {
+                        console.error('Company ID is missing:', company);
+                        return null;
+                      }
+                      return (
+                        <Card
+                          key={company.id}
+                          className="border border-gray-200 dark:border-gray-800 hover:shadow-md transition-shadow cursor-pointer"
+                          onClick={() => {
+                            if (company.id) {
+                              router.push(`/consultant-dashboard/companies/${company.id}`);
+                            }
+                          }}
+                        >
+                          <CardHeader>
+                            <CardTitle className="text-base text-gray-900 dark:text-white">
+                              {company.name}
+                            </CardTitle>
+                            <CardDescription className="text-gray-600 dark:text-gray-400">
+                              {company.legalName}
+                            </CardDescription>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                              <Users className="w-4 h-4" />
+                              <span>
+                                {company.currentUsers || 0} / {company.maxUsers} kullanıcı
+                              </span>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
                   </div>
                 )}
               </TabsContent>

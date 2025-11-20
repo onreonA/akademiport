@@ -97,20 +97,38 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 401 });
     }
 
-    // Get user's company
+    // Get user's role and company
     const { data: userData } = await supabase
       .from('users')
-      .select('company_id, companies!inner(program_id)')
+      .select('company_id, role, companies!inner(program_id)')
       .eq('id', user.id)
       .single();
 
-    if (!userData || !userData.company_id) {
-      return NextResponse.json({ error: 'Firma bilgisi bulunamadı' }, { status: 404 });
+    if (!userData) {
+      return NextResponse.json({ error: 'Kullanıcı bilgisi bulunamadı' }, { status: 404 });
     }
 
+    const isAdmin = userData.role === 'master_admin';
     const body = await request.json();
+
+    // For admin, programId comes from request body
+    // For other users, programId comes from their company
+    let programId: string;
+    let companyId: string | null;
+
+    if (isAdmin) {
+      programId = body.programId || '';
+      companyId = null; // Admin doesn't have a company
+    } else {
+      if (!userData.company_id) {
+        return NextResponse.json({ error: 'Firma bilgisi bulunamadı' }, { status: 404 });
+      }
+      programId = userData.companies?.[0]?.program_id || body.programId || '';
+      companyId = userData.company_id;
+    }
+
     const dto: CreateTopicDto = {
-      programId: userData.companies?.[0]?.program_id || '',
+      programId,
       categoryId: body.categoryId,
       title: body.title,
       content: body.content,
@@ -125,7 +143,9 @@ export async function POST(request: NextRequest) {
       companyRepository
     );
     const useCase = new CreateTopicUseCase(repository, addLeaderboardScore);
-    const result = await useCase.execute(dto, user.id, userData.company_id);
+    // For admin, pass empty string as companyId (use case should handle this)
+    // Note: Admin topics won't have leaderboard scores
+    const result = await useCase.execute(dto, user.id, companyId || '');
 
     if (result.isFailure) {
       return NextResponse.json({ error: result.error?.message || result.error }, { status: 400 });

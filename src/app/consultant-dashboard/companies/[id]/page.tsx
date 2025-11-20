@@ -19,6 +19,8 @@ import {
   ArrowLeft,
   UserPlus,
   GraduationCap,
+  FolderKanban,
+  Loader2,
 } from 'lucide-react';
 import {
   Card,
@@ -41,6 +43,7 @@ import {
 } from '@/presentation/components/ui/atoms/dialog';
 import { UserForm, type UserFormData } from '@/presentation/components/features/users/UserForm';
 import { AssignTrainingModal, TrainingCard } from '@/presentation/components/features/trainings';
+import { ProjectCard } from '@/presentation/components/features/projects/ProjectCard';
 import { CompanyRiskAnalysis } from '@/1-presentation/components/features/ai/CompanyRiskAnalysis';
 import { SuccessPrediction } from '@/1-presentation/components/features/ai/SuccessPrediction';
 import { TrendAnalysis } from '@/1-presentation/components/features/ai/TrendAnalysis';
@@ -59,6 +62,8 @@ export default function CompanyDetailPage({ params }: CompanyDetailPageProps) {
   const [company, setCompany] = useState<Company | null>(null);
   const [users, setUsers] = useState<User[]>([]);
   const [trainings, setTrainings] = useState<Training[]>([]);
+  const [projects, setProjects] = useState<any[]>([]);
+  const [loadingProjects, setLoadingProjects] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [companyId, setCompanyId] = useState<string>('');
@@ -66,10 +71,21 @@ export default function CompanyDetailPage({ params }: CompanyDetailPageProps) {
   const [isAssignTrainingModalOpen, setIsAssignTrainingModalOpen] = useState(false);
 
   useEffect(() => {
-    params.then((p) => {
-      setCompanyId(p.id);
-      fetchCompanyData(p.id);
-    });
+    params
+      .then((p) => {
+        if (!p.id || p.id === 'undefined') {
+          setError('Geçersiz firma ID');
+          setIsLoading(false);
+          return;
+        }
+        setCompanyId(p.id);
+        fetchCompanyData(p.id);
+      })
+      .catch((err) => {
+        console.error('Failed to get params:', err);
+        setError('Sayfa parametreleri yüklenemedi');
+        setIsLoading(false);
+      });
   }, [params]);
 
   const fetchCompanyData = async (id: string) => {
@@ -104,6 +120,9 @@ export default function CompanyDetailPage({ params }: CompanyDetailPageProps) {
 
       // Fetch trainings
       fetchTrainings(id);
+
+      // Fetch projects
+      fetchProjects(id);
     } catch (err) {
       setError('Firma bilgileri yüklenirken bir hata oluştu');
       console.error('Failed to fetch company:', err);
@@ -127,6 +146,29 @@ export default function CompanyDetailPage({ params }: CompanyDetailPageProps) {
     } catch (err) {
       console.error('Failed to fetch trainings:', err);
       setTrainings([]);
+    }
+  };
+
+  const fetchProjects = async (id: string) => {
+    try {
+      setLoadingProjects(true);
+      const response = await fetch(`/api/projects?companyId=${id}`);
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error('Failed to fetch projects:', data.error);
+        setProjects([]);
+        return;
+      }
+
+      // Handle different response formats
+      const projectsList = data.projects || data.data?.projects || data.data || [];
+      setProjects(Array.isArray(projectsList) ? projectsList : []);
+    } catch (err) {
+      console.error('Failed to fetch projects:', err);
+      setProjects([]);
+    } finally {
+      setLoadingProjects(false);
     }
   };
 
@@ -356,18 +398,18 @@ export default function CompanyDetailPage({ params }: CompanyDetailPageProps) {
           <TabsTrigger value="overview">Genel Bakış</TabsTrigger>
           <TabsTrigger value="users">Kullanıcılar ({users?.length || 0})</TabsTrigger>
           <TabsTrigger value="trainings">Eğitimler ({trainings?.length || 0})</TabsTrigger>
-          <TabsTrigger value="projects">Projeler (Sprint 8)</TabsTrigger>
+          <TabsTrigger value="projects">Projeler ({projects?.length || 0})</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
           {/* AI Risk Analysis */}
-          <CompanyRiskAnalysis companyId={companyId} />
+          {companyId && <CompanyRiskAnalysis companyId={companyId} />}
 
           {/* AI Success Prediction */}
-          <SuccessPrediction companyId={companyId} />
+          {companyId && <SuccessPrediction companyId={companyId} />}
 
           {/* AI Trend Analysis */}
-          <TrendAnalysis companyId={companyId} />
+          {companyId && <TrendAnalysis companyId={companyId} />}
 
           <Card>
             <CardHeader>
@@ -526,14 +568,40 @@ export default function CompanyDetailPage({ params }: CompanyDetailPageProps) {
           </Card>
         </TabsContent>
 
-        <TabsContent value="projects">
+        <TabsContent value="projects" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Projeler</CardTitle>
-              <CardDescription>Sprint 8'de eklenecek</CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Projeler</CardTitle>
+                  <CardDescription>{company.name} firmasına ait projeler</CardDescription>
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground">Proje yönetimi Sprint 8'de gelecek</p>
+              {loadingProjects ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                </div>
+              ) : !projects || projects.length === 0 ? (
+                <div className="text-center py-12 text-muted-foreground">
+                  <FolderKanban className="h-12 w-12 mx-auto mb-4" />
+                  <p>Henüz proje eklenmemiş</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {projects.map((project) => (
+                    <ProjectCard
+                      key={project.id}
+                      project={project}
+                      onEdit={() =>
+                        router.push(`/consultant-dashboard/projects/${project.id}/edit`)
+                      }
+                      onDelete={() => {}}
+                    />
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>

@@ -50,17 +50,27 @@ export default function ConsultantTrainingsPage() {
       params.append('limit', pagination.limit.toString());
 
       const response = await fetch(`/api/consultant/trainings?${params.toString()}`);
+
+      // Check if response is JSON before parsing
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        throw new Error(`API yanıtı JSON formatında değil. Status: ${response.status}`);
+      }
+
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Eğitimler yüklenemedi');
+        throw new Error(data.error || `Eğitimler yüklenemedi (${response.status})`);
       }
 
       setTrainings(data.trainings || []);
       setPagination((prev) => ({ ...prev, total: data.total || 0 }));
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Bir hata oluştu');
-      toast.error(err instanceof Error ? err.message : 'Eğitimler yüklenirken bir hata oluştu');
+      const errorMessage = err instanceof Error ? err.message : 'Bir hata oluştu';
+      setError(errorMessage);
+      toast.error(errorMessage);
+      console.error('Error fetching trainings:', err);
     } finally {
       setLoading(false);
     }

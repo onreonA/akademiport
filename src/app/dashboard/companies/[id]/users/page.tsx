@@ -26,39 +26,57 @@ import { toast } from 'sonner';
 export default function CompanyUsersPage() {
   const router = useRouter();
   const params = useParams();
-  const id = params.id as string;
+  const id = params?.id as string | undefined;
 
   const [company, setCompany] = useState<Company | null>(null);
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!id) {
+      setLoading(false);
+      return;
+    }
     fetchCompany();
     fetchUsers();
   }, [id]);
 
   const fetchCompany = async () => {
+    if (!id) return;
     try {
       const response = await fetch(`/api/companies/${id}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
       const data = await response.json();
 
-      if (data.success) {
+      if (data.success && data.data) {
         setCompany(data.data);
+      } else {
+        console.error('Failed to fetch company:', data.error || 'Unknown error');
+        toast.error('Firma bilgileri alınamadı');
       }
     } catch (error) {
       console.error('Failed to fetch company:', error);
+      toast.error('Firma bilgileri yüklenirken bir hata oluştu');
     } finally {
       setLoading(false);
     }
   };
 
   const fetchUsers = async () => {
+    if (!id) return;
     try {
       const response = await fetch(`/api/companies/${id}/users`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
       const data = await response.json();
 
       if (data.success) {
-        setUsers(data.data);
+        setUsers(data.data || []);
+      } else {
+        console.error('Failed to fetch users:', data.error || 'Unknown error');
       }
     } catch (error) {
       console.error('Failed to fetch users:', error);
@@ -105,6 +123,14 @@ export default function CompanyUsersPage() {
     );
   }
 
+  if (!id) {
+    return (
+      <div className="container mx-auto py-8">
+        <p className="text-center text-muted-foreground">Geçersiz firma ID'si</p>
+      </div>
+    );
+  }
+
   if (!company) {
     return (
       <div className="container mx-auto py-8">
@@ -113,7 +139,7 @@ export default function CompanyUsersPage() {
     );
   }
 
-  const canAddMore = company.currentUsers < company.maxUsers;
+  const canAddMore = (company.currentUsers ?? 0) < (company.maxUsers ?? 0);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -141,7 +167,7 @@ export default function CompanyUsersPage() {
                   variant={canAddMore ? 'default' : 'destructive'}
                   className="border font-medium"
                 >
-                  {company.currentUsers} / {company.maxUsers} Kullanıcı
+                  {company.currentUsers ?? 0} / {company.maxUsers ?? 0} Kullanıcı
                 </Badge>
                 {!canAddMore && (
                   <Badge

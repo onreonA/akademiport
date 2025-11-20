@@ -74,6 +74,10 @@ export function ConsultantCompanyList({ onCompanyClick, limit = 10 }: Consultant
   };
 
   const handleCompanyClick = (companyId: string) => {
+    if (!companyId || companyId === 'undefined') {
+      console.error('Company ID is undefined or invalid:', companyId);
+      return;
+    }
     if (onCompanyClick) {
       onCompanyClick(companyId);
     } else {
@@ -170,48 +174,54 @@ export function ConsultantCompanyList({ onCompanyClick, limit = 10 }: Consultant
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {companies.map((item) => (
-            <div
-              key={item.company.id}
-              className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
-              onClick={() => handleCompanyClick(item.company.id)}
-            >
-              <div className="flex items-center space-x-4 flex-1">
-                <div className="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                  <Building2 className="h-6 w-6 text-primary" />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-semibold">{item.company.name}</h3>
-                    {item.company.isActive ? (
-                      <Badge variant="default" className="text-xs">
-                        Aktif
-                      </Badge>
-                    ) : (
-                      <Badge variant="outline" className="text-xs">
-                        Pasif
-                      </Badge>
-                    )}
+          {companies.map((item) => {
+            if (!item.company?.id) {
+              console.error('Company ID is missing:', item);
+              return null;
+            }
+            return (
+              <div
+                key={item.company.id}
+                className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
+                onClick={() => handleCompanyClick(item.company.id)}
+              >
+                <div className="flex items-center space-x-4 flex-1">
+                  <div className="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                    <Building2 className="h-6 w-6 text-primary" />
                   </div>
-                  <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
-                    {item.company.city && (
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-semibold">{item.company.name}</h3>
+                      {item.company.isActive ? (
+                        <Badge variant="default" className="text-xs">
+                          Aktif
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline" className="text-xs">
+                          Pasif
+                        </Badge>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
+                      {item.company.city && (
+                        <div className="flex items-center gap-1">
+                          <MapPin className="h-3 w-3" />
+                          <span>{item.company.city}</span>
+                        </div>
+                      )}
                       <div className="flex items-center gap-1">
-                        <MapPin className="h-3 w-3" />
-                        <span>{item.company.city}</span>
+                        <Users className="h-3 w-3" />
+                        <span>{item.usersCount} kullanıcı</span>
                       </div>
-                    )}
-                    <div className="flex items-center gap-1">
-                      <Users className="h-3 w-3" />
-                      <span>{item.usersCount} kullanıcı</span>
                     </div>
                   </div>
                 </div>
+                <Button variant="ghost" size="sm">
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
               </div>
-              <Button variant="ghost" size="sm">
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </CardContent>
     </Card>

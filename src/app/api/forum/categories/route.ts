@@ -18,10 +18,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 401 });
     }
 
-    // Get user's program
+    // Get user's role and program
     const { data: userData } = await supabase
       .from('users')
-      .select('companies!inner(program_id)')
+      .select('role, companies(program_id)')
       .eq('id', user.id)
       .single();
 
@@ -29,8 +29,12 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Kullanıcı bilgileri bulunamadı' }, { status: 404 });
     }
 
+    const isAdmin = userData.role === 'master_admin';
+    // For admin, programId must come from query params
+    // For other users, use their company's program_id
     const programId =
-      request.nextUrl.searchParams.get('programId') || userData.companies?.[0]?.program_id;
+      request.nextUrl.searchParams.get('programId') ||
+      (isAdmin ? undefined : userData.companies?.[0]?.program_id);
 
     if (!programId) {
       return NextResponse.json({ error: 'Program ID gereklidir' }, { status: 400 });

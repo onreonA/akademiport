@@ -13,6 +13,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/presentation/components/ui/atoms/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/presentation/components/ui/atoms/select';
 import { Input } from '@/presentation/components/ui/atoms/input';
 import { Textarea } from '@/presentation/components/ui/atoms/textarea';
 import { Label } from '@/presentation/components/ui/atoms/label';
@@ -20,7 +27,9 @@ import { Plus, Loader2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { usePrograms } from '@/5-shared/hooks/api/usePrograms';
+import { toast } from 'sonner';
 
 const categoryFormSchema = z.object({
   name: z
@@ -40,11 +49,24 @@ const categoryFormSchema = z.object({
 type CategoryFormValues = z.infer<typeof categoryFormSchema>;
 
 function AdminCategoriesPageContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const programId = searchParams.get('programId') || '';
-  const { data: categories = [], isLoading } = useCategories(programId);
+  const [selectedProgramId, setSelectedProgramId] = useState<string | undefined>(
+    searchParams.get('programId') || undefined
+  );
+  const { data: programsData } = usePrograms({ limit: 100 });
+  const programs = programsData?.data || [];
+  const { data: categories = [], isLoading } = useCategories(selectedProgramId || '');
   const createCategory = useCreateCategory();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+
+  const handleProgramChange = (programId: string) => {
+    setSelectedProgramId(programId);
+    // Update URL without page reload
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('programId', programId);
+    router.replace(`/admin-dashboard/forum/categories?${params.toString()}`);
+  };
 
   const form = useForm<CategoryFormValues>({
     resolver: zodResolver(categoryFormSchema),
@@ -59,30 +81,79 @@ function AdminCategoriesPageContent() {
   });
 
   const handleSubmit = async (values: CategoryFormValues) => {
-    if (!programId) {
-      alert('Lütfen bir program seçiniz');
+    if (!selectedProgramId) {
+      toast.error('Lütfen bir program seçiniz');
       return;
     }
 
-    await createCategory.mutateAsync({
-      programId,
-      ...values,
-    });
-
-    form.reset();
-    setIsCreateDialogOpen(false);
+    try {
+      await createCategory.mutateAsync({
+        programId: selectedProgramId,
+        ...values,
+      });
+      toast.success('Kategori başarıyla oluşturuldu');
+      form.reset();
+      setIsCreateDialogOpen(false);
+    } catch (error) {
+      console.error('Error creating category:', error);
+      toast.error('Kategori oluşturulamadı');
+    }
   };
 
-  if (!programId) {
+  if (!selectedProgramId) {
     return (
-      <div className="text-center py-12">
-        <p className="text-muted-foreground">Lütfen bir program seçiniz</p>
+      <div className="space-y-6 p-6">
+        {/* Program Selection */}
+        <div className="flex items-center gap-4 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+          <Label htmlFor="program-select" className="whitespace-nowrap">
+            Program Seçin:
+          </Label>
+          <Select value={selectedProgramId || ''} onValueChange={handleProgramChange}>
+            <SelectTrigger id="program-select" className="w-[300px]">
+              <SelectValue placeholder="Program seçiniz" />
+            </SelectTrigger>
+            <SelectContent>
+              {programs.map((program) => (
+                <SelectItem key={program.id} value={program.id}>
+                  {program.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">Lütfen bir program seçiniz</p>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="space-y-6 p-6">
+      {/* Program Selection */}
+      <div className="flex items-center gap-4 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+        <Label htmlFor="program-select" className="whitespace-nowrap">
+          Program Seçin:
+        </Label>
+        <Select value={selectedProgramId || ''} onValueChange={handleProgramChange}>
+          <SelectTrigger id="program-select" className="w-[300px]">
+            <SelectValue placeholder="Program seçiniz" />
+          </SelectTrigger>
+          <SelectContent>
+            {programs.map((program) => (
+              <SelectItem key={program.id} value={program.id}>
+                {program.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {selectedProgramId && (
+          <span className="text-sm text-muted-foreground">
+            {categories.length} kategori bulundu
+          </span>
+        )}
+      </div>
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>

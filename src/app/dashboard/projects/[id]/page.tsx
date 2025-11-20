@@ -130,6 +130,14 @@ export default function AdminProjectDetailPage() {
   const router = useRouter();
   const projectId = params.id;
 
+  // Redirect to new page if id is "new"
+  useEffect(() => {
+    if (projectId === 'new') {
+      router.replace('/dashboard/projects/new');
+      return;
+    }
+  }, [projectId, router]);
+
   const [activeTab, setActiveTab] = useState<TabValue>('overview');
   const [hierarchy, setHierarchy] = useState<ProjectHierarchyDTO | null>(null);
   const [hierarchyLoading, setHierarchyLoading] = useState(true);
@@ -150,6 +158,11 @@ export default function AdminProjectDetailPage() {
   const [bulkDatesSubmitting, setBulkDatesSubmitting] = useState(false);
 
   const fetchHierarchy = useCallback(async () => {
+    // Don't fetch if id is "new"
+    if (projectId === 'new') {
+      return;
+    }
+
     setHierarchyLoading(true);
     setHierarchyError(null);
 

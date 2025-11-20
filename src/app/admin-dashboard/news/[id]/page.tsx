@@ -1,6 +1,6 @@
 'use client';
 
-import { use } from 'react';
+import { use, useEffect } from 'react';
 import {
   useNewsDetail,
   useUpdateNews,
@@ -25,6 +25,19 @@ import { tr } from 'date-fns/locale';
 export default function AdminNewsDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
+
+  // Redirect to new page if id is "new"
+  useEffect(() => {
+    if (id === 'new') {
+      router.replace('/admin-dashboard/news/new');
+    }
+  }, [id, router]);
+
+  // Don't render if redirecting
+  if (id === 'new') {
+    return null;
+  }
+
   const { data: news, isLoading } = useNewsDetail(id);
   const updateNews = useUpdateNews();
   const publishNews = usePublishNews();
