@@ -39,8 +39,8 @@ export function PageRenderer({ page }: PageRendererProps) {
             />
           </div>
         ) : (
-          activeSections.map((section) => (
-            <SectionRenderer key={section.id || Math.random()} section={section} />
+          activeSections.map((section, index) => (
+            <SectionRenderer key={section.id || `section-${index}`} section={section} />
           ))
         )}
       </div>

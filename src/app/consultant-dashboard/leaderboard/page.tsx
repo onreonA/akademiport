@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { LeaderboardTable, BadgeGallery } from '@/1-presentation/components/features/leaderboard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/presentation/components/ui/atoms/tabs';
 import {
@@ -21,11 +21,7 @@ export default function ConsultantLeaderboardPage() {
   const [programs, setPrograms] = useState<Program[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchPrograms();
-  }, []);
-
-  const fetchPrograms = async () => {
+  const fetchPrograms = useCallback(async () => {
     try {
       const response = await fetch('/api/consultant/programs?limit=100');
       const data = await response.json();
@@ -43,7 +39,11 @@ export default function ConsultantLeaderboardPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedProgramId]);
+
+  useEffect(() => {
+    fetchPrograms();
+  }, [fetchPrograms]);
 
   return (
     <div className="space-y-6">

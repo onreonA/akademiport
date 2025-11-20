@@ -180,7 +180,7 @@ export function NewsForm({
               <FormControl>
                 <Input placeholder="https://example.com/image.jpg" {...field} />
               </FormControl>
-              <FormDescription>Haberin kapak görseli URL'si</FormDescription>
+              <FormDescription>Haberin kapak görseli URL&apos;si</FormDescription>
               <FormMessage />
             </FormItem>
           )}

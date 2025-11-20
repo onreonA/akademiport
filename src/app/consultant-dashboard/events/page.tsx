@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import React from 'react';
 import { Calendar, Plus } from 'lucide-react';
 import { Button } from '@/presentation/components/ui/atoms/button';
@@ -58,7 +58,7 @@ export default function ConsultantEventsPage() {
     programId: selectedProgram?.id || null,
   });
 
-  const events = eventsData?.events || [];
+  const events = useMemo(() => eventsData?.events || [], [eventsData?.events]);
   const appointments = appointmentsData?.appointments || [];
 
   // Debug logging

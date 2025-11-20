@@ -34,11 +34,8 @@ import {
 } from 'lucide-react';
 
 export default function HomePage() {
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
+  // Use useState with initial value instead of useEffect
+  const [isClient] = useState(true);
 
   return (
     <div className="min-h-screen bg-white">

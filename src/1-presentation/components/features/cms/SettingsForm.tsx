@@ -151,7 +151,7 @@ export function SettingsForm({ settings, onSubmit, isSubmitting = false }: Setti
                   <FormControl>
                     <Input placeholder="https://..." {...field} />
                   </FormControl>
-                  <FormDescription>Site logo görsel URL'i</FormDescription>
+                  <FormDescription>Site logo görsel URL&apos;i</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

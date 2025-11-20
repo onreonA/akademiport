@@ -58,7 +58,7 @@ export const WithSelected: Story = {
 };
 
 export const Interactive: Story = {
-  render: () => {
+  render: function InteractiveProgramSelector() {
     const [selected, setSelected] = useState<Program | undefined>(samplePrograms[0]);
 
     return (

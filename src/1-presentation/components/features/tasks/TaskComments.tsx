@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/1-presentation/components/ui/atoms/button';
 import { Textarea } from '@/1-presentation/components/ui/atoms/textarea';
 import { EnhancedCard } from '@/1-presentation/components/ui/atoms/enhanced-card';
@@ -36,11 +36,7 @@ export function TaskComments({ taskId, currentUserId }: TaskCommentsProps) {
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [replyText, setReplyText] = useState('');
 
-  useEffect(() => {
-    fetchComments();
-  }, [taskId]);
-
-  const fetchComments = async () => {
+  const fetchComments = useCallback(async () => {
     try {
       const response = await fetch(`/api/tasks/${taskId}/comments`);
       if (!response.ok) throw new Error('Failed to fetch comments');
@@ -54,7 +50,11 @@ export function TaskComments({ taskId, currentUserId }: TaskCommentsProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [taskId]);
+
+  useEffect(() => {
+    fetchComments();
+  }, [fetchComments]);
 
   const handleSubmit = async (e: React.FormEvent, parentCommentId?: string | null) => {
     e.preventDefault();

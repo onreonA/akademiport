@@ -52,8 +52,8 @@ export function BulkAssignmentDialog({
   const [cityFilter, setCityFilter] = useState<string | null>(null);
   const [sectorFilter, setSectorFilter] = useState<string | null>(null);
 
-  const companies = matrix?.companies ?? [];
-  const subProjects = matrix?.subProjects ?? [];
+  const companies = useMemo(() => matrix?.companies ?? [], [matrix]);
+  const subProjects = useMemo(() => matrix?.subProjects ?? [], [matrix]);
 
   // Unique values for filters
   const uniqueCities = useMemo(() => {

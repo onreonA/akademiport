@@ -6,7 +6,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Card,
   CardContent,
@@ -42,7 +42,7 @@ export function AIInsightsWidget({
   const [loading, setLoading] = useState(false);
   const [insights, setInsights] = useState<any>(null);
 
-  const fetchInsights = async () => {
+  const fetchInsights = useCallback(async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams({
@@ -64,11 +64,11 @@ export function AIInsightsWidget({
     } finally {
       setLoading(false);
     }
-  };
+  }, [dashboardType, companyId, programId]);
 
   useEffect(() => {
     fetchInsights();
-  }, [dashboardType, companyId, programId]);
+  }, [fetchInsights]);
 
   const getSeverityColor = (severity?: string) => {
     switch (severity) {

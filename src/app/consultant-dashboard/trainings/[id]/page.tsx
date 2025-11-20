@@ -8,6 +8,7 @@
 'use client';
 
 import * as React from 'react';
+import { useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { ArrowLeft, GraduationCap, Video, FileText, AlertCircle } from 'lucide-react';
 import { Button } from '@/presentation/components/ui/atoms/button';
@@ -36,15 +37,7 @@ export default function ConsultantTrainingDetailPage() {
   const [error, setError] = React.useState<string | null>(null);
   const [activeTab, setActiveTab] = React.useState<'overview' | 'videos' | 'documents'>('overview');
 
-  React.useEffect(() => {
-    if (id) {
-      fetchTraining();
-      fetchVideos();
-      fetchDocuments();
-    }
-  }, [id]);
-
-  const fetchTraining = async () => {
+  const fetchTraining = React.useCallback(async () => {
     try {
       const response = await fetch(`/api/trainings/${id}`);
       const data = await response.json();
@@ -60,9 +53,9 @@ export default function ConsultantTrainingDetailPage() {
       setError(errorMessage);
       toast.error(errorMessage);
     }
-  };
+  }, [id]);
 
-  const fetchVideos = async () => {
+  const fetchVideos = React.useCallback(async () => {
     try {
       const response = await fetch(`/api/trainings/${id}/videos`);
       const data = await response.json();
@@ -76,9 +69,9 @@ export default function ConsultantTrainingDetailPage() {
       console.error('Failed to fetch videos:', err);
       setVideos([]);
     }
-  };
+  }, [id]);
 
-  const fetchDocuments = async () => {
+  const fetchDocuments = React.useCallback(async () => {
     try {
       const response = await fetch(`/api/trainings/${id}/documents`);
       const data = await response.json();
@@ -94,7 +87,7 @@ export default function ConsultantTrainingDetailPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
 
   if (loading) {
     return (

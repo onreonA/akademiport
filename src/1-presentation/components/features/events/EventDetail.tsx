@@ -225,7 +225,7 @@ export function EventDetail({
                       className="w-full"
                     >
                       <ExternalLink className="w-4 h-4 mr-2" />
-                      Zoom'a Katıl
+                      Zoom&apos;a Katıl
                     </Button>
                     {event.zoomPassword && (
                       <p className="text-xs text-muted-foreground mt-2">

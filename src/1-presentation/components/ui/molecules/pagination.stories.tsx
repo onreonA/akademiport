@@ -44,7 +44,7 @@ export const FewPages: Story = {
 };
 
 export const Interactive: Story = {
-  render: () => {
+  render: function InteractivePagination() {
     const [currentPage, setCurrentPage] = useState(1);
     return (
       <div className="space-y-4">

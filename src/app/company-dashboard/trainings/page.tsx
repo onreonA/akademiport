@@ -51,7 +51,7 @@ export default function CompanyTrainingsPage() {
     if (!authLoading && user?.companyId) {
       fetchTrainings();
     }
-  }, [user, authLoading, filters, pagination.page, pagination.limit]);
+  }, [user, authLoading, filters, pagination.page, pagination.limit, fetchTrainings]);
 
   const fetchTrainings = React.useCallback(async () => {
     if (!user?.companyId) {

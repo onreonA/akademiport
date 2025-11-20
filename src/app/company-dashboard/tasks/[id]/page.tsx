@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeft, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
 import { TaskComments } from '@/1-presentation/components/features/tasks/TaskComments';
@@ -56,11 +56,7 @@ export default function CompanyTaskDetailPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchTask();
-  }, [taskId]);
-
-  const fetchTask = async () => {
+  const fetchTask = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch(`/api/tasks/${taskId}`);
@@ -72,7 +68,11 @@ export default function CompanyTaskDetailPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [taskId]);
+
+  useEffect(() => {
+    fetchTask();
+  }, [fetchTask]);
 
   const handleCompleteTask = async () => {
     if (!confirm('Görevi tamamlandı olarak işaretlemek istediğinizden emin misiniz?')) return;

@@ -5,7 +5,7 @@
  * Sprint 6: Company Management
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Bell, Shield, Palette, AlertCircle } from 'lucide-react';
 import { Button } from '@/presentation/components/ui/atoms/button';
@@ -25,11 +25,7 @@ export default function CompanySettingsPage() {
   const [pushNotifications, setPushNotifications] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
 
-  useEffect(() => {
-    fetchCurrentUser();
-  }, []);
-
-  const fetchCurrentUser = async () => {
+  const fetchCurrentUser = useCallback(async () => {
     try {
       const response = await fetch('/api/auth/me');
       const data = await response.json();
@@ -42,7 +38,11 @@ export default function CompanySettingsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchCurrentUser();
+  }, [fetchCurrentUser]);
 
   const fetchCompany = async (companyId: string) => {
     try {

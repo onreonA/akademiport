@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link2, Link2Off, Plus, Trash2, AlertCircle } from 'lucide-react';
 import { EnhancedCard } from '@/presentation/components/ui/atoms/enhanced-card';
 import { Button } from '@/presentation/components/ui/atoms/button';
@@ -55,12 +55,7 @@ export function TaskDependencies({ taskId, projectId }: TaskDependenciesProps) {
   });
   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    fetchDependencies();
-    fetchTasks();
-  }, [taskId]);
-
-  const fetchDependencies = async () => {
+  const fetchDependencies = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch(`/api/tasks/${taskId}/dependencies`);
@@ -75,9 +70,9 @@ export function TaskDependencies({ taskId, projectId }: TaskDependenciesProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [taskId]);
 
-  const fetchTasks = async () => {
+  const fetchTasks = useCallback(async () => {
     try {
       const response = await fetch(`/api/projects/${projectId}/tasks`);
       if (!response.ok) throw new Error('Failed to fetch tasks');
@@ -87,7 +82,12 @@ export function TaskDependencies({ taskId, projectId }: TaskDependenciesProps) {
     } catch (error) {
       console.error('Error fetching tasks:', error);
     }
-  };
+  }, [projectId]);
+
+  useEffect(() => {
+    fetchDependencies();
+    fetchTasks();
+  }, [fetchDependencies, fetchTasks]);
 
   const handleAddDependency = async () => {
     if (!newDependency.dependsOnTaskId) {

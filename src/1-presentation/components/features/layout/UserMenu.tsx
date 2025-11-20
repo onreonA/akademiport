@@ -6,6 +6,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { LogOut, User, Settings } from 'lucide-react';
 import { useAuth } from '@/shared/hooks/useAuth';
 import { Avatar, AvatarFallback } from '@/presentation/components/ui/atoms/avatar';
@@ -77,10 +78,10 @@ export function UserMenu() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <a href="/profile" className="cursor-pointer">
+          <Link href="/profile" className="cursor-pointer">
             <User className="mr-2 h-4 w-4" />
             <span>Profil</span>
-          </a>
+          </Link>
         </DropdownMenuItem>
         <DropdownMenuItem disabled>
           <Settings className="mr-2 h-4 w-4" />

@@ -130,8 +130,8 @@ export const Complete: Story = {
 };
 
 export const Interactive: Story = {
-  render: () => {
-    const [data, setData] = useState(sampleData);
+  render: function InteractiveDataTable() {
+    const [data] = useState(sampleData);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 3;
 

@@ -25,7 +25,7 @@ export const WithValue: Story = {
 };
 
 export const Interactive: Story = {
-  render: () => {
+  render: function InteractiveSearchInput() {
     const [value, setValue] = useState('');
     return (
       <SearchInput

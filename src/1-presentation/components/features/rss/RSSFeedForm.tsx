@@ -127,7 +127,7 @@ export function RSSFeedForm({
               <FormControl>
                 <Input placeholder="Örn: E-İhracat Haberleri" {...field} />
               </FormControl>
-              <FormDescription>RSS feed'in görünen adı</FormDescription>
+              <FormDescription>RSS feed&apos;in görünen adı</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -143,7 +143,7 @@ export function RSSFeedForm({
               <FormControl>
                 <Input placeholder="https://example.com/rss.xml" {...field} />
               </FormControl>
-              <FormDescription>RSS feed URL'i</FormDescription>
+              <FormDescription>RSS feed URL&apos;i</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -211,7 +211,7 @@ export function RSSFeedForm({
                 />
               </FormControl>
               <FormDescription>
-                Feed'in ne sıklıkla kontrol edileceği (en az 60 dakika)
+                Feed&apos;in ne sıklıkla kontrol edileceği (en az 60 dakika)
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -244,7 +244,7 @@ export function RSSFeedForm({
               <div className="space-y-0.5">
                 <FormLabel className="text-base">Otomatik Yayınlama</FormLabel>
                 <FormDescription>
-                  Aktifse, yeni item'lar otomatik olarak AI ile yeniden yazılıp haber olarak
+                  Aktifse, yeni item&apos;lar otomatik olarak AI ile yeniden yazılıp haber olarak
                   oluşturulur (draft)
                 </FormDescription>
               </div>

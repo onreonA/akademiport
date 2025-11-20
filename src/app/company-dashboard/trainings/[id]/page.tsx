@@ -59,22 +59,7 @@ export default function CompanyTrainingDetailPage() {
   const [error, setError] = React.useState<string | null>(null);
   const [activeTab, setActiveTab] = React.useState<'overview' | 'videos' | 'documents'>('overview');
 
-  React.useEffect(() => {
-    if (id && user?.companyId) {
-      fetchTraining();
-      fetchVideos();
-      fetchDocuments();
-    }
-  }, [id, user?.companyId]);
-
-  // Fetch progress after videos and documents are loaded
-  React.useEffect(() => {
-    if (videos.length > 0 && documents.length >= 0 && training && user?.companyId) {
-      fetchProgress();
-    }
-  }, [videos, documents, training, user?.companyId]);
-
-  const fetchTraining = async () => {
+  const fetchTraining = React.useCallback(async () => {
     try {
       const response = await fetch(`/api/trainings/${id}`);
       const data = await response.json();
@@ -91,9 +76,9 @@ export default function CompanyTrainingDetailPage() {
       toast.error(errorMessage);
       setLoading(false);
     }
-  };
+  }, [id]);
 
-  const fetchVideos = async () => {
+  const fetchVideos = React.useCallback(async () => {
     try {
       const response = await fetch(`/api/trainings/${id}/videos`);
       const data = await response.json();
@@ -107,9 +92,9 @@ export default function CompanyTrainingDetailPage() {
       console.error('Failed to fetch videos:', err);
       setVideos([]);
     }
-  };
+  }, [id]);
 
-  const fetchDocuments = async () => {
+  const fetchDocuments = React.useCallback(async () => {
     try {
       const response = await fetch(`/api/trainings/${id}/documents`);
       const data = await response.json();
@@ -123,20 +108,15 @@ export default function CompanyTrainingDetailPage() {
       console.error('Failed to fetch documents:', err);
       setDocuments([]);
     }
-  };
+  }, [id]);
 
-  const fetchProgress = async () => {
-    if (!user?.companyId || videos.length === 0 || documents.length === 0) {
-      // Wait for videos and documents to load
-      if (videos.length > 0 || documents.length > 0) {
-        // Videos or documents loaded, but we still need both
-        // Try again after a short delay
-        setTimeout(() => {
-          if (videos.length > 0 && documents.length > 0) {
-            fetchProgress();
-          }
-        }, 500);
-      }
+  const fetchProgress = React.useCallback(async () => {
+    if (!user?.companyId || !training) {
+      return;
+    }
+
+    // Allow progress fetch even if videos or documents are empty (for trainings with only videos or only documents)
+    if (videos.length === 0 && documents.length === 0) {
       return;
     }
 
@@ -282,7 +262,22 @@ export default function CompanyTrainingDetailPage() {
       });
       setLoading(false);
     }
-  };
+  }, [id, user?.companyId, videos, documents, training]);
+
+  React.useEffect(() => {
+    if (id && user?.companyId) {
+      fetchTraining();
+      fetchVideos();
+      fetchDocuments();
+    }
+  }, [id, user?.companyId, fetchTraining, fetchVideos, fetchDocuments]);
+
+  // Fetch progress after videos and documents are loaded
+  React.useEffect(() => {
+    if (videos.length > 0 && documents.length >= 0 && training && user?.companyId) {
+      fetchProgress();
+    }
+  }, [videos, documents, training, user?.companyId, fetchProgress]);
 
   const handleVideoWatchComplete = async (videoId: string, progress: number) => {
     if (!user?.companyId) return;

@@ -7,7 +7,7 @@
 
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { FolderKanban, AlertCircle } from 'lucide-react';
 import { Button } from '@/presentation/components/ui/atoms/button';
@@ -27,11 +27,7 @@ function ConsultantProgramsContent() {
   const { setPrograms, setSelectedProgram, isLoading, setIsLoading } = useConsultantProgram();
   const [allPrograms, setAllPrograms] = useState<ConsultantProgramWithStats[]>([]);
 
-  useEffect(() => {
-    fetchAllPrograms();
-  }, []);
-
-  const fetchAllPrograms = async () => {
+  const fetchAllPrograms = useCallback(async () => {
     setIsLoading(true);
     try {
       const response = await fetch('/api/consultant/programs?limit=100');
@@ -46,7 +42,11 @@ function ConsultantProgramsContent() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [setIsLoading, setPrograms]);
+
+  useEffect(() => {
+    fetchAllPrograms();
+  }, [fetchAllPrograms]);
 
   const handleProgramClick = (program: Program) => {
     const item = allPrograms.find((p) => p.program.id === program.id);

@@ -78,7 +78,7 @@ export const WithFooter: Story = {
 };
 
 export const Interactive: Story = {
-  render: () => {
+  render: function InteractiveSidebar() {
     const [isOpen, setIsOpen] = useState(true);
     const [items, setItems] = useState(navItems);
 

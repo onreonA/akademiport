@@ -7,7 +7,7 @@
 
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Building2, MapPin, Users, ArrowRight } from 'lucide-react';
 import {
   Card,
@@ -40,15 +40,7 @@ export function ConsultantCompanyList({ onCompanyClick, limit = 10 }: Consultant
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (selectedProgram) {
-      fetchCompanies();
-    } else {
-      setCompanies([]);
-    }
-  }, [selectedProgram]);
-
-  const fetchCompanies = async () => {
+  const fetchCompanies = useCallback(async () => {
     if (!selectedProgram) return;
 
     try {
@@ -71,7 +63,15 @@ export function ConsultantCompanyList({ onCompanyClick, limit = 10 }: Consultant
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [selectedProgram, limit]);
+
+  useEffect(() => {
+    if (selectedProgram) {
+      fetchCompanies();
+    } else {
+      setCompanies([]);
+    }
+  }, [selectedProgram, fetchCompanies]);
 
   const handleCompanyClick = (companyId: string) => {
     if (!companyId || companyId === 'undefined') {

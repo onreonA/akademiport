@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { Briefcase, ArrowLeft, Save, Loader2, Trash2 } from 'lucide-react';
 import { GradientHeader } from '@/presentation/components/ui/molecules/gradient-header';
@@ -57,14 +57,7 @@ export default function EditProjectPage() {
     endDate: '',
   });
 
-  useEffect(() => {
-    async function loadData() {
-      await Promise.all([fetchProject(), fetchCompanies()]);
-    }
-    loadData();
-  }, [projectId]);
-
-  const fetchProject = async () => {
+  const fetchProject = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch(`/api/projects/${projectId}`);
@@ -109,9 +102,9 @@ export default function EditProjectPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [projectId]);
 
-  const fetchCompanies = async () => {
+  const fetchCompanies = useCallback(async () => {
     try {
       setCompaniesLoading(true);
 
@@ -182,7 +175,6 @@ export default function EditProjectPage() {
         '📦 [Edit Project] Companies:',
         uniqueCompanies.map((c) => ({ id: c.id, name: c.name }))
       );
-      console.log('📦 [Edit Project] Current formData.companyId:', formData.companyId);
     } catch (error) {
       console.error('Error fetching companies:', error);
       toast.error(error instanceof Error ? error.message : 'Firmalar yüklenemedi');
@@ -190,7 +182,14 @@ export default function EditProjectPage() {
     } finally {
       setCompaniesLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    async function loadData() {
+      await Promise.all([fetchProject(), fetchCompanies()]);
+    }
+    loadData();
+  }, [projectId, fetchProject, fetchCompanies]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

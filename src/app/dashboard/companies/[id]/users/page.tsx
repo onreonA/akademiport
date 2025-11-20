@@ -126,7 +126,7 @@ export default function CompanyUsersPage() {
   if (!id) {
     return (
       <div className="container mx-auto py-8">
-        <p className="text-center text-muted-foreground">Geçersiz firma ID'si</p>
+        <p className="text-center text-muted-foreground">Geçersiz firma ID&apos;si</p>
       </div>
     );
   }

@@ -116,7 +116,7 @@ export default function ComponentsDemo() {
                 <CardDescription>İkinci kart örneği</CardDescription>
               </CardHeader>
               <CardContent>
-                <p>Dark mode'da da çalışır.</p>
+                <p>Dark mode&apos;da da çalışır.</p>
               </CardContent>
             </Card>
             <Card>

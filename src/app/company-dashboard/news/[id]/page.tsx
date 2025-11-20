@@ -1,6 +1,6 @@
 'use client';
 
-import { use, useEffect, useState } from 'react';
+import { use, useEffect, useState, useCallback } from 'react';
 import {
   useNewsDetail,
   useLikeNews,
@@ -26,7 +26,8 @@ export default function CompanyNewsDetailPage({ params }: { params: Promise<{ id
   const recordRead = useRecordRead();
 
   const [isLiked, setIsLiked] = useState(false);
-  const [startTime, setStartTime] = useState<number>(Date.now());
+  // Use function initializer to avoid calling Date.now() during render
+  const [startTime] = useState<number>(() => Date.now());
   const [scrollPercentage, setScrollPercentage] = useState(0);
 
   // Track scroll percentage
@@ -57,7 +58,7 @@ export default function CompanyNewsDetailPage({ params }: { params: Promise<{ id
         });
       }
     };
-  }, [news, id, startTime, scrollPercentage]);
+  }, [news, id, startTime, scrollPercentage, recordRead]);
 
   const handleLike = async () => {
     if (isLiked) {

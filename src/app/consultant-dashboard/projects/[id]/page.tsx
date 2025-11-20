@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import type { LucideIcon } from 'lucide-react';
 import {
@@ -86,17 +86,13 @@ export default function ConsultantProjectDetailPage() {
   const [decisionLoading, setDecisionLoading] = useState(false);
   const [decisionNote, setDecisionNote] = useState('');
 
-  const subProjects: SubProjectWithTasksDTO[] = hierarchy?.subProjects || [];
+  const subProjects: SubProjectWithTasksDTO[] = useMemo(
+    () => hierarchy?.subProjects || [],
+    [hierarchy]
+  );
   const allTasks = useMemo(() => subProjects.flatMap((sp) => sp.tasks || []), [subProjects]);
 
-  useEffect(() => {
-    if (projectId) {
-      fetchProject();
-      fetchHierarchy();
-    }
-  }, [projectId]);
-
-  const fetchProject = async () => {
+  const fetchProject = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch(`/api/projects/${projectId}`);
@@ -126,9 +122,9 @@ export default function ConsultantProjectDetailPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [projectId]);
 
-  const fetchHierarchy = async () => {
+  const fetchHierarchy = useCallback(async () => {
     try {
       setHierarchyLoading(true);
       const response = await fetch(`/api/projects/${projectId}/hierarchy`);
@@ -141,35 +137,54 @@ export default function ConsultantProjectDetailPage() {
     } finally {
       setHierarchyLoading(false);
     }
-  };
+  }, [projectId]);
 
-  const loadCompanyUsers = async (force = false) => {
-    if (!project?.companyId) {
-      toast.error('Firma bilgisi bulunamadı.');
-      return;
+  useEffect(() => {
+    if (projectId) {
+      fetchProject();
+      fetchHierarchy();
     }
+  }, [projectId, fetchProject, fetchHierarchy]);
 
-    if (!force && companyUsers.length > 0) {
-      return;
-    }
-
-    try {
-      setCompanyUsersLoading(true);
-      const response = await fetch(`/api/companies/${project.companyId}/users`);
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || 'Firma kullanıcıları yüklenemedi');
+  const loadCompanyUsers = useCallback(
+    async (force = false) => {
+      if (!project?.companyId) {
+        toast.error('Firma bilgisi bulunamadı.');
+        return;
       }
 
-      const data = await response.json();
-      setCompanyUsers(data.users || data.data || []);
-    } catch (error) {
-      console.error('Error fetching company users:', error);
-      toast.error(error instanceof Error ? error.message : 'Firma kullanıcıları yüklenemedi');
-    } finally {
-      setCompanyUsersLoading(false);
+      if (!force && companyUsers.length > 0) {
+        return;
+      }
+
+      try {
+        setCompanyUsersLoading(true);
+        const response = await fetch(`/api/companies/${project.companyId}/users`);
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.error || 'Firma kullanıcıları yüklenemedi');
+        }
+
+        const data = await response.json();
+        setCompanyUsers(data.users || data.data || []);
+      } catch (error) {
+        console.error('Error fetching company users:', error);
+        toast.error(error instanceof Error ? error.message : 'Firma kullanıcıları yüklenemedi');
+      } finally {
+        setCompanyUsersLoading(false);
+      }
+    },
+    [project?.companyId, companyUsers.length]
+  );
+
+  useEffect(() => {
+    if (!project?.companyId) {
+      setCompanyUsers([]);
+      return;
     }
-  };
+
+    loadCompanyUsers(true);
+  }, [project?.companyId, loadCompanyUsers]);
 
   const handleTaskAssign = async (taskId: string) => {
     const task = allTasks.find((t) => t.id === taskId) || null;
@@ -324,15 +339,6 @@ export default function ConsultantProjectDetailPage() {
       setDecisionNote('');
     }
   };
-
-  useEffect(() => {
-    if (!project?.companyId) {
-      setCompanyUsers([]);
-      return;
-    }
-
-    loadCompanyUsers(true);
-  }, [project?.companyId]);
 
   const handleTaskView = (task: TaskDTO) => {
     router.push(`/consultant-dashboard/tasks/${task.id}/edit`);

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { Button } from '@/1-presentation/components/ui/atoms/button';
 import { Input } from '@/1-presentation/components/ui/atoms/input';
@@ -48,11 +48,7 @@ export default function EditSubProjectPage() {
     orderIndex: 0,
   });
 
-  useEffect(() => {
-    fetchSubProject();
-  }, [subProjectId]);
-
-  const fetchSubProject = async () => {
+  const fetchSubProject = useCallback(async () => {
     try {
       const response = await fetch(`/api/sub-projects/${subProjectId}`);
       if (!response.ok) throw new Error('Failed to fetch sub-project');
@@ -71,7 +67,11 @@ export default function EditSubProjectPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [subProjectId]);
+
+  useEffect(() => {
+    fetchSubProject();
+  }, [fetchSubProject]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

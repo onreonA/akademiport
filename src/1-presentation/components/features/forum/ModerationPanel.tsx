@@ -112,8 +112,8 @@ export function ModerationPanel() {
       <Tabs value={selectedType} onValueChange={(v) => setSelectedType(v as any)}>
         <TabsList>
           <TabsTrigger value="all">Tümü</TabsTrigger>
-          <TabsTrigger value="topics">Topic'ler ({topics.length})</TabsTrigger>
-          <TabsTrigger value="replies">Reply'ler ({replies.length})</TabsTrigger>
+          <TabsTrigger value="topics">Topic&apos;ler ({topics.length})</TabsTrigger>
+          <TabsTrigger value="replies">Reply&apos;ler ({replies.length})</TabsTrigger>
         </TabsList>
 
         {/* Topics Tab */}

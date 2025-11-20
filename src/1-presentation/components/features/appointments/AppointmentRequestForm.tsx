@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Calendar, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/presentation/components/ui/atoms/card';
 import { Button } from '@/presentation/components/ui/atoms/button';
@@ -47,14 +47,7 @@ export function AppointmentRequestForm({ onSuccess, onCancel }: AppointmentReque
     null
   );
 
-  // Fetch consultants for company's program
-  useEffect(() => {
-    if (user?.companyId) {
-      fetchConsultants();
-    }
-  }, [user?.companyId]);
-
-  const fetchConsultants = async () => {
+  const fetchConsultants = useCallback(async () => {
     try {
       setIsLoadingConsultants(true);
 
@@ -143,18 +136,16 @@ export function AppointmentRequestForm({ onSuccess, onCancel }: AppointmentReque
     } finally {
       setIsLoadingConsultants(false);
     }
-  };
+  }, [user?.companyId]);
 
-  // Check availability when time changes
+  // Fetch consultants for company's program
   useEffect(() => {
-    if (selectedConsultantId && startTime && endTime) {
-      checkAvailability();
-    } else {
-      setAvailabilityStatus(null);
+    if (user?.companyId) {
+      fetchConsultants();
     }
-  }, [selectedConsultantId, startTime, endTime]);
+  }, [user?.companyId, fetchConsultants]);
 
-  const checkAvailability = async () => {
+  const checkAvailability = useCallback(async () => {
     if (!selectedConsultantId || !startTime || !endTime) return;
 
     try {
@@ -194,7 +185,16 @@ export function AppointmentRequestForm({ onSuccess, onCancel }: AppointmentReque
     } finally {
       setIsCheckingAvailability(false);
     }
-  };
+  }, [selectedConsultantId, startTime, endTime, companyProgramId]);
+
+  // Check availability when time changes
+  useEffect(() => {
+    if (selectedConsultantId && startTime && endTime) {
+      checkAvailability();
+    } else {
+      setAvailabilityStatus(null);
+    }
+  }, [selectedConsultantId, startTime, endTime, checkAvailability]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

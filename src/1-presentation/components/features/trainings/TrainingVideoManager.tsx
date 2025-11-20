@@ -249,14 +249,14 @@ export function TrainingVideoManager({
             <DialogHeader>
               <DialogTitle>{editingVideo ? 'Videoyu Düzenle' : 'Yeni Video Ekle'}</DialogTitle>
               <DialogDescription>
-                YouTube video URL'si ekleyin. Video unlisted olmalıdır.
+                YouTube video URL&apos;si ekleyin. Video unlisted olmalıdır.
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="title">
                   Başlık *{' '}
-                  <span className="text-xs text-muted-foreground">(YouTube'dan otomatik)</span>
+                  <span className="text-xs text-muted-foreground">(YouTube&apos;dan otomatik)</span>
                 </Label>
                 <Input
                   id="title"
@@ -269,7 +269,7 @@ export function TrainingVideoManager({
               <div className="space-y-2">
                 <Label htmlFor="description">
                   Açıklama{' '}
-                  <span className="text-xs text-muted-foreground">(YouTube'dan otomatik)</span>
+                  <span className="text-xs text-muted-foreground">(YouTube&apos;dan otomatik)</span>
                 </Label>
                 <Textarea
                   id="description"
@@ -299,8 +299,8 @@ export function TrainingVideoManager({
                   )}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  YouTube video URL'si (watch, embed veya youtu.be formatı). URL girildiğinde başlık
-                  ve açıklama otomatik doldurulur.
+                  YouTube video URL&apos;si (watch, embed veya youtu.be formatı). URL girildiğinde
+                  başlık ve açıklama otomatik doldurulur.
                 </p>
               </div>
               <div className="space-y-2">

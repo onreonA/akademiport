@@ -75,7 +75,7 @@ export default function RegisterPage() {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl">Kayıt Ol</CardTitle>
-          <CardDescription>Akademi Port'a hoş geldiniz</CardDescription>
+          <CardDescription>Akademi Port&apos;a hoş geldiniz</CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ListTodo, ArrowLeft } from 'lucide-react';
 import { GradientHeader } from '@/presentation/components/ui/molecules/gradient-header';
@@ -54,13 +54,7 @@ export default function NewTaskPage() {
     due_date: '',
   });
 
-  useEffect(() => {
-    fetchSubProjects();
-    fetchCompanyUsers();
-    fetchProjectData();
-  }, [projectId]);
-
-  const fetchSubProjects = async () => {
+  const fetchSubProjects = useCallback(async () => {
     try {
       const response = await fetch(`/api/sub-projects?projectId=${projectId}`);
       if (!response.ok) throw new Error('Failed to fetch sub-projects');
@@ -70,9 +64,9 @@ export default function NewTaskPage() {
     } catch (err) {
       console.error('Error fetching sub-projects:', err);
     }
-  };
+  }, [projectId]);
 
-  const fetchProjectData = async () => {
+  const fetchProjectData = useCallback(async () => {
     try {
       const projectResponse = await fetch(`/api/projects/${projectId}`);
       if (!projectResponse.ok) throw new Error('Failed to fetch project');
@@ -88,9 +82,9 @@ export default function NewTaskPage() {
     } catch (err) {
       console.error('Error fetching project data:', err);
     }
-  };
+  }, [projectId]);
 
-  const fetchCompanyUsers = async () => {
+  const fetchCompanyUsers = useCallback(async () => {
     try {
       // First get project to get company_id
       const projectResponse = await fetch(`/api/projects/${projectId}`);
@@ -113,7 +107,13 @@ export default function NewTaskPage() {
     } catch (err) {
       console.error('Error fetching company users:', err);
     }
-  };
+  }, [projectId]);
+
+  useEffect(() => {
+    fetchSubProjects();
+    fetchCompanyUsers();
+    fetchProjectData();
+  }, [projectId, fetchSubProjects, fetchCompanyUsers, fetchProjectData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

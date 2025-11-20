@@ -122,7 +122,7 @@ export default function AdminSettingsPage() {
             </div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Yetkisiz Erişim</h3>
             <p className="text-gray-600 dark:text-gray-400">Bu sayfaya erişim yetkiniz yok</p>
-            <Button onClick={() => router.push('/dashboard')}>Dashboard'a Dön</Button>
+            <Button onClick={() => router.push('/dashboard')}>Dashboard&apos;a Dön</Button>
           </div>
         </div>
       </div>

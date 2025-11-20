@@ -13,15 +13,11 @@ interface ChatbotProps {
 
 export function Chatbot({ companyId, programId, context }: ChatbotProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [currentConversationId, setCurrentConversationId] = useState<string | undefined>();
   const { data: conversations } = useChatbotConversations(10, 0);
 
-  // Son konuşmayı varsayılan olarak aç
-  useEffect(() => {
-    if (!currentConversationId && conversations?.data && conversations.data.length > 0) {
-      setCurrentConversationId(conversations.data[0].id);
-    }
-  }, [conversations, currentConversationId]);
+  // Initialize currentConversationId from conversations data
+  const currentConversationId =
+    conversations?.data && conversations.data.length > 0 ? conversations.data[0].id : undefined;
 
   const handleNewConversation = () => {
     setCurrentConversationId(undefined);

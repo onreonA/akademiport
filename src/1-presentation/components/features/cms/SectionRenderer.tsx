@@ -204,7 +204,9 @@ function TestimonialsSection({ content }: { content: any }) {
       {content.testimonials.map((testimonial: any, index: number) => (
         <div key={index} className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg">
           {testimonial.quote && (
-            <p className="text-gray-700 dark:text-gray-300 mb-4 italic">"{testimonial.quote}"</p>
+            <p className="text-gray-700 dark:text-gray-300 mb-4 italic">
+              &quot;{testimonial.quote}&quot;
+            </p>
           )}
           {testimonial.author && <p className="font-semibold">{testimonial.author}</p>}
           {testimonial.role && <p className="text-sm text-gray-600">{testimonial.role}</p>}

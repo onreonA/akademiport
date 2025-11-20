@@ -22,11 +22,7 @@ export default function CompanyLeaderboardPage() {
   const [companyId, setCompanyId] = useState<string>('');
   const [programId, setProgramId] = useState<string>('');
 
-  useEffect(() => {
-    fetchCurrentUser();
-  }, []);
-
-  const fetchCurrentUser = async () => {
+  const fetchCurrentUser = useCallback(async () => {
     try {
       const response = await fetch('/api/auth/me');
       const data = await response.json();
@@ -43,7 +39,11 @@ export default function CompanyLeaderboardPage() {
     } catch (error) {
       console.error('Failed to fetch current user:', error);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchCurrentUser();
+  }, [fetchCurrentUser]);
 
   const { data: rankingData, isLoading: rankingLoading } = useCompanyRanking(companyId, programId);
   const { data: badgesData, isLoading: badgesLoading } = useCompanyBadges(companyId);

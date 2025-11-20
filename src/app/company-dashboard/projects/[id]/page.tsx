@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import type { LucideIcon } from 'lucide-react';
@@ -142,12 +142,7 @@ export default function CompanyProjectDetailPage() {
   const [questionLoading, setQuestionLoading] = useState(false);
   const [selectedTask, setSelectedTask] = useState<TaskDTO | null>(null);
 
-  useEffect(() => {
-    fetchProject();
-    fetchHierarchy();
-  }, [projectId]);
-
-  const fetchProject = async () => {
+  const fetchProject = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch(`/api/projects/${projectId}`);
@@ -177,9 +172,9 @@ export default function CompanyProjectDetailPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [projectId]);
 
-  const fetchHierarchy = async () => {
+  const fetchHierarchy = useCallback(async () => {
     try {
       setHierarchyLoading(true);
       const response = await fetch(`/api/projects/${projectId}/hierarchy`);
@@ -192,9 +187,17 @@ export default function CompanyProjectDetailPage() {
     } finally {
       setHierarchyLoading(false);
     }
-  };
+  }, [projectId]);
 
-  const subProjects: SubProjectWithTasksDTO[] = hierarchy?.subProjects || [];
+  useEffect(() => {
+    fetchProject();
+    fetchHierarchy();
+  }, [fetchProject, fetchHierarchy]);
+
+  const subProjects: SubProjectWithTasksDTO[] = useMemo(
+    () => hierarchy?.subProjects || [],
+    [hierarchy]
+  );
   const allTasks = useMemo(() => subProjects.flatMap((sp) => sp.tasks || []), [subProjects]);
   const taskStats = useMemo(() => {
     const totals = {

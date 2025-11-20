@@ -33,15 +33,17 @@ export default function AdminNewsDetailPage({ params }: { params: Promise<{ id: 
     }
   }, [id, router]);
 
+  // Hooks must be called unconditionally - use empty string as fallback for "new"
+  const newsId = id === 'new' ? '' : id;
+  const { data: news, isLoading } = useNewsDetail(newsId);
+  const updateNews = useUpdateNews();
+  const publishNews = usePublishNews();
+  const deleteNews = useDeleteNews();
+
   // Don't render if redirecting
   if (id === 'new') {
     return null;
   }
-
-  const { data: news, isLoading } = useNewsDetail(id);
-  const updateNews = useUpdateNews();
-  const publishNews = usePublishNews();
-  const deleteNews = useDeleteNews();
 
   const handleUpdate = async (dto: UpdateNewsDto) => {
     await updateNews.mutateAsync({ id, dto });

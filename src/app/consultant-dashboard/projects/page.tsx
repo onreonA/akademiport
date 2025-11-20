@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Plus, FolderKanban, Search, Filter } from 'lucide-react';
 import { GradientHeader } from '@/presentation/components/ui/molecules/gradient-header';
@@ -34,11 +34,7 @@ export default function ConsultantProjectsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
-  useEffect(() => {
-    fetchProjects();
-  }, [statusFilter]);
-
-  const fetchProjects = async () => {
+  const fetchProjects = useCallback(async () => {
     try {
       setLoading(true);
       const params = new URLSearchParams();
@@ -55,7 +51,7 @@ export default function ConsultantProjectsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [statusFilter]);
 
   const filteredProjects = projects.filter((project) =>
     project.name.toLowerCase().includes(searchTerm.toLowerCase())

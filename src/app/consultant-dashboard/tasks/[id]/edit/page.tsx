@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { Button } from '@/1-presentation/components/ui/atoms/button';
 import { Input } from '@/1-presentation/components/ui/atoms/input';
@@ -79,11 +79,7 @@ export default function EditTaskPage() {
     orderIndex: 0,
   });
 
-  useEffect(() => {
-    fetchTask();
-  }, [taskId]);
-
-  const fetchTask = async () => {
+  const fetchTask = useCallback(async () => {
     try {
       const response = await fetch(`/api/tasks/${taskId}`);
       if (!response.ok) throw new Error('Failed to fetch task');
@@ -110,7 +106,7 @@ export default function EditTaskPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [taskId]);
 
   const fetchCompanyUsers = async (subProjectId: string) => {
     try {

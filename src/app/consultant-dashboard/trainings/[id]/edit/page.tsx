@@ -7,6 +7,7 @@
 'use client';
 
 import * as React from 'react';
+import { useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { Button } from '@/presentation/components/ui/atoms/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/presentation/components/ui/atoms/card';
@@ -36,22 +37,7 @@ export default function EditTrainingPage() {
   const [loadingPrograms, setLoadingPrograms] = React.useState(true);
   const [activeTab, setActiveTab] = React.useState('general');
 
-  React.useEffect(() => {
-    fetchTraining();
-    fetchPrograms();
-  }, [id]);
-
-  React.useEffect(() => {
-    if (id) {
-      if (activeTab === 'videos') {
-        fetchVideos();
-      } else if (activeTab === 'documents') {
-        fetchDocuments();
-      }
-    }
-  }, [id, activeTab]);
-
-  const fetchTraining = async () => {
+  const fetchTraining = React.useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch(`/api/trainings/${id}`);
@@ -70,9 +56,9 @@ export default function EditTrainingPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
 
-  const fetchPrograms = async () => {
+  const fetchPrograms = React.useCallback(async () => {
     try {
       setLoadingPrograms(true);
       // Consultant can only see programs they're assigned to
@@ -87,7 +73,7 @@ export default function EditTrainingPage() {
     } finally {
       setLoadingPrograms(false);
     }
-  };
+  }, []);
 
   const fetchVideos = async () => {
     try {

@@ -108,8 +108,8 @@ export function CMSPageForm({
                     <Input placeholder="ana-sayfa" {...field} />
                   </FormControl>
                   <FormDescription>
-                    URL'de kullanılacak slug (örn: /ana-sayfa). Sadece küçük harf, rakam ve tire
-                    kullanılabilir.
+                    URL&apos;de kullanılacak slug (örn: /ana-sayfa). Sadece küçük harf, rakam ve
+                    tire kullanılabilir.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -244,7 +244,7 @@ export function CMSPageForm({
                     <Input placeholder="https://..." {...field} />
                   </FormControl>
                   <FormDescription>
-                    Open Graph görsel URL'i (sosyal medya paylaşımları için)
+                    Open Graph görsel URL&apos;i (sosyal medya paylaşımları için)
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

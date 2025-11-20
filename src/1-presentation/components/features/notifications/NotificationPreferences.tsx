@@ -6,7 +6,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useLayoutEffect } from 'react';
 import {
   useNotificationPreferences,
   useUpdateNotificationPreferences,
@@ -41,8 +41,8 @@ export function NotificationPreferences() {
   const [quietHoursStart, setQuietHoursStart] = useState(preferences?.quietHoursStart || '22:00');
   const [quietHoursEnd, setQuietHoursEnd] = useState(preferences?.quietHoursEnd || '08:00');
 
-  // Update local state when preferences load
-  useEffect(() => {
+  // Update local state when preferences load using useLayoutEffect to avoid cascading renders
+  useLayoutEffect(() => {
     if (preferences) {
       setEmailEnabled(preferences.emailEnabled);
       setPushEnabled(preferences.pushEnabled);
