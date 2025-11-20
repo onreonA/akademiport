@@ -122,6 +122,7 @@ describe('SubProject Entity', () => {
         id: 'subproject-1',
         projectId: 'project-1',
         name: 'Test SubProject',
+        description: null,
         status: 'in_progress',
         orderIndex: 1,
         progress: 45,

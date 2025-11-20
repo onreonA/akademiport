@@ -6,6 +6,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { CloseTopicUseCase } from './CloseTopicUseCase';
 import { IForumRepository } from '@/3-domain/interfaces/repositories/IForumRepository';
 import { Result } from '@/6-core/result/Result';
+import { TopicStatus, TopicPriority } from '@/3-domain/enums/ForumEnums';
 
 describe('CloseTopicUseCase', () => {
   let mockRepository: IForumRepository;
@@ -67,8 +68,8 @@ describe('CloseTopicUseCase', () => {
         title: 'Test Topic',
         slug: 'test-topic',
         content: 'Test content',
-        status: 'closed' as const,
-        priority: 'normal' as const,
+        status: TopicStatus.CLOSED,
+        priority: TopicPriority.NORMAL,
         isPinned: false,
         isLocked: false,
         isApproved: true,

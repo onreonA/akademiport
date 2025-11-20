@@ -73,9 +73,13 @@ describe('CreateProjectUseCase', () => {
     const createdTemplate: Project = {
       id: 'template-1',
       companyId: null,
+      programId: null,
       ...templateData,
       progress: 0,
       templateId: null,
+      startDate: null,
+      endDate: null,
+      deletedAt: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };

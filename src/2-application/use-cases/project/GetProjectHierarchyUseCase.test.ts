@@ -61,6 +61,10 @@ describe('GetProjectHierarchyUseCase', () => {
       reject: vi.fn(),
       assignTo: vi.fn(),
       exists: vi.fn(),
+      restore: vi.fn(),
+      findDeleted: vi.fn(),
+      updateStatus: vi.fn(),
+      updateOrder: vi.fn(),
     };
 
     useCase = new GetProjectHierarchyUseCase(

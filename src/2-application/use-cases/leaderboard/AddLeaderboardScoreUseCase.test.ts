@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { AddLeaderboardScoreUseCase } from './AddLeaderboardScoreUseCase';
 import { ILeaderboardRepository } from '@/3-domain/interfaces/repositories/ILeaderboardRepository';
-import { ICompanyRepository } from '@/3-domain/interfaces/repositories/ICompanyRepository';
+import { ICompanyRepository } from '@/3-domain/interfaces/ICompanyRepository';
 import { Result } from '@/6-core/result/Result';
 import { ActivityType } from '@/3-domain/enums/LeaderboardEnums';
 import { AddScoreDto } from '@/2-application/dtos/leaderboard';

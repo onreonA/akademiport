@@ -14,6 +14,7 @@ describe('GetUnreadNotificationCountUseCase', () => {
   beforeEach(() => {
     mockRepository = {
       create: vi.fn(),
+      createMany: vi.fn(),
       findById: vi.fn(),
       findMany: vi.fn(),
       update: vi.fn(),
@@ -21,6 +22,7 @@ describe('GetUnreadNotificationCountUseCase', () => {
       markAsRead: vi.fn(),
       markAllAsRead: vi.fn(),
       getUnreadCount: vi.fn(),
+      deleteExpired: vi.fn(),
     };
 
     useCase = new GetUnreadNotificationCountUseCase(mockRepository);

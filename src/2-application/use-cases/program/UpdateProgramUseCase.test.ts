@@ -22,9 +22,12 @@ describe('UpdateProgramUseCase', () => {
       update: vi.fn(),
       delete: vi.fn(),
       findByManagerId: vi.fn(),
-      findByConsultantId: vi.fn(),
       findByStatus: vi.fn(),
       findByCity: vi.fn(),
+      search: vi.fn(),
+      addConsultant: vi.fn(),
+      removeConsultant: vi.fn(),
+      getConsultants: vi.fn(),
     };
 
     useCase = new UpdateProgramUseCase(mockRepository);

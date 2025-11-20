@@ -6,6 +6,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { ApproveTopicUseCase } from './ApproveTopicUseCase';
 import { IForumRepository } from '@/3-domain/interfaces/repositories/IForumRepository';
 import { Result } from '@/6-core/result/Result';
+import { TopicStatus, TopicPriority } from '@/3-domain/enums/ForumEnums';
 
 describe('ApproveTopicUseCase', () => {
   let mockRepository: IForumRepository;
@@ -66,11 +67,14 @@ describe('ApproveTopicUseCase', () => {
         title: 'Test Topic',
         slug: 'test-topic',
         content: 'Test content',
-        status: 'approved' as const,
-        priority: 'normal' as const,
+        status: TopicStatus.OPEN,
+        priority: TopicPriority.NORMAL,
         isPinned: false,
         isLocked: false,
         isApproved: true,
+        solutionReplyId: null,
+        solvedAt: null,
+        solvedBy: null,
         viewCount: 0,
         replyCount: 0,
         likeCount: 0,

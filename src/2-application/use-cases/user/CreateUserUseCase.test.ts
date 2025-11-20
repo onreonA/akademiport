@@ -21,6 +21,21 @@ describe('CreateUserUseCase', () => {
       update: vi.fn(),
       delete: vi.fn(),
       findAll: vi.fn(),
+      findByRole: vi.fn(),
+      findByCompanyId: vi.fn(),
+      findByProgramId: vi.fn(),
+      search: vi.fn(),
+      findWithFilters: vi.fn(),
+      assignProgram: vi.fn(),
+      removeProgram: vi.fn(),
+      getPrograms: vi.fn(),
+      isProgramAssigned: vi.fn(),
+      changePassword: vi.fn(),
+      activate: vi.fn(),
+      deactivate: vi.fn(),
+      countByRole: vi.fn(),
+      countByCompany: vi.fn(),
+      countByProgram: vi.fn(),
     };
 
     useCase = new CreateUserUseCase(mockRepository);

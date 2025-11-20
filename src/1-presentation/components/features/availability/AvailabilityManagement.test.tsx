@@ -6,6 +6,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@/shared/test/utils';
 import userEvent from '@testing-library/user-event';
 import { AvailabilityManagement } from './AvailabilityManagement';
+import type { Availability } from '@/domain/entities/Availability';
 
 // Mock hooks
 vi.mock('@/shared/hooks/useAuth', () => ({

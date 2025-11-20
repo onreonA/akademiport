@@ -92,7 +92,7 @@ describe('CreateTaskUseCase', () => {
     const result = await useCase.execute(dto);
 
     expect(result.isFailure).toBe(true);
-    expect(result.error?.statusCode).toBe(400);
+    expect((result.error as AppError)?.statusCode).toBe(400);
     expect(mockSubProjectRepository.exists).not.toHaveBeenCalled();
     expect(mockTaskRepository.create).not.toHaveBeenCalled();
   });

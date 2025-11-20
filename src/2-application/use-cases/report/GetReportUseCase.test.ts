@@ -77,7 +77,7 @@ describe('GetReportUseCase', () => {
 
       expect(result.isFailure).toBe(true);
       expect(result.error?.message).toContain('Rapor bulunamadı');
-      expect(result.error?.statusCode).toBe(404);
+      expect((result.error as AppError)?.statusCode).toBe(404);
     });
 
     it('should fail when repository fails', async () => {

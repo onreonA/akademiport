@@ -3,7 +3,9 @@
  * Rapor şablonu entity'si - PDF ve AI analizi için template yapıları
  */
 
-import { ReportType } from './ProgressReport';
+import type { ReportType } from './ProgressReport';
+
+export type { ReportType };
 
 export interface ReportTemplate {
   id: string;

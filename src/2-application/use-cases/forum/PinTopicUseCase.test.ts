@@ -6,6 +6,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { PinTopicUseCase } from './PinTopicUseCase';
 import { IForumRepository } from '@/3-domain/interfaces/repositories/IForumRepository';
 import { Result } from '@/6-core/result/Result';
+import { TopicStatus, TopicPriority } from '@/3-domain/enums/ForumEnums';
 
 describe('PinTopicUseCase', () => {
   let mockRepository: IForumRepository;
@@ -67,8 +68,8 @@ describe('PinTopicUseCase', () => {
         title: 'Test Topic',
         slug: 'test-topic',
         content: 'Test content',
-        status: 'open' as const,
-        priority: 'normal' as const,
+        status: TopicStatus.OPEN,
+        priority: TopicPriority.NORMAL,
         isPinned: true,
         isLocked: false,
         isApproved: true,

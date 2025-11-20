@@ -8,6 +8,7 @@ describe('Project Entity', () => {
         id: 'project-1',
         companyId: 'company-1',
         consultantId: 'consultant-1',
+        programId: null,
         name: 'Test Project',
         description: 'Test description',
         status: 'in_progress',

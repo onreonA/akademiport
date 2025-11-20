@@ -29,6 +29,9 @@ export const UpdateNotificationPreferencesDtoSchema = z.object({
   quietHoursEnabled: z.boolean().optional(),
 });
 
-export type UpdateNotificationPreferencesDto = z.infer<
-  typeof UpdateNotificationPreferencesDtoSchema
->;
+export type UpdateNotificationPreferencesDto = Omit<
+  z.infer<typeof UpdateNotificationPreferencesDtoSchema>,
+  'typePreferences'
+> & {
+  typePreferences?: Partial<Record<NotificationType, z.infer<typeof TypePreferenceSchema>>>;
+};

@@ -77,7 +77,6 @@ describe('NotificationPreferences Entity', () => {
           email: false,
           push: true,
           inApp: true,
-          sms: false,
         },
       };
 

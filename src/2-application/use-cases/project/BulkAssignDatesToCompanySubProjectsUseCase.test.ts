@@ -58,7 +58,7 @@ describe('BulkAssignDatesToCompanySubProjectsUseCase', () => {
     const result = await useCase.execute(request);
 
     expect(result.isFailure).toBe(true);
-    expect(result.error?.code).toBe('SUBPROJECT_ID_MISSING');
+    expect((result.error as AppError)?.code).toBe('SUBPROJECT_ID_MISSING');
   });
 
   it('should return error when project not found', async () => {

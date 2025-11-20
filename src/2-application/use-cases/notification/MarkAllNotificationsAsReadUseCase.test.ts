@@ -14,6 +14,7 @@ describe('MarkAllNotificationsAsReadUseCase', () => {
   beforeEach(() => {
     mockRepository = {
       create: vi.fn(),
+      createMany: vi.fn(),
       findById: vi.fn(),
       findMany: vi.fn(),
       update: vi.fn(),
@@ -21,6 +22,7 @@ describe('MarkAllNotificationsAsReadUseCase', () => {
       markAsRead: vi.fn(),
       markAllAsRead: vi.fn(),
       getUnreadCount: vi.fn(),
+      deleteExpired: vi.fn(),
     };
 
     useCase = new MarkAllNotificationsAsReadUseCase(mockRepository);
