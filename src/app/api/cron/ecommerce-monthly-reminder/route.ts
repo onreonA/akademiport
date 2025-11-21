@@ -4,6 +4,7 @@ import { CompanyRepository } from '@/4-infrastructure/database/repositories/Comp
 import { UserRepository } from '@/4-infrastructure/database/repositories/UserRepository';
 import { SendMonthlyEcommerceReminderUseCase } from '@/2-application/use-cases/ecommerce/SendMonthlyEcommerceReminderUseCase';
 import { logger } from '@/5-shared/utils/logger';
+import { AppError } from '@/6-core/errors/AppError';
 
 /**
  * POST /api/cron/ecommerce-monthly-reminder
@@ -44,13 +45,15 @@ export async function POST(request: NextRequest) {
     const result = await sendReminderUseCase.execute();
 
     if (result.isFailure) {
-      logger.error('Failed to send monthly reminders:', result.error);
+      const error =
+        result.error instanceof AppError ? result.error : new AppError('Unknown error', 500);
+      logger.error('Failed to send monthly reminders:', error);
       return NextResponse.json(
         {
           success: false,
-          error: (result.error as any)?.message || 'Unknown error',
+          error: error.message,
         },
-        { status: 500 }
+        { status: error.statusCode }
       );
     }
 

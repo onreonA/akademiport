@@ -27,12 +27,7 @@ export default function CompaniesPage() {
   const [page, setPage] = useState(1);
   const limit = 12;
 
-  // Fetch companies
-  useEffect(() => {
-    fetchCompanies();
-  }, [search, city, sector, isActive, sortBy, page]);
-
-  const fetchCompanies = async () => {
+  const fetchCompanies = useCallback(async () => {
     try {
       setLoading(true);
       const params = new URLSearchParams({
@@ -79,7 +74,12 @@ export default function CompaniesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [search, city, sector, isActive, sortBy, page]);
+
+  // Fetch companies
+  useEffect(() => {
+    fetchCompanies();
+  }, [fetchCompanies]);
 
   const handleReset = () => {
     setSearch('');

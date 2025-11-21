@@ -7,7 +7,8 @@ import {
 } from '@/application/use-cases/event';
 import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
 import { logger } from '@/shared/utils/logger';
-import { UpdateEventDtoSchema } from '@/application/dto/event';
+import { UpdateEventDtoSchema, type UpdateEventDto } from '@/application/dto/event';
+import { AppError } from '@/6-core/errors/AppError';
 
 const eventRepository = new EventRepository();
 
@@ -28,10 +29,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const result = await getEventUseCase.execute(id);
 
     if (result.isFailure) {
-      return NextResponse.json(
-        { error: (result.error as any)?.message || 'Unknown error' },
-        { status: (result.error as any)?.statusCode || 500 }
-      );
+      const error =
+        result.error instanceof AppError ? result.error : new AppError('Unknown error', 500);
+      return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
 
     return NextResponse.json({
@@ -76,15 +76,15 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       );
     }
 
-    const updateData: any = {
+    const updateData: Partial<UpdateEventDto & { startTime?: Date; endTime?: Date }> = {
       ...validationResult.data,
     };
 
     // Convert date strings to Date objects
-    if (updateData.startTime) {
+    if (updateData.startTime && typeof updateData.startTime === 'string') {
       updateData.startTime = new Date(updateData.startTime);
     }
-    if (updateData.endTime) {
+    if (updateData.endTime && typeof updateData.endTime === 'string') {
       updateData.endTime = new Date(updateData.endTime);
     }
 
@@ -92,10 +92,9 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     const result = await updateEventUseCase.execute(id, updateData);
 
     if (result.isFailure) {
-      return NextResponse.json(
-        { error: (result.error as any)?.message || 'Unknown error' },
-        { status: (result.error as any)?.statusCode || 500 }
-      );
+      const error =
+        result.error instanceof AppError ? result.error : new AppError('Unknown error', 500);
+      return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
 
     return NextResponse.json({
@@ -139,10 +138,9 @@ export async function DELETE(
     const result = await deleteEventUseCase.execute(id, deleteZoomMeeting);
 
     if (result.isFailure) {
-      return NextResponse.json(
-        { error: (result.error as any)?.message || 'Unknown error' },
-        { status: (result.error as any)?.statusCode || 500 }
-      );
+      const error =
+        result.error instanceof AppError ? result.error : new AppError('Unknown error', 500);
+      return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
 
     return NextResponse.json({

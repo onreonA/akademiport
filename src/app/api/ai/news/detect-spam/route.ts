@@ -13,6 +13,7 @@ import { PromptManagerService } from '@/5-shared/services/ai/prompt-manager.serv
 import { TokenTrackerService } from '@/5-shared/services/ai/token-tracker.service';
 import { getAuthenticatedUser } from '@/4-infrastructure/api/helpers/auth';
 import { logger } from '@/5-shared/utils/logger';
+import { AppError } from '@/6-core/errors/AppError';
 
 export async function POST(request: NextRequest) {
   try {
@@ -59,13 +60,17 @@ export async function POST(request: NextRequest) {
     });
 
     if (result.isFailure) {
-      logger.error('News spam detection failed:', result.error);
+      const error =
+        result.error instanceof AppError
+          ? result.error
+          : new AppError('Failed to detect spam', 500);
+      logger.error('News spam detection failed:', error);
       return NextResponse.json(
         {
-          error: result.error?.message || 'Failed to detect spam',
-          code: (result.error as any)?.code || undefined,
+          error: error.message,
+          code: error.code,
         },
-        { status: (result.error as any)?.statusCode || 500 }
+        { status: error.statusCode }
       );
     }
 

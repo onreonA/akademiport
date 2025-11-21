@@ -5,6 +5,7 @@ import { CompanyRepository } from '@/infrastructure/database/repositories/Compan
 import { ReminderRepository } from '@/infrastructure/database/repositories/ReminderRepository';
 import { SendAppointmentRemindersUseCase } from '@/application/use-cases/appointment/SendAppointmentRemindersUseCase';
 import { logger } from '@/shared/utils/logger';
+import { AppError } from '@/6-core/errors/AppError';
 
 const appointmentRepository = new AppointmentRepository();
 const userRepository = new UserRepository();
@@ -52,13 +53,15 @@ export async function POST(request: NextRequest) {
     const result = await sendRemindersUseCase.execute(reminderType);
 
     if (result.isFailure) {
-      logger.error('Failed to send appointment reminders:', result.error);
+      const error =
+        result.error instanceof AppError ? result.error : new AppError('Unknown error', 500);
+      logger.error('Failed to send appointment reminders:', error);
       return NextResponse.json(
         {
           success: false,
-          error: (result.error as any)?.message || 'Unknown error',
+          error: error.message,
         },
-        { status: 500 }
+        { status: error.statusCode }
       );
     }
 

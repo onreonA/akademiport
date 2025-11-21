@@ -46,10 +46,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const result = await getStatisticsUseCase.execute(id);
 
     if (result.isFailure) {
-      return NextResponse.json(
-        { error: (result.error as any)?.message || 'Unknown error' },
-        { status: (result.error as any)?.statusCode || 500 }
-      );
+      const error =
+        result.error instanceof AppError ? result.error : new AppError('Unknown error', 500);
+      return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
 
     return NextResponse.json({

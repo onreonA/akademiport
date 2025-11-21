@@ -4,6 +4,7 @@ import { ListTrainingsUseCase } from '@/2-application/use-cases/training';
 import { getAuthenticatedUser } from '@/4-infrastructure/api/helpers/auth';
 import { logger } from '@/5-shared/utils/logger';
 import type { TrainingStatus } from '@/3-domain/entities/Training';
+import { AppError } from '@/6-core/errors/AppError';
 
 export const dynamic = 'force-dynamic';
 
@@ -59,10 +60,9 @@ export async function GET(request: NextRequest) {
     );
 
     if (result.isFailure) {
-      return NextResponse.json(
-        { error: (result.error as any)?.message || 'Unknown error' },
-        { status: (result.error as any)?.statusCode || 500 }
-      );
+      const error =
+        result.error instanceof AppError ? result.error : new AppError('Unknown error', 500);
+      return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
 
     return NextResponse.json({

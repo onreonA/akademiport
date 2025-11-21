@@ -15,6 +15,7 @@ import { PromptManagerService } from '@/5-shared/services/ai/prompt-manager.serv
 import { TokenTrackerService } from '@/5-shared/services/ai/token-tracker.service';
 import { logger } from '@/5-shared/utils/logger';
 import { AIUseCase } from '@/3-domain/enums/AIEnums';
+import { AppError } from '@/6-core/errors/AppError';
 
 /**
  * Streaming response için Server-Sent Events (SSE) kullanıyoruz
@@ -78,14 +79,16 @@ export async function POST(request: NextRequest) {
     });
 
     if (result.isFailure) {
-      logger.error('Chatbot message failed:', result.error);
+      const error =
+        result.error instanceof AppError ? result.error : new AppError('Mesaj gönderilemedi', 500);
+      logger.error('Chatbot message failed:', error);
       return new Response(
         JSON.stringify({
-          error: result.error?.message || 'Mesaj gönderilemedi',
-          code: (result.error as any)?.code || undefined,
+          error: error.message,
+          code: error.code,
         }),
         {
-          status: (result.error as any)?.statusCode || 500,
+          status: error.statusCode,
           headers: { 'Content-Type': 'application/json' },
         }
       );

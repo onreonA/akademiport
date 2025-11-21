@@ -5,7 +5,7 @@
 'use client';
 
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { toast } from 'sonner';
 import {
@@ -27,11 +27,7 @@ export default function EditCustomReportPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [reportData, setReportData] = useState<any>(null);
 
-  useEffect(() => {
-    loadReport();
-  }, [reportId]);
-
-  const loadReport = async () => {
+  const loadReport = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch(`/api/custom-reports/${reportId}`);
@@ -46,7 +42,11 @@ export default function EditCustomReportPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [reportId, router]);
+
+  useEffect(() => {
+    loadReport();
+  }, [loadReport]);
 
   const handleUpdate = async (formData: any) => {
     try {

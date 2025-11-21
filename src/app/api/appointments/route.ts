@@ -10,8 +10,10 @@ import {
   CreateAppointmentDtoSchema,
   AppointmentFilterDtoSchema,
   type AppointmentResponseDto,
+  type AppointmentFilterDto,
 } from '@/application/dto/appointment';
 import { UserRole } from '@/domain/enums/UserRole';
+import { AppError } from '@/6-core/errors/AppError';
 
 const appointmentRepository = new AppointmentRepository();
 
@@ -54,7 +56,7 @@ export async function GET(request: NextRequest) {
     // Admin and Program Manager can see all appointments
 
     // Build filters object - only include defined values
-    const filters: any = {
+    const filters: Partial<AppointmentFilterDto> = {
       page,
       limit,
     };
@@ -89,10 +91,9 @@ export async function GET(request: NextRequest) {
     const result = await listAppointmentsUseCase.execute(filtersForUseCase);
 
     if (result.isFailure) {
-      return NextResponse.json(
-        { error: (result.error as any)?.message || 'Unknown error' },
-        { status: (result.error as any)?.statusCode || 500 }
-      );
+      const error =
+        result.error instanceof AppError ? result.error : new AppError('Unknown error', 500);
+      return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
 
     const totalPages = Math.ceil(result.value.total / limit);
@@ -204,10 +205,9 @@ export async function POST(request: NextRequest) {
     });
 
     if (result.isFailure) {
-      return NextResponse.json(
-        { error: (result.error as any)?.message || 'Unknown error' },
-        { status: (result.error as any)?.statusCode || 500 }
-      );
+      const error =
+        result.error instanceof AppError ? result.error : new AppError('Unknown error', 500);
+      return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
 
     // Fetch the created appointment to get full details

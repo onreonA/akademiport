@@ -12,6 +12,7 @@ import { ProjectRepository } from '@/infrastructure/database/repositories/Projec
 import { SubProjectRepository } from '@/infrastructure/database/repositories/SubProjectRepository';
 import { TaskRepository } from '@/infrastructure/database/repositories/TaskRepository';
 import { logger } from '@/shared/utils/logger';
+import { AppError } from '@/6-core/errors/AppError';
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -43,11 +44,12 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     const result = await useCase.execute(projectId);
 
     if (!result.isSuccess) {
-      logger.info('❌ [Hierarchy API] Use case failed:', result.error?.message);
-      return NextResponse.json(
-        { error: (result.error as any)?.message || 'Failed to fetch project hierarchy' },
-        { status: (result.error as any)?.statusCode || 500 }
-      );
+      const error =
+        result.error instanceof AppError
+          ? result.error
+          : new AppError('Failed to fetch project hierarchy', 500);
+      logger.info('❌ [Hierarchy API] Use case failed:', error.message);
+      return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
 
     logger.info('✅ [Hierarchy API] Success:', {

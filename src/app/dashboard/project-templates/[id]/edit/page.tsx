@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import {
   Building2,
@@ -98,24 +98,7 @@ export default function EditProjectTemplatePage() {
     priority: 'medium' as ProjectPriority,
   });
 
-  useEffect(() => {
-    fetchTemplate();
-    fetchHierarchy();
-  }, [templateId]);
-
-  useEffect(() => {
-    if (activeTab === 'structure' && subProjectHierarchy.length === 0) {
-      fetchHierarchy();
-    }
-  }, [activeTab, subProjectHierarchy.length]);
-
-  useEffect(() => {
-    if (activeTab === 'assignments' && !assignmentMatrix && !matrixLoading) {
-      fetchAssignmentMatrix();
-    }
-  }, [activeTab, assignmentMatrix, matrixLoading]);
-
-  const fetchTemplate = async () => {
+  const fetchTemplate = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch(`/api/projects/${templateId}`);
@@ -134,9 +117,9 @@ export default function EditProjectTemplatePage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [templateId]);
 
-  const fetchHierarchy = async () => {
+  const fetchHierarchy = useCallback(async () => {
     try {
       setStructureLoading(true);
       const response = await fetch(`/api/projects/${templateId}/hierarchy`);
@@ -194,9 +177,9 @@ export default function EditProjectTemplatePage() {
     } finally {
       setStructureLoading(false);
     }
-  };
+  }, [templateId]);
 
-  const fetchAssignmentMatrix = async () => {
+  const fetchAssignmentMatrix = useCallback(async () => {
     try {
       setMatrixLoading(true);
       setMatrixError(null);
@@ -215,7 +198,24 @@ export default function EditProjectTemplatePage() {
     } finally {
       setMatrixLoading(false);
     }
-  };
+  }, [templateId]);
+
+  useEffect(() => {
+    fetchTemplate();
+    fetchHierarchy();
+  }, [fetchTemplate, fetchHierarchy]);
+
+  useEffect(() => {
+    if (activeTab === 'structure' && subProjectHierarchy.length === 0) {
+      fetchHierarchy();
+    }
+  }, [activeTab, subProjectHierarchy.length, fetchHierarchy]);
+
+  useEffect(() => {
+    if (activeTab === 'assignments' && !assignmentMatrix && !matrixLoading) {
+      fetchAssignmentMatrix();
+    }
+  }, [activeTab, assignmentMatrix, matrixLoading, fetchAssignmentMatrix]);
 
   const handleSubProjectModalSuccess = () => {
     fetchHierarchy();

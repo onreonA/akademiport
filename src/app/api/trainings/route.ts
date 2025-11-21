@@ -4,6 +4,7 @@ import { CreateTrainingUseCase, ListTrainingsUseCase } from '@/application/use-c
 import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
 import { logger } from '@/shared/utils/logger';
 import type { TrainingStatus, TrainingPriority } from '@/domain/entities/Training';
+import { AppError } from '@/6-core/errors/AppError';
 
 const trainingRepository = new TrainingRepository();
 
@@ -67,10 +68,9 @@ export async function GET(request: NextRequest) {
     );
 
     if (result.isFailure) {
-      return NextResponse.json(
-        { error: (result.error as any)?.message || 'Unknown error' },
-        { status: (result.error as any)?.statusCode || 500 }
-      );
+      const error =
+        result.error instanceof AppError ? result.error : new AppError('Unknown error', 500);
+      return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
 
     return NextResponse.json({
@@ -118,10 +118,9 @@ export async function POST(request: NextRequest) {
     );
 
     if (result.isFailure) {
-      return NextResponse.json(
-        { error: (result.error as any)?.message || 'Unknown error' },
-        { status: (result.error as any)?.statusCode || 500 }
-      );
+      const error =
+        result.error instanceof AppError ? result.error : new AppError('Unknown error', 500);
+      return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
 
     return NextResponse.json(result.value, { status: 201 });

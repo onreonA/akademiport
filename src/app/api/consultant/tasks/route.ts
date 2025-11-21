@@ -4,6 +4,7 @@ import { ProjectRepository } from '@/infrastructure/database/repositories/Projec
 import { SubProjectRepository } from '@/infrastructure/database/repositories/SubProjectRepository';
 import { ListConsultantTasksUseCase } from '@/application/use-cases/task';
 import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
+import { AppError } from '@/6-core/errors/AppError';
 
 const taskRepository = new TaskRepository();
 const projectRepository = new ProjectRepository();
@@ -44,10 +45,9 @@ export async function GET(request: NextRequest) {
     const result = await useCase.execute(consultantId, { status, page, limit });
 
     if (result.isFailure) {
-      return NextResponse.json(
-        { error: (result.error as any)?.message || 'Unknown error' },
-        { status: (result.error as any)?.statusCode || 500 }
-      );
+      const error =
+        result.error instanceof AppError ? result.error : new AppError('Unknown error', 500);
+      return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
 
     return NextResponse.json({

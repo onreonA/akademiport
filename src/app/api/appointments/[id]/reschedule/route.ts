@@ -5,6 +5,7 @@ import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
 import { logger } from '@/shared/utils/logger';
 import { RescheduleAppointmentDtoSchema } from '@/application/dto/appointment';
 import { UserRole } from '@/domain/enums/UserRole';
+import { AppError } from '@/6-core/errors/AppError';
 
 const appointmentRepository = new AppointmentRepository();
 
@@ -69,10 +70,9 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     );
 
     if (result.isFailure) {
-      return NextResponse.json(
-        { error: (result.error as any)?.message || 'Unknown error' },
-        { status: (result.error as any)?.statusCode || 500 }
-      );
+      const error =
+        result.error instanceof AppError ? result.error : new AppError('Unknown error', 500);
+      return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
 
     return NextResponse.json({

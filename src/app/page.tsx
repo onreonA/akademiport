@@ -5,8 +5,7 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
-import Image from 'next/image';
+import { useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@/1-presentation/components/ui/atoms/button';
 import { ModernNavigation } from '@/1-presentation/components/features/layout/ModernNavigation';

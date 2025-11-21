@@ -4,6 +4,7 @@ import { SubProjectRepository } from '@/infrastructure/database/repositories/Sub
 import { TaskRepository } from '@/infrastructure/database/repositories/TaskRepository';
 import { CreateProjectFromTemplateUseCase } from '@/application/use-cases/project';
 import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
+import { AppError } from '@/6-core/errors/AppError';
 
 /**
  * POST /api/projects/from-template
@@ -66,10 +67,9 @@ export async function POST(request: NextRequest) {
     });
 
     if (!result.isSuccess) {
-      return NextResponse.json(
-        { error: (result.error as any)?.message || 'Unknown error' },
-        { status: (result.error as any)?.statusCode || 500 || 400 }
-      );
+      const error =
+        result.error instanceof AppError ? result.error : new AppError('Unknown error', 500);
+      return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
 
     return NextResponse.json({

@@ -26,13 +26,7 @@ export default function EditUserPage({ params }: { params: Promise<{ id: string 
     params.then((p) => setId(p.id));
   }, [params]);
 
-  useEffect(() => {
-    if (id) {
-      fetchUser();
-    }
-  }, [id]);
-
-  const fetchUser = async () => {
+  const fetchUser = useCallback(async () => {
     try {
       const response = await fetch(`/api/users/${id}`);
       const result = await response.json();
@@ -50,7 +44,13 @@ export default function EditUserPage({ params }: { params: Promise<{ id: string 
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    if (id) {
+      fetchUser();
+    }
+  }, [id, fetchUser]);
 
   const handleSubmit = async (data: UserFormData) => {
     try {

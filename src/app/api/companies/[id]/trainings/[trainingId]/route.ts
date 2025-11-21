@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { CompanyTrainingRepository } from '@/infrastructure/database/repositories/CompanyTrainingRepository';
 import { RemoveTrainingFromCompanyUseCase } from '@/application/use-cases/company-training';
 import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
+import { AppError } from '@/6-core/errors/AppError';
 
 const companyTrainingRepository = new CompanyTrainingRepository();
 
@@ -30,10 +31,9 @@ export async function DELETE(
     const result = await removeTrainingUseCase.execute(id, trainingId);
 
     if (result.isFailure) {
-      return NextResponse.json(
-        { error: (result.error as any)?.message || 'Unknown error' },
-        { status: (result.error as any)?.statusCode || 500 }
-      );
+      const error =
+        result.error instanceof AppError ? result.error : new AppError('Unknown error', 500);
+      return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
 
     return NextResponse.json({ success: true });

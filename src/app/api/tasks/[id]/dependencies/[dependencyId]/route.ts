@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { TaskDependencyRepository } from '@/infrastructure/database/repositories/TaskDependencyRepository';
 import { DeleteTaskDependencyUseCase } from '@/application/use-cases/task';
 import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
+import { AppError } from '@/6-core/errors/AppError';
 
 const taskDependencyRepository = new TaskDependencyRepository();
 
@@ -30,10 +31,9 @@ export async function DELETE(
     const result = await deleteTaskDependencyUseCase.execute(dependencyId);
 
     if (result.isFailure) {
-      return NextResponse.json(
-        { error: (result.error as any)?.message || 'Unknown error' },
-        { status: (result.error as any)?.statusCode || 500 }
-      );
+      const error =
+        result.error instanceof AppError ? result.error : new AppError('Unknown error', 500);
+      return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
 
     return NextResponse.json({ success: true, message: 'Bağımlılık başarıyla silindi' });

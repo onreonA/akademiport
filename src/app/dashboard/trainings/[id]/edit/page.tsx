@@ -7,6 +7,7 @@
 'use client';
 
 import * as React from 'react';
+import { useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { Button } from '@/presentation/components/ui/atoms/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/presentation/components/ui/atoms/card';
@@ -36,22 +37,7 @@ export default function EditTrainingPage() {
   const [loadingPrograms, setLoadingPrograms] = React.useState(true);
   const [activeTab, setActiveTab] = React.useState('general');
 
-  React.useEffect(() => {
-    fetchTraining();
-    fetchPrograms();
-  }, [id]);
-
-  React.useEffect(() => {
-    if (id) {
-      if (activeTab === 'videos') {
-        fetchVideos();
-      } else if (activeTab === 'documents') {
-        fetchDocuments();
-      }
-    }
-  }, [id, activeTab]);
-
-  const fetchTraining = async () => {
+  const fetchTraining = React.useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch(`/api/trainings/${id}`);
@@ -70,9 +56,9 @@ export default function EditTrainingPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, router]);
 
-  const fetchPrograms = async () => {
+  const fetchPrograms = React.useCallback(async () => {
     try {
       setLoadingPrograms(true);
       const response = await fetch('/api/programs?status=active');
@@ -86,9 +72,9 @@ export default function EditTrainingPage() {
     } finally {
       setLoadingPrograms(false);
     }
-  };
+  }, []);
 
-  const fetchVideos = async () => {
+  const fetchVideos = React.useCallback(async () => {
     try {
       const response = await fetch(`/api/trainings/${id}/videos`);
       const data = await response.json();
@@ -99,9 +85,9 @@ export default function EditTrainingPage() {
     } catch (error) {
       console.error('Failed to fetch videos:', error);
     }
-  };
+  }, [id]);
 
-  const fetchDocuments = async () => {
+  const fetchDocuments = React.useCallback(async () => {
     try {
       const response = await fetch(`/api/trainings/${id}/documents`);
       const data = await response.json();
@@ -112,7 +98,22 @@ export default function EditTrainingPage() {
     } catch (error) {
       console.error('Failed to fetch documents:', error);
     }
-  };
+  }, [id]);
+
+  React.useEffect(() => {
+    fetchTraining();
+    fetchPrograms();
+  }, [fetchTraining, fetchPrograms]);
+
+  React.useEffect(() => {
+    if (id) {
+      if (activeTab === 'videos') {
+        fetchVideos();
+      } else if (activeTab === 'documents') {
+        fetchDocuments();
+      }
+    }
+  }, [id, activeTab, fetchVideos, fetchDocuments]);
 
   const handleSubmit = async (data: TrainingFormData) => {
     try {

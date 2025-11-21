@@ -8,6 +8,7 @@ import { UserRepository } from '@/infrastructure/database/repositories/UserRepos
 import { GetAssignmentMatrixUseCase } from '@/application/use-cases/project';
 import { UserRole } from '@/domain/enums/UserRole';
 import { logger } from '@/shared/utils/logger';
+import { AppError } from '@/6-core/errors/AppError';
 
 const projectRepository = new ProjectRepository();
 const subProjectRepository = new SubProjectRepository();
@@ -48,12 +49,14 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const result = await useCase.execute(id);
 
     if (result.isFailure) {
+      const error =
+        result.error instanceof AppError ? result.error : new AppError('Unknown error', 500);
       return NextResponse.json(
         {
-          error: (result.error as any)?.message || 'Unknown error',
-          code: (result.error as any)?.code,
+          error: error.message,
+          code: error.code,
         },
-        { status: (result.error as any)?.statusCode || 500 }
+        { status: error.statusCode }
       );
     }
 

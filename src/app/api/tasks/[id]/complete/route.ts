@@ -5,6 +5,7 @@ import { AddLeaderboardScoreUseCase } from '@/2-application/use-cases/leaderboar
 import { SupabaseLeaderboardRepository } from '@/4-infrastructure/database/repositories/SupabaseLeaderboardRepository';
 import { CompanyRepository } from '@/4-infrastructure/database/repositories/CompanyRepository';
 import { getAuthenticatedUser } from '@/4-infrastructure/api/helpers/auth';
+import { AppError } from '@/6-core/errors/AppError';
 
 const taskRepository = new TaskRepository();
 const leaderboardRepository = new SupabaseLeaderboardRepository();
@@ -39,10 +40,9 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const result = await completeTaskUseCase.execute(id, user.companyId, programId);
 
     if (result.isFailure) {
-      return NextResponse.json(
-        { error: (result.error as any)?.message || 'Unknown error' },
-        { status: (result.error as any)?.statusCode || 500 }
-      );
+      const error =
+        result.error instanceof AppError ? result.error : new AppError('Unknown error', 500);
+      return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
 
     return NextResponse.json({

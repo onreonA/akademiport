@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
-import { AppError } from '@/core/errors';
+import { AppError } from '@/6-core/errors/AppError';
 import { ProjectRepository } from '@/infrastructure/database/repositories/ProjectRepository';
 import { SubProjectRepository } from '@/infrastructure/database/repositories/SubProjectRepository';
 import { CompanyProjectAssignmentRepository } from '@/infrastructure/database/repositories/CompanyProjectAssignmentRepository';
@@ -50,11 +50,11 @@ export async function POST(
     if (result.isFailure && result.error instanceof AppError) {
       return NextResponse.json(
         {
-          error: (result.error as any)?.message || 'Unknown error',
+          error: result.error.message,
           code: result.error.code,
           errors: Array.isArray(result.error.details) ? result.error.details : undefined,
         },
-        { status: (result.error as any)?.statusCode || 500 }
+        { status: result.error.statusCode }
       );
     }
 

@@ -5,6 +5,7 @@ import { ProgramRepository } from '@/infrastructure/database/repositories/Progra
 import { ReminderRepository } from '@/infrastructure/database/repositories/ReminderRepository';
 import { SendEventRemindersUseCase } from '@/application/use-cases/event/SendEventRemindersUseCase';
 import { logger } from '@/shared/utils/logger';
+import { AppError } from '@/6-core/errors/AppError';
 
 const eventRepository = new EventRepository();
 const userRepository = new UserRepository();
@@ -52,13 +53,15 @@ export async function POST(request: NextRequest) {
     const result = await sendRemindersUseCase.execute(reminderType);
 
     if (result.isFailure) {
-      logger.error('Failed to send event reminders:', result.error);
+      const error =
+        result.error instanceof AppError ? result.error : new AppError('Unknown error', 500);
+      logger.error('Failed to send event reminders:', error);
       return NextResponse.json(
         {
           success: false,
-          error: (result.error as any)?.message || 'Unknown error',
+          error: error.message,
         },
-        { status: 500 }
+        { status: error.statusCode }
       );
     }
 

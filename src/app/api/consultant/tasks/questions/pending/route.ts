@@ -5,6 +5,7 @@ import { SubProjectRepository } from '@/infrastructure/database/repositories/Sub
 import { TaskCommentRepository } from '@/infrastructure/database/repositories/TaskCommentRepository';
 import { ListConsultantPendingQuestionsUseCase } from '@/application/use-cases/task';
 import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
+import { AppError } from '@/6-core/errors/AppError';
 
 const taskRepository = new TaskRepository();
 const projectRepository = new ProjectRepository();
@@ -55,11 +56,10 @@ export async function GET(request: NextRequest) {
     });
 
     if (result.isFailure) {
-      console.error('ListConsultantPendingQuestionsUseCase failed:', result.error);
-      return NextResponse.json(
-        { error: (result.error as any)?.message || 'Unknown error' },
-        { status: (result.error as any)?.statusCode || 500 }
-      );
+      const error =
+        result.error instanceof AppError ? result.error : new AppError('Unknown error', 500);
+      console.error('ListConsultantPendingQuestionsUseCase failed:', error);
+      return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
 
     console.log('Questions found:', result.value?.length || 0);

@@ -4,6 +4,7 @@ import { CompanyRepository } from '@/infrastructure/database/repositories/Compan
 import { TrainingRepository } from '@/infrastructure/database/repositories/TrainingRepository';
 import { AssignTrainingToCompanyUseCase } from '@/application/use-cases/company-training';
 import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
+import { AppError } from '@/6-core/errors/AppError';
 
 const companyTrainingRepository = new CompanyTrainingRepository();
 const companyRepository = new CompanyRepository();
@@ -47,10 +48,9 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     );
 
     if (result.isFailure) {
-      return NextResponse.json(
-        { error: (result.error as any)?.message || 'Unknown error' },
-        { status: (result.error as any)?.statusCode || 500 }
-      );
+      const error =
+        result.error instanceof AppError ? result.error : new AppError('Unknown error', 500);
+      return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
 
     return NextResponse.json(result.value, { status: 201 });

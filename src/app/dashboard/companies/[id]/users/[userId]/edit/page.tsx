@@ -5,7 +5,7 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { ArrowLeft, Users, Loader2 } from 'lucide-react';
 import { Button } from '@/presentation/components/ui/atoms/button';
@@ -25,11 +25,7 @@ export default function EditCompanyUserPage() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchData();
-  }, [companyId, userId]);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       // Fetch company and user in parallel
       const [companyRes, userRes] = await Promise.all([
@@ -52,7 +48,11 @@ export default function EditCompanyUserPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [companyId, userId]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const handleSubmit = async (data: UserFormData) => {
     try {

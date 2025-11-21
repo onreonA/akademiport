@@ -4,6 +4,7 @@ import { SubProjectRepository } from '@/infrastructure/database/repositories/Sub
 import { ProjectRepository } from '@/infrastructure/database/repositories/ProjectRepository';
 import { CreateSubProjectUseCase } from '@/application/use-cases/sub-project/CreateSubProjectUseCase';
 import { ListSubProjectsUseCase } from '@/application/use-cases/sub-project/ListSubProjectsUseCase';
+import { AppError } from '@/6-core/errors/AppError';
 
 /**
  * GET /api/sub-projects?projectId=xxx
@@ -29,10 +30,11 @@ export async function GET(request: NextRequest) {
     const result = await useCase.execute(projectId);
 
     if (result.isFailure) {
-      return NextResponse.json(
-        { error: (result.error as any)?.message || 'Failed to list sub-projects' },
-        { status: (result.error as any)?.statusCode || 400 }
-      );
+      const error =
+        result.error instanceof AppError
+          ? result.error
+          : new AppError('Failed to list sub-projects', 400);
+      return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
 
     return NextResponse.json(result.value);
@@ -78,10 +80,11 @@ export async function POST(request: NextRequest) {
     });
 
     if (result.isFailure) {
-      return NextResponse.json(
-        { error: (result.error as any)?.message || 'Failed to create sub-project' },
-        { status: (result.error as any)?.statusCode || 400 }
-      );
+      const error =
+        result.error instanceof AppError
+          ? result.error
+          : new AppError('Failed to create sub-project', 400);
+      return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
 
     return NextResponse.json(result.value, { status: 201 });

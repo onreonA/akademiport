@@ -10,7 +10,10 @@ import { logger } from '@/5-shared/utils/logger';
 import type {
   CustomReportFilterDto,
   CreateCustomReportDto,
+  CustomReportType,
+  CustomReportStatus,
 } from '@/3-domain/entities/CustomReport';
+import { AppError } from '@/6-core/errors/AppError';
 
 export async function GET(request: NextRequest) {
   try {
@@ -35,12 +38,31 @@ export async function GET(request: NextRequest) {
     }
 
     const searchParams = request.nextUrl.searchParams;
+    const reportTypeParam = searchParams.get('reportType');
+    const statusParam = searchParams.get('status');
+    const sortByParam = searchParams.get('sortBy');
+
+    const validReportTypes: CustomReportType[] = ['dashboard', 'company', 'program', 'custom'];
+    const validStatuses: CustomReportStatus[] = ['draft', 'saved', 'scheduled', 'archived'];
+    const validSortBy: Array<CustomReportFilterDto['sortBy']> = [
+      'name',
+      'createdAt',
+      'updatedAt',
+      'lastGeneratedAt',
+    ];
+
     const filter: CustomReportFilterDto = {
       userId: searchParams.get('userId') || undefined,
       programId: searchParams.get('programId') || undefined,
       companyId: searchParams.get('companyId') || undefined,
-      reportType: (searchParams.get('reportType') as any) || undefined,
-      status: (searchParams.get('status') as any) || undefined,
+      reportType:
+        reportTypeParam && validReportTypes.includes(reportTypeParam as CustomReportType)
+          ? (reportTypeParam as CustomReportType)
+          : undefined,
+      status:
+        statusParam && validStatuses.includes(statusParam as CustomReportStatus)
+          ? (statusParam as CustomReportStatus)
+          : undefined,
       isScheduled:
         searchParams.get('isScheduled') === 'true'
           ? true
@@ -49,7 +71,10 @@ export async function GET(request: NextRequest) {
             : undefined,
       page: searchParams.get('page') ? parseInt(searchParams.get('page')!) : 1,
       limit: searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : 10,
-      sortBy: (searchParams.get('sortBy') as any) || 'createdAt',
+      sortBy:
+        sortByParam && validSortBy.includes(sortByParam as CustomReportFilterDto['sortBy'])
+          ? (sortByParam as CustomReportFilterDto['sortBy'])
+          : 'createdAt',
       sortOrder: (searchParams.get('sortOrder') as 'asc' | 'desc') || 'desc',
     };
 
@@ -61,17 +86,19 @@ export async function GET(request: NextRequest) {
 
     if (result.isFailure) {
       logger.error('List custom reports failed:', result.error);
-      return NextResponse.json(
-        { error: result.error?.message || "Custom report'lar alınamadı" },
-        { status: 500 }
-      );
+      const error =
+        result.error instanceof AppError
+          ? result.error
+          : new AppError("Custom report'lar alınamadı", 500);
+      return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
 
     return NextResponse.json(result.value);
-  } catch (error: any) {
+  } catch (error) {
     logger.error('List custom reports error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Internal server error';
     return NextResponse.json(
-      { error: 'Internal server error', message: error.message },
+      { error: 'Internal server error', message: errorMessage },
       { status: 500 }
     );
   }
@@ -152,22 +179,19 @@ export async function POST(request: NextRequest) {
 
     if (result.isFailure) {
       logger.error('Create custom report failed:', result.error);
-      return NextResponse.json(
-        { error: result.error?.message || 'Custom report oluşturulamadı' },
-        {
-          status:
-            result.error instanceof Error && 'statusCode' in result.error
-              ? (result.error as any).statusCode
-              : 500,
-        }
-      );
+      const error =
+        result.error instanceof AppError
+          ? result.error
+          : new AppError('Custom report oluşturulamadı', 500);
+      return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
 
     return NextResponse.json(result.value, { status: 201 });
-  } catch (error: any) {
+  } catch (error) {
     logger.error('Create custom report error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Internal server error';
     return NextResponse.json(
-      { error: 'Internal server error', message: error.message },
+      { error: 'Internal server error', message: errorMessage },
       { status: 500 }
     );
   }

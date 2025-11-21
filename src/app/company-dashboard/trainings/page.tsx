@@ -47,12 +47,6 @@ export default function CompanyTrainingsPage() {
     total: 0,
   });
 
-  React.useEffect(() => {
-    if (!authLoading && user?.companyId) {
-      fetchTrainings();
-    }
-  }, [user, authLoading, filters, pagination.page, pagination.limit, fetchTrainings]);
-
   const fetchTrainings = React.useCallback(async () => {
     if (!user?.companyId) {
       setError('Firma bilgisi bulunamadı');
@@ -72,8 +66,21 @@ export default function CompanyTrainingsPage() {
       }
 
       // Map trainings - API already returns CompanyTrainingWithTraining format
+      interface CompanyTrainingResponse {
+        id: string;
+        companyId: string;
+        trainingId: string;
+        assignedBy: string;
+        assignedAt: string;
+        status: 'assigned' | 'in_progress' | 'completed' | 'cancelled';
+        createdAt: string;
+        updatedAt: string;
+        training: Training;
+        videosCount?: number;
+        documentsCount?: number;
+      }
       const companyTrainings: CompanyTrainingWithTraining[] = (data.trainings || []).map(
-        (ct: any) => ({
+        (ct: CompanyTrainingResponse) => ({
           id: ct.id,
           companyId: ct.companyId,
           trainingId: ct.trainingId,
@@ -98,6 +105,12 @@ export default function CompanyTrainingsPage() {
       setLoading(false);
     }
   }, [user?.companyId]);
+
+  React.useEffect(() => {
+    if (!authLoading && user?.companyId) {
+      fetchTrainings();
+    }
+  }, [user, authLoading, fetchTrainings]);
 
   const handleFilterChange = (key: string, value: string) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
@@ -309,7 +322,7 @@ export default function CompanyTrainingsPage() {
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400 mb-4">{error}</p>
                 <button
-                  onClick={() => fetchTrainings()}
+                  onClick={fetchTrainings}
                   className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 shadow-sm"
                 >
                   Tekrar Dene

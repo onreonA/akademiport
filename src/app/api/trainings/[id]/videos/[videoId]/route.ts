@@ -6,6 +6,7 @@ import {
 } from '@/application/use-cases/training-video';
 import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
 import { logger } from '@/shared/utils/logger';
+import { AppError } from '@/6-core/errors/AppError';
 
 const trainingVideoRepository = new TrainingVideoRepository();
 
@@ -70,10 +71,9 @@ export async function PUT(
     });
 
     if (result.isFailure) {
-      return NextResponse.json(
-        { error: (result.error as any)?.message || 'Unknown error' },
-        { status: (result.error as any)?.statusCode || 500 }
-      );
+      const error =
+        result.error instanceof AppError ? result.error : new AppError('Unknown error', 500);
+      return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
 
     return NextResponse.json({ success: true });
@@ -108,10 +108,9 @@ export async function DELETE(
     const result = await deleteVideoUseCase.execute(videoId);
 
     if (result.isFailure) {
-      return NextResponse.json(
-        { error: (result.error as any)?.message || 'Unknown error' },
-        { status: (result.error as any)?.statusCode || 500 }
-      );
+      const error =
+        result.error instanceof AppError ? result.error : new AppError('Unknown error', 500);
+      return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
 
     return NextResponse.json({ success: true });

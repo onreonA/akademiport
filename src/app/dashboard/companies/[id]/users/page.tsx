@@ -5,7 +5,7 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { ArrowLeft, UserPlus, Users, Mail, Phone, Edit, Trash2, Shield } from 'lucide-react';
 import { Button } from '@/presentation/components/ui/atoms/button';
@@ -32,16 +32,7 @@ export default function CompanyUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (!id) {
-      setLoading(false);
-      return;
-    }
-    fetchCompany();
-    fetchUsers();
-  }, [id]);
-
-  const fetchCompany = async () => {
+  const fetchCompany = useCallback(async () => {
     if (!id) return;
     try {
       const response = await fetch(`/api/companies/${id}`);
@@ -62,9 +53,9 @@ export default function CompanyUsersPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     if (!id) return;
     try {
       const response = await fetch(`/api/companies/${id}/users`);
@@ -81,7 +72,16 @@ export default function CompanyUsersPage() {
     } catch (error) {
       console.error('Failed to fetch users:', error);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    if (!id) {
+      setLoading(false);
+      return;
+    }
+    fetchCompany();
+    fetchUsers();
+  }, [id, fetchCompany, fetchUsers]);
 
   const handleAddUser = () => {
     router.push(`/dashboard/companies/${id}/users/new`);

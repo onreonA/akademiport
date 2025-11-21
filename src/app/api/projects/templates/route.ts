@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { ProjectRepository } from '@/infrastructure/database/repositories/ProjectRepository';
 import { GetProjectTemplatesUseCase } from '@/application/use-cases/project';
 import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
+import { AppError } from '@/6-core/errors/AppError';
 
 /**
  * GET /api/projects/templates
@@ -51,16 +52,20 @@ export async function GET(request: NextRequest) {
       });
 
       // Return more detailed error for debugging
+      const error =
+        result.error instanceof AppError
+          ? result.error
+          : new AppError('Failed to get templates', 400);
       return NextResponse.json(
         {
-          error: (result.error as any)?.message || 'Failed to get templates',
+          error: error.message,
           details: {
-            message: (result.error as any)?.message,
-            code: (result.error as any)?.code,
-            statusCode: (result.error as any)?.statusCode,
+            message: error.message,
+            code: error.code,
+            statusCode: error.statusCode,
           },
         },
-        { status: 400 }
+        { status: error.statusCode }
       );
     }
 

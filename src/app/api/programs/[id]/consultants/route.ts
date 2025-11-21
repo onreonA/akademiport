@@ -10,6 +10,7 @@ import { ProgramRepository } from '@/4-infrastructure/database/repositories/Prog
 import { ManageConsultantsUseCase } from '@/application/use-cases/program';
 import { UserRole } from '@/domain/enums/UserRole';
 import { requireAuth } from '@/4-infrastructure/api/helpers/auth';
+import { AppError } from '@/6-core/errors/AppError';
 
 const programRepository = new ProgramRepository();
 const manageConsultantsUseCase = new ManageConsultantsUseCase(programRepository);
@@ -162,18 +163,20 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     });
 
     if (result.isFailure) {
-      const errorMessage =
-        result.error instanceof Error
-          ? (result.error as any)?.message || 'Unknown error'
-          : result.error || 'Bilinmeyen hata';
-      console.error('🔴 [GET /api/programs/[id]/consultants] Error:', errorMessage);
+      const error =
+        result.error instanceof AppError
+          ? result.error
+          : result.error instanceof Error
+            ? new AppError(result.error.message, 400)
+            : new AppError('Bilinmeyen hata', 400);
+      console.error('🔴 [GET /api/programs/[id]/consultants] Error:', error.message);
       console.error('🔴 [GET /api/programs/[id]/consultants] Full error object:', result.error);
       return NextResponse.json(
         {
           success: false,
-          error: errorMessage,
+          error: error.message,
         },
-        { status: 400 }
+        { status: error.statusCode }
       );
     }
 

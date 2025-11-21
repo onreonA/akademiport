@@ -5,7 +5,7 @@
  * Sprint 6: Company Management
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { ArrowLeft, Building2, AlertCircle } from 'lucide-react';
 import { Button } from '@/presentation/components/ui/atoms/button';
@@ -24,12 +24,7 @@ export default function EditCompanyPage() {
   const [loading, setLoading] = useState(false);
   const [fetchLoading, setFetchLoading] = useState(true);
 
-  useEffect(() => {
-    fetchCompany();
-    fetchPrograms();
-  }, [id]);
-
-  const fetchCompany = async () => {
+  const fetchCompany = useCallback(async () => {
     try {
       const response = await fetch(`/api/companies/${id}`);
       const data = await response.json();
@@ -42,9 +37,9 @@ export default function EditCompanyPage() {
     } finally {
       setFetchLoading(false);
     }
-  };
+  }, [id]);
 
-  const fetchPrograms = async () => {
+  const fetchPrograms = useCallback(async () => {
     try {
       const response = await fetch('/api/programs');
       const data = await response.json();
@@ -55,7 +50,12 @@ export default function EditCompanyPage() {
     } catch (error) {
       console.error('Failed to fetch programs:', error);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchCompany();
+    fetchPrograms();
+  }, [fetchCompany, fetchPrograms]);
 
   const handleSubmit = async (data: CreateCompanyDto) => {
     try {

@@ -56,7 +56,7 @@ export default function EditTrainingPage() {
     } finally {
       setLoading(false);
     }
-  }, [id]);
+  }, [id, router]);
 
   const fetchPrograms = React.useCallback(async () => {
     try {
@@ -75,7 +75,7 @@ export default function EditTrainingPage() {
     }
   }, []);
 
-  const fetchVideos = async () => {
+  const fetchVideos = React.useCallback(async () => {
     try {
       const response = await fetch(`/api/trainings/${id}/videos`);
       const data = await response.json();
@@ -86,9 +86,9 @@ export default function EditTrainingPage() {
     } catch (error) {
       console.error('Failed to fetch videos:', error);
     }
-  };
+  }, [id]);
 
-  const fetchDocuments = async () => {
+  const fetchDocuments = React.useCallback(async () => {
     try {
       const response = await fetch(`/api/trainings/${id}/documents`);
       const data = await response.json();
@@ -99,7 +99,7 @@ export default function EditTrainingPage() {
     } catch (error) {
       console.error('Failed to fetch documents:', error);
     }
-  };
+  }, [id]);
 
   const handleSubmit = async (data: TrainingFormData) => {
     try {
@@ -138,6 +138,11 @@ export default function EditTrainingPage() {
   const handleCancel = () => {
     router.back();
   };
+
+  React.useEffect(() => {
+    fetchTraining();
+    fetchPrograms();
+  }, [fetchTraining, fetchPrograms]);
 
   if (loading) {
     return (

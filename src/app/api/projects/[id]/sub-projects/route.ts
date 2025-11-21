@@ -6,6 +6,7 @@ import {
   ListSubProjectsUseCase,
 } from '@/application/use-cases/sub-project';
 import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
+import { AppError } from '@/6-core/errors/AppError';
 
 const subProjectRepository = new SubProjectRepository();
 const projectRepository = new ProjectRepository();
@@ -26,10 +27,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const result = await listSubProjectsUseCase.execute(id);
 
     if (result.isFailure) {
-      return NextResponse.json(
-        { error: (result.error as any)?.message || 'Unknown error' },
-        { status: (result.error as any)?.statusCode || 500 }
-      );
+      const error =
+        result.error instanceof AppError ? result.error : new AppError('Unknown error', 500);
+      return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
 
     return NextResponse.json({ data: result.value });
@@ -72,10 +72,9 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     });
 
     if (result.isFailure) {
-      return NextResponse.json(
-        { error: (result.error as any)?.message || 'Unknown error' },
-        { status: (result.error as any)?.statusCode || 500 }
-      );
+      const error =
+        result.error instanceof AppError ? result.error : new AppError('Unknown error', 500);
+      return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
 
     return NextResponse.json(result.value, { status: 201 });

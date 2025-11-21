@@ -10,8 +10,10 @@ import { logger } from '@/shared/utils/logger';
 import {
   UpdateAppointmentDtoSchema,
   type AppointmentResponseDto,
+  type UpdateAppointmentDto,
 } from '@/application/dto/appointment';
 import { UserRole } from '@/domain/enums/UserRole';
+import { AppError } from '@/6-core/errors/AppError';
 
 const appointmentRepository = new AppointmentRepository();
 
@@ -32,10 +34,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const result = await getAppointmentUseCase.execute(id);
 
     if (result.isFailure) {
-      return NextResponse.json(
-        { error: (result.error as any)?.message || 'Unknown error' },
-        { status: (result.error as any)?.statusCode || 500 }
-      );
+      const error =
+        result.error instanceof AppError ? result.error : new AppError('Unknown error', 500);
+      return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
 
     const appointment = result.value;
@@ -126,15 +127,15 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       );
     }
 
-    const updateData: any = {
+    const updateData: Partial<UpdateAppointmentDto & { startTime?: Date; endTime?: Date }> = {
       ...validationResult.data,
     };
 
     // Convert date strings to Date objects
-    if (updateData.startTime) {
+    if (updateData.startTime && typeof updateData.startTime === 'string') {
       updateData.startTime = new Date(updateData.startTime);
     }
-    if (updateData.endTime) {
+    if (updateData.endTime && typeof updateData.endTime === 'string') {
       updateData.endTime = new Date(updateData.endTime);
     }
 
@@ -142,10 +143,9 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     const result = await updateAppointmentUseCase.execute(id, updateData);
 
     if (result.isFailure) {
-      return NextResponse.json(
-        { error: (result.error as any)?.message || 'Unknown error' },
-        { status: (result.error as any)?.statusCode || 500 }
-      );
+      const error =
+        result.error instanceof AppError ? result.error : new AppError('Unknown error', 500);
+      return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
 
     // Map Appointment entity to AppointmentResponseDto
@@ -218,10 +218,9 @@ export async function DELETE(
     const result = await deleteAppointmentUseCase.execute(id);
 
     if (result.isFailure) {
-      return NextResponse.json(
-        { error: (result.error as any)?.message || 'Unknown error' },
-        { status: (result.error as any)?.statusCode || 500 }
-      );
+      const error =
+        result.error instanceof AppError ? result.error : new AppError('Unknown error', 500);
+      return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
 
     return NextResponse.json({

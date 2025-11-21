@@ -3,6 +3,7 @@ import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
 import { TaskRepository } from '@/infrastructure/database/repositories/TaskRepository';
 import { AssignTaskUseCase } from '@/application/use-cases/task';
 import { logger } from '@/shared/utils/logger';
+import { AppError } from '@/6-core/errors/AppError';
 
 const taskRepository = new TaskRepository();
 
@@ -37,10 +38,9 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const result = await assignTaskUseCase.execute(taskId, userId);
 
     if (result.isFailure) {
-      return NextResponse.json(
-        { error: (result.error as any)?.message || 'Görev atanamadı.' },
-        { status: (result.error as any)?.statusCode ?? 400 }
-      );
+      const error =
+        result.error instanceof AppError ? result.error : new AppError('Görev atanamadı.', 400);
+      return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
 
     return NextResponse.json({ success: true, message: 'Görev başarıyla atandı.' });

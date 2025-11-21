@@ -5,7 +5,7 @@
  * Sprint 6: Company Management
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { ArrowLeft, AlertCircle, Edit, Trash2, Briefcase, Users, Building2 } from 'lucide-react';
 import { Button } from '@/presentation/components/ui/atoms/button';
@@ -32,12 +32,20 @@ export default function CompanyDetailPage() {
   const [program, setProgram] = useState<Program | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchCompany();
-    fetchUsers();
-  }, [id]);
+  const fetchProgram = useCallback(async (programId: string) => {
+    try {
+      const response = await fetch(`/api/programs/${programId}`);
+      const data = await response.json();
 
-  const fetchCompany = async () => {
+      if (data.success) {
+        setProgram(data.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch program:', error);
+    }
+  }, []);
+
+  const fetchCompany = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch(`/api/companies/${id}`);
@@ -55,9 +63,9 @@ export default function CompanyDetailPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, fetchProgram]);
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       const response = await fetch(`/api/companies/${id}/users`);
       const data = await response.json();
@@ -69,20 +77,12 @@ export default function CompanyDetailPage() {
       console.error('Failed to fetch users:', error);
       setUsers([]); // Set empty array on error to prevent undefined
     }
-  };
+  }, [id]);
 
-  const fetchProgram = async (programId: string) => {
-    try {
-      const response = await fetch(`/api/programs/${programId}`);
-      const data = await response.json();
-
-      if (data.success) {
-        setProgram(data.data);
-      }
-    } catch (error) {
-      console.error('Failed to fetch program:', error);
-    }
-  };
+  useEffect(() => {
+    fetchCompany();
+    fetchUsers();
+  }, [fetchCompany, fetchUsers]);
 
   const handleRemoveUser = async (userId: string) => {
     if (!confirm('Bu kullanıcıyı çıkarmak istediğinizden emin misiniz?')) return;

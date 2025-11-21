@@ -7,6 +7,8 @@ import { logger } from '@/shared/utils/logger';
 import { CreateEventDtoSchema, EventFilterDtoSchema } from '@/application/dto/event';
 import { EventFilterDto } from '@/3-domain/entities/Event';
 import { UserRole } from '@/domain/enums/UserRole';
+import { AppError } from '@/6-core/errors/AppError';
+import type { z } from 'zod';
 
 const eventRepository = new EventRepository();
 const userRepository = new UserRepository();
@@ -92,14 +94,14 @@ export async function GET(request: NextRequest) {
     }
 
     // Prepare filters for validation (schema expects strings)
-    const filtersForValidation: any = {
+    const filtersForValidation: z.infer<typeof EventFilterDtoSchema> = {
       programId: finalProgramId || null,
       consultantId: finalConsultantId || null,
-      category,
-      status,
+      category: category || null,
+      status: status || null,
       startDate: startDate || null,
       endDate: endDate || null,
-      search,
+      search: search || null,
       page,
       limit,
     };
@@ -128,10 +130,9 @@ export async function GET(request: NextRequest) {
     const result = await listEventsUseCase.execute(filtersForUseCase);
 
     if (result.isFailure) {
-      return NextResponse.json(
-        { error: (result.error as any)?.message || 'Unknown error' },
-        { status: (result.error as any)?.statusCode || 500 }
-      );
+      const error =
+        result.error instanceof AppError ? result.error : new AppError('Unknown error', 500);
+      return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
 
     return NextResponse.json({
@@ -207,10 +208,9 @@ export async function POST(request: NextRequest) {
     );
 
     if (result.isFailure) {
-      return NextResponse.json(
-        { error: (result.error as any)?.message || 'Unknown error' },
-        { status: (result.error as any)?.statusCode || 500 }
-      );
+      const error =
+        result.error instanceof AppError ? result.error : new AppError('Unknown error', 500);
+      return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
 
     return NextResponse.json(

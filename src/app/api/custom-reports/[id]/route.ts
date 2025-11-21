@@ -9,6 +9,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/5-shared/utils/logger';
 import type { UpdateCustomReportDto } from '@/3-domain/entities/CustomReport';
+import { AppError } from '@/6-core/errors/AppError';
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -40,23 +41,20 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const result = await useCase.execute(id, user.id, isAdmin);
 
     if (result.isFailure) {
-      logger.error('Get custom report failed:', result.error);
-      return NextResponse.json(
-        { error: result.error?.message || 'Custom report bulunamadı' },
-        {
-          status:
-            result.error instanceof Error && 'statusCode' in result.error
-              ? (result.error as any).statusCode
-              : 404,
-        }
-      );
+      const error =
+        result.error instanceof AppError
+          ? result.error
+          : new AppError('Custom report bulunamadı', 404);
+      logger.error('Get custom report failed:', error);
+      return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
 
     return NextResponse.json(result.value);
-  } catch (error: any) {
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Internal server error';
     logger.error('Get custom report error:', error);
     return NextResponse.json(
-      { error: 'Internal server error', message: error.message },
+      { error: 'Internal server error', message: errorMessage },
       { status: 500 }
     );
   }
@@ -112,23 +110,20 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     const result = await useCase.execute(id, dto, user.id);
 
     if (result.isFailure) {
-      logger.error('Update custom report failed:', result.error);
-      return NextResponse.json(
-        { error: result.error?.message || 'Custom report güncellenemedi' },
-        {
-          status:
-            result.error instanceof Error && 'statusCode' in result.error
-              ? (result.error as any).statusCode
-              : 500,
-        }
-      );
+      const error =
+        result.error instanceof AppError
+          ? result.error
+          : new AppError('Custom report güncellenemedi', 500);
+      logger.error('Update custom report failed:', error);
+      return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
 
     return NextResponse.json(result.value);
-  } catch (error: any) {
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Internal server error';
     logger.error('Update custom report error:', error);
     return NextResponse.json(
-      { error: 'Internal server error', message: error.message },
+      { error: 'Internal server error', message: errorMessage },
       { status: 500 }
     );
   }
@@ -166,23 +161,20 @@ export async function DELETE(
     const result = await useCase.execute(id, user.id);
 
     if (result.isFailure) {
-      logger.error('Delete custom report failed:', result.error);
-      return NextResponse.json(
-        { error: result.error?.message || 'Custom report silinemedi' },
-        {
-          status:
-            result.error instanceof Error && 'statusCode' in result.error
-              ? (result.error as any).statusCode
-              : 500,
-        }
-      );
+      const error =
+        result.error instanceof AppError
+          ? result.error
+          : new AppError('Custom report silinemedi', 500);
+      logger.error('Delete custom report failed:', error);
+      return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Internal server error';
     logger.error('Delete custom report error:', error);
     return NextResponse.json(
-      { error: 'Internal server error', message: error.message },
+      { error: 'Internal server error', message: errorMessage },
       { status: 500 }
     );
   }

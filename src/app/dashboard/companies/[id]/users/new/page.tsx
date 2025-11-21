@@ -5,7 +5,7 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { ArrowLeft, UserPlus } from 'lucide-react';
 import { Button } from '@/presentation/components/ui/atoms/button';
@@ -22,11 +22,7 @@ export default function AddCompanyUserPage() {
   const [company, setCompany] = useState<Company | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchCompany();
-  }, [companyId]);
-
-  const fetchCompany = async () => {
+  const fetchCompany = useCallback(async () => {
     try {
       const response = await fetch(`/api/companies/${companyId}`);
       const data = await response.json();
@@ -39,7 +35,11 @@ export default function AddCompanyUserPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [companyId]);
+
+  useEffect(() => {
+    fetchCompany();
+  }, [fetchCompany]);
 
   const handleSubmit = async (data: UserFormData) => {
     try {

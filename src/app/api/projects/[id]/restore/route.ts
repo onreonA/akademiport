@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { ProjectRepository } from '@/infrastructure/database/repositories/ProjectRepository';
 import { RestoreProjectUseCase } from '@/application/use-cases/project/RestoreProjectUseCase';
 import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
+import { AppError } from '@/6-core/errors/AppError';
 
 const projectRepository = new ProjectRepository();
 
@@ -27,10 +28,9 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const result = await restoreProjectUseCase.execute(id);
 
     if (result.isFailure) {
-      return NextResponse.json(
-        { error: (result.error as any)?.message || 'Unknown error' },
-        { status: (result.error as any)?.statusCode || 500 }
-      );
+      const error =
+        result.error instanceof AppError ? result.error : new AppError('Unknown error', 500);
+      return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
 
     return NextResponse.json({ success: true, message: 'Proje başarıyla geri yüklendi' });

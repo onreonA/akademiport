@@ -6,6 +6,7 @@ import { UpdateTrainingProgressUseCase } from '@/2-application/use-cases/trainin
 import { getAuthenticatedUser } from '@/4-infrastructure/api/helpers/auth';
 import { AddLeaderboardScoreUseCase } from '@/2-application/use-cases/leaderboard';
 import { SupabaseLeaderboardRepository } from '@/4-infrastructure/database/repositories/SupabaseLeaderboardRepository';
+import { AppError } from '@/6-core/errors/AppError';
 
 const trainingProgressRepository = new TrainingProgressRepository();
 const companyRepository = new CompanyRepository();
@@ -60,10 +61,9 @@ export async function POST(
     });
 
     if (result.isFailure) {
-      return NextResponse.json(
-        { error: (result.error as any)?.message || 'Unknown error' },
-        { status: (result.error as any)?.statusCode || 500 }
-      );
+      const error =
+        result.error instanceof AppError ? result.error : new AppError('Unknown error', 500);
+      return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
 
     return NextResponse.json({ success: true });

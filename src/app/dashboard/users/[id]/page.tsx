@@ -7,7 +7,7 @@
 'use client';
 
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/presentation/components/ui/atoms/button';
 import { Badge } from '@/presentation/components/ui/atoms/badge';
@@ -39,14 +39,7 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
     params.then((p) => setId(p.id));
   }, [params]);
 
-  useEffect(() => {
-    if (id) {
-      fetchUser();
-      fetchPrograms();
-    }
-  }, [id]);
-
-  const fetchUser = async () => {
+  const fetchUser = useCallback(async () => {
     try {
       const response = await fetch(`/api/users/${id}`);
       const result = await response.json();
@@ -59,9 +52,9 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
 
-  const fetchPrograms = async () => {
+  const fetchPrograms = useCallback(async () => {
     try {
       const response = await fetch(`/api/users/${id}/program`);
       const result = await response.json();
@@ -72,7 +65,14 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
     } catch (error) {
       console.error('Failed to fetch programs:', error);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    if (id) {
+      fetchUser();
+      fetchPrograms();
+    }
+  }, [id, fetchUser, fetchPrograms]);
 
   if (loading) {
     return (

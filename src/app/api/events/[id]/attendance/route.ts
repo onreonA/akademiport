@@ -10,6 +10,7 @@ import { SupabaseLeaderboardRepository } from '@/4-infrastructure/database/repos
 import { CompanyRepository } from '@/4-infrastructure/database/repositories/CompanyRepository';
 import { RegisterAttendanceDtoSchema } from '@/2-application/dtos/event/RegisterAttendanceDto';
 import { logger } from '@/5-shared/utils/logger';
+import { AppError } from '@/6-core/errors/AppError';
 
 const eventRepository = new EventRepository();
 const leaderboardRepository = new SupabaseLeaderboardRepository();
@@ -36,10 +37,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const result = await getAttendeesUseCase.execute(id);
 
     if (result.isFailure) {
-      return NextResponse.json(
-        { error: (result.error as any)?.message || 'Unknown error' },
-        { status: (result.error as any)?.statusCode || 500 }
-      );
+      const error =
+        result.error instanceof AppError ? result.error : new AppError('Unknown error', 500);
+      return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
 
     return NextResponse.json({
@@ -102,10 +102,9 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     );
 
     if (result.isFailure) {
-      return NextResponse.json(
-        { error: (result.error as any)?.message || 'Unknown error' },
-        { status: (result.error as any)?.statusCode || 500 }
-      );
+      const error =
+        result.error instanceof AppError ? result.error : new AppError('Unknown error', 500);
+      return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
 
     return NextResponse.json(
