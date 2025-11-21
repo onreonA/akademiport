@@ -22,28 +22,29 @@ export default function CompanyLeaderboardPage() {
   const [companyId, setCompanyId] = useState<string>('');
   const [programId, setProgramId] = useState<string>('');
 
-  const fetchCurrentUser = useCallback(async () => {
-    try {
-      const response = await fetch('/api/auth/me');
-      const data = await response.json();
-
-      if (data.success && data.user?.companyId) {
-        setCompanyId(data.user.companyId);
-        // Fetch company to get programId
-        const companyResponse = await fetch(`/api/companies/${data.user.companyId}`);
-        const companyData = await companyResponse.json();
-        if (companyData.success && companyData.data?.programId) {
-          setProgramId(companyData.data.programId);
-        }
-      }
-    } catch (error) {
-      console.error('Failed to fetch current user:', error);
-    }
-  }, []);
-
   useEffect(() => {
+    // Fetch current user and set company/program IDs
+    const fetchCurrentUser = async () => {
+      try {
+        const response = await fetch('/api/auth/me');
+        const data = await response.json();
+
+        if (data.success && data.user?.companyId) {
+          setCompanyId(data.user.companyId);
+          // Fetch company to get programId
+          const companyResponse = await fetch(`/api/companies/${data.user.companyId}`);
+          const companyData = await companyResponse.json();
+          if (companyData.success && companyData.data?.programId) {
+            setProgramId(companyData.data.programId);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch current user:', error);
+      }
+    };
+
     fetchCurrentUser();
-  }, [fetchCurrentUser]);
+  }, []);
 
   const { data: rankingData, isLoading: rankingLoading } = useCompanyRanking(companyId, programId);
   const { data: badgesData, isLoading: badgesLoading } = useCompanyBadges(companyId);

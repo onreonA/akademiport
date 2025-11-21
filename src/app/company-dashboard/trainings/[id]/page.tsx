@@ -80,16 +80,29 @@ export default function CompanyTrainingDetailPage() {
 
   const fetchVideos = React.useCallback(async () => {
     try {
+      console.log('🔍 [CompanyTrainingDetail] Fetching videos for training:', id);
       const response = await fetch(`/api/trainings/${id}/videos`);
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Videolar yüklenemedi');
+        const errorMsg = data.error || 'Videolar yüklenemedi';
+        console.error('❌ [CompanyTrainingDetail] Failed to fetch videos:', {
+          status: response.status,
+          error: errorMsg,
+        });
+        throw new Error(errorMsg);
       }
 
+      console.log('✅ [CompanyTrainingDetail] Videos fetched:', {
+        count: data.videos?.length || 0,
+        videos: data.videos,
+      });
       setVideos(data.videos || []);
     } catch (err) {
-      console.error('Failed to fetch videos:', err);
+      console.error('❌ [CompanyTrainingDetail] Failed to fetch videos:', err);
+      const errorMessage =
+        err instanceof Error ? err.message : 'Videolar yüklenirken bir hata oluştu';
+      toast.error(errorMessage);
       setVideos([]);
     }
   }, [id]);
@@ -112,11 +125,19 @@ export default function CompanyTrainingDetailPage() {
 
   const fetchProgress = React.useCallback(async () => {
     if (!user?.companyId || !training) {
+      setLoading(false);
       return;
     }
 
     // Allow progress fetch even if videos or documents are empty (for trainings with only videos or only documents)
+    // But if both are empty, set loading to false and return
     if (videos.length === 0 && documents.length === 0) {
+      setProgress({
+        overallProgress: 0,
+        videos: [],
+        documents: [],
+      });
+      setLoading(false);
       return;
     }
 
@@ -274,8 +295,19 @@ export default function CompanyTrainingDetailPage() {
 
   // Fetch progress after videos and documents are loaded
   React.useEffect(() => {
-    if (videos.length > 0 && documents.length >= 0 && training && user?.companyId) {
-      fetchProgress();
+    if (training && user?.companyId) {
+      // If both videos and documents are empty, set loading to false
+      if (videos.length === 0 && documents.length === 0) {
+        setProgress({
+          overallProgress: 0,
+          videos: [],
+          documents: [],
+        });
+        setLoading(false);
+      } else {
+        // Otherwise, fetch progress
+        fetchProgress();
+      }
     }
   }, [videos, documents, training, user?.companyId, fetchProgress]);
 

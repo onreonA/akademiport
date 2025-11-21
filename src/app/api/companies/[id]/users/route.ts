@@ -50,7 +50,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     return NextResponse.json({
       success: true,
-      users: users,
+      data: users,
+      users: users, // Keep for backward compatibility
     });
   } catch (error) {
     console.error('Error in GET /api/companies/[id]/users:', error);

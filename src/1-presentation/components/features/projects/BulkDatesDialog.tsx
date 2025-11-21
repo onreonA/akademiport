@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -63,16 +63,24 @@ export function BulkDatesDialog({
     return map;
   }, [matrix]);
 
-  // Use useLayoutEffect to avoid synchronous setState warning
-  useLayoutEffect(() => {
+  // Use useEffect with setTimeout to avoid synchronous setState warning
+  useEffect(() => {
     if (!open) {
-      setSelectedSubProjectId(undefined);
-      return;
+      const timeoutId = setTimeout(() => {
+        setSelectedSubProjectId(undefined);
+      }, 0);
+      return () => clearTimeout(timeoutId);
     }
     if (matrix && matrix.subProjects.length > 0) {
-      setSelectedSubProjectId((current) => current ?? matrix.subProjects[0]?.id);
+      const timeoutId = setTimeout(() => {
+        setSelectedSubProjectId((current) => current ?? matrix.subProjects[0]?.id);
+      }, 0);
+      return () => clearTimeout(timeoutId);
     } else {
-      setSelectedSubProjectId(undefined);
+      const timeoutId = setTimeout(() => {
+        setSelectedSubProjectId(undefined);
+      }, 0);
+      return () => clearTimeout(timeoutId);
     }
   }, [open, matrix]);
 

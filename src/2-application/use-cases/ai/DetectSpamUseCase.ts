@@ -45,7 +45,7 @@ export class DetectSpamUseCase {
     try {
       // 1. İçeriği al (topic veya reply)
       let content = dto.content;
-      let authorInfo = '';
+      const authorInfo = '';
 
       if (dto.topicId) {
         const topicResult = await this.forumRepository.findTopicById(dto.topicId);

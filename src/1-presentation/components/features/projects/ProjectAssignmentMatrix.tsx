@@ -12,6 +12,7 @@ interface ProjectAssignmentMatrixProps {
   onRefresh?: () => void;
   onBulkAssign?: () => void;
   onBulkDates?: () => void;
+  onBulkAllDates?: () => void;
   actionsDisabled?: boolean;
   onSelectionChange?: (selections: Map<string, boolean>) => void;
 }
@@ -23,6 +24,7 @@ export function ProjectAssignmentMatrix({
   onRefresh,
   onBulkAssign,
   onBulkDates,
+  onBulkAllDates,
   actionsDisabled = false,
   onSelectionChange,
 }: ProjectAssignmentMatrixProps) {
@@ -205,6 +207,16 @@ export function ProjectAssignmentMatrix({
               disabled={loading || disableActions}
             >
               Tarihleri Düzenle
+            </Button>
+          ) : null}
+          {onBulkAllDates ? (
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={onBulkAllDates}
+              disabled={loading || disableActions}
+            >
+              Tüm Alt Projeler İçin Toplu Tarih
             </Button>
           ) : null}
           <Button size="sm" variant="outline" onClick={onRefresh} disabled={loading}>

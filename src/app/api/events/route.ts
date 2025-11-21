@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { EventRepository } from '@/infrastructure/database/repositories/EventRepository';
+import { EventRepository } from '@/4-infrastructure/database/repositories/EventRepository';
 import { UserRepository } from '@/4-infrastructure/database/repositories/UserRepository';
-import { CreateEventUseCase, ListEventsUseCase } from '@/application/use-cases/event';
-import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
-import { logger } from '@/shared/utils/logger';
-import { CreateEventDtoSchema, EventFilterDtoSchema } from '@/application/dto/event';
-import { EventFilterDto } from '@/3-domain/entities/Event';
-import { UserRole } from '@/domain/enums/UserRole';
+import { CreateEventUseCase, ListEventsUseCase } from '@/2-application/use-cases/event';
+import { getAuthenticatedUser } from '@/4-infrastructure/api/helpers/auth';
+import { logger } from '@/5-shared/utils/logger';
+import { CreateEventDtoSchema, EventFilterDtoSchema } from '@/2-application/dto/event';
+import { EventFilterDto } from '@/2-application/dto/event';
+import { UserRole } from '@/3-domain/enums/UserRole';
 import { AppError } from '@/6-core/errors/AppError';
 import type { z } from 'zod';
 
@@ -93,15 +93,15 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Prepare filters for validation (schema expects strings)
+    // Prepare filters for validation (schema expects nullable strings for UUIDs, optional for others)
     const filtersForValidation: z.infer<typeof EventFilterDtoSchema> = {
       programId: finalProgramId || null,
       consultantId: finalConsultantId || null,
-      category: category || null,
-      status: status || null,
+      category: category || undefined, // optional() accepts undefined, not null
+      status: status || undefined, // optional() accepts undefined, not null
       startDate: startDate || null,
       endDate: endDate || null,
-      search: search || null,
+      search: search || undefined, // optional() accepts undefined, not null
       page,
       limit,
     };
@@ -109,8 +109,16 @@ export async function GET(request: NextRequest) {
     // Validate filters
     const validationResult = EventFilterDtoSchema.safeParse(filtersForValidation);
     if (!validationResult.success) {
+      const errorMessages = validationResult.error.issues.map(
+        (issue) => `${issue.path.join('.')}: ${issue.message}`
+      );
+      const errorMessage = `Geçersiz filtreler: ${errorMessages.join(', ')}`;
+      logger.warn('Event filter validation failed:', {
+        filters: filtersForValidation,
+        issues: validationResult.error.issues,
+      });
       return NextResponse.json(
-        { error: 'Invalid filters', details: validationResult.error.issues },
+        { error: errorMessage, details: validationResult.error.issues },
         { status: 400 }
       );
     }
@@ -130,9 +138,28 @@ export async function GET(request: NextRequest) {
     const result = await listEventsUseCase.execute(filtersForUseCase);
 
     if (result.isFailure) {
-      const error =
-        result.error instanceof AppError ? result.error : new AppError('Unknown error', 500);
-      return NextResponse.json({ error: error.message }, { status: error.statusCode });
+      let errorMessage = 'Etkinlikler yüklenemedi';
+      let statusCode = 500;
+
+      if (result.error instanceof AppError) {
+        errorMessage = result.error.message;
+        statusCode = result.error.statusCode;
+      } else if (result.error instanceof Error) {
+        errorMessage = result.error.message;
+      } else if (typeof result.error === 'string') {
+        errorMessage = result.error;
+      } else if (typeof result.error === 'object' && result.error !== null) {
+        if ('message' in result.error) {
+          errorMessage = String(result.error.message);
+        } else {
+          errorMessage = JSON.stringify(result.error);
+        }
+      } else {
+        errorMessage = String(result.error);
+      }
+
+      logger.error('ListEventsUseCase failed:', { error: result.error, errorMessage });
+      return NextResponse.json({ error: errorMessage }, { status: statusCode });
     }
 
     return NextResponse.json({
@@ -147,7 +174,15 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     logger.error('Error in GET /api/events:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+
+    let errorMessage = 'Etkinlikler yüklenirken beklenmeyen bir hata oluştu';
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    } else if (typeof error === 'object' && error !== null && 'message' in error) {
+      errorMessage = String(error.message);
+    }
+
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
 
@@ -208,9 +243,28 @@ export async function POST(request: NextRequest) {
     );
 
     if (result.isFailure) {
-      const error =
-        result.error instanceof AppError ? result.error : new AppError('Unknown error', 500);
-      return NextResponse.json({ error: error.message }, { status: error.statusCode });
+      let errorMessage = 'Etkinlik oluşturulamadı';
+      let statusCode = 500;
+
+      if (result.error instanceof AppError) {
+        errorMessage = result.error.message;
+        statusCode = result.error.statusCode;
+      } else if (result.error instanceof Error) {
+        errorMessage = result.error.message;
+      } else if (typeof result.error === 'string') {
+        errorMessage = result.error;
+      } else if (typeof result.error === 'object' && result.error !== null) {
+        if ('message' in result.error) {
+          errorMessage = String(result.error.message);
+        } else {
+          errorMessage = JSON.stringify(result.error);
+        }
+      } else {
+        errorMessage = String(result.error);
+      }
+
+      logger.error('CreateEventUseCase failed:', { error: result.error, errorMessage });
+      return NextResponse.json({ error: errorMessage }, { status: statusCode });
     }
 
     return NextResponse.json(
@@ -222,6 +276,14 @@ export async function POST(request: NextRequest) {
     );
   } catch (error) {
     logger.error('Error in POST /api/events:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+
+    let errorMessage = 'Etkinlik oluşturulurken beklenmeyen bir hata oluştu';
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    } else if (typeof error === 'object' && error !== null && 'message' in error) {
+      errorMessage = String(error.message);
+    }
+
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

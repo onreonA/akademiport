@@ -46,12 +46,13 @@ export default function ConsultantTrainingDetailPage() {
         throw new Error(data.error || 'Eğitim bulunamadı');
       }
 
-      setTraining(data);
+      setTraining(data.training || data); // Handle both { training: ... } and direct training object
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : 'Eğitim yüklenirken bir hata oluştu';
       setError(errorMessage);
       toast.error(errorMessage);
+      throw err; // Re-throw to be handled by Promise.allSettled
     }
   }, [id]);
 
@@ -68,6 +69,7 @@ export default function ConsultantTrainingDetailPage() {
     } catch (err) {
       console.error('Failed to fetch videos:', err);
       setVideos([]);
+      // Don't throw - videos are optional
     }
   }, [id]);
 
@@ -84,10 +86,38 @@ export default function ConsultantTrainingDetailPage() {
     } catch (err) {
       console.error('Failed to fetch documents:', err);
       setDocuments([]);
-    } finally {
-      setLoading(false);
+      // Don't throw - documents are optional
     }
   }, [id]);
+
+  // Fetch all data when component mounts
+  React.useEffect(() => {
+    if (!id) {
+      setError('Eğitim ID bulunamadı');
+      setLoading(false);
+      return;
+    }
+
+    const loadData = async () => {
+      setLoading(true);
+      setError(null);
+
+      // Fetch all data in parallel, but don't fail if videos/documents fail
+      const results = await Promise.allSettled([fetchTraining(), fetchVideos(), fetchDocuments()]);
+
+      // Check if training fetch failed
+      if (results[0].status === 'rejected') {
+        // Error already set by fetchTraining
+        setLoading(false);
+        return;
+      }
+
+      // All data loaded successfully
+      setLoading(false);
+    };
+
+    loadData();
+  }, [id, fetchTraining, fetchVideos, fetchDocuments]);
 
   if (loading) {
     return (

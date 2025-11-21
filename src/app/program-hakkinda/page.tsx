@@ -6,12 +6,10 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { Button } from '@/1-presentation/components/ui/atoms/button';
 import { ModernNavigation } from '@/1-presentation/components/features/layout/ModernNavigation';
 import { ModernFooter } from '@/1-presentation/components/features/layout/ModernFooter';
 import {
-  ArrowRight,
   BookOpen,
   Rocket,
   Calendar,

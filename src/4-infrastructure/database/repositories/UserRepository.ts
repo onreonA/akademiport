@@ -314,19 +314,30 @@ export class UserRepository implements IUserRepository {
 
   async delete(id: string): Promise<Result<void>> {
     try {
-      const supabase = await createClient();
+      const supabase = getSupabaseAdminClient();
 
-      // Soft delete: set is_active to false
-      const { error } = await supabase
-        .from(this.tableName)
-        .update({
-          is_active: false,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', id);
+      // Hard delete: Delete from Supabase Auth (cascade will delete from public.users)
+      // First, verify user exists in public.users
+      const userCheck = await this.findById(id);
+      if (userCheck.isFailure || !userCheck.value) {
+        return Result.fail('Kullanıcı bulunamadı');
+      }
 
-      if (error) {
-        return Result.fail(error.message);
+      // Delete from Supabase Auth (this will cascade delete from public.users due to ON DELETE CASCADE)
+      const { error: authError } = await supabase.auth.admin.deleteUser(id);
+
+      if (authError) {
+        // If auth delete fails, try to delete from public.users directly as fallback
+        console.warn(
+          '⚠️ [UserRepository] Auth delete failed, trying direct delete:',
+          authError.message
+        );
+        const regularSupabase = await createClient();
+        const { error: dbError } = await regularSupabase.from(this.tableName).delete().eq('id', id);
+
+        if (dbError) {
+          return Result.fail(`Kullanıcı silinemedi: ${authError.message || dbError.message}`);
+        }
       }
 
       return Result.ok(undefined);

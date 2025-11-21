@@ -52,15 +52,47 @@ export function AIInsightsWidget({
       if (programId) params.append('programId', programId);
 
       const response = await fetch(`/api/dashboard/ai-insights?${params.toString()}`);
+
       if (!response.ok) {
-        throw new Error('AI insights alınamadı');
+        // 503 (Service Unavailable) durumunda widget'ı sessizce gizle
+        if (response.status === 503) {
+          setInsights(null);
+          return;
+        }
+
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.error || 'AI insights alınamadı';
+
+        // AI servisi yoksa veya prompt yoksa widget'ı gizle (sessizce başarısız ol)
+        if (
+          errorMessage.includes('Service not available') ||
+          errorMessage.includes('No active prompt') ||
+          errorMessage.includes('OPENAI_API_KEY') ||
+          errorMessage.includes('API_KEY') ||
+          errorMessage.includes('Provider selection failed')
+        ) {
+          // AI servisi yapılandırılmamış - widget'ı gizle
+          setInsights(null);
+          return;
+        }
+
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();
       setInsights(data);
     } catch (error) {
       console.error('Error fetching AI insights:', error);
-      toast.error('AI insights yüklenemedi');
+      // Sadece beklenmeyen hatalar için toast göster
+      const errorMessage = error instanceof Error ? error.message : 'AI insights yüklenemedi';
+      if (
+        !errorMessage.includes('Service not available') &&
+        !errorMessage.includes('No active prompt') &&
+        !errorMessage.includes('OPENAI_API_KEY')
+      ) {
+        toast.error('AI insights yüklenemedi');
+      }
+      setInsights(null);
     } finally {
       setLoading(false);
     }
@@ -115,26 +147,9 @@ export function AIInsightsWidget({
     );
   }
 
-  if (!insights) {
-    return (
-      <Card className={className}>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5" />
-            AI Insights
-          </CardTitle>
-          <CardDescription>AI destekli analiz ve öneriler</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-8 text-muted-foreground">
-            <p>AI insights yüklenemedi</p>
-            <Button onClick={fetchInsights} variant="outline" className="mt-4" size="sm">
-              Tekrar Dene
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    );
+  // AI servisi yoksa widget'ı gizle (null döndür)
+  if (!insights && !loading) {
+    return null;
   }
 
   return (

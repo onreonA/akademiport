@@ -31,6 +31,8 @@ import { toast } from 'sonner';
 import { ProjectDetailHeader } from './components/ProjectDetailHeader';
 import { BulkAssignmentDialog } from '@/presentation/components/features/projects/BulkAssignmentDialog';
 import { BulkDatesDialog } from '@/presentation/components/features/projects/BulkDatesDialog';
+import { BulkAllSubProjectsDatesDialog } from '@/presentation/components/features/projects/BulkAllSubProjectsDatesDialog';
+import { TaskCompanyDatesDialog } from '@/presentation/components/features/tasks/TaskCompanyDatesDialog';
 
 type TabValue = 'overview' | 'structure' | 'assignments';
 
@@ -156,6 +158,10 @@ export default function AdminProjectDetailPage() {
   const [bulkAssignmentSubmitting, setBulkAssignmentSubmitting] = useState(false);
   const [bulkDatesOpen, setBulkDatesOpen] = useState(false);
   const [bulkDatesSubmitting, setBulkDatesSubmitting] = useState(false);
+  const [taskDatesOpen, setTaskDatesOpen] = useState(false);
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+  const [bulkAllDatesOpen, setBulkAllDatesOpen] = useState(false);
+  const [bulkAllDatesSubmitting, setBulkAllDatesSubmitting] = useState(false);
 
   const fetchHierarchy = useCallback(async () => {
     // Don't fetch if id is "new"
@@ -441,6 +447,11 @@ export default function AdminProjectDetailPage() {
     toast.info(`Görev detay ekranı yakında: ${task.title}`);
   }, []);
 
+  const handleTaskDates = useCallback((taskId: string) => {
+    setSelectedTaskId(taskId);
+    setTaskDatesOpen(true);
+  }, []);
+
   const hasMatrixData =
     Boolean(matrix) && matrix!.companies.length > 0 && matrix!.subProjects.length > 0;
 
@@ -476,6 +487,23 @@ export default function AdminProjectDetailPage() {
     }
 
     setBulkDatesOpen(true);
+  }, [fetchAssignmentMatrix, matrix, matrixLoading]);
+
+  const handleOpenBulkAllDates = useCallback(() => {
+    if (!matrix) {
+      if (!matrixLoading) {
+        fetchAssignmentMatrix();
+      }
+      setBulkAllDatesOpen(true);
+      return;
+    }
+
+    if (matrix.companies.length === 0 || matrix.subProjects.length === 0) {
+      toast.info('Tarih düzenleyebileceğiniz firma veya alt proje bulunmuyor.');
+      return;
+    }
+
+    setBulkAllDatesOpen(true);
   }, [fetchAssignmentMatrix, matrix, matrixLoading]);
 
   const handleBulkAssignmentSubmit = useCallback(
@@ -871,6 +899,7 @@ export default function AdminProjectDetailPage() {
                 onTaskMoveUp={(taskId) => handleMoveTask(taskId, 'up')}
                 onTaskMoveDown={(taskId) => handleMoveTask(taskId, 'down')}
                 onTaskView={handleViewTask}
+                onTaskDates={handleTaskDates}
               />
             </TabsContent>
 
@@ -882,8 +911,13 @@ export default function AdminProjectDetailPage() {
                 onRefresh={fetchAssignmentMatrix}
                 onBulkAssign={handleOpenBulkAssignment}
                 onBulkDates={handleOpenBulkDates}
+                onBulkAllDates={handleOpenBulkAllDates}
                 actionsDisabled={
-                  matrixLoading || bulkAssignmentSubmitting || bulkDatesSubmitting || !hasMatrixData
+                  matrixLoading ||
+                  bulkAssignmentSubmitting ||
+                  bulkDatesSubmitting ||
+                  bulkAllDatesSubmitting ||
+                  !hasMatrixData
                 }
               />
             </TabsContent>
@@ -963,6 +997,37 @@ export default function AdminProjectDetailPage() {
           matrix={matrix}
           onSubmit={handleBulkDatesSubmit}
           submitting={bulkDatesSubmitting}
+        />
+
+        <TaskCompanyDatesDialog
+          open={taskDatesOpen}
+          onOpenChange={(open) => {
+            setTaskDatesOpen(open);
+            if (!open) {
+              setSelectedTaskId(null);
+            }
+          }}
+          taskId={selectedTaskId}
+          onSubmit={() => {
+            // Görev tarihleri güncellendiğinde hierarchy'yi yenile
+            fetchHierarchy();
+          }}
+        />
+
+        <BulkAllSubProjectsDatesDialog
+          open={bulkAllDatesOpen}
+          onOpenChange={(open) => {
+            if (!open && bulkAllDatesSubmitting) {
+              return;
+            }
+            setBulkAllDatesOpen(open);
+          }}
+          matrix={matrix}
+          projectId={projectId}
+          onSubmit={() => {
+            fetchAssignmentMatrix();
+          }}
+          submitting={bulkAllDatesSubmitting}
         />
       </div>
     </div>

@@ -10,4 +10,5 @@ export * from './CreateProjectFromTemplateUseCase';
 export * from './GetProjectHierarchyUseCase';
 export * from './BulkAssignSubProjectsToCompaniesUseCase';
 export * from './BulkAssignDatesToCompanySubProjectsUseCase';
+export * from './BulkAssignDatesToAllSubProjectsUseCase';
 export * from './GetAssignmentMatrixUseCase';

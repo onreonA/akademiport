@@ -27,13 +27,37 @@ export default function NewTrainingPage() {
     try {
       setLoadingPrograms(true);
       const response = await fetch('/api/programs?status=active');
-      const data = await response.json();
 
-      if (data.success) {
-        setPrograms(data.data?.map((p: any) => ({ id: p.id, name: p.name })) || []);
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.error || `HTTP ${response.status}: ${response.statusText}`;
+        console.error('Failed to fetch programs:', errorMessage);
+        toast.error(`Programlar yüklenemedi: ${errorMessage}`);
+        return;
+      }
+
+      const data = await response.json();
+      console.log('Programs API response:', data);
+
+      if (data.success && data.data) {
+        const programsList = Array.isArray(data.data)
+          ? data.data.map((p: any) => ({ id: p.id, name: p.name }))
+          : [];
+        console.log('Parsed programs:', programsList);
+        setPrograms(programsList);
+
+        if (programsList.length === 0) {
+          toast.info('Henüz aktif program bulunmuyor');
+        }
+      } else {
+        console.warn('Programs API returned unsuccessful response:', data);
+        toast.error(data.error || 'Programlar yüklenemedi');
       }
     } catch (error) {
       console.error('Failed to fetch programs:', error);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Programlar yüklenirken bir hata oluştu';
+      toast.error(errorMessage);
     } finally {
       setLoadingPrograms(false);
     }

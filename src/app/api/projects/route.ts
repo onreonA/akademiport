@@ -7,13 +7,18 @@ import {
   ListProjectsUseCase,
   GetProjectTemplatesUseCase,
   CreateProjectFromTemplateUseCase,
+  BulkAssignSubProjectsToCompaniesUseCase,
 } from '@/application/use-cases/project';
 import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
 import { AppError } from '@/6-core/errors/AppError';
+import { CompanyProjectAssignmentRepository } from '@/infrastructure/database/repositories/CompanyProjectAssignmentRepository';
+import { CompanyRepository } from '@/infrastructure/database/repositories/CompanyRepository';
 
 const projectRepository = new ProjectRepository();
 const subProjectRepository = new SubProjectRepository();
 const taskRepository = new TaskRepository();
+const assignmentRepository = new CompanyProjectAssignmentRepository();
+const companyRepository = new CompanyRepository();
 
 /**
  * GET /api/projects
@@ -111,6 +116,18 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
 
+    // Support both single companyId and multiple companyIds
+    const companyIds = Array.isArray(body.companyIds)
+      ? body.companyIds
+      : body.companyId
+        ? [body.companyId]
+        : [];
+    const primaryCompanyId = companyIds.length > 0 ? companyIds[0] : body.companyId;
+
+    if (companyIds.length === 0 && !body.companyId) {
+      return NextResponse.json({ error: 'En az bir firma seçilmelidir' }, { status: 400 });
+    }
+
     // Create from template
     if (body.templateId) {
       const createFromTemplateUseCase = new CreateProjectFromTemplateUseCase(
@@ -121,7 +138,7 @@ export async function POST(request: NextRequest) {
 
       const result = await createFromTemplateUseCase.execute({
         templateId: body.templateId,
-        companyId: body.companyId,
+        companyId: primaryCompanyId, // İlk firma primary olarak kullanılır
         consultantId: body.consultantId || user.id,
         name: body.name,
         description: body.description,
@@ -135,13 +152,20 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: error.message }, { status: error.statusCode });
       }
 
+      const projectId = result.value.id;
+
+      // Otomatik atama: Seçilen tüm firmalara tüm alt projeleri ata
+      if (companyIds.length > 0) {
+        await autoAssignCompaniesToSubProjects(projectId, companyIds);
+      }
+
       return NextResponse.json(result.value, { status: 201 });
     }
 
     // Create new project
     const createProjectUseCase = new CreateProjectUseCase(projectRepository);
     const result = await createProjectUseCase.execute({
-      companyId: body.companyId,
+      companyId: primaryCompanyId, // İlk firma primary olarak kullanılır
       consultantId: body.consultantId || user.id,
       name: body.name,
       description: body.description,
@@ -159,9 +183,60 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
 
+    const projectId = result.value.id;
+
+    // Otomatik atama: Seçilen tüm firmalara tüm alt projeleri ata
+    if (companyIds.length > 0) {
+      await autoAssignCompaniesToSubProjects(projectId, companyIds);
+    }
+
     return NextResponse.json(result.value, { status: 201 });
   } catch (error) {
     console.error('Error in POST /api/projects:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+/**
+ * Helper function: Otomatik olarak seçilen firmalara tüm alt projeleri atar
+ */
+async function autoAssignCompaniesToSubProjects(
+  projectId: string,
+  companyIds: string[]
+): Promise<void> {
+  try {
+    // Projenin alt projelerini al
+    const subProjects = await subProjectRepository.findByProjectId(projectId);
+    if (subProjects.length === 0) {
+      // Alt proje yoksa atama yapmaya gerek yok
+      return;
+    }
+
+    // Bulk assignment use case'i kullanarak tüm firmalara tüm alt projeleri ata
+    const bulkAssignUseCase = new BulkAssignSubProjectsToCompaniesUseCase(
+      projectRepository,
+      subProjectRepository,
+      companyRepository,
+      assignmentRepository
+    );
+
+    const assignments = companyIds.map((companyId) => ({
+      companyId,
+      subProjectIds: subProjects.map((sp) => sp.id),
+    }));
+
+    const result = await bulkAssignUseCase.execute({
+      projectId,
+      assignments,
+    });
+
+    if (result.isFailure) {
+      console.error('[autoAssignCompaniesToSubProjects] Bulk assignment failed:', result.error);
+      // Hata olsa bile proje oluşturulmuş olur, sadece atamalar yapılamaz
+      // Kullanıcı daha sonra manuel olarak atama yapabilir
+    }
+  } catch (error) {
+    console.error('[autoAssignCompaniesToSubProjects] Error:', error);
+    // Hata olsa bile proje oluşturulmuş olur
   }
 }

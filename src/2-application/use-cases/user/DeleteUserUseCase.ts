@@ -1,7 +1,8 @@
 /**
  * Delete User Use Case
  *
- * Business logic for deleting (soft delete) a user
+ * Business logic for deleting (hard delete) a user
+ * Deletes from both Supabase Auth and public.users table
  */
 
 import { Result } from '@/core/result/Result';
@@ -27,22 +28,36 @@ export class DeleteUserUseCase {
       // 2. Check if user exists
       const userResult = await this.userRepository.findById(request.id);
       if (userResult.isFailure) {
-        return Result.fail(userResult.error || 'Kullanıcı bulunamadı');
+        const errorMsg =
+          userResult.error instanceof Error
+            ? userResult.error.message
+            : typeof userResult.error === 'string'
+              ? userResult.error
+              : 'Bilinmeyen hata';
+        return Result.fail(`Kullanıcı bulunamadı: ${errorMsg}`);
       }
 
       if (!userResult.value) {
-        return Result.fail('Kullanıcı bulunamadı');
+        return Result.fail('Kullanıcı bulunamadı. Kullanıcı ID geçersiz veya silinmiş olabilir.');
       }
 
       // 3. Cannot delete self
       if (request.userId === request.id) {
-        return Result.fail('Kendi hesabınızı silemezsiniz');
+        return Result.fail(
+          'Kendi hesabınızı silemezsiniz. Başka bir admin hesabından silme işlemini gerçekleştirin.'
+        );
       }
 
-      // 4. Soft delete user
+      // 4. Hard delete user (deletes from Supabase Auth and public.users)
       const deleteResult = await this.userRepository.delete(request.id);
       if (deleteResult.isFailure) {
-        return Result.fail(deleteResult.error || 'Kullanıcı silinemedi');
+        const errorMsg =
+          deleteResult.error instanceof Error
+            ? deleteResult.error.message
+            : typeof deleteResult.error === 'string'
+              ? deleteResult.error
+              : 'Bilinmeyen hata';
+        return Result.fail(`Kullanıcı silinemedi: ${errorMsg}`);
       }
 
       return Result.ok(undefined);

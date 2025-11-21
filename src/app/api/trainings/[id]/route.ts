@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { TrainingRepository } from '@/infrastructure/database/repositories/TrainingRepository';
+import { TrainingRepository } from '@/4-infrastructure/database/repositories/TrainingRepository';
 import {
   GetTrainingUseCase,
   UpdateTrainingUseCase,
   DeleteTrainingUseCase,
-} from '@/application/use-cases/training';
-import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
+} from '@/2-application/use-cases/training';
+import { getAuthenticatedUser } from '@/4-infrastructure/api/helpers/auth';
 import { AppError } from '@/6-core/errors/AppError';
+import { logger } from '@/5-shared/utils/logger';
 
 const trainingRepository = new TrainingRepository();
 
@@ -22,18 +23,30 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     }
 
     const { id } = await params;
+    logger.info('📋 [GET /api/trainings/[id]] Request:', {
+      trainingId: id,
+      userId: user.id,
+      userRole: user.role,
+    });
+
     const getTrainingUseCase = new GetTrainingUseCase(trainingRepository);
     const result = await getTrainingUseCase.execute(id);
 
     if (result.isFailure) {
       const error =
         result.error instanceof AppError ? result.error : new AppError('Unknown error', 500);
+      logger.error('❌ [GET /api/trainings/[id]] Use case failed:', {
+        trainingId: id,
+        error: error.message,
+        statusCode: error.statusCode,
+      });
       return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
 
+    logger.info('✅ [GET /api/trainings/[id]] Success:', { trainingId: id });
     return NextResponse.json(result.value);
   } catch (error) {
-    console.error('Error in GET /api/trainings/[id]:', error);
+    logger.error('❌ [GET /api/trainings/[id]] Error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

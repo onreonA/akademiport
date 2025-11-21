@@ -19,20 +19,40 @@ export class DeleteCompanyUseCase {
     // Get company
     const companyResult = await this.companyRepository.findById(companyId);
     if (companyResult.isFailure) {
-      return Result.fail(companyResult.error!);
+      const errorMsg =
+        companyResult.error instanceof Error
+          ? companyResult.error.message
+          : typeof companyResult.error === 'string'
+            ? companyResult.error
+            : 'Bilinmeyen hata';
+      return Result.fail(`Firma bulunamadı: ${errorMsg}`);
     }
 
     const company = companyResult.value;
     if (!company) {
-      return Result.fail('Firma bulunamadı');
+      return Result.fail('Firma bulunamadı. Firma ID geçersiz veya silinmiş olabilir.');
     }
 
     // Business rule: Cannot delete company with active users
     if (company.currentUsers > 0) {
-      return Result.fail('Aktif kullanıcısı olan firma silinemez');
+      return Result.fail(
+        `Bu firma silinemez. ${company.currentUsers} aktif kullanıcı bulunmaktadır. Önce kullanıcıları çıkarın veya pasif hale getirin.`
+      );
     }
 
     // Delete company
-    return await this.companyRepository.delete(companyId);
+    const deleteResult = await this.companyRepository.delete(companyId);
+
+    if (deleteResult.isFailure) {
+      const errorMsg =
+        deleteResult.error instanceof Error
+          ? deleteResult.error.message
+          : typeof deleteResult.error === 'string'
+            ? deleteResult.error
+            : 'Bilinmeyen hata';
+      return Result.fail(`Firma silinemedi: ${errorMsg}`);
+    }
+
+    return deleteResult;
   }
 }

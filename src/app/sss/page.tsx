@@ -13,8 +13,6 @@ import { ModernFooter } from '@/1-presentation/components/features/layout/Modern
 import {
   HelpCircle,
   Search,
-  ChevronDown,
-  ChevronUp,
   Info,
   FileText,
   BookOpen,

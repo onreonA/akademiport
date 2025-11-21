@@ -36,6 +36,7 @@ import {
   Briefcase,
   UserCheck,
 } from 'lucide-react';
+import { toast } from 'sonner';
 import type { Program } from '@/domain/entities/Program';
 import { ProgramStatusLabels } from '@/domain/enums/ProgramStatus';
 
@@ -126,12 +127,33 @@ export default function ProgramDetailPage({ params }: { params: Promise<{ id: st
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Program silinemedi');
+        // Extract error message properly
+        let errorMessage = 'Program silinemedi';
+
+        if (data.error) {
+          if (typeof data.error === 'string') {
+            errorMessage = data.error;
+          } else if (typeof data.error === 'object' && data.error !== null) {
+            // If error is an object, try to extract message
+            if ('message' in data.error) {
+              errorMessage = String(data.error.message);
+            } else {
+              errorMessage = JSON.stringify(data.error);
+            }
+          } else {
+            errorMessage = String(data.error);
+          }
+        }
+
+        throw new Error(errorMessage);
       }
 
+      toast.success('Program başarıyla silindi');
       router.push('/dashboard/programs');
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Program silinirken bir hata oluştu');
+      const errorMessage =
+        err instanceof Error ? err.message : 'Program silinirken bir hata oluştu';
+      toast.error(errorMessage);
     }
   };
 

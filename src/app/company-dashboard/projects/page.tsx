@@ -51,7 +51,9 @@ export default function CompanyProjectsPage() {
   const fetchProjects = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/projects');
+      const params = new URLSearchParams();
+      params.append('isTemplate', 'false'); // Şablonları hariç tut
+      const response = await fetch(`/api/projects?${params.toString()}`);
       if (!response.ok) throw new Error('Failed to fetch projects');
       const data = await response.json();
       // Ensure projects have default values for status, priority, and progress

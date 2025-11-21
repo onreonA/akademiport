@@ -60,6 +60,7 @@ export default function AdminProjectsPage() {
     setError(null);
     try {
       const params = new URLSearchParams();
+      params.append('isTemplate', 'false'); // Şablonları hariç tut
       if (statusFilter !== 'all') {
         params.append('status', statusFilter);
       }

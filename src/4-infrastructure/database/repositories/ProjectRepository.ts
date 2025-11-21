@@ -93,8 +93,13 @@ export class ProjectRepository implements IProjectRepository {
       query = query.eq('status', filters.status);
     }
 
+    // Şablonları varsayılan olarak hariç tut (sadece normal projeleri göster)
+    // Eğer isTemplate açıkça belirtilmişse, o değeri kullan
     if (filters?.isTemplate !== undefined) {
       query = query.eq('is_template', filters.isTemplate);
+    } else {
+      // Varsayılan olarak şablonları hariç tut
+      query = query.eq('is_template', false);
     }
 
     query = query.order('created_at', { ascending: false }).range(offset, offset + limit - 1);
@@ -115,6 +120,9 @@ export class ProjectRepository implements IProjectRepository {
     const supabase = await createClient();
 
     let query = supabase.from('projects').select(PROJECT_SELECT_FIELDS).eq('company_id', companyId);
+
+    // Şablonları hariç tut
+    query = query.eq('is_template', false);
 
     // Soft delete kontrolü
     if (!includeDeleted) {
@@ -140,6 +148,9 @@ export class ProjectRepository implements IProjectRepository {
       .from('projects')
       .select(PROJECT_SELECT_FIELDS)
       .eq('consultant_id', consultantId);
+
+    // Şablonları hariç tut
+    query = query.eq('is_template', false);
 
     // Soft delete kontrolü
     if (!includeDeleted) {

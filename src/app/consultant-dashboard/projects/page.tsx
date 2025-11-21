@@ -38,6 +38,7 @@ export default function ConsultantProjectsPage() {
     try {
       setLoading(true);
       const params = new URLSearchParams();
+      params.append('isTemplate', 'false'); // Şablonları hariç tut
       if (statusFilter !== 'all') params.append('status', statusFilter);
 
       const response = await fetch(`/api/projects?${params}`);

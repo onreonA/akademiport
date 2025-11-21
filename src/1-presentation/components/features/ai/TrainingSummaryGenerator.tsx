@@ -14,7 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/1-presentation/components/ui/atoms/card';
-import { Sparkles, Loader2, Check, X, BookOpen } from 'lucide-react';
+import { Sparkles, Loader2, Check, BookOpen } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface TrainingSummaryGeneratorProps {

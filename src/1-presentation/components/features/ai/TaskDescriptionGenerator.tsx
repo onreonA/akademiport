@@ -8,9 +8,8 @@
 
 import { useState } from 'react';
 import { Button } from '@/1-presentation/components/ui/atoms/button';
-import { Textarea } from '@/1-presentation/components/ui/atoms/textarea';
 import { Label } from '@/1-presentation/components/ui/atoms/label';
-import { Sparkles, Loader2, Check, X } from 'lucide-react';
+import { Sparkles, Loader2, Check } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface TaskDescriptionGeneratorProps {

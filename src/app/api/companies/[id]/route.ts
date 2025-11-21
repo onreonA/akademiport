@@ -115,7 +115,28 @@ export async function DELETE(
     const result = await deleteCompanyUseCase.execute(id, userId, userRole);
 
     if (result.isFailure) {
-      return NextResponse.json({ error: result.error }, { status: 400 });
+      // Extract error message properly
+      let errorMessage = 'Firma silinemedi';
+
+      if (result.error) {
+        if (typeof result.error === 'string') {
+          errorMessage = result.error;
+        } else if (result.error instanceof Error) {
+          errorMessage = result.error.message;
+        } else if (typeof result.error === 'object' && 'message' in result.error) {
+          errorMessage = String(result.error.message);
+        } else {
+          errorMessage = String(result.error);
+        }
+      }
+
+      return NextResponse.json(
+        {
+          success: false,
+          error: errorMessage,
+        },
+        { status: 400 }
+      );
     }
 
     return NextResponse.json({
@@ -123,8 +144,18 @@ export async function DELETE(
       message: 'Firma başarıyla silindi',
     });
   } catch (error) {
+    let errorMessage = 'Firma silinirken beklenmeyen bir hata oluştu';
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    } else if (typeof error === 'object' && error !== null && 'message' in error) {
+      errorMessage = String(error.message);
+    }
+
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Firma silinemedi' },
+      {
+        success: false,
+        error: errorMessage,
+      },
       { status: 500 }
     );
   }

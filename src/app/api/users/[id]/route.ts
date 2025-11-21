@@ -144,10 +144,25 @@ export async function DELETE(
     });
 
     if (result.isFailure) {
+      // Extract error message properly
+      let errorMessage = 'Kullanıcı silinemedi';
+
+      if (result.error) {
+        if (typeof result.error === 'string') {
+          errorMessage = result.error;
+        } else if (result.error instanceof Error) {
+          errorMessage = result.error.message;
+        } else if (typeof result.error === 'object' && 'message' in result.error) {
+          errorMessage = String(result.error.message);
+        } else {
+          errorMessage = String(result.error);
+        }
+      }
+
       return NextResponse.json(
         {
           success: false,
-          error: result.error,
+          error: errorMessage,
         },
         { status: 400 }
       );
@@ -162,10 +177,18 @@ export async function DELETE(
     );
   } catch (error) {
     console.error('Delete user error:', error);
+
+    let errorMessage = 'Kullanıcı silinirken beklenmeyen bir hata oluştu';
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    } else if (typeof error === 'object' && error !== null && 'message' in error) {
+      errorMessage = String(error.message);
+    }
+
     return NextResponse.json(
       {
         success: false,
-        error: 'Kullanıcı silinemedi',
+        error: errorMessage,
       },
       { status: 500 }
     );

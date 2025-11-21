@@ -5,9 +5,10 @@
  * Sprint 6: Company Management
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Plus } from 'lucide-react';
+import { toast } from 'sonner';
 import { Button } from '@/presentation/components/ui/atoms/button';
 import { CompanyCard, CompanyFilters } from '@/presentation/components/features/companies';
 import type { Company } from '@/domain/entities/Company';
@@ -104,14 +105,35 @@ export default function CompaniesPage() {
 
       const data = await response.json();
 
-      if (data.success) {
-        fetchCompanies();
-      } else {
-        alert(data.error || 'Firma silinemedi');
+      if (!response.ok || !data.success) {
+        // Extract error message properly
+        let errorMessage = 'Firma silinemedi';
+
+        if (data.error) {
+          if (typeof data.error === 'string') {
+            errorMessage = data.error;
+          } else if (typeof data.error === 'object' && data.error !== null) {
+            // If error is an object, try to extract message
+            if ('message' in data.error) {
+              errorMessage = String(data.error.message);
+            } else {
+              errorMessage = JSON.stringify(data.error);
+            }
+          } else {
+            errorMessage = String(data.error);
+          }
+        }
+
+        throw new Error(errorMessage);
       }
+
+      // Refresh list
+      fetchCompanies();
+      toast.success('Firma başarıyla silindi');
     } catch (error) {
-      console.error('Failed to delete company:', error);
-      alert('Firma silinemedi');
+      const errorMessage =
+        error instanceof Error ? error.message : 'Firma silinirken bir hata oluştu';
+      toast.error(errorMessage);
     }
   };
 

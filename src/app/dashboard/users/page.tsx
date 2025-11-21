@@ -14,6 +14,7 @@ import { UserCard, UserFilters } from '@/presentation/components/features/users'
 import { User } from '@/domain/entities/User';
 import { UserRole } from '@/domain/enums/UserRole';
 import { Plus, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function UsersPage() {
   const router = useRouter();
@@ -90,11 +91,37 @@ export default function UsersPage() {
         method: 'DELETE',
       });
 
-      if (response.ok) {
-        fetchUsers();
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        // Extract error message properly
+        let errorMessage = 'Kullanıcı silinemedi';
+
+        if (data.error) {
+          if (typeof data.error === 'string') {
+            errorMessage = data.error;
+          } else if (typeof data.error === 'object' && data.error !== null) {
+            // If error is an object, try to extract message
+            if ('message' in data.error) {
+              errorMessage = String(data.error.message);
+            } else {
+              errorMessage = JSON.stringify(data.error);
+            }
+          } else {
+            errorMessage = String(data.error);
+          }
+        }
+
+        throw new Error(errorMessage);
       }
+
+      // Refresh list
+      fetchUsers();
+      toast.success('Kullanıcı başarıyla silindi');
     } catch (error) {
-      console.error('Failed to delete user:', error);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Kullanıcı silinirken bir hata oluştu';
+      toast.error(errorMessage);
     }
   };
 

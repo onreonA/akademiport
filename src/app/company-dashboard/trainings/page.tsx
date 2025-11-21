@@ -49,6 +49,7 @@ export default function CompanyTrainingsPage() {
 
   const fetchTrainings = React.useCallback(async () => {
     if (!user?.companyId) {
+      console.warn('⚠️ [CompanyTrainingsPage] No companyId found for user:', user);
       setError('Firma bilgisi bulunamadı');
       setLoading(false);
       return;
@@ -58,10 +59,21 @@ export default function CompanyTrainingsPage() {
       setLoading(true);
       setError(null);
 
+      console.log('🔍 [CompanyTrainingsPage] Fetching trainings for company:', user.companyId);
       const response = await fetch(`/api/companies/${user.companyId}/trainings`);
       const data = await response.json();
 
+      console.log('📋 [CompanyTrainingsPage] API Response:', {
+        status: response.status,
+        ok: response.ok,
+        data,
+      });
+
       if (!response.ok) {
+        console.error('❌ [CompanyTrainingsPage] API Error:', {
+          status: response.status,
+          error: data.error,
+        });
         throw new Error(data.error || 'Eğitimler yüklenemedi');
       }
 
@@ -79,6 +91,8 @@ export default function CompanyTrainingsPage() {
         videosCount?: number;
         documentsCount?: number;
       }
+
+      console.log('📦 [CompanyTrainingsPage] Raw trainings data:', data.trainings);
       const companyTrainings: CompanyTrainingWithTraining[] = (data.trainings || []).map(
         (ct: CompanyTrainingResponse) => ({
           id: ct.id,
@@ -96,9 +110,20 @@ export default function CompanyTrainingsPage() {
         })
       );
 
+      console.log('✅ [CompanyTrainingsPage] Mapped trainings:', {
+        count: companyTrainings.length,
+        trainings: companyTrainings.map((ct) => ({
+          id: ct.id,
+          trainingId: ct.trainingId,
+          trainingName: ct.training?.name,
+          status: ct.status,
+        })),
+      });
+
       setTrainings(companyTrainings);
       setPagination((prev) => ({ ...prev, total: companyTrainings.length }));
     } catch (err) {
+      console.error('❌ [CompanyTrainingsPage] Failed to fetch trainings:', err);
       setError(err instanceof Error ? err.message : 'Bir hata oluştu');
       toast.error(err instanceof Error ? err.message : 'Eğitimler yüklenirken bir hata oluştu');
     } finally {

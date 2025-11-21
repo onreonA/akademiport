@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { TrainingVideoRepository } from '@/infrastructure/database/repositories/TrainingVideoRepository';
-import { TrainingRepository } from '@/infrastructure/database/repositories/TrainingRepository';
+import { TrainingVideoRepository } from '@/4-infrastructure/database/repositories/TrainingVideoRepository';
+import { TrainingRepository } from '@/4-infrastructure/database/repositories/TrainingRepository';
 import {
   CreateTrainingVideoUseCase,
   ListTrainingVideosUseCase,
-} from '@/application/use-cases/training-video';
-import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
-import { logger } from '@/shared/utils/logger';
+} from '@/2-application/use-cases/training-video';
+import { getAuthenticatedUser } from '@/4-infrastructure/api/helpers/auth';
+import { logger } from '@/5-shared/utils/logger';
 import { AppError } from '@/6-core/errors/AppError';
 
 const trainingVideoRepository = new TrainingVideoRepository();
@@ -24,6 +24,13 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     }
 
     const { id } = await params;
+    logger.info('📋 [GET /api/trainings/[id]/videos] Request:', {
+      trainingId: id,
+      userId: user.id,
+      userRole: user.role,
+      userCompanyId: user.companyId,
+    });
+
     const listVideosUseCase = new ListTrainingVideosUseCase(
       trainingVideoRepository,
       trainingRepository
@@ -33,12 +40,21 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     if (result.isFailure) {
       const error =
         result.error instanceof AppError ? result.error : new AppError('Unknown error', 500);
+      logger.error('❌ [GET /api/trainings/[id]/videos] Use case failed:', {
+        trainingId: id,
+        error: error.message,
+        statusCode: error.statusCode,
+      });
       return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
 
+    logger.info('✅ [GET /api/trainings/[id]/videos] Success:', {
+      trainingId: id,
+      videosCount: result.value?.length || 0,
+    });
     return NextResponse.json({ videos: result.value });
   } catch (error) {
-    logger.error('Error in GET /api/trainings/[id]/videos:', error);
+    logger.error('❌ [GET /api/trainings/[id]/videos] Error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

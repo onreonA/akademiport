@@ -40,7 +40,6 @@ import {
   BarChart3,
   Settings,
   FileText,
-  Calendar,
   ArrowRight,
   Activity,
   Loader2,

@@ -63,6 +63,7 @@ export interface ProjectHierarchyAccordionProps {
   onTaskDelete?: (taskId: string) => void;
   onTaskMoveUp?: (taskId: string) => void;
   onTaskMoveDown?: (taskId: string) => void;
+  onTaskDates?: (taskId: string) => void;
 
   // Consultant features
   assignable?: boolean;
@@ -164,6 +165,7 @@ interface TaskItemProps
     | 'onTaskMoveDown'
     | 'onTaskView'
     | 'onTaskQuestion'
+    | 'onTaskDates'
   > {
   task: TaskDTO;
   canMoveUp?: boolean;
@@ -368,6 +370,21 @@ function TaskItem({ task, mode, ...props }: TaskItemProps) {
                   }}
                 >
                   <Edit className="w-4 h-4" />
+                </Button>
+              )}
+
+              {props.onTaskDates && (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  disabled={isPending}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    props.onTaskDates?.(task.id);
+                  }}
+                  title="Firma bazlı tarih ataması"
+                >
+                  <Calendar className="w-4 h-4" />
                 </Button>
               )}
 

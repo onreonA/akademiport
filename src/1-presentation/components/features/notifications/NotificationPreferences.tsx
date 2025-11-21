@@ -6,7 +6,7 @@
 
 'use client';
 
-import { useState, useLayoutEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   useNotificationPreferences,
   useUpdateNotificationPreferences,
@@ -32,6 +32,7 @@ export function NotificationPreferences() {
   const updateMutation = useUpdateNotificationPreferences();
   const { subscribe: subscribePush, isLoading: isSubscribing } = usePushNotifications();
 
+  // Initialize state with preferences, update when preferences change
   const [emailEnabled, setEmailEnabled] = useState(preferences?.emailEnabled ?? true);
   const [pushEnabled, setPushEnabled] = useState(preferences?.pushEnabled ?? true);
   const [inAppEnabled, setInAppEnabled] = useState(preferences?.inAppEnabled ?? true);
@@ -41,15 +42,19 @@ export function NotificationPreferences() {
   const [quietHoursStart, setQuietHoursStart] = useState(preferences?.quietHoursStart || '22:00');
   const [quietHoursEnd, setQuietHoursEnd] = useState(preferences?.quietHoursEnd || '08:00');
 
-  // Update local state when preferences load using useLayoutEffect to avoid cascading renders
-  useLayoutEffect(() => {
+  // Update local state when preferences load using useEffect to avoid cascading renders
+  useEffect(() => {
     if (preferences) {
-      setEmailEnabled(preferences.emailEnabled);
-      setPushEnabled(preferences.pushEnabled);
-      setInAppEnabled(preferences.inAppEnabled);
-      setQuietHoursEnabled(preferences.quietHoursEnabled);
-      setQuietHoursStart(preferences.quietHoursStart || '22:00');
-      setQuietHoursEnd(preferences.quietHoursEnd || '08:00');
+      // Use setTimeout to avoid synchronous setState in effect
+      const timeoutId = setTimeout(() => {
+        setEmailEnabled(preferences.emailEnabled);
+        setPushEnabled(preferences.pushEnabled);
+        setInAppEnabled(preferences.inAppEnabled);
+        setQuietHoursEnabled(preferences.quietHoursEnabled);
+        setQuietHoursStart(preferences.quietHoursStart || '22:00');
+        setQuietHoursEnd(preferences.quietHoursEnd || '08:00');
+      }, 0);
+      return () => clearTimeout(timeoutId);
     }
   }, [preferences]);
 

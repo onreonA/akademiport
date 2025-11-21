@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { CompanyTrainingRepository } from '@/infrastructure/database/repositories/CompanyTrainingRepository';
-import { CompanyRepository } from '@/infrastructure/database/repositories/CompanyRepository';
-import { TrainingRepository } from '@/infrastructure/database/repositories/TrainingRepository';
-import { TrainingVideoRepository } from '@/infrastructure/database/repositories/TrainingVideoRepository';
-import { TrainingDocumentRepository } from '@/infrastructure/database/repositories/TrainingDocumentRepository';
+import { CompanyTrainingRepository } from '@/4-infrastructure/database/repositories/CompanyTrainingRepository';
+import { CompanyRepository } from '@/4-infrastructure/database/repositories/CompanyRepository';
+import { TrainingRepository } from '@/4-infrastructure/database/repositories/TrainingRepository';
+import { TrainingVideoRepository } from '@/4-infrastructure/database/repositories/TrainingVideoRepository';
+import { TrainingDocumentRepository } from '@/4-infrastructure/database/repositories/TrainingDocumentRepository';
 import {
   AssignTrainingToCompanyUseCase,
   ListCompanyTrainingsUseCase,
-} from '@/application/use-cases/company-training';
-import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
-import { logger } from '@/shared/utils/logger';
+} from '@/2-application/use-cases/company-training';
+import { getAuthenticatedUser } from '@/4-infrastructure/api/helpers/auth';
+import { logger } from '@/5-shared/utils/logger';
 import { AppError } from '@/6-core/errors/AppError';
 
 const companyTrainingRepository = new CompanyTrainingRepository();
@@ -31,9 +31,20 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     const { id } = await params;
 
+    logger.info('📋 [GET /api/companies/[id]/trainings] Request:', {
+      companyId: id,
+      userId: user.id,
+      userRole: user.role,
+      userCompanyId: user.companyId,
+    });
+
     // Authorization: Company users can only see their own company's trainings
     if (user.role === 'company_user' || user.role === 'company_admin') {
       if (user.companyId !== id) {
+        logger.warn('🚫 [GET /api/companies/[id]/trainings] Forbidden:', {
+          requestedCompanyId: id,
+          userCompanyId: user.companyId,
+        });
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
       }
     }
@@ -50,10 +61,35 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     if (result.isFailure) {
       const error =
         result.error instanceof AppError ? result.error : new AppError('Unknown error', 500);
+      logger.error('❌ [GET /api/companies/[id]/trainings] Use case failed:', {
+        error: error.message,
+        statusCode: error.statusCode,
+      });
       return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
 
-    return NextResponse.json({ trainings: result.value });
+    logger.info('✅ [GET /api/companies/[id]/trainings] Success:', {
+      trainingsCount: result.value?.length || 0,
+    });
+
+    // Get debug info from use case
+    const debugInfo = listCompanyTrainingsUseCase.getDebugInfo?.();
+
+    // Include debug info in response for development
+    const response = {
+      trainings: result.value,
+      _debug:
+        process.env.NODE_ENV === 'development'
+          ? {
+              companyId: id,
+              trainingsCount: result.value?.length || 0,
+              timestamp: new Date().toISOString(),
+              useCaseDebug: debugInfo,
+            }
+          : undefined,
+    };
+
+    return NextResponse.json(response);
   } catch (error) {
     logger.error('Error in GET /api/companies/[id]/trainings:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

@@ -17,10 +17,17 @@ import {
   SelectValue,
 } from '@/presentation/components/ui/atoms/select';
 import { toast } from 'sonner';
+import { Checkbox } from '@/presentation/components/ui/atoms/checkbox';
+import { ScrollArea } from '@/presentation/components/ui/atoms/scroll-area';
+import { Badge } from '@/presentation/components/ui/atoms/badge';
+import { X, Search, Users } from 'lucide-react';
+import { cn } from '@/presentation/lib/utils';
 
 interface Company {
   id: string;
   name: string;
+  city?: string;
+  sector?: string;
 }
 
 interface ProjectTemplate {
@@ -34,8 +41,9 @@ export default function NewProjectPage() {
   const [loading, setLoading] = useState(false);
   const [companies, setCompanies] = useState<Company[]>([]);
   const [templates, setTemplates] = useState<ProjectTemplate[]>([]);
+  const [selectedCompanyIds, setSelectedCompanyIds] = useState<Set<string>>(new Set());
+  const [companySearchTerm, setCompanySearchTerm] = useState('');
   const [formData, setFormData] = useState({
-    company_id: '',
     name: '',
     description: '',
     status: 'planning',
@@ -63,6 +71,44 @@ export default function NewProjectPage() {
     }
   };
 
+  const filteredCompanies = companies.filter((company) => {
+    if (!companySearchTerm) return true;
+    const searchLower = companySearchTerm.toLowerCase();
+    return (
+      company.name.toLowerCase().includes(searchLower) ||
+      company.city?.toLowerCase().includes(searchLower) ||
+      company.sector?.toLowerCase().includes(searchLower)
+    );
+  });
+
+  const toggleCompanySelection = (companyId: string) => {
+    setSelectedCompanyIds((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(companyId)) {
+        newSet.delete(companyId);
+      } else {
+        newSet.add(companyId);
+      }
+      return newSet;
+    });
+  };
+
+  const removeCompany = (companyId: string) => {
+    setSelectedCompanyIds((prev) => {
+      const newSet = new Set(prev);
+      newSet.delete(companyId);
+      return newSet;
+    });
+  };
+
+  const selectAllCompanies = () => {
+    setSelectedCompanyIds(new Set(filteredCompanies.map((c) => c.id)));
+  };
+
+  const deselectAllCompanies = () => {
+    setSelectedCompanyIds(new Set());
+  };
+
   const fetchTemplates = async () => {
     try {
       const response = await fetch('/api/projects/templates');
@@ -77,6 +123,13 @@ export default function NewProjectPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validation: At least one company must be selected
+    if (selectedCompanyIds.size === 0) {
+      toast.error('Lütfen en az bir firma seçin');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -84,7 +137,7 @@ export default function NewProjectPage() {
 
       // Map formData to API expected format
       const payload: any = {
-        companyId: formData.company_id,
+        companyIds: Array.from(selectedCompanyIds), // Çoklu firma desteği
         name: formData.name,
         description: formData.description || undefined,
         status: formData.status || 'planning',
@@ -183,27 +236,121 @@ export default function NewProjectPage() {
               )}
             </div>
 
-            {/* Company Selection */}
+            {/* Company Selection - Multiple */}
             <div className="space-y-2">
-              <Label htmlFor="company_id">
-                Firma <span className="text-destructive">*</span>
-              </Label>
-              <Select
-                value={formData.company_id}
-                onValueChange={(value) => handleChange('company_id', value)}
-                required
-              >
-                <SelectTrigger id="company_id">
-                  <SelectValue placeholder="Firma seçin" />
-                </SelectTrigger>
-                <SelectContent>
-                  {companies.map((company) => (
-                    <SelectItem key={company.id} value={company.id}>
-                      {company.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="flex items-center justify-between">
+                <Label>
+                  Firmalar <span className="text-destructive">*</span>
+                </Label>
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={selectAllCompanies}
+                    disabled={loading || filteredCompanies.length === 0}
+                    className="h-7 text-xs"
+                  >
+                    Tümünü Seç
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={deselectAllCompanies}
+                    disabled={loading || selectedCompanyIds.size === 0}
+                    className="h-7 text-xs"
+                  >
+                    Tümünü Kaldır
+                  </Button>
+                </div>
+              </div>
+
+              {/* Selected Companies Badges */}
+              {selectedCompanyIds.size > 0 && (
+                <div className="flex flex-wrap gap-2 p-3 rounded-lg border border-border/60 bg-muted/30">
+                  {Array.from(selectedCompanyIds).map((companyId) => {
+                    const company = companies.find((c) => c.id === companyId);
+                    if (!company) return null;
+                    return (
+                      <Badge
+                        key={companyId}
+                        variant="secondary"
+                        className="flex items-center gap-1 pr-1"
+                      >
+                        <Users className="h-3 w-3" />
+                        {company.name}
+                        <button
+                          type="button"
+                          onClick={() => removeCompany(companyId)}
+                          className="ml-1 hover:bg-destructive/20 rounded-full p-0.5 transition-colors"
+                          disabled={loading}
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </Badge>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Company Search */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Firma ara..."
+                  value={companySearchTerm}
+                  onChange={(e) => setCompanySearchTerm(e.target.value)}
+                  className="pl-9"
+                  disabled={loading}
+                />
+              </div>
+
+              {/* Company List */}
+              <ScrollArea className="h-[200px] rounded-lg border border-border/60">
+                <div className="p-2 space-y-1">
+                  {filteredCompanies.length === 0 ? (
+                    <div className="text-center py-8 text-sm text-muted-foreground">
+                      {companySearchTerm ? 'Arama sonucu bulunamadı' : 'Firma bulunamadı'}
+                    </div>
+                  ) : (
+                    filteredCompanies.map((company) => {
+                      const isSelected = selectedCompanyIds.has(company.id);
+                      return (
+                        <label
+                          key={company.id}
+                          className={cn(
+                            'flex items-center gap-3 p-2 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors',
+                            isSelected && 'bg-primary/10'
+                          )}
+                        >
+                          <Checkbox
+                            checked={isSelected}
+                            onCheckedChange={() => toggleCompanySelection(company.id)}
+                            disabled={loading}
+                          />
+                          <div className="flex-1">
+                            <div className="font-medium text-sm">{company.name}</div>
+                            {(company.city || company.sector) && (
+                              <div className="text-xs text-muted-foreground">
+                                {[company.city, company.sector].filter(Boolean).join(' · ')}
+                              </div>
+                            )}
+                          </div>
+                        </label>
+                      );
+                    })
+                  )}
+                </div>
+              </ScrollArea>
+              {selectedCompanyIds.size === 0 && (
+                <p className="text-sm text-destructive">En az bir firma seçmelisiniz</p>
+              )}
+              {selectedCompanyIds.size > 0 && (
+                <p className="text-sm text-muted-foreground">
+                  {selectedCompanyIds.size} firma seçildi
+                </p>
+              )}
             </div>
 
             {/* Project Name */}

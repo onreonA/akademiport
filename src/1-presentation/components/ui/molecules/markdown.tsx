@@ -18,7 +18,7 @@ export function Markdown({ content, className }: MarkdownProps) {
   // Basit markdown parsing (chatbot için yeterli)
   const parseMarkdown = (text: string): React.ReactNode[] => {
     const parts: React.ReactNode[] = [];
-    let currentIndex = 0;
+    const currentIndex = 0;
 
     // Bold (**text**)
     const boldRegex = /\*\*(.+?)\*\*/g;

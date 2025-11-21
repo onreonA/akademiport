@@ -7,10 +7,10 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { ProgramRepository } from '@/4-infrastructure/database/repositories/ProgramRepository';
-import { CreateProgramUseCase, ListProgramsUseCase } from '@/application/use-cases/program';
-import { UserRole } from '@/domain/enums/UserRole';
-import { ProgramStatus } from '@/domain/enums/ProgramStatus';
-import type { ProgramSortField } from '@/application/dto/program/ProgramFilterDto';
+import { CreateProgramUseCase, ListProgramsUseCase } from '@/2-application/use-cases/program';
+import { UserRole } from '@/3-domain/enums/UserRole';
+import { ProgramStatus } from '@/3-domain/enums/ProgramStatus';
+import type { ProgramSortField } from '@/2-application/dto/program/ProgramFilterDto';
 import { requireAuth } from '@/4-infrastructure/api/helpers/auth';
 
 const programRepository = new ProgramRepository();
@@ -57,10 +57,24 @@ export async function GET(request: NextRequest) {
     });
 
     if (result.isFailure) {
+      let errorMessage = 'Programlar alınamadı';
+
+      if (result.error) {
+        if (typeof result.error === 'string') {
+          errorMessage = result.error;
+        } else if (result.error instanceof Error) {
+          errorMessage = result.error.message;
+        } else if (typeof result.error === 'object' && 'message' in result.error) {
+          errorMessage = String(result.error.message);
+        } else {
+          errorMessage = String(result.error);
+        }
+      }
+
       return NextResponse.json(
         {
           success: false,
-          error: result.error,
+          error: errorMessage,
         },
         { status: 400 }
       );

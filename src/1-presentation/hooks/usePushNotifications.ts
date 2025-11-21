@@ -23,11 +23,16 @@ export function usePushNotifications() {
     // Check if browser supports push notifications
     const supported =
       'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
-    setIsSupported(supported);
 
-    if (supported) {
-      setPermission(Notification.permission);
-    }
+    // Use setTimeout to avoid synchronous setState in effect
+    const timeoutId = setTimeout(() => {
+      setIsSupported(supported);
+      if (supported) {
+        setPermission(Notification.permission);
+      }
+    }, 0);
+
+    return () => clearTimeout(timeoutId);
   }, []);
 
   const requestPermission = async (): Promise<boolean> => {

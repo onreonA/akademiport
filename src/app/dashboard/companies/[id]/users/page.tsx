@@ -6,7 +6,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, usePathname } from 'next/navigation';
 import { ArrowLeft, UserPlus, Users, Mail, Phone, Edit, Trash2, Shield } from 'lucide-react';
 import { Button } from '@/presentation/components/ui/atoms/button';
 import {
@@ -26,6 +26,7 @@ import { toast } from 'sonner';
 export default function CompanyUsersPage() {
   const router = useRouter();
   const params = useParams();
+  const pathname = usePathname();
   const id = params?.id as string | undefined;
 
   const [company, setCompany] = useState<Company | null>(null);
@@ -65,7 +66,8 @@ export default function CompanyUsersPage() {
       const data = await response.json();
 
       if (data.success) {
-        setUsers(data.data || []);
+        // Support both data.data and data.users for backward compatibility
+        setUsers(data.data || data.users || []);
       } else {
         console.error('Failed to fetch users:', data.error || 'Unknown error');
       }
@@ -81,7 +83,8 @@ export default function CompanyUsersPage() {
     }
     fetchCompany();
     fetchUsers();
-  }, [id, fetchCompany, fetchUsers]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, pathname]); // Refetch when pathname changes (e.g., navigating back from add user page)
 
   const handleAddUser = () => {
     router.push(`/dashboard/companies/${id}/users/new`);

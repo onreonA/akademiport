@@ -9,6 +9,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ProgramRepository } from '@/4-infrastructure/database/repositories/ProgramRepository';
 import { CompanyRepository } from '@/4-infrastructure/database/repositories/CompanyRepository';
+import { TrainingRepository } from '@/4-infrastructure/database/repositories/TrainingRepository';
 import {
   GetProgramUseCase,
   UpdateProgramUseCase,
@@ -19,9 +20,14 @@ import { requireAuth } from '@/4-infrastructure/api/helpers/auth';
 
 const programRepository = new ProgramRepository();
 const companyRepository = new CompanyRepository();
+const trainingRepository = new TrainingRepository();
 const getProgramUseCase = new GetProgramUseCase(programRepository);
 const updateProgramUseCase = new UpdateProgramUseCase(programRepository);
-const deleteProgramUseCase = new DeleteProgramUseCase(programRepository, companyRepository);
+const deleteProgramUseCase = new DeleteProgramUseCase(
+  programRepository,
+  companyRepository,
+  trainingRepository
+);
 
 /**
  * GET /api/programs/[id]
@@ -150,10 +156,33 @@ export async function DELETE(
     });
 
     if (result.isFailure) {
+      // Extract error message properly
+      let errorMessage = 'Program silinemedi';
+
+      if (result.error) {
+        if (typeof result.error === 'string') {
+          errorMessage = result.error;
+        } else if (result.error instanceof Error) {
+          errorMessage = result.error.message;
+          // Check if error message contains database constraint errors
+          if (
+            errorMessage.includes('trainings_global_or_program') ||
+            errorMessage.includes('violates check constraint')
+          ) {
+            errorMessage =
+              'Bu program silinemez. Programa bağlı eğitimler bulunmaktadır. Önce eğitimleri silin veya başka bir programa taşıyın.';
+          }
+        } else if (typeof result.error === 'object' && 'message' in result.error) {
+          errorMessage = String(result.error.message);
+        } else {
+          errorMessage = String(result.error);
+        }
+      }
+
       return NextResponse.json(
         {
           success: false,
-          error: result.error,
+          error: errorMessage,
         },
         { status: 400 }
       );
@@ -168,10 +197,26 @@ export async function DELETE(
     );
   } catch (error) {
     console.error('Delete program error:', error);
+
+    let errorMessage = 'Program silinirken beklenmeyen bir hata oluştu';
+    if (error instanceof Error) {
+      errorMessage = error.message;
+      // Check if error message contains database constraint errors
+      if (
+        errorMessage.includes('trainings_global_or_program') ||
+        errorMessage.includes('violates check constraint')
+      ) {
+        errorMessage =
+          'Bu program silinemez. Programa bağlı eğitimler bulunmaktadır. Önce eğitimleri silin veya başka bir programa taşıyın.';
+      }
+    } else if (typeof error === 'object' && error !== null && 'message' in error) {
+      errorMessage = String(error.message);
+    }
+
     return NextResponse.json(
       {
         success: false,
-        error: 'Program silinemedi',
+        error: errorMessage,
       },
       { status: 500 }
     );

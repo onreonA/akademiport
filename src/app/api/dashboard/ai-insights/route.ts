@@ -68,13 +68,27 @@ export async function GET(request: NextRequest) {
     });
 
     if (result.isFailure) {
+      const errorMessage =
+        result.error instanceof Error ? result.error.message : 'Failed to get AI insights';
+
+      // AI servisi yoksa veya prompt yoksa 503 (Service Unavailable) döndür
+      // Bu durumda widget sessizce gizlenecek
+      if (
+        errorMessage.includes('Service not available') ||
+        errorMessage.includes('No active prompt') ||
+        errorMessage.includes('OPENAI_API_KEY') ||
+        errorMessage.includes('API_KEY') ||
+        errorMessage.includes('Provider selection failed')
+      ) {
+        logger.warn('AI insights service unavailable:', errorMessage);
+        return NextResponse.json(
+          { error: errorMessage },
+          { status: 503 } // Service Unavailable
+        );
+      }
+
       logger.error('Failed to get AI insights:', result.error);
-      return NextResponse.json(
-        {
-          error: result.error instanceof Error ? result.error.message : 'Failed to get AI insights',
-        },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: errorMessage }, { status: 500 });
     }
 
     return NextResponse.json(result.value, { status: 200 });
