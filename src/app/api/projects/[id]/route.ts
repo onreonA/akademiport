@@ -7,8 +7,17 @@ import {
 } from '@/application/use-cases/project';
 import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
 import { AppError } from '@/6-core/errors/AppError';
+import { AddLeaderboardScoreUseCase } from '@/2-application/use-cases/leaderboard';
+import { SupabaseLeaderboardRepository } from '@/4-infrastructure/database/repositories/SupabaseLeaderboardRepository';
+import { CompanyRepository } from '@/4-infrastructure/database/repositories/CompanyRepository';
 
 const projectRepository = new ProjectRepository();
+const leaderboardRepository = new SupabaseLeaderboardRepository();
+const companyRepository = new CompanyRepository();
+const addLeaderboardScore = new AddLeaderboardScoreUseCase(
+  leaderboardRepository,
+  companyRepository
+);
 
 /**
  * GET /api/projects/[id]
@@ -57,7 +66,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     const { id } = await params;
     const body = await request.json();
 
-    const updateProjectUseCase = new UpdateProjectUseCase(projectRepository);
+    const updateProjectUseCase = new UpdateProjectUseCase(projectRepository, addLeaderboardScore);
     const result = await updateProjectUseCase.execute(id, {
       companyId: body.companyId || body.company_id,
       consultantId: body.consultantId || body.consultant_id,

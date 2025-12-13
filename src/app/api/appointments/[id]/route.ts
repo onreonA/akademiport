@@ -14,8 +14,17 @@ import {
 } from '@/application/dto/appointment';
 import { UserRole } from '@/domain/enums/UserRole';
 import { AppError } from '@/6-core/errors/AppError';
+import { AddLeaderboardScoreUseCase } from '@/2-application/use-cases/leaderboard';
+import { SupabaseLeaderboardRepository } from '@/4-infrastructure/database/repositories/SupabaseLeaderboardRepository';
+import { CompanyRepository } from '@/4-infrastructure/database/repositories/CompanyRepository';
 
 const appointmentRepository = new AppointmentRepository();
+const leaderboardRepository = new SupabaseLeaderboardRepository();
+const companyRepository = new CompanyRepository();
+const addLeaderboardScore = new AddLeaderboardScoreUseCase(
+  leaderboardRepository,
+  companyRepository
+);
 
 /**
  * GET /api/appointments/[id]
@@ -139,7 +148,10 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       updateData.endTime = new Date(updateData.endTime);
     }
 
-    const updateAppointmentUseCase = new UpdateAppointmentUseCase(appointmentRepository);
+    const updateAppointmentUseCase = new UpdateAppointmentUseCase(
+      appointmentRepository,
+      addLeaderboardScore
+    );
     const result = await updateAppointmentUseCase.execute(id, updateData);
 
     if (result.isFailure) {

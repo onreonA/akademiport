@@ -3,9 +3,14 @@ import { UpdateAppointmentDto } from '@/3-domain/entities/Appointment';
 import { Result } from '@/6-core/result/Result';
 import { AppError } from '@/6-core/errors/AppError';
 import { logger } from '@/shared/utils/logger';
+import { AddLeaderboardScoreUseCase } from '@/2-application/use-cases/leaderboard';
+import { ActivityType } from '@/3-domain/enums/LeaderboardEnums';
 
 export class UpdateAppointmentUseCase {
-  constructor(private appointmentRepository: IAppointmentRepository) {}
+  constructor(
+    private appointmentRepository: IAppointmentRepository,
+    private addLeaderboardScore?: AddLeaderboardScoreUseCase
+  ) {}
 
   async execute(appointmentId: string, data: UpdateAppointmentDto): Promise<Result<any>> {
     try {
@@ -18,6 +23,10 @@ export class UpdateAppointmentUseCase {
       if (!existingAppointment) {
         return Result.fail(new AppError('Appointment not found', 404));
       }
+
+      // Check if appointment is being marked as attended
+      const isBeingMarkedAsAttended =
+        data.attendedAt && !existingAppointment.attendedAt && existingAppointment.companyId;
 
       // Conflict detection if time is being changed
       if (data.startTime || data.endTime) {
@@ -54,6 +63,20 @@ export class UpdateAppointmentUseCase {
       };
 
       const updatedAppointment = await this.appointmentRepository.update(appointmentId, updateData);
+
+      // Add leaderboard score if appointment was marked as attended
+      if (isBeingMarkedAsAttended && this.addLeaderboardScore && existingAppointment.companyId) {
+        await this.addLeaderboardScore.execute({
+          companyId: existingAppointment.companyId,
+          activityType: ActivityType.APPOINTMENT_COMPLETED,
+          activityId: appointmentId,
+          metadata: {
+            appointmentId,
+            consultantId: existingAppointment.consultantId,
+            attendedAt: updatedAppointment.attendedAt?.toISOString(),
+          },
+        });
+      }
 
       logger.info('Appointment updated successfully', {
         appointmentId: updatedAppointment.id,
