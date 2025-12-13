@@ -16,9 +16,23 @@ export default defineConfig(({ mode }) => {
       globals: true,
       setupFiles: ['./src/5-shared/test/setup.ts'],
       env,
+      // Parallelization settings
+      threads: !process.env.CI, // Disable threads in CI for better stability
+      maxWorkers: process.env.CI ? 1 : undefined, // Use single worker in CI
+      minWorkers: 1,
+      // Performance optimizations
+      isolate: true, // Isolate each test file (better performance)
+      // Test timeout
+      testTimeout: 10000,
+      hookTimeout: 10000,
+      // Retry flaky tests (only in CI)
+      retry: process.env.CI ? 2 : 0,
+      // Flaky test detection
+      bail: 0, // Don't bail on first failure
+      // Coverage settings
       coverage: {
         provider: 'v8',
-        reporter: ['text', 'json', 'html'],
+        reporter: ['text', 'json', 'html', 'lcov'],
         exclude: [
           'node_modules/',
           'src/5-shared/test/',
@@ -28,6 +42,12 @@ export default defineConfig(({ mode }) => {
           '**/*.stories.*',
           '.storybook/',
         ],
+        thresholds: {
+          lines: 60,
+          functions: 60,
+          branches: 60,
+          statements: 60,
+        },
       },
       include: ['**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
       exclude: [
@@ -39,6 +59,12 @@ export default defineConfig(({ mode }) => {
         'e2e/**', // E2E testleri Playwright ile çalışır, Vitest ile değil
         '**/*.e2e.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
       ],
+      // Reporter settings
+      reporters: process.env.CI ? ['verbose', 'json', 'junit'] : ['verbose', 'json'],
+      outputFile: {
+        json: './test-results/results.json',
+        junit: './test-results/junit.xml',
+      },
     },
     resolve: {
       alias: {

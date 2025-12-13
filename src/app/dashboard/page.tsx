@@ -10,15 +10,6 @@ import * as React from 'react';
 import { useAuth } from '@/shared/hooks/useAuth';
 import { useDashboardStats } from '@/1-presentation/hooks/useDashboard';
 import { Button } from '@/presentation/components/ui/atoms/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/presentation/components/ui/atoms/card';
-import { StatCard } from '@/presentation/components/ui/atoms/stat-card';
-import { MetricCard } from '@/presentation/components/ui/atoms/metric-card';
 import { ModernStatCard } from '@/presentation/components/ui/atoms/modern-stat-card';
 import { EnhancedCard } from '@/presentation/components/ui/atoms/enhanced-card';
 import { EmptyState } from '@/presentation/components/ui/atoms/empty-state';
@@ -43,6 +34,10 @@ import {
   ArrowRight,
   Activity,
   Loader2,
+  UserPlus,
+  Edit3,
+  AlertCircle,
+  Clock,
 } from 'lucide-react';
 import { ExportButton } from '@/1-presentation/components/features/export';
 import { AIInsightsWidget } from '@/1-presentation/components/features/analytics';
@@ -324,66 +319,135 @@ export default function DashboardPage() {
 
           {/* Enhanced Recent Activity */}
           <EnhancedCard variant="default" className="lg:col-span-2 p-6">
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold flex items-center gap-2 mb-2 text-gray-900 dark:text-white">
-                <Activity className="h-5 w-5 text-primary" />
-                Son Aktiviteler
-              </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Son 24 saatteki sistem aktiviteleri
-              </p>
+            <div className="mb-6 flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-semibold flex items-center gap-2 mb-2 text-gray-900 dark:text-white">
+                  <div className="p-2 rounded-lg bg-primary/10">
+                    <Activity className="h-5 w-5 text-primary" />
+                  </div>
+                  Son Aktiviteler
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Son 24 saatteki sistem aktiviteleri
+                </p>
+              </div>
+              <Button variant="ghost" size="sm" className="text-primary hover:text-primary/80">
+                Tümünü Gör
+                <ArrowRight className="h-4 w-4 ml-1" />
+              </Button>
             </div>
             <div>
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {[
                   {
                     action: 'Yeni program oluşturuldu',
                     user: 'Ahmet Yılmaz',
                     time: '2 saat önce',
                     type: 'success',
+                    icon: FolderKanban,
+                    description: 'E-İhracat Akademisi programı başlatıldı',
                   },
                   {
                     action: 'Firma kaydı güncellendi',
                     user: 'Mehmet Kaya',
                     time: '4 saat önce',
                     type: 'info',
+                    icon: Edit3,
+                    description: 'ABC Tekstil firma bilgileri güncellendi',
                   },
                   {
                     action: 'Kullanıcı eklendi',
                     user: 'Ayşe Demir',
                     time: '6 saat önce',
                     type: 'success',
+                    icon: UserPlus,
+                    description: 'Yeni danışman hesabı oluşturuldu',
                   },
                   {
                     action: 'Program durumu değiştirildi',
                     user: 'Ali Veli',
                     time: '8 saat önce',
                     type: 'warning',
+                    icon: AlertCircle,
+                    description: 'Dijital Pazarlama programı duraklatıldı',
                   },
-                ].map((activity, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-                  >
+                ].map((activity, index) => {
+                  const Icon = activity.icon;
+                  return (
                     <div
-                      className={`w-2 h-2 rounded-full ${
-                        activity.type === 'success'
-                          ? 'bg-green-600'
-                          : activity.type === 'warning'
-                            ? 'bg-orange-600'
-                            : 'bg-blue-600'
-                      }`}
-                    />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate text-gray-900 dark:text-white">
-                        {activity.action}
-                      </p>
-                      <p className="text-xs text-gray-600 dark:text-gray-400">
-                        {activity.user} • {activity.time}
-                      </p>
+                      key={index}
+                      className="group relative flex items-start gap-4 p-4 rounded-xl border border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 hover:shadow-md transition-all duration-200 cursor-pointer"
+                    >
+                      {/* Icon with colored background */}
+                      <div
+                        className={`flex-shrink-0 p-3 rounded-xl ${
+                          activity.type === 'success'
+                            ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400'
+                            : activity.type === 'warning'
+                              ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400'
+                              : 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
+                        }`}
+                      >
+                        <Icon className="h-5 w-5" />
+                      </div>
+
+                      {/* Content */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-2 mb-1">
+                          <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                            {activity.action}
+                          </p>
+                          <Badge
+                            variant={
+                              activity.type === 'success'
+                                ? 'success'
+                                : activity.type === 'warning'
+                                  ? 'warning'
+                                  : 'default'
+                            }
+                            className="flex-shrink-0"
+                          >
+                            {activity.type === 'success'
+                              ? 'Başarılı'
+                              : activity.type === 'warning'
+                                ? 'Uyarı'
+                                : 'Bilgi'}
+                          </Badge>
+                        </div>
+                        <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
+                          {activity.description}
+                        </p>
+                        <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-500">
+                          <div className="flex items-center gap-1">
+                            <Users className="h-3 w-3" />
+                            <span>{activity.user}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            <span>{activity.time}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Hover indicator */}
+                      <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <ArrowRight className="h-4 w-4 text-gray-400" />
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
+              </div>
+
+              {/* View all button at bottom */}
+              <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">
+                <Button
+                  variant="ghost"
+                  className="w-full justify-center text-sm text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary"
+                >
+                  <Activity className="h-4 w-4 mr-2" />
+                  Tüm Aktiviteleri Görüntüle
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Button>
               </div>
             </div>
           </EnhancedCard>

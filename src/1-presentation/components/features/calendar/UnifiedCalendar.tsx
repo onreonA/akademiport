@@ -555,6 +555,13 @@ export function UnifiedCalendar({
               center: 'title',
               right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
             }}
+            buttonText={{
+              today: 'Bugün',
+              month: 'Ay',
+              week: 'Hafta',
+              day: 'Gün',
+              list: 'Liste',
+            }}
             events={calendarEvents}
             eventClick={handleEventClick}
             selectable={!!onDateSelect}

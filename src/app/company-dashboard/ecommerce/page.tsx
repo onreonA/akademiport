@@ -30,6 +30,7 @@ import {
   EcommercePlatformType,
   EcommercePlatformTypeLabels,
 } from '@/3-domain/enums/EcommerceEnums';
+import { EcommerceMetricsChart } from '@/1-presentation/components/features/analytics/EcommerceMetricsChart';
 
 export default function CompanyEcommercePage() {
   const [companyId, setCompanyId] = useState<string>('');
@@ -195,6 +196,44 @@ export default function CompanyEcommercePage() {
           </DialogContent>
         </Dialog>
       </div>
+
+      {/* Metrics Chart */}
+      {metrics.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>E-ticaret Trend Analizi</CardTitle>
+            <CardDescription>
+              Aylık gelir, sipariş ve ziyaretçi trendinizi görüntüleyin
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <EcommerceMetricsChart
+              data={metrics
+                .sort((a: any, b: any) => {
+                  const dateA = new Date(a.periodYear, a.periodMonth - 1);
+                  const dateB = new Date(b.periodYear, b.periodMonth - 1);
+                  return dateA.getTime() - dateB.getTime();
+                })
+                .map((metric: any) => ({
+                  month: `${metric.periodYear}-${String(metric.periodMonth).padStart(2, '0')}`,
+                  revenue:
+                    metric.platformType === EcommercePlatformType.ALIBABA
+                      ? metric.alibabaRevenue
+                      : metric.b2cRevenue,
+                  orders:
+                    metric.platformType === EcommercePlatformType.ALIBABA
+                      ? metric.alibabaOrders
+                      : metric.b2cOrders,
+                  visitors:
+                    metric.platformType === EcommercePlatformType.ALIBABA
+                      ? metric.alibabaVisitors
+                      : metric.b2cVisitors,
+                }))}
+              height={400}
+            />
+          </CardContent>
+        </Card>
+      )}
 
       {/* Metrics List */}
       {metrics.length === 0 ? (

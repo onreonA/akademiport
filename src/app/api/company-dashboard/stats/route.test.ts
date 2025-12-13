@@ -288,4 +288,3 @@ describe('GET /api/company-dashboard/stats', () => {
     });
   });
 });
-

@@ -1,4 +1,6 @@
 export * from './CreateTopicUseCase';
+export * from './UpdateTopicUseCase';
+export * from './DeleteTopicUseCase';
 export * from './ReplyTopicUseCase';
 export * from './MarkSolutionUseCase';
 export * from './ListTopicsUseCase';

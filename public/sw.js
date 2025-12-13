@@ -15,7 +15,7 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       console.log('[Service Worker] Caching static assets');
-      return cache.addAll(['/', '/icon-192x192.png', '/badge-72x72.png']);
+      return cache.addAll(['/']);
     })
   );
   self.skipWaiting();

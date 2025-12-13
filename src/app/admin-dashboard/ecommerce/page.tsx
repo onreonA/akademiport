@@ -11,6 +11,24 @@ import {
 } from '@/presentation/components/ui/atoms/select';
 import { Input } from '@/presentation/components/ui/atoms/input';
 import { Label } from '@/presentation/components/ui/atoms/label';
+import { useEcommercePerformance } from '@/1-presentation/hooks/useEcommerce';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/presentation/components/ui/atoms/card';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from 'recharts';
 
 interface Program {
   id: string;
@@ -22,6 +40,12 @@ export default function AdminEcommercePage() {
   const [minRevenue, setMinRevenue] = useState<string>('');
   const [programs, setPrograms] = useState<Program[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const { data: performanceData } = useEcommercePerformance({
+    programId: selectedProgramId === 'all' ? undefined : selectedProgramId,
+    minRevenue: minRevenue ? parseFloat(minRevenue) : undefined,
+    limit: 50,
+  });
 
   useEffect(() => {
     fetchPrograms();
@@ -40,6 +64,16 @@ export default function AdminEcommercePage() {
       setLoading(false);
     }
   };
+
+  // Prepare chart data for top companies
+  const chartData =
+    performanceData?.performance?.slice(0, 10).map((item: any) => ({
+      name:
+        item.companyName.length > 15 ? item.companyName.substring(0, 15) + '...' : item.companyName,
+      revenue: item.totalRevenueAllTime,
+      orders: item.totalOrdersAllTime,
+      visitors: item.totalVisitorsAllTime,
+    })) || [];
 
   return (
     <div className="space-y-6">
@@ -83,6 +117,55 @@ export default function AdminEcommercePage() {
           />
         </div>
       </div>
+
+      {/* Performance Chart */}
+      {chartData.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Top 10 Firma Performansı</CardTitle>
+            <CardDescription>
+              En yüksek gelire sahip firmaların performans karşılaştırması
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={400}>
+              <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="name"
+                  angle={-45}
+                  textAnchor="end"
+                  height={100}
+                  className="text-xs"
+                />
+                <YAxis className="text-xs" />
+                <Tooltip
+                  formatter={(value: number, name: string) => {
+                    if (name === 'revenue') {
+                      return [
+                        value.toLocaleString('tr-TR', {
+                          style: 'currency',
+                          currency: 'TRY',
+                          maximumFractionDigits: 0,
+                        }),
+                        'Gelir',
+                      ];
+                    }
+                    return [
+                      value.toLocaleString('tr-TR'),
+                      name === 'orders' ? 'Sipariş' : 'Ziyaretçi',
+                    ];
+                  }}
+                />
+                <Legend />
+                <Bar dataKey="revenue" fill="#0088FE" name="Gelir" />
+                <Bar dataKey="orders" fill="#00C49F" name="Sipariş" />
+                <Bar dataKey="visitors" fill="#FFBB28" name="Ziyaretçi" />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Performance Table */}
       <EcommercePerformanceTable

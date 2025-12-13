@@ -7,6 +7,7 @@ export enum ActivityType {
   TASK_COMPLETED = 'task_completed',
   TASK_COMPLETED_EARLY = 'task_completed_early',
   SUBPROJECT_COMPLETED = 'subproject_completed',
+  PROJECT_COMPLETED = 'project_completed',
   TASK_COMMENT = 'task_comment',
 
   // Eğitimler
@@ -22,6 +23,8 @@ export enum ActivityType {
   FORUM_TOPIC_CREATED = 'forum_topic_created',
   FORUM_REPLY_CREATED = 'forum_reply_created',
   FORUM_SOLUTION_MARKED = 'forum_solution_marked',
+  FORUM_TOPIC_LIKED = 'forum_topic_liked',
+  FORUM_REPLY_LIKED = 'forum_reply_liked',
 
   // Haberler
   NEWS_READ = 'news_read',

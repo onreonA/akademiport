@@ -7,6 +7,7 @@ export const LEADERBOARD_POINTS: Record<string, number> = {
   TASK_COMPLETED: 10, // Görev tamamlama
   TASK_COMPLETED_EARLY: 12, // Zamanında tamamlama (+20%)
   SUBPROJECT_COMPLETED: 100, // Alt proje tamamlama
+  PROJECT_COMPLETED: 500, // Proje tamamlama (bonus)
   TASK_COMMENT: 2, // Görev yorumu
 
   // Eğitimler
@@ -22,6 +23,8 @@ export const LEADERBOARD_POINTS: Record<string, number> = {
   FORUM_TOPIC_CREATED: 10, // Konu açma
   FORUM_REPLY_CREATED: 5, // Yanıt yazma
   FORUM_SOLUTION_MARKED: 20, // Çözüm işaretlenme
+  FORUM_TOPIC_LIKED: 1, // Konu beğenme
+  FORUM_REPLY_LIKED: 1, // Yanıt beğenme
 
   // Haberler
   NEWS_READ: 2, // Haber okuma

@@ -1,8 +1,35 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-# Run all tests before push
-npm run test:all || exit 1
+echo "🧪 Running tests before push..."
+
+# Run only changed tests if possible (faster)
+if command -v npx >/dev/null 2>&1; then
+  echo "🔍 Checking for changed tests..."
+  CHANGED_TESTS=$(git diff --name-only origin/HEAD...HEAD | grep -E '\.(test|spec)\.(ts|tsx|js|jsx)$' || true)
+  
+  if [ -n "$CHANGED_TESTS" ]; then
+    echo "✅ Found changed test files, running them..."
+    npm run test:changed || {
+      echo "❌ Changed tests failed. Please fix the errors."
+      exit 1
+    }
+  else
+    echo "ℹ️  No changed test files detected, running full test suite..."
+    npm run test:run || {
+      echo "❌ Tests failed. Please fix the errors."
+      exit 1
+    }
+  fi
+else
+  echo "⚠️  Running full test suite..."
+  npm run test:run || {
+    echo "❌ Tests failed. Please fix the errors."
+    exit 1
+  }
+fi
+
+echo "✅ All tests passed!"
 
 
 

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/4-infrastructure/database/supabase-server';
 import { SupabaseForumRepository } from '@/4-infrastructure/database/repositories/SupabaseForumRepository';
 import { UpdateTopicDto } from '@/2-application/dtos/forum';
+import { UpdateTopicUseCase, DeleteTopicUseCase } from '@/2-application/use-cases/forum';
 
 /**
  * GET /api/forum/topics/[id]
@@ -93,7 +94,9 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       isLocked: body.isLocked,
     };
 
-    const result = await repository.updateTopic(id, dto);
+    // Use UpdateTopicUseCase
+    const updateUseCase = new UpdateTopicUseCase(repository);
+    const result = await updateUseCase.execute(id, dto, user.id);
 
     if (result.isFailure) {
       return NextResponse.json({ error: result.error?.message || result.error }, { status: 400 });
@@ -150,7 +153,9 @@ export async function DELETE(
       return NextResponse.json({ error: 'Yetkiniz yok' }, { status: 403 });
     }
 
-    const result = await repository.deleteTopic(id);
+    // Use DeleteTopicUseCase
+    const deleteUseCase = new DeleteTopicUseCase(repository);
+    const result = await deleteUseCase.execute(id, user.id);
 
     if (result.isFailure) {
       return NextResponse.json({ error: result.error?.message || result.error }, { status: 400 });

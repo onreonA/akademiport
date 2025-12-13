@@ -3,19 +3,30 @@
 
 echo "🔍 Running pre-commit checks..."
 
-# Format check (değişiklik yapmadan) - ZORUNLU
-echo "✨ Checking code format..."
-npm run format:check || {
-  echo "❌ Code format check failed. Run 'npm run format' to fix."
-  exit 1
-}
+# Check if lint-staged is available
+if command -v npx >/dev/null 2>&1 && npx lint-staged --version >/dev/null 2>&1; then
+  echo "✨ Running lint-staged (linting & formatting changed files)..."
+  npx lint-staged || {
+    echo "❌ lint-staged failed. Please fix the errors and try again."
+    exit 1
+  }
+else
+  echo "⚠️  lint-staged not found, falling back to full checks..."
+  
+  # Format check (değişiklik yapmadan) - ZORUNLU
+  echo "✨ Checking code format..."
+  npm run format:check || {
+    echo "❌ Code format check failed. Run 'npm run format' to fix."
+    exit 1
+  }
 
-# Lint check - OPSIYONEL (sadece uyarı ver, engelleme)
-echo "🔍 Running linter (non-blocking)..."
-npm run lint -- --quiet || {
-  echo "⚠️  Linting found errors. Consider running 'npm run lint:fix'."
-  echo "💡 Continuing with commit (lint check is non-blocking)..."
-}
+  # Lint check - OPSIYONEL (sadece uyarı ver, engelleme)
+  echo "🔍 Running linter (non-blocking)..."
+  npm run lint -- --quiet || {
+    echo "⚠️  Linting found errors. Consider running 'npm run lint:fix'."
+    echo "💡 Continuing with commit (lint check is non-blocking)..."
+  }
+fi
 
 # Type check - OPSIYONEL (sadece uyarı ver, engelleme)
 echo "📝 Type checking (non-blocking)..."
