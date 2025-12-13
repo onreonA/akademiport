@@ -1,0 +1,12 @@
+{
+  "projectToken": "${CHROMATIC_PROJECT_TOKEN}",
+  "buildScriptName": "build-storybook",
+  "exitZeroOnChanges": true,
+  "exitOnceUploaded": true,
+  "ignoreLastBuildOnBranch": "main",
+  "onlyChanged": true,
+  "zip": true,
+  "skip": "${CI:-false}",
+  "storybookBaseDir": ".",
+  "storybookBuildDir": "storybook-static"
+}

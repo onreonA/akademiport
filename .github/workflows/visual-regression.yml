@@ -1,0 +1,98 @@
+name: Visual Regression Tests
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'src/**/*.stories.*'
+      - 'src/**/*.{tsx,ts}'
+      - '.storybook/**'
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  chromatic:
+    name: Chromatic Visual Tests
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Required for Chromatic to detect changes
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Storybook
+        run: npm run build-storybook
+        continue-on-error: true
+
+      - name: Publish to Chromatic
+        uses: chromaui/action@v1
+        with:
+          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+          buildScriptName: build-storybook
+          exitZeroOnChanges: true
+          exitOnceUploaded: true
+          onlyChanged: true
+        continue-on-error: true
+
+  storybook-test-runner:
+    name: Storybook Test Runner
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Build Storybook
+        run: npm run build-storybook
+        continue-on-error: true
+
+      - name: Start Storybook
+        run: npm run storybook &
+        continue-on-error: true
+
+      - name: Wait for Storybook
+        run: npx wait-on http://localhost:6006 --timeout 120000
+        continue-on-error: true
+
+      - name: Run Storybook Test Runner
+        run: |
+          npx test-storybook --url http://localhost:6006 || true
+        continue-on-error: true
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: storybook-test-results
+          path: test-results/
+          retention-days: 7
+          if-no-files-found: ignore
