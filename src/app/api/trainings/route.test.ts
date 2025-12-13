@@ -155,9 +155,13 @@ describe('GET /api/trainings', () => {
     });
     vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
 
+    // Import AppError for proper error instance
+    const { AppError } = await import('@/6-core/errors/AppError');
+    const error = new AppError('Failed to list trainings', 500);
+
     mockListTrainingsExecute.mockResolvedValue({
       isFailure: true,
-      error: { message: 'Failed to list trainings', statusCode: 500 },
+      error: error,
     });
 
     const { GET } = await import('./route');
@@ -297,9 +301,13 @@ describe('POST /api/trainings', () => {
     });
     vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
 
+    // Import AppError for proper error instance
+    const { AppError } = await import('@/6-core/errors/AppError');
+    const error = new AppError('Training name is required', 400);
+
     mockCreateTrainingExecute.mockResolvedValue({
       isFailure: true,
-      error: { message: 'Training name is required', statusCode: 400 },
+      error: error,
     });
 
     const { POST } = await import('./route');

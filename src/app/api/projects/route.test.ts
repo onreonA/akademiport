@@ -10,9 +10,32 @@ vi.mock('@/4-infrastructure/api/helpers/auth', () => ({
   getAuthenticatedUser: vi.fn(),
 }));
 
-vi.mock('@/4-infrastructure/database/repositories/ProjectRepository', () => ({
-  ProjectRepository: vi.fn(),
-}));
+const mockFindByProjectId = vi.fn();
+const mockCreateAssignment = vi.fn();
+
+vi.mock('@/4-infrastructure/database/repositories/ProjectRepository', () => {
+  return {
+    ProjectRepository: class {
+      // Mock methods as needed
+    },
+  };
+});
+
+vi.mock('@/4-infrastructure/database/repositories/SubProjectRepository', () => {
+  return {
+    SubProjectRepository: class {
+      findByProjectId = mockFindByProjectId;
+    },
+  };
+});
+
+vi.mock('@/4-infrastructure/database/repositories/CompanyProjectAssignmentRepository', () => {
+  return {
+    CompanyProjectAssignmentRepository: class {
+      create = mockCreateAssignment;
+    },
+  };
+});
 
 // Mock use cases - use class mock pattern
 const mockCreateProjectExecute = vi.fn();
@@ -30,6 +53,9 @@ vi.mock('@/application/use-cases/project', () => ({
 describe('GET /api/projects', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Mock sub-project repository
+    mockFindByProjectId.mockResolvedValue([]);
+    mockCreateAssignment.mockResolvedValue({ id: 'assignment-1' });
   });
 
   it('returns 401 when user is not authenticated', async () => {
@@ -174,6 +200,7 @@ describe('POST /api/projects', () => {
       body: {
         name: 'Test Project',
         consultantId: 'consultant-1',
+        companyId: 'company-1', // Required field - route checks for companyId or companyIds
       },
     });
     const response = await POST(request);

@@ -26,7 +26,7 @@ describe('Project Entity', () => {
       expect(project).toBeDefined();
       expect(project.id).toBe('project-1');
       expect(project.name).toBe('Test Project');
-      expect(project.status).toBe('active');
+      expect(project.status).toBe('in_progress');
       expect(project.priority).toBe('high');
       expect(project.progress).toBe(50);
       expect(project.isTemplate).toBe(false);

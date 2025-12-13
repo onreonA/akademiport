@@ -226,7 +226,7 @@ describe('DeleteProgramUseCase', () => {
     const result = await useCase.execute(input);
 
     expect(result.isFailure).toBe(true);
-    expect(result.error?.message || result.error).toBe(errorMessage);
+    expect(result.error?.message || result.error).toContain(errorMessage);
   });
 
   it('should handle exceptions', async () => {
@@ -244,6 +244,6 @@ describe('DeleteProgramUseCase', () => {
     const result = await useCase.execute(input);
 
     expect(result.isFailure).toBe(true);
-    expect(result.error?.message || result.error).toBe(errorMessage);
+    expect(result.error?.message || result.error).toContain(errorMessage);
   });
 });

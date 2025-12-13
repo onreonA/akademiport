@@ -1,11 +1,31 @@
 import '@testing-library/jest-dom';
-import { expect, afterEach, vi } from 'vitest';
+import { expect, afterEach, beforeEach, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
 import { config } from 'dotenv';
 import { resolve } from 'path';
 
+// Extend Vitest expect with jest-axe matchers (if jest-axe is installed)
+try {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { toHaveNoViolations } = require('jest-axe');
+  expect.extend(toHaveNoViolations);
+} catch {
+  // jest-axe not installed, skip
+}
+
 // Load environment variables from .env.local for integration tests
 config({ path: resolve(process.cwd(), '.env.local') });
+
+// Import test helpers for isolation
+let resetTestCookies: () => void;
+try {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const apiHelpers = require('@/shared/test/api-helpers');
+  resetTestCookies = apiHelpers.resetTestCookies;
+} catch {
+  // Fallback if import fails
+  resetTestCookies = () => {};
+}
 
 // Mock Next.js cookies() function for API route tests
 vi.mock('next/headers', async () => {
@@ -87,9 +107,24 @@ vi.mock('@/4-infrastructure/database/supabase-server', () => {
   };
 });
 
+// Setup before each test - ensure test isolation
+beforeEach(() => {
+  // Reset all mocks
+  vi.clearAllMocks();
+
+  // Reset test cookies for API route tests
+  resetTestCookies();
+});
+
 // Cleanup after each test
 afterEach(() => {
   cleanup();
+
+  // Clear all mocks again
+  vi.clearAllMocks();
+
+  // Reset test cookies
+  resetTestCookies();
 });
 
 // Mock Next.js router

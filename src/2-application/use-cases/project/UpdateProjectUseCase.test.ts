@@ -6,7 +6,6 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { UpdateProjectUseCase } from './UpdateProjectUseCase';
 import { IProjectRepository } from '@/3-domain/interfaces/repositories/IProjectRepository';
 import { Project } from '@/3-domain/entities/Project';
-import { AppError } from '@/6-core/errors/AppError';
 
 describe('UpdateProjectUseCase', () => {
   let mockProjectRepository: IProjectRepository;
@@ -19,6 +18,7 @@ describe('UpdateProjectUseCase', () => {
       findAll: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
+      exists: vi.fn(),
       findTemplates: vi.fn(),
       updateProgress: vi.fn(),
       findByCompanyId: vi.fn(),
@@ -64,12 +64,15 @@ describe('UpdateProjectUseCase', () => {
       ...updateData,
     };
 
-    vi.mocked(mockProjectRepository.exists).mockResolvedValue(true);
+    vi.mocked(mockProjectRepository.findById)
+      .mockResolvedValueOnce(existingProject) // First call - check if exists
+      .mockResolvedValueOnce(updatedProject); // Second call - after update (for leaderboard check)
     vi.mocked(mockProjectRepository.update).mockResolvedValue(updatedProject);
 
     const result = await useCase.execute(projectId, updateData);
 
     expect(result.isSuccess).toBe(true);
+    expect(mockProjectRepository.findById).toHaveBeenCalledWith(projectId);
     expect(mockProjectRepository.update).toHaveBeenCalledWith(projectId, updateData);
   });
 
@@ -79,7 +82,7 @@ describe('UpdateProjectUseCase', () => {
       name: 'Updated Name',
     };
 
-    vi.mocked(mockProjectRepository.exists).mockResolvedValue(false);
+    vi.mocked(mockProjectRepository.findById).mockResolvedValue(null);
 
     const result = await useCase.execute(projectId, updateData);
 
@@ -114,7 +117,7 @@ describe('UpdateProjectUseCase', () => {
       updatedAt: new Date(),
     };
 
-    vi.mocked(mockProjectRepository.exists).mockResolvedValue(true);
+    vi.mocked(mockProjectRepository.findById).mockResolvedValue(existingProject);
 
     const result = await useCase.execute(projectId, updateData);
 
@@ -148,7 +151,7 @@ describe('UpdateProjectUseCase', () => {
       updatedAt: new Date(),
     };
 
-    vi.mocked(mockProjectRepository.exists).mockResolvedValue(true);
+    vi.mocked(mockProjectRepository.findById).mockResolvedValue(existingProject);
     vi.mocked(mockProjectRepository.update).mockRejectedValue(new Error('Database error'));
 
     const result = await useCase.execute(projectId, updateData);

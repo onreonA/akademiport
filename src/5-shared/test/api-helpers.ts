@@ -7,23 +7,66 @@ import { NextRequest } from 'next/server';
 import { UserRole } from '@/domain/enums/UserRole';
 import { vi } from 'vitest';
 
+// Store cookies per test to ensure isolation
+let testCookies: Map<string, string> = new Map();
+
+/**
+ * Reset test cookies (call in beforeEach)
+ */
+export function resetTestCookies() {
+  testCookies.clear();
+}
+
+/**
+ * Set a test cookie
+ */
+export function setTestCookie(name: string, value: string) {
+  testCookies.set(name, value);
+}
+
+/**
+ * Get a test cookie
+ */
+export function getTestCookie(name: string): string | undefined {
+  return testCookies.get(name);
+}
+
 // Mock Next.js cookies() function for tests
+// This mock is improved to handle async cookies() calls properly
 vi.mock('next/headers', async () => {
-  const actual = await vi.importActual('next/headers');
+  const actual = await vi.importActual<typeof import('next/headers')>('next/headers');
+
   return {
     ...actual,
-    cookies: vi.fn(() => ({
-      get: vi.fn(),
-      set: vi.fn(),
-      getAll: vi.fn(() => []),
-      has: vi.fn(),
-      delete: vi.fn(),
-    })),
+    cookies: vi.fn(async () => {
+      // Return a mock cookie store that uses testCookies
+      return {
+        get: vi.fn((name: string) => {
+          const value = testCookies.get(name);
+          return value ? { name, value } : undefined;
+        }),
+        set: vi.fn((name: string, value: string) => {
+          testCookies.set(name, value);
+        }),
+        getAll: vi.fn(() => {
+          return Array.from(testCookies.entries()).map(([name, value]) => ({
+            name,
+            value,
+          }));
+        }),
+        has: vi.fn((name: string) => testCookies.has(name)),
+        delete: vi.fn((name: string) => {
+          testCookies.delete(name);
+        }),
+      };
+    }),
   };
 });
 
 /**
  * Create a mock NextRequest for testing
+ *
+ * This function also sets up test cookies for proper isolation
  */
 export function createMockRequest(
   url: string,
@@ -36,8 +79,15 @@ export function createMockRequest(
 ): NextRequest {
   const { method = 'GET', headers = {}, body, cookies = {} } = options || {};
 
-  const requestHeaders = new Headers(headers);
+  // Set test cookies for this request
   if (cookies) {
+    Object.entries(cookies).forEach(([key, value]) => {
+      setTestCookie(key, value);
+    });
+  }
+
+  const requestHeaders = new Headers(headers);
+  if (cookies && Object.keys(cookies).length > 0) {
     const cookieString = Object.entries(cookies)
       .map(([key, value]) => `${key}=${value}`)
       .join('; ');
@@ -111,6 +161,7 @@ export function createMockUser(
  * Mock getAuthenticatedUser helper
  */
 export function mockAuthenticatedUser(user: ReturnType<typeof createMockUser>) {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { vi } = require('vitest');
   return vi.fn().mockResolvedValue(user);
 }

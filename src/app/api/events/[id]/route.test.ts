@@ -87,9 +87,13 @@ describe('GET /api/events/[id]', () => {
     const user = createMockUser({ role: UserRole.CONSULTANT });
     vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
 
+    // Import NotFoundError for proper error instance
+    const { NotFoundError } = await import('@/6-core/errors/AppError');
+    const error = new NotFoundError('Event not found');
+
     mockGetEventExecute.mockResolvedValue({
       isFailure: true,
-      error: { message: 'Event not found', statusCode: 404 },
+      error: error,
     });
 
     const { GET } = await import('./route');

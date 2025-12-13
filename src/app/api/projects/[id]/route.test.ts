@@ -86,9 +86,13 @@ describe('GET /api/projects/[id]', () => {
     const user = createMockUser({ role: UserRole.CONSULTANT });
     vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
 
+    // Import NotFoundError for proper error instance
+    const { NotFoundError } = await import('@/6-core/errors/AppError');
+    const error = new NotFoundError('Project not found');
+
     mockGetProjectExecute.mockResolvedValue({
       isFailure: true,
-      error: { message: 'Project not found', statusCode: 404 },
+      error: error,
     });
 
     const { GET } = await import('./route');

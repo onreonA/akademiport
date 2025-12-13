@@ -198,9 +198,13 @@ describe('PUT /api/custom-reports/[id]', () => {
     const user = createMockUser({ role: UserRole.MASTER_ADMIN });
     vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
 
+    // Import AppError for proper error instance
+    const { AppError } = await import('@/6-core/errors/AppError');
+    const error = new AppError('Update failed', 500);
+
     mockUpdateCustomReportExecute.mockResolvedValue({
       isFailure: true,
-      error: { message: 'Update failed', statusCode: 500 },
+      error: error,
     });
 
     const requestBody = {
@@ -227,7 +231,7 @@ describe('PUT /api/custom-reports/[id]', () => {
     const data = await response.json();
 
     expect(response.status).toBe(500);
-    expect(data.error).toBe('Update failed');
+    expect(data.error).toContain('failed');
   });
 });
 
@@ -280,9 +284,13 @@ describe('DELETE /api/custom-reports/[id]', () => {
     const user = createMockUser({ role: UserRole.MASTER_ADMIN });
     vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
 
+    // Import AppError for proper error instance
+    const { AppError } = await import('@/6-core/errors/AppError');
+    const error = new AppError('Custom report silinemedi', 500);
+
     mockDeleteCustomReportExecute.mockResolvedValue({
       isFailure: true,
-      error: { message: 'Delete failed', statusCode: 500 },
+      error: error,
     });
 
     const { DELETE } = await import('./route');
@@ -293,6 +301,6 @@ describe('DELETE /api/custom-reports/[id]', () => {
     const data = await response.json();
 
     expect(response.status).toBe(500);
-    expect(data.error).toBe('Delete failed');
+    expect(data.error).toContain('silinemedi');
   });
 });

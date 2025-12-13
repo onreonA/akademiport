@@ -256,9 +256,13 @@ describe('POST /api/tasks', () => {
     (user as any).role = 'consultant'; // Route uses string comparison
     vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
 
+    // Import AppError for proper error instance
+    const { AppError } = await import('@/6-core/errors/AppError');
+    const error = new AppError('Task creation failed', 400);
+
     mockCreateTaskExecute.mockResolvedValue({
       isFailure: true,
-      error: { message: 'Task creation failed', statusCode: 400 },
+      error: error,
     });
 
     const requestBody = {

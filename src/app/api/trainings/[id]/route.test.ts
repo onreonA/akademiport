@@ -101,9 +101,13 @@ describe('GET /api/trainings/[id]', () => {
     });
     vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
 
+    // Import NotFoundError for proper error instance
+    const { NotFoundError } = await import('@/6-core/errors/AppError');
+    const error = new NotFoundError('Training not found');
+
     mockGetTrainingExecute.mockResolvedValue({
       isFailure: true,
-      error: { message: 'Training not found', statusCode: 404 },
+      error: error,
     });
 
     const { GET } = await import('./route');
@@ -215,9 +219,13 @@ describe('PUT /api/trainings/[id]', () => {
     });
     vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
 
+    // Import NotFoundError for proper error instance
+    const { NotFoundError } = await import('@/6-core/errors/AppError');
+    const error = new NotFoundError('Training not found');
+
     mockUpdateTrainingExecute.mockResolvedValue({
       isFailure: true,
-      error: { message: 'Training not found', statusCode: 404 },
+      error: error,
     });
 
     const { PUT } = await import('./route');
@@ -318,9 +326,13 @@ describe('DELETE /api/trainings/[id]', () => {
     });
     vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
 
+    // Import NotFoundError for proper error instance
+    const { NotFoundError } = await import('@/6-core/errors/AppError');
+    const error = new NotFoundError('Training not found');
+
     mockDeleteTrainingExecute.mockResolvedValue({
       isFailure: true,
-      error: { message: 'Training not found', statusCode: 404 },
+      error: error,
     });
 
     const { DELETE } = await import('./route');

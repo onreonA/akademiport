@@ -315,9 +315,13 @@ describe('POST /api/appointments', () => {
     (user as any).companyId = '550e8400-e29b-41d4-a716-446655440002'; // Valid UUID
     vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
 
+    // Import AppError for proper error instance
+    const { AppError } = await import('@/6-core/errors/AppError');
+    const error = new AppError('Consultant is not available', 400);
+
     mockCreateAppointmentExecute.mockResolvedValue({
       isFailure: true,
-      error: { message: 'Consultant is not available', statusCode: 400 },
+      error: error,
     });
 
     const { POST } = await import('./route');

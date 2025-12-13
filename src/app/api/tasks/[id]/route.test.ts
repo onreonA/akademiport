@@ -79,9 +79,13 @@ describe('GET /api/tasks/[id]', () => {
     const user = createMockUser({ role: UserRole.COMPANY_USER });
     vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
 
+    // Import NotFoundError for proper error instance
+    const { NotFoundError } = await import('@/6-core/errors/AppError');
+    const error = new NotFoundError('Task not found');
+
     mockGetTaskExecute.mockResolvedValue({
       isFailure: true,
-      error: { message: 'Task not found', statusCode: 404 },
+      error: error,
     });
 
     const { GET } = await import('./route');
@@ -177,9 +181,13 @@ describe('PUT /api/tasks/[id]', () => {
     const user = createMockUser({ role: UserRole.COMPANY_USER });
     vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
 
+    // Import AppError for proper error instance
+    const { AppError } = await import('@/6-core/errors/AppError');
+    const error = new AppError('Update failed', 400);
+
     mockUpdateTaskExecute.mockResolvedValue({
       isFailure: true,
-      error: { message: 'Update failed', statusCode: 400 },
+      error: error,
     });
 
     const requestBody = {
@@ -259,9 +267,13 @@ describe('DELETE /api/tasks/[id]', () => {
     const user = createMockUser({ role: UserRole.CONSULTANT });
     vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
 
+    // Import AppError for proper error instance
+    const { AppError } = await import('@/6-core/errors/AppError');
+    const error = new AppError('Delete failed', 400);
+
     mockDeleteTaskExecute.mockResolvedValue({
       isFailure: true,
-      error: { message: 'Delete failed', statusCode: 400 },
+      error: error,
     });
 
     const { DELETE } = await import('./route');

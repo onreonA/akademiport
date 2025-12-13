@@ -3,41 +3,61 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { createMockRequest, createMockUser } from '@/shared/test/api-helpers';
+import { createMockRequest, createMockUser, resetTestCookies } from '@/shared/test/api-helpers';
 import { UserRole } from '@/domain/enums/UserRole';
+import { setupTestIsolation } from '@/shared/test/test-isolation';
 
+// Mock auth helper
+const mockGetAuthenticatedUser = vi.fn();
 vi.mock('@/4-infrastructure/api/helpers/auth', () => ({
-  getAuthenticatedUser: vi.fn(),
+  getAuthenticatedUser: () => mockGetAuthenticatedUser(),
 }));
 
-vi.mock('@/4-infrastructure/database/repositories/EventRepository', () => ({
-  EventRepository: vi.fn(),
-}));
-
-// Mock UserRepository
+// Mock repositories - use class constructor pattern
 const mockGetPrograms = vi.fn();
-vi.mock('@/4-infrastructure/database/repositories/UserRepository', () => ({
-  UserRepository: class {
-    getPrograms = mockGetPrograms;
-  },
-}));
+const mockListEvents = vi.fn();
+const mockCreateEvent = vi.fn();
 
-// Mock use cases - use class mock pattern
+vi.mock('@/4-infrastructure/database/repositories/UserRepository', () => {
+  return {
+    UserRepository: class {
+      getPrograms = mockGetPrograms;
+    },
+  };
+});
+
+vi.mock('@/4-infrastructure/database/repositories/EventRepository', () => {
+  return {
+    EventRepository: class {
+      list = mockListEvents;
+      create = mockCreateEvent;
+    },
+  };
+});
+
+// Mock use cases - use class constructor pattern
 const mockCreateEventExecute = vi.fn();
 const mockListEventsExecute = vi.fn();
 
-vi.mock('@/application/use-cases/event', () => ({
-  CreateEventUseCase: class {
-    execute = mockCreateEventExecute;
-  },
-  ListEventsUseCase: class {
-    execute = mockListEventsExecute;
-  },
-}));
+vi.mock('@/application/use-cases/event', () => {
+  return {
+    CreateEventUseCase: class {
+      execute = mockCreateEventExecute;
+    },
+    ListEventsUseCase: class {
+      execute = mockListEventsExecute;
+    },
+  };
+});
+
+// Setup test isolation
+setupTestIsolation();
 
 describe('GET /api/events', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    resetTestCookies();
+
     // Reset repository mocks
     mockGetPrograms.mockResolvedValue({
       isSuccess: true,
@@ -46,8 +66,7 @@ describe('GET /api/events', () => {
   });
 
   it('returns 401 when user is not authenticated', async () => {
-    const { getAuthenticatedUser } = await import('@/4-infrastructure/api/helpers/auth');
-    vi.mocked(getAuthenticatedUser).mockResolvedValue(null);
+    mockGetAuthenticatedUser.mockResolvedValue(null);
 
     const { GET } = await import('./route');
     const request = createMockRequest('http://localhost:3000/api/events');
@@ -59,10 +78,8 @@ describe('GET /api/events', () => {
   });
 
   it('returns events for consultant', async () => {
-    const { getAuthenticatedUser } = await import('@/4-infrastructure/api/helpers/auth');
-
     const user = createMockUser({ role: UserRole.CONSULTANT });
-    vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
+    mockGetAuthenticatedUser.mockResolvedValue(user as any);
 
     // Mock UserRepository.getPrograms
     mockGetPrograms.mockResolvedValue({
@@ -92,14 +109,12 @@ describe('GET /api/events', () => {
   });
 
   it('returns events for company user', async () => {
-    const { getAuthenticatedUser } = await import('@/4-infrastructure/api/helpers/auth');
-
     const user = createMockUser({
       role: UserRole.COMPANY_USER,
       id: 'company-user-1',
     });
     (user as any).companyId = 'company-1';
-    vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
+    mockGetAuthenticatedUser.mockResolvedValue(user as any);
 
     mockListEventsExecute.mockResolvedValue({
       isFailure: false,
@@ -120,10 +135,8 @@ describe('GET /api/events', () => {
   });
 
   it('handles query parameters correctly', async () => {
-    const { getAuthenticatedUser } = await import('@/4-infrastructure/api/helpers/auth');
-
     const user = createMockUser({ role: UserRole.CONSULTANT });
-    vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
+    mockGetAuthenticatedUser.mockResolvedValue(user as any);
 
     // Mock UserRepository.getPrograms
     mockGetPrograms.mockResolvedValue({
@@ -158,11 +171,11 @@ describe('GET /api/events', () => {
 describe('POST /api/events', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    resetTestCookies();
   });
 
   it('returns 401 when user is not authenticated', async () => {
-    const { getAuthenticatedUser } = await import('@/4-infrastructure/api/helpers/auth');
-    vi.mocked(getAuthenticatedUser).mockResolvedValue(null);
+    mockGetAuthenticatedUser.mockResolvedValue(null);
 
     const { POST } = await import('./route');
     const request = createMockRequest('http://localhost:3000/api/events', {
@@ -182,10 +195,8 @@ describe('POST /api/events', () => {
   });
 
   it('returns 403 when user is not consultant or admin', async () => {
-    const { getAuthenticatedUser } = await import('@/4-infrastructure/api/helpers/auth');
-
     const user = createMockUser({ role: UserRole.COMPANY_USER });
-    vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
+    mockGetAuthenticatedUser.mockResolvedValue(user as any);
 
     const { POST } = await import('./route');
     const request = createMockRequest('http://localhost:3000/api/events', {
@@ -205,13 +216,11 @@ describe('POST /api/events', () => {
   });
 
   it('creates event successfully for consultant', async () => {
-    const { getAuthenticatedUser } = await import('@/4-infrastructure/api/helpers/auth');
-
     const user = createMockUser({
       role: UserRole.CONSULTANT,
       id: '550e8400-e29b-41d4-a716-446655440002', // Valid UUID format (version 4)
     });
-    vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
+    mockGetAuthenticatedUser.mockResolvedValue(user as any);
 
     const mockEvent = {
       id: 'event-1',
@@ -247,12 +256,10 @@ describe('POST /api/events', () => {
   });
 
   it('validates required fields', async () => {
-    const { getAuthenticatedUser } = await import('@/4-infrastructure/api/helpers/auth');
-
     const user = createMockUser({
       role: UserRole.CONSULTANT,
     });
-    vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
+    mockGetAuthenticatedUser.mockResolvedValue(user as any);
 
     const { POST } = await import('./route');
     const request = createMockRequest('http://localhost:3000/api/events', {
@@ -270,17 +277,19 @@ describe('POST /api/events', () => {
   });
 
   it('handles use case failure', async () => {
-    const { getAuthenticatedUser } = await import('@/4-infrastructure/api/helpers/auth');
-
     const user = createMockUser({
       role: UserRole.CONSULTANT,
       id: '550e8400-e29b-41d4-a716-446655440002', // Valid UUID format (version 4)
     });
-    vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
+    mockGetAuthenticatedUser.mockResolvedValue(user as any);
+
+    // Import AppError for proper error instance
+    const { AppError } = await import('@/6-core/errors/AppError');
+    const error = new AppError('Program not found', 404);
 
     mockCreateEventExecute.mockResolvedValue({
       isFailure: true,
-      error: { message: 'Program not found', statusCode: 404 },
+      error: error,
     });
 
     const { POST } = await import('./route');

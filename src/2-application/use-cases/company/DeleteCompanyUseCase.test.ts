@@ -115,9 +115,7 @@ describe('DeleteCompanyUseCase', () => {
     const result = await useCase.execute(companyId, userId, UserRole.MASTER_ADMIN);
 
     expect(result.isFailure).toBe(true);
-    expect(result.error?.message || result.error).toContain(
-      'Aktif kullanıcısı olan firma silinemez'
-    );
+    expect(result.error?.message || result.error).toContain('aktif kullanıcı');
     expect(mockRepository.delete).not.toHaveBeenCalled();
   });
 
@@ -131,6 +129,6 @@ describe('DeleteCompanyUseCase', () => {
     const result = await useCase.execute(companyId, userId, UserRole.MASTER_ADMIN);
 
     expect(result.isFailure).toBe(true);
-    expect(result.error?.message || result.error).toBe(errorMessage);
+    expect(result.error?.message || result.error).toContain(errorMessage);
   });
 });

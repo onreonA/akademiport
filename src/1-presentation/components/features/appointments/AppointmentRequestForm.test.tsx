@@ -6,6 +6,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@/shared/test/utils';
 import userEvent from '@testing-library/user-event';
 import { AppointmentRequestForm } from './AppointmentRequestForm';
+import { waitForElement, waitForAsync } from '@/shared/test/flaky-test-helpers';
+import { setupTestIsolation } from '@/shared/test/test-isolation';
 
 // Mock hooks
 vi.mock('@/shared/hooks/useAuth', () => ({
@@ -110,7 +112,7 @@ vi.mock('@/presentation/components/ui/atoms/select', async () => {
         </select>
       );
     },
-    SelectTrigger: ({ children, id, ...props }: any) => {
+    SelectTrigger: () => {
       // Return null since Select will render the select element directly
       return null;
     },
@@ -127,8 +129,12 @@ vi.mock('@/presentation/components/ui/atoms/select', async () => {
 });
 
 describe('AppointmentRequestForm', () => {
+  setupTestIsolation();
+
   beforeEach(() => {
     vi.clearAllMocks();
+    // Reset fetch mock before each test
+    vi.mocked(global.fetch).mockReset();
   });
 
   it('renders form fields', async () => {
@@ -148,11 +154,26 @@ describe('AppointmentRequestForm', () => {
 
     render(<AppointmentRequestForm />);
 
-    await waitFor(() => {
-      // With mocked Select, we check for the select element directly
-      const select = screen.queryByTestId('mock-select') || screen.queryByRole('combobox');
-      expect(select).toBeInTheDocument();
-    });
+    // Wait for form to be fully rendered using flaky test helper
+    await waitForElement(
+      () => {
+        const select = screen.queryByTestId('mock-select') || screen.queryByRole('combobox');
+        return select as HTMLElement | null;
+      },
+      { timeout: 5000 }
+    );
+
+    // Wait for all form fields to be visible
+    await waitForAsync(
+      async () => {
+        const titleField = screen.queryByLabelText(/randevu başlığı/i);
+        const descriptionField = screen.queryByLabelText(/açıklama/i);
+        const startTimeField = screen.queryByLabelText(/başlangıç tarihi ve saati/i);
+        const endTimeField = screen.queryByLabelText(/bitiş tarihi ve saati/i);
+        return !!(titleField && descriptionField && startTimeField && endTimeField);
+      },
+      { timeout: 5000 }
+    );
 
     expect(screen.getByLabelText(/randevu başlığı/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/açıklama/i)).toBeInTheDocument();
@@ -289,9 +310,9 @@ describe('AppointmentRequestForm', () => {
     const { useCreateAppointment } = await import('@/shared/hooks/api/useAppointments');
     const mockMutate = vi.fn((data, options) => {
       // Call onSuccess synchronously for test
-      setTimeout(() => {
+      Promise.resolve().then(() => {
         options?.onSuccess?.({ id: 'appointment-1' });
-      }, 0);
+      });
     });
 
     vi.mocked(useCreateAppointment).mockReturnValue({
@@ -342,28 +363,24 @@ describe('AppointmentRequestForm', () => {
 
     render(<AppointmentRequestForm onSuccess={onSuccess} />);
 
-    await waitFor(
-      () => {
-        expect(screen.getByLabelText(/randevu başlığı/i)).toBeInTheDocument();
-      },
-      { timeout: 3000 }
-    );
+    // Wait for form to be fully rendered
+    await waitForElement(() => screen.queryByLabelText(/randevu başlığı/i) as HTMLElement | null, {
+      timeout: 5000,
+    });
 
     // Wait for consultants to load and select to be rendered with options
     let consultantSelect: HTMLSelectElement;
-    await waitFor(
-      () => {
+    await waitForAsync(
+      async () => {
         consultantSelect = screen.getByTestId('mock-select') as HTMLSelectElement;
-        expect(consultantSelect).toBeInTheDocument();
-        // Check if options are available - wait for consultants to be mapped
+        if (!consultantSelect) return false;
         const options = consultantSelect.querySelectorAll('option');
-        if (options.length === 0) {
-          throw new Error('Options not loaded yet');
-        }
-        expect(options.length).toBeGreaterThan(0);
+        return options.length > 0;
       },
       { timeout: 10000 }
     );
+    consultantSelect = screen.getByTestId('mock-select') as HTMLSelectElement;
+    expect(consultantSelect).toBeInTheDocument();
 
     // Select the consultant by setting the value directly
     await user.selectOptions(consultantSelect!, '123e4567-e89b-12d3-a456-426614174001');
@@ -409,50 +426,44 @@ describe('AppointmentRequestForm', () => {
     // Wait for availability check to complete and form to be valid
     // The submit button is disabled when availabilityStatus === 'conflict' or createAppointment.isPending
     // Also need to ensure consultant is selected
-    await waitFor(
-      () => {
-        const submitButton = screen.getByRole('button', { name: /randevu talebi gönder/i });
-        // Button should be enabled when:
-        // 1. Consultant is selected
-        // 2. Form fields are filled
-        // 3. No availability conflict
-        // 4. Not pending
-        const isEnabled =
-          !submitButton.hasAttribute('disabled') && submitButton.getAttribute('disabled') !== '';
-        if (!isEnabled) {
-          // Check why button might be disabled
-          const consultantSelect = screen.getByRole('combobox');
-          const selectValue = consultantSelect.textContent;
-          // If consultant not selected, that's the issue
-          if (!selectValue || selectValue === 'Danışman seçin') {
-            throw new Error('Consultant not selected');
-          }
-        }
-        expect(submitButton).not.toBeDisabled();
+    await waitForAsync(
+      async () => {
+        const submitButton = screen.queryByRole('button', { name: /randevu talebi gönder/i });
+        if (!submitButton) return false;
+        const isDisabled =
+          submitButton.hasAttribute('disabled') || submitButton.getAttribute('disabled') === '';
+        return !isDisabled;
       },
       { timeout: 10000 }
     );
 
-    // Submit form
     const submitButton = screen.getByRole('button', { name: /randevu talebi gönder/i });
     expect(submitButton).not.toBeDisabled();
+
+    // Submit form
     await user.click(submitButton);
 
+    // Wait for mutation and success callback
+    await waitForAsync(
+      async () => {
+        return mockMutate.mock.calls.length > 0;
+      },
+      { timeout: 5000 }
+    );
+
+    // Wait for onSuccess callback (may be async)
     await waitFor(
       () => {
         expect(mockMutate).toHaveBeenCalled();
         expect(onSuccess).toHaveBeenCalled();
       },
-      { timeout: 5000 }
+      { timeout: 3000 }
     );
   });
 
   it('calls onCancel callback when cancel button is clicked', { timeout: 20000 }, async () => {
     const onCancel = vi.fn();
     const user = userEvent.setup();
-
-    // Reset fetch mock to ensure clean state
-    vi.mocked(global.fetch).mockReset();
 
     // Mock fetch for company and consultants (component fetches both)
     vi.mocked(global.fetch)
@@ -479,40 +490,32 @@ describe('AppointmentRequestForm', () => {
     render(<AppointmentRequestForm onCancel={onCancel} />);
 
     // Wait for component to fully load - consultants need to be fetched and mapped
-    await waitFor(
-      () => {
-        // Wait for form fields to appear
-        expect(screen.getByLabelText(/randevu başlığı/i)).toBeInTheDocument();
-        // Wait for consultants to be loaded (check for consultant select)
-        const consultantSelect = screen.queryByTestId('mock-select');
-        expect(consultantSelect).toBeInTheDocument();
+    await waitForElement(() => screen.queryByLabelText(/randevu başlığı/i) as HTMLElement | null, {
+      timeout: 5000,
+      checkVisibility: false,
+    });
+
+    // Wait for consultant select to be available
+    await waitForAsync(
+      async () => {
+        const select = screen.queryByTestId('mock-select');
+        return select !== null;
       },
       { timeout: 5000 }
     );
 
-    // Wait for cancel button to appear - it's conditionally rendered when onCancel prop exists
-    // The button is in the Actions section with text "İptal"
-    // Wait for form to be fully rendered first
-    await waitFor(
-      () => {
-        // Ensure form is rendered
-        expect(screen.getByLabelText(/randevu başlığı/i)).toBeInTheDocument();
-      },
-      { timeout: 3000 }
-    );
-
-    // Now wait for cancel button - it's in the Actions section
-    await waitFor(
-      () => {
-        // Method 1: Direct query by role and name (most reliable)
+    // Wait for form to be fully rendered and cancel button to appear
+    // Cancel button is conditionally rendered when onCancel prop exists
+    await waitForAsync(
+      async () => {
+        // Try to find cancel button by role
         const byRole = screen.queryByRole('button', { name: /iptal/i });
         if (byRole) return true;
 
-        // Method 2: Find all buttons and check text content
+        // Try to find by text in all buttons
         const buttons = screen.getAllByRole('button');
         const found = buttons.some((btn) => {
           const text = btn.textContent?.trim() || '';
-          // Case-insensitive match for "İptal" (Turkish I)
           return (
             text.toLowerCase() === 'iptal' ||
             text.toLowerCase().includes('iptal') ||
@@ -520,34 +523,23 @@ describe('AppointmentRequestForm', () => {
             text.includes('İptal')
           );
         });
-        if (found) return true;
-
-        // Method 3: Query by text directly and find closest button
-        const byText = screen.queryByText(/iptal/i);
-        if (byText) {
-          const button = byText.closest('button');
-          if (button) return true;
-        }
-
-        return false;
+        return found;
       },
       { timeout: 10000 }
     );
 
-    // Find the cancel button using the most reliable method
-    // The button should be rendered since onCancel prop is provided
+    // Find the cancel button
     let cancelButton: HTMLElement | null = null;
 
-    // Try getByRole first (most reliable)
+    // Try getByRole first
     try {
       cancelButton = screen.getByRole('button', { name: /iptal/i });
-    } catch (e) {
-      // Fallback: find by text content in all buttons
+    } catch {
+      // Fallback: find by text content
       const buttons = screen.getAllByRole('button');
       cancelButton =
         buttons.find((btn) => {
           const text = btn.textContent?.trim() || '';
-          // Case-insensitive match for "İptal" (Turkish I)
           return (
             text.toLowerCase() === 'iptal' ||
             text.toLowerCase().includes('iptal') ||
@@ -555,33 +547,8 @@ describe('AppointmentRequestForm', () => {
             text.includes('İptal')
           );
         }) || null;
-
-      // Last resort: query by text and find closest button
-      if (!cancelButton) {
-        const textElement = screen.queryByText(/iptal/i);
-        if (textElement) {
-          cancelButton = textElement.closest('button') as HTMLElement;
-        }
-      }
-
-      // If still not found, try to find by data attributes or test id
-      if (!cancelButton) {
-        const allButtons = document.querySelectorAll('button');
-        cancelButton =
-          (Array.from(allButtons).find((btn) => {
-            const text = btn.textContent?.trim() || '';
-            // Case-insensitive match for "İptal" (Turkish I)
-            return (
-              text.toLowerCase() === 'iptal' ||
-              text.toLowerCase().includes('iptal') ||
-              text === 'İptal' ||
-              text.includes('İptal')
-            );
-          }) as HTMLElement) || null;
-      }
     }
 
-    // Final check - button must exist
     if (!cancelButton) {
       // Debug: log all buttons
       const allButtons = screen.getAllByRole('button');
@@ -589,17 +556,16 @@ describe('AppointmentRequestForm', () => {
       throw new Error(`Cancel button not found. Available buttons: ${buttonTexts.join(', ')}`);
     }
 
-    expect(cancelButton).toBeDefined();
-    expect(cancelButton).not.toBeNull();
     expect(cancelButton).toBeInTheDocument();
     expect(cancelButton).not.toBeDisabled();
+
     await user.click(cancelButton);
 
     await waitFor(
       () => {
         expect(onCancel).toHaveBeenCalled();
       },
-      { timeout: 2000 }
+      { timeout: 3000 }
     );
   });
 });
