@@ -88,7 +88,7 @@ export class GetEventStatisticsUseCase {
         totalAttended,
         attendanceRate: Math.round(attendanceRate * 100) / 100, // Round to 2 decimals
         maxAttendees: event.maxAttendees,
-        currentAttendees: event.currentAttendees,
+        currentAttendees: totalRegistrations, // Use total registrations as current attendees for capacity
         capacityUtilization: capacityUtilization
           ? Math.round(capacityUtilization * 100) / 100
           : null,

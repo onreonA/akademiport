@@ -1,20 +1,59 @@
 'use client';
 
-import { Users, Building2, Calendar, CheckCircle2, Clock } from 'lucide-react';
+import { useState } from 'react';
+import { Users, Building2, Calendar, CheckCircle2, Clock, XCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/presentation/components/ui/atoms/card';
 import { Badge } from '@/presentation/components/ui/atoms/badge';
 import { Avatar, AvatarFallback } from '@/presentation/components/ui/atoms/avatar';
+import { Button } from '@/presentation/components/ui/atoms/button';
 import { Loader2 } from 'lucide-react';
 import { useEventAttendees } from '@/shared/hooks/api/useEventAttendees';
 import { formatEventDate } from '@/shared/utils/calendar.utils';
+import { useAuth } from '@/shared/hooks/useAuth';
+import { useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 
 interface AttendeeListProps {
   eventId: string;
   showCompany?: boolean;
+  canMarkAttendance?: boolean; // Consultant/Admin için katılım işaretleme yetkisi
 }
 
-export function AttendeeList({ eventId, showCompany = true }: AttendeeListProps) {
-  const { data, isLoading, error } = useEventAttendees(eventId);
+export function AttendeeList({
+  eventId,
+  showCompany = true,
+  canMarkAttendance = false,
+}: AttendeeListProps) {
+  const { data, isLoading, error, refetch } = useEventAttendees(eventId);
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const [markingAttendance, setMarkingAttendance] = useState<string | null>(null);
+
+  const handleMarkAttendance = async (attendanceId: string) => {
+    if (!canMarkAttendance) return;
+
+    try {
+      setMarkingAttendance(attendanceId);
+      const response = await fetch(`/api/events/${eventId}/attendance/${attendanceId}`, {
+        method: 'PATCH',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Katılım işaretlenemedi');
+      }
+
+      toast.success('Katılım başarıyla işaretlendi');
+      // Refresh attendees list
+      await refetch();
+      queryClient.invalidateQueries({ queryKey: ['eventAttendees', eventId] });
+      queryClient.invalidateQueries({ queryKey: ['eventStatistics', eventId] });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Katılım işaretlenemedi');
+    } finally {
+      setMarkingAttendance(null);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -122,10 +161,33 @@ export function AttendeeList({ eventId, showCompany = true }: AttendeeListProps)
                         Katıldı
                       </Badge>
                     ) : (
-                      <Badge variant="secondary" className="gap-1">
-                        <Clock className="w-3 h-3" />
-                        Kayıtlı
-                      </Badge>
+                      <>
+                        <Badge variant="secondary" className="gap-1">
+                          <Clock className="w-3 h-3" />
+                          Kayıtlı
+                        </Badge>
+                        {canMarkAttendance && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleMarkAttendance(attendee.id)}
+                            disabled={markingAttendance === attendee.id}
+                            className="h-7 px-2 text-xs"
+                          >
+                            {markingAttendance === attendee.id ? (
+                              <>
+                                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                                İşaretleniyor...
+                              </>
+                            ) : (
+                              <>
+                                <CheckCircle2 className="w-3 h-3 mr-1" />
+                                Katıldı İşaretle
+                              </>
+                            )}
+                          </Button>
+                        )}
+                      </>
                     )}
                   </div>
                 </div>

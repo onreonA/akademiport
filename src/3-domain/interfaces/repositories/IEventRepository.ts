@@ -78,6 +78,11 @@ export interface IEventRepository {
   cancelAttendance(eventId: string, userId: string): Promise<void>;
 
   /**
+   * Katılım kaydını "katıldı" olarak işaretle (danışman için)
+   */
+  markAttendanceAsAttended(attendanceId: string): Promise<EventAttendance>;
+
+  /**
    * Etkinlik katılımcılarını getir
    */
   getAttendees(eventId: string): Promise<EventAttendance[]>;

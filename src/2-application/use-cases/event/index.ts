@@ -8,6 +8,7 @@ export * from './GetEventUseCase';
 export * from './UpdateEventUseCase';
 export * from './DeleteEventUseCase';
 export * from './RegisterEventAttendanceUseCase';
+export * from './MarkEventAttendanceAsAttendedUseCase';
 export * from './GetEventAttendeesUseCase';
 export * from './SendEventRemindersUseCase';
 export * from './GetEventStatisticsUseCase';

@@ -1,6 +1,6 @@
 'use client';
 
-import { use } from 'react';
+import { use, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Calendar, MapPin, Users, Clock, ExternalLink } from 'lucide-react';
 import { Button } from '@/presentation/components/ui/atoms/button';
@@ -21,6 +21,17 @@ interface PageProps {
 export default function AdminEventDetailPage({ params }: PageProps) {
   const { id } = use(params);
   const router = useRouter();
+
+  // Redirect "new" to the new event page
+  useEffect(() => {
+    if (id === 'new') {
+      router.replace('/dashboard/events/new');
+    }
+  }, [id, router]);
+
+  if (id === 'new') {
+    return null;
+  }
 
   return (
     <div className="space-y-6">

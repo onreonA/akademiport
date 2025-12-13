@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { EventRepository } from '@/infrastructure/database/repositories/EventRepository';
-import { GetEventStatisticsUseCase } from '@/application/use-cases/event/GetEventStatisticsUseCase';
-import { getAuthenticatedUser } from '@/infrastructure/api/helpers/auth';
-import { logger } from '@/shared/utils/logger';
-import { UserRole } from '@/domain/enums/UserRole';
+import { EventRepository } from '@/4-infrastructure/database/repositories/EventRepository';
+import { GetEventStatisticsUseCase } from '@/2-application/use-cases/event/GetEventStatisticsUseCase';
+import { getAuthenticatedUser } from '@/4-infrastructure/api/helpers/auth';
+import { logger } from '@/5-shared/utils/logger';
+import { UserRole } from '@/3-domain/enums/UserRole';
+import { AppError } from '@/6-core/errors/AppError';
+import { CompanyRepository } from '@/4-infrastructure/database/repositories/CompanyRepository';
 
 const eventRepository = new EventRepository();
+const companyRepository = new CompanyRepository();
 
 /**
  * GET /api/events/[id]/statistics
@@ -28,12 +31,27 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     // Role-based access control
     if (user.role === UserRole.COMPANY_ADMIN || user.role === UserRole.COMPANY_USER) {
-      // Company users can only see statistics for events they're registered to
+      // Company users can see statistics for events in their program or events they're registered to
+      if (!user.companyId) {
+        return NextResponse.json({ error: 'Company ID is required' }, { status: 400 });
+      }
+
+      // Check if user is registered to this event
       const attendees = await eventRepository.getAttendees(id);
       const userAttendance = attendees.find((a) => a.userId === user.id);
-      if (!userAttendance && user.companyId !== event.programId) {
-        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+
+      // If not registered, check if event is in user's company's program
+      if (!userAttendance) {
+        const companyResult = await companyRepository.findById(user.companyId);
+        if (companyResult.isFailure || !companyResult.value) {
+          return NextResponse.json({ error: 'Company not found' }, { status: 404 });
+        }
+        const company = companyResult.value;
+        if (company.programId !== event.programId) {
+          return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+        }
       }
+      // If registered or event is in their program, allow access
     } else if (user.role === UserRole.CONSULTANT) {
       // Consultants can only see statistics for their own events
       if (event.consultantId !== user.id) {

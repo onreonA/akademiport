@@ -33,6 +33,29 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     const { id } = await params;
 
+    // Authorization: Check if user has access to this event's attendees
+    const event = await eventRepository.findById(id);
+    if (!event) {
+      return NextResponse.json({ error: 'Event not found' }, { status: 404 });
+    }
+
+    // Company users can only see attendees for events in their program
+    if (user.role === 'company_admin' || user.role === 'company_user') {
+      if (!user.companyId) {
+        return NextResponse.json({ error: 'Company ID is required' }, { status: 400 });
+      }
+
+      const companyResult = await companyRepository.findById(user.companyId);
+      if (companyResult.isFailure || !companyResult.value) {
+        return NextResponse.json({ error: 'Company not found' }, { status: 404 });
+      }
+
+      const company = companyResult.value;
+      if (company.programId !== event.programId) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      }
+    }
+
     const getAttendeesUseCase = new GetEventAttendeesUseCase(eventRepository);
     const result = await getAttendeesUseCase.execute(id);
 
@@ -73,14 +96,25 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     }
 
     const { id } = await params;
-    const body = await request.json();
+
+    // Parse body if present, otherwise use empty object
+    let body = {};
+    try {
+      const contentType = request.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        body = await request.json().catch(() => ({}));
+      }
+    } catch (error) {
+      // Body is optional, continue with empty object
+      body = {};
+    }
 
     // Validate request body
     const validationResult = RegisterAttendanceDtoSchema.safeParse({
       eventId: id,
       userId: user.id,
       companyId: user.companyId,
-      notes: body.notes,
+      notes: (body as { notes?: string }).notes,
     });
 
     if (!validationResult.success) {

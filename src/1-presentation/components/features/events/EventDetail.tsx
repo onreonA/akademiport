@@ -26,6 +26,7 @@ import { Loader2 } from 'lucide-react';
 import type { EventResponseDto } from '@/application/dto/event';
 import { AttendeeList } from './AttendeeList';
 import { EventStatistics } from './EventStatistics';
+import { useAuth } from '@/shared/hooks/useAuth';
 
 interface EventDetailProps {
   eventId: string;
@@ -44,6 +45,11 @@ export function EventDetail({
 }: EventDetailProps) {
   const { data, isLoading, error } = useEvent(eventId);
   const [isRegistering, setIsRegistering] = useState(false);
+  const { user } = useAuth();
+
+  // Check if user can mark attendance (consultant or admin)
+  const canMarkAttendance =
+    user && (user.role === 'consultant' || user.role === 'admin' || user.role === 'master_admin');
 
   if (isLoading) {
     return (
@@ -213,7 +219,7 @@ export function EventDetail({
             </div>
 
             <div className="space-y-4">
-              {event.zoomJoinUrl && (
+              {event.zoomJoinUrl ? (
                 <div className="flex items-start gap-3">
                   <Video className="w-5 h-5 text-muted-foreground mt-0.5" />
                   <div className="flex-1">
@@ -233,6 +239,16 @@ export function EventDetail({
                         <code className="bg-muted px-1 py-0.5 rounded">{event.zoomPassword}</code>
                       </p>
                     )}
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-start gap-3 p-3 rounded-lg border border-dashed border-muted-foreground/30 bg-muted/30">
+                  <Video className="w-5 h-5 text-muted-foreground mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium mb-1">Zoom Meeting</p>
+                    <p className="text-xs text-muted-foreground">
+                      Bu etkinlik için Zoom meeting oluşturulmamış.
+                    </p>
                   </div>
                 </div>
               )}
@@ -291,7 +307,9 @@ export function EventDetail({
       )}
 
       {/* Attendees List */}
-      {event.attendanceRequired && <AttendeeList eventId={eventId} showCompany={true} />}
+      {event.attendanceRequired && (
+        <AttendeeList eventId={eventId} showCompany={true} canMarkAttendance={canMarkAttendance} />
+      )}
     </div>
   );
 }

@@ -25,6 +25,12 @@ import {
 import { Switch } from '@/presentation/components/ui/atoms/switch';
 import { CreateEventDtoSchema, type CreateEventDto } from '@/application/dto/event';
 import { toast } from 'sonner';
+import { usePrograms } from '@/shared/hooks/api/usePrograms';
+
+interface Program {
+  id: string;
+  name: string;
+}
 
 interface EventFormProps {
   open: boolean;
@@ -33,6 +39,7 @@ interface EventFormProps {
   defaultValues?: Partial<CreateEventDto>;
   programId?: string;
   consultantId?: string;
+  programs?: Program[];
 }
 
 export function EventForm({
@@ -42,7 +49,15 @@ export function EventForm({
   defaultValues,
   programId,
   consultantId,
+  programs: programsProp,
 }: EventFormProps) {
+  // Fetch programs if not provided
+  const { data: programsData } = usePrograms({
+    page: 1,
+    limit: 100,
+  });
+  const programs = programsProp || programsData?.data || [];
+
   const {
     register,
     handleSubmit,
@@ -73,6 +88,7 @@ export function EventForm({
   const createZoomMeeting = watch('createZoomMeeting');
   const startTimeValue = watch('startTime');
   const endTimeValue = watch('endTime');
+  const selectedProgramId = watch('programId');
 
   // Helper function to convert ISO string to datetime-local format
   const isoToDatetimeLocal = (isoString: string | undefined | null): string => {
@@ -103,6 +119,13 @@ export function EventForm({
       return '';
     }
   };
+
+  // Set programId when prop changes
+  useEffect(() => {
+    if (programId && !selectedProgramId) {
+      setValue('programId', programId, { shouldValidate: true });
+    }
+  }, [programId, selectedProgramId, setValue]);
 
   useEffect(() => {
     if (open) {
@@ -245,6 +268,38 @@ export function EventForm({
             />
             {errors.description && (
               <p className="text-sm text-destructive">{errors.description.message}</p>
+            )}
+          </div>
+
+          {/* Program Selection */}
+          <div className="space-y-2">
+            <Label htmlFor="programId">
+              Program <span className="text-destructive">*</span>
+            </Label>
+            <Select
+              value={selectedProgramId || programId || ''}
+              onValueChange={(value) => {
+                setValue('programId', value, { shouldValidate: true });
+              }}
+            >
+              <SelectTrigger
+                id="programId"
+                className={errors.programId ? 'border-destructive' : ''}
+              >
+                <SelectValue placeholder="Program seçin" />
+              </SelectTrigger>
+              <SelectContent>
+                {programs.map((program) => (
+                  <SelectItem key={program.id} value={program.id}>
+                    {program.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {errors.programId && (
+              <p className="text-sm text-destructive">
+                {errors.programId.message || 'Program seçimi gereklidir'}
+              </p>
             )}
           </div>
 
@@ -449,12 +504,7 @@ export function EventForm({
             </div>
           </div>
 
-          {/* Hidden fields */}
-          <input
-            type="hidden"
-            {...register('programId')}
-            value={programId || defaultValues?.programId || ''}
-          />
+          {/* Hidden field for consultantId */}
           <input
             type="hidden"
             {...register('consultantId')}

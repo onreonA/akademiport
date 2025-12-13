@@ -337,6 +337,38 @@ export class EventRepository implements IEventRepository {
     }
   }
 
+  async markAttendanceAsAttended(attendanceId: string): Promise<EventAttendance> {
+    const supabase = await createClient();
+
+    const { data: attendance, error } = await supabase
+      .from('event_attendances')
+      .update({
+        attended_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', attendanceId)
+      .select(
+        `
+        *,
+        users!event_attendances_user_id_fkey (
+          id,
+          full_name
+        ),
+        companies!event_attendances_company_id_fkey (
+          id,
+          name
+        )
+      `
+      )
+      .single();
+
+    if (error) {
+      throw new Error(`Failed to mark attendance as attended: ${error.message}`);
+    }
+
+    return this.mapToAttendance(attendance);
+  }
+
   async getAttendees(eventId: string): Promise<EventAttendance[]> {
     const supabase = await createClient();
 
