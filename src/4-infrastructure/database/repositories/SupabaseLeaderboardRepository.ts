@@ -74,13 +74,8 @@ export class SupabaseLeaderboardRepository implements ILeaderboardRepository {
     try {
       const supabase = await this.getSupabaseClient();
 
-      // Use JOIN to fetch company name in a single query (avoid N+1)
-      let query = supabase.from('leaderboard_rankings').select(
-        `
-          *,
-          companies!leaderboard_rankings_company_id_fkey(id, name)
-        `
-      );
+      // Select all columns (leaderboard_rankings view already includes company_name)
+      let query = supabase.from('leaderboard_rankings').select('*');
 
       if (filter?.programId) {
         query = query.eq('program_id', filter.programId);
@@ -135,15 +130,10 @@ export class SupabaseLeaderboardRepository implements ILeaderboardRepository {
     try {
       const supabase = await this.getSupabaseClient();
 
-      // Use JOIN to fetch company name in a single query
+      // Select all columns (leaderboard_rankings view already includes company_name)
       const { data, error } = await supabase
         .from('leaderboard_rankings')
-        .select(
-          `
-          *,
-          companies!leaderboard_rankings_company_id_fkey(id, name)
-        `
-        )
+        .select('*')
         .eq('company_id', companyId)
         .eq('program_id', programId)
         .single();
