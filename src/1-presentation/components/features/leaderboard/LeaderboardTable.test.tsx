@@ -94,26 +94,29 @@ describe('LeaderboardTable', () => {
   });
 
   it('displays rank numbers', () => {
-    const rankings = [createMockRanking({ rank: 1 }), createMockRanking({ rank: 2 })];
+    // Use rank > 3 to avoid emoji rendering (rank 1-3 show medals)
+    const rankings = [createMockRanking({ rank: 4 }), createMockRanking({ rank: 5 })];
     mockUseLeaderboard.mockReturnValue({
       data: { rankings },
       isLoading: false,
       error: null,
     });
     render(<LeaderboardTable />);
-    expect(screen.getByText('1')).toBeInTheDocument();
-    expect(screen.getByText('2')).toBeInTheDocument();
+    // Rank numbers > 3 are displayed as text
+    expect(screen.getByText('4')).toBeInTheDocument();
+    expect(screen.getByText('5')).toBeInTheDocument();
   });
 
   it('displays total scores', () => {
-    const rankings = [createMockRanking({ totalScore: 1000 })];
+    const rankings = [createMockRanking({ totalScore: 1000, companyName: 'Test Company' })];
     mockUseLeaderboard.mockReturnValue({
       data: { rankings },
       isLoading: false,
       error: null,
     });
     render(<LeaderboardTable />);
-    expect(screen.getByText('1000')).toBeInTheDocument();
+    // totalScore is formatted with toLocaleString(), so check for formatted version
+    expect(screen.getByText('1,000')).toBeInTheDocument();
   });
 
   it('displays badge count', () => {

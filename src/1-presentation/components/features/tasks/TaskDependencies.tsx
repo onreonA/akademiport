@@ -1,17 +1,26 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Link2, Link2Off, Plus, Trash2, AlertCircle } from 'lucide-react';
-import { EnhancedCard } from '@/presentation/components/ui/atoms/enhanced-card';
-import { Button } from '@/presentation/components/ui/atoms/button';
-import { Badge } from '@/presentation/components/ui/atoms/badge';
+import {
+  Link2,
+  Link2Off,
+  Plus,
+  Trash2,
+  AlertCircle,
+  CheckCircle2,
+  Clock,
+  XCircle,
+} from 'lucide-react';
+import { EnhancedCard } from '@/1-presentation/components/ui/atoms/enhanced-card';
+import { Button } from '@/1-presentation/components/ui/atoms/button';
+import { Badge } from '@/1-presentation/components/ui/atoms/badge';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/presentation/components/ui/atoms/select';
+} from '@/1-presentation/components/ui/atoms/select';
 import {
   Dialog,
   DialogContent,
@@ -20,8 +29,14 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/presentation/components/ui/atoms/dialog';
-import { Label } from '@/presentation/components/ui/atoms/label';
+} from '@/1-presentation/components/ui/atoms/dialog';
+import { Label } from '@/1-presentation/components/ui/atoms/label';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/1-presentation/components/ui/atoms/tooltip';
 import { toast } from 'sonner';
 
 interface TaskDependency {
@@ -36,6 +51,7 @@ interface Task {
   id: string;
   title: string;
   status: string;
+  priority?: string;
 }
 
 interface TaskDependenciesProps {
@@ -54,6 +70,10 @@ export function TaskDependencies({ taskId, projectId }: TaskDependenciesProps) {
     dependencyType: 'blocks' as 'blocks' | 'related',
   });
   const [submitting, setSubmitting] = useState(false);
+  const [dependencyCheck, setDependencyCheck] = useState<{
+    allComplete: boolean;
+    incompleteDependencies: string[];
+  } | null>(null);
 
   const fetchDependencies = useCallback(async () => {
     try {
@@ -84,10 +104,23 @@ export function TaskDependencies({ taskId, projectId }: TaskDependenciesProps) {
     }
   }, [projectId]);
 
+  const checkDependencies = useCallback(async () => {
+    try {
+      const response = await fetch(`/api/tasks/${taskId}/dependencies/check`);
+      if (response.ok) {
+        const data = await response.json();
+        setDependencyCheck(data);
+      }
+    } catch (error) {
+      console.error('Error checking dependencies:', error);
+    }
+  }, [taskId]);
+
   useEffect(() => {
     fetchDependencies();
     fetchTasks();
-  }, [fetchDependencies, fetchTasks]);
+    checkDependencies();
+  }, [fetchDependencies, fetchTasks, checkDependencies]);
 
   const handleAddDependency = async () => {
     if (!newDependency.dependsOnTaskId) {
@@ -168,6 +201,35 @@ export function TaskDependencies({ taskId, projectId }: TaskDependenciesProps) {
   const getTaskTitle = (taskId: string) => {
     const task = tasks.find((t) => t.id === taskId);
     return task?.title || 'Bilinmeyen Görev';
+  };
+
+  const getTaskStatus = (taskId: string) => {
+    const task = tasks.find((t) => t.id === taskId);
+    return task?.status || 'unknown';
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'done':
+        return <CheckCircle2 className="h-4 w-4 text-green-500" />;
+      case 'in_progress':
+        return <Clock className="h-4 w-4 text-blue-500" />;
+      case 'cancelled':
+        return <XCircle className="h-4 w-4 text-red-500" />;
+      default:
+        return <Clock className="h-4 w-4 text-gray-400" />;
+    }
+  };
+
+  const getStatusLabel = (status: string) => {
+    const statusMap: Record<string, string> = {
+      todo: 'Yapılacak',
+      in_progress: 'Devam Ediyor',
+      review: 'İncelemede',
+      done: 'Tamamlandı',
+      cancelled: 'İptal',
+    };
+    return statusMap[status] || status;
   };
 
   if (loading) {
@@ -258,37 +320,74 @@ export function TaskDependencies({ taskId, projectId }: TaskDependenciesProps) {
           </p>
         ) : (
           <div className="space-y-3">
-            {dependencies.map((dependency) => (
-              <div
-                key={dependency.id}
-                className="flex items-center justify-between p-3 bg-background/50 rounded-lg border"
-              >
-                <div className="flex items-center gap-3">
-                  <Link2 className="h-4 w-4 text-muted-foreground" />
-                  <div>
-                    <p className="font-medium">{getTaskTitle(dependency.dependsOnTaskId)}</p>
-                    <div className="flex items-center gap-2 mt-1">
-                      <Badge
-                        variant={
-                          dependency.dependencyType === 'blocks' ? 'destructive' : 'secondary'
-                        }
-                        className="text-xs"
-                      >
-                        {dependency.dependencyType === 'blocks' ? 'Zorunlu' : 'İlişkili'}
-                      </Badge>
+            {dependencies.map((dependency) => {
+              const dependsOnTaskStatus = getTaskStatus(dependency.dependsOnTaskId);
+              const isComplete = dependsOnTaskStatus === 'done';
+              const isBlocking = dependency.dependencyType === 'blocks';
+              const isIncomplete = isBlocking && !isComplete;
+
+              return (
+                <div
+                  key={dependency.id}
+                  className={`flex items-center justify-between p-3 bg-background/50 rounded-lg border ${
+                    isIncomplete ? 'border-yellow-500/50 bg-yellow-500/5' : ''
+                  }`}
+                >
+                  <div className="flex items-center gap-3 flex-1">
+                    <Link2
+                      className={`h-4 w-4 ${isIncomplete ? 'text-yellow-500' : 'text-muted-foreground'}`}
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium">{getTaskTitle(dependency.dependsOnTaskId)}</p>
+                        {getStatusIcon(dependsOnTaskStatus)}
+                      </div>
+                      <div className="flex items-center gap-2 mt-1 flex-wrap">
+                        <Badge
+                          variant={
+                            dependency.dependencyType === 'blocks' ? 'destructive' : 'secondary'
+                          }
+                          className="text-xs"
+                        >
+                          {dependency.dependencyType === 'blocks' ? 'Zorunlu' : 'İlişkili'}
+                        </Badge>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Badge
+                                variant={isComplete ? 'default' : 'outline'}
+                                className={`text-xs ${isComplete ? 'bg-green-500' : ''}`}
+                              >
+                                {getStatusLabel(dependsOnTaskStatus)}
+                              </Badge>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Bağımlı görevin durumu: {getStatusLabel(dependsOnTaskStatus)}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                        {isIncomplete && (
+                          <Badge
+                            variant="outline"
+                            className="text-xs text-yellow-600 border-yellow-500"
+                          >
+                            Bekleniyor
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                   </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDeleteDependency(dependency.id)}
+                    className="text-destructive hover:text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleDeleteDependency(dependency.id)}
-                  className="text-destructive hover:text-destructive"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </EnhancedCard>
@@ -323,20 +422,49 @@ export function TaskDependencies({ taskId, projectId }: TaskDependenciesProps) {
       )}
 
       {/* Uyarı: Bağımlı görevler tamamlanmamışsa */}
-      {dependencies.some((dep) => dep.dependencyType === 'blocks') && (
-        <EnhancedCard variant="glass" className="p-4 bg-yellow-500/10 border-yellow-500/20">
-          <div className="flex items-start gap-3">
-            <AlertCircle className="h-5 w-5 text-yellow-500 mt-0.5" />
-            <div>
-              <p className="font-medium text-yellow-600 dark:text-yellow-400">Bağımlılık Uyarısı</p>
-              <p className="text-sm text-yellow-600/80 dark:text-yellow-400/80 mt-1">
-                Bu görev, zorunlu bağımlılıklara sahip. Görevi başlatmak için bağımlı görevlerin
-                tamamlanmış olması gerekir.
-              </p>
+      {dependencyCheck &&
+        !dependencyCheck.allComplete &&
+        dependencyCheck.incompleteDependencies.length > 0 && (
+          <EnhancedCard variant="glass" className="p-4 bg-yellow-500/10 border-yellow-500/20">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="h-5 w-5 text-yellow-500 mt-0.5" />
+              <div className="flex-1">
+                <p className="font-medium text-yellow-600 dark:text-yellow-400">
+                  Bağımlılık Uyarısı
+                </p>
+                <p className="text-sm text-yellow-600/80 dark:text-yellow-400/80 mt-1">
+                  Bu görev, {dependencyCheck.incompleteDependencies.length} tamamlanmamış zorunlu
+                  bağımlılığa sahip. Görevi başlatmak için bağımlı görevlerin tamamlanmış olması
+                  gerekir.
+                </p>
+                <div className="mt-2 space-y-1">
+                  {dependencyCheck.incompleteDependencies.map((taskId) => (
+                    <p key={taskId} className="text-xs text-yellow-600/70 dark:text-yellow-400/70">
+                      • {getTaskTitle(taskId)}
+                    </p>
+                  ))}
+                </div>
+              </div>
             </div>
-          </div>
-        </EnhancedCard>
-      )}
+          </EnhancedCard>
+        )}
+      {dependencyCheck &&
+        dependencyCheck.allComplete &&
+        dependencies.some((dep) => dep.dependencyType === 'blocks') && (
+          <EnhancedCard variant="glass" className="p-4 bg-green-500/10 border-green-500/20">
+            <div className="flex items-start gap-3">
+              <CheckCircle2 className="h-5 w-5 text-green-500 mt-0.5" />
+              <div>
+                <p className="font-medium text-green-600 dark:text-green-400">
+                  Bağımlılıklar Tamamlandı
+                </p>
+                <p className="text-sm text-green-600/80 dark:text-green-400/80 mt-1">
+                  Tüm zorunlu bağımlılıklar tamamlandı. Bu görevi başlatabilirsiniz.
+                </p>
+              </div>
+            </div>
+          </EnhancedCard>
+        )}
     </div>
   );
 }

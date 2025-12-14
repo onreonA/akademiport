@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/4-infrastructure/database/supabase-server';
 import { SupabaseForumRepository } from '@/4-infrastructure/database/repositories/SupabaseForumRepository';
 import { UpdateReplyUseCase, DeleteReplyUseCase } from '@/2-application/use-cases/forum';
-import { UpdateReplyDto } from '@/2-application/dtos/forum';
+import { UpdateReplyDto, UpdateReplyDtoSchema } from '@/2-application/dtos/forum';
 
 /**
  * PUT /api/forum/replies/[id]
@@ -21,9 +21,23 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
     const { id } = await params;
     const body = await request.json();
-    const dto: UpdateReplyDto = {
+
+    // Validate request body
+    const validationResult = UpdateReplyDtoSchema.safeParse({
       content: body.content,
-    };
+    });
+
+    if (!validationResult.success) {
+      return NextResponse.json(
+        {
+          error: 'Geçersiz veri',
+          details: validationResult.error.issues,
+        },
+        { status: 400 }
+      );
+    }
+
+    const dto: UpdateReplyDto = validationResult.data;
 
     const repository = new SupabaseForumRepository();
     const useCase = new UpdateReplyUseCase(repository);

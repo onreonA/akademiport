@@ -84,7 +84,9 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     }
 
     const body = await request.json();
-    const dto: UpdateTopicDto = {
+
+    // Validate request body
+    const validationResult = UpdateTopicDtoSchema.safeParse({
       title: body.title,
       content: body.content,
       categoryId: body.categoryId,
@@ -92,7 +94,19 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       priority: body.priority,
       isPinned: body.isPinned,
       isLocked: body.isLocked,
-    };
+    });
+
+    if (!validationResult.success) {
+      return NextResponse.json(
+        {
+          error: 'Geçersiz veri',
+          details: validationResult.error.issues,
+        },
+        { status: 400 }
+      );
+    }
+
+    const dto: UpdateTopicDto = validationResult.data;
 
     // Use UpdateTopicUseCase
     const updateUseCase = new UpdateTopicUseCase(repository);

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/infrastructure/database/supabase-server';
 import { SupabaseNewsRepository } from '@/4-infrastructure/database/repositories/SupabaseNewsRepository';
 import { UpdateNewsUseCase } from '@/2-application/use-cases/news';
-import { UpdateNewsDto } from '@/2-application/dtos/news';
+import { UpdateNewsDto, UpdateNewsDtoSchema } from '@/2-application/dtos/news';
 
 /**
  * GET /api/news/[id]
@@ -70,7 +70,21 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     }
 
     const body = await request.json();
-    const dto: UpdateNewsDto = body;
+
+    // Validate request body
+    const validationResult = UpdateNewsDtoSchema.safeParse(body);
+
+    if (!validationResult.success) {
+      return NextResponse.json(
+        {
+          error: 'Geçersiz veri',
+          details: validationResult.error.issues,
+        },
+        { status: 400 }
+      );
+    }
+
+    const dto: UpdateNewsDto = validationResult.data;
 
     const repository = new SupabaseNewsRepository();
     const useCase = new UpdateNewsUseCase(repository);

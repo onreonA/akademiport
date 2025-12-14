@@ -104,15 +104,9 @@ export default function EditTaskPage() {
     } finally {
       setLoading(false);
     }
-  }, [taskId, fetchCompanyUsers]);
+  }, [taskId]);
 
-  useEffect(() => {
-    if (taskId) {
-      fetchTask();
-    }
-  }, [taskId, fetchTask]);
-
-  const fetchCompanyUsers = async (subProjectId: string) => {
+  const fetchCompanyUsers = useCallback(async (subProjectId: string) => {
     try {
       // Get sub-project to find project
       const subProjectResponse = await fetch(`/api/sub-projects/${subProjectId}`);
@@ -139,7 +133,13 @@ export default function EditTaskPage() {
       // Fallback to all users if company users fetch fails
       fetchAllUsers();
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (taskId) {
+      fetchTask();
+    }
+  }, [taskId, fetchTask]);
 
   const fetchAllUsers = async () => {
     try {
@@ -194,6 +194,7 @@ export default function EditTaskPage() {
       toast.success('Görev başarıyla güncellendi!');
       router.push('/consultant-dashboard/tasks/review');
     } catch (error) {
+      console.error('Error updating task:', error);
       toast.error(error instanceof Error ? error.message : 'Bir hata oluştu');
     } finally {
       setSaving(false);

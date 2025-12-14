@@ -14,6 +14,7 @@ import {
   LeaderboardRanking,
   LeaderboardHistory,
 } from '@/3-domain/entities/Leaderboard';
+import { trackSupabaseQuery } from '@/5-shared/middleware/query-performance';
 
 export class SupabaseLeaderboardRepository implements ILeaderboardRepository {
   private async getSupabaseClient() {
@@ -73,7 +74,13 @@ export class SupabaseLeaderboardRepository implements ILeaderboardRepository {
     try {
       const supabase = await this.getSupabaseClient();
 
-      let query = supabase.from('leaderboard_rankings').select('*');
+      // Use JOIN to fetch company name in a single query (avoid N+1)
+      let query = supabase.from('leaderboard_rankings').select(
+        `
+          *,
+          companies!leaderboard_rankings_company_id_fkey(id, name)
+        `
+      );
 
       if (filter?.programId) {
         query = query.eq('program_id', filter.programId);
@@ -94,7 +101,22 @@ export class SupabaseLeaderboardRepository implements ILeaderboardRepository {
         query = query.range(filter.offset, filter.offset + (filter.limit || 50) - 1);
       }
 
-      const { data, error } = await query;
+      const result = await trackSupabaseQuery(
+        'LeaderboardRepository.getRankings',
+        async () => {
+          const result = await query;
+          return result;
+        },
+        {
+          filters: {
+            programId: filter?.programId,
+            companyId: filter?.companyId,
+            limit: filter?.limit,
+            offset: filter?.offset,
+          },
+        }
+      );
+      const { data, error } = result;
 
       if (error) {
         return Result.fail(`Liderlik tablosu alınamadı: ${error.message}`);
@@ -113,9 +135,15 @@ export class SupabaseLeaderboardRepository implements ILeaderboardRepository {
     try {
       const supabase = await this.getSupabaseClient();
 
+      // Use JOIN to fetch company name in a single query
       const { data, error } = await supabase
         .from('leaderboard_rankings')
-        .select('*')
+        .select(
+          `
+          *,
+          companies!leaderboard_rankings_company_id_fkey(id, name)
+        `
+        )
         .eq('company_id', companyId)
         .eq('program_id', programId)
         .single();
@@ -147,7 +175,22 @@ export class SupabaseLeaderboardRepository implements ILeaderboardRepository {
         query = query.limit(limit);
       }
 
-      const { data, error } = await query;
+      const result = await trackSupabaseQuery(
+        'LeaderboardRepository.getRankings',
+        async () => {
+          const result = await query;
+          return result;
+        },
+        {
+          filters: {
+            programId: filter?.programId,
+            companyId: filter?.companyId,
+            limit: filter?.limit,
+            offset: filter?.offset,
+          },
+        }
+      );
+      const { data, error } = result;
 
       if (error) {
         return Result.fail(`Firma puanları alınamadı: ${error.message}`);
@@ -179,7 +222,22 @@ export class SupabaseLeaderboardRepository implements ILeaderboardRepository {
 
       query = query.order('order_index', { ascending: true });
 
-      const { data, error } = await query;
+      const result = await trackSupabaseQuery(
+        'LeaderboardRepository.getRankings',
+        async () => {
+          const result = await query;
+          return result;
+        },
+        {
+          filters: {
+            programId: filter?.programId,
+            companyId: filter?.companyId,
+            limit: filter?.limit,
+            offset: filter?.offset,
+          },
+        }
+      );
+      const { data, error } = result;
 
       if (error) {
         return Result.fail(`Rozetler alınamadı: ${error.message}`);
@@ -347,7 +405,22 @@ export class SupabaseLeaderboardRepository implements ILeaderboardRepository {
 
       query = query.order('snapshot_date', { ascending: false });
 
-      const { data, error } = await query;
+      const result = await trackSupabaseQuery(
+        'LeaderboardRepository.getRankings',
+        async () => {
+          const result = await query;
+          return result;
+        },
+        {
+          filters: {
+            programId: filter?.programId,
+            companyId: filter?.companyId,
+            limit: filter?.limit,
+            offset: filter?.offset,
+          },
+        }
+      );
+      const { data, error } = result;
 
       if (error) {
         return Result.fail(`Geçmiş veriler alınamadı: ${error.message}`);
@@ -451,9 +524,12 @@ export class SupabaseLeaderboardRepository implements ILeaderboardRepository {
   }
 
   private mapToRanking(data: any): LeaderboardRanking {
+    // Handle both cases: direct company_name (from view) or companies.name (from JOIN)
+    const companyName = data.company_name || data.companies?.name || '';
+
     return {
       companyId: data.company_id,
-      companyName: data.company_name,
+      companyName,
       programId: data.program_id,
       totalScore: data.total_score,
       projectScore: data.project_score,

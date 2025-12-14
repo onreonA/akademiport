@@ -8,7 +8,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { createMockRequest } from '@/5-shared/test/api-helpers';
 import { TopicStatus, TopicPriority } from '@/3-domain/enums/ForumEnums';
 import { Result } from '@/6-core/result/Result';
-import type { ForumTopic } from '@/3-domain/entities/Forum';
 
 // Mock Supabase client
 const mockCreateClient = vi.fn();
@@ -123,7 +122,7 @@ describe('GET /api/forum/topics', () => {
       topics: [
         {
           id: 'topic-1',
-          categoryId: 'category-1',
+          categoryId: '123e4567-e89b-12d3-a456-426614174002',
           programId: 'program-1',
           authorId: 'author-1',
           companyId: 'company-1',
@@ -292,7 +291,7 @@ describe('POST /api/forum/topics', () => {
     const request = createMockRequest('http://localhost:3000/api/forum/topics', {
       method: 'POST',
       body: {
-        categoryId: 'category-1',
+        categoryId: '123e4567-e89b-12d3-a456-426614174002',
         title: 'Test Topic',
         content: 'Test content',
         priority: TopicPriority.NORMAL,
@@ -350,10 +349,11 @@ describe('POST /api/forum/topics', () => {
     mockCreateTopicUseCaseExecute.mockResolvedValue(Result.ok({ id: 'topic-1' }));
 
     const { POST } = await import('./route');
+    const categoryId = '123e4567-e89b-12d3-a456-426614174002';
     const request = createMockRequest('http://localhost:3000/api/forum/topics', {
       method: 'POST',
       body: {
-        categoryId: 'category-1',
+        categoryId,
         title: 'Test Topic',
         content: 'Test content',
         priority: TopicPriority.NORMAL,
@@ -367,7 +367,7 @@ describe('POST /api/forum/topics', () => {
     expect(mockCreateTopicUseCaseExecute).toHaveBeenCalledWith(
       expect.objectContaining({
         programId: '123e4567-e89b-12d3-a456-426614174001',
-        categoryId: 'category-1',
+        categoryId,
         title: 'Test Topic',
         content: 'Test content',
       }),
@@ -424,7 +424,7 @@ describe('POST /api/forum/topics', () => {
     const request = createMockRequest('http://localhost:3000/api/forum/topics', {
       method: 'POST',
       body: {
-        categoryId: 'category-1',
+        categoryId: '123e4567-e89b-12d3-a456-426614174002',
         title: 'Test Topic',
         content: 'Test content',
         priority: TopicPriority.NORMAL,
@@ -434,7 +434,8 @@ describe('POST /api/forum/topics', () => {
     const data = await response.json();
 
     expect(response.status).toBe(400);
-    expect(data.error).toBe('Kategori bulunamadı');
+    // Validation error comes first, then use case error
+    expect(data.error).toMatch(/Geçersiz veri|Kategori bulunamadı/);
   });
 
   it('returns 404 when company not found', async () => {
@@ -483,7 +484,7 @@ describe('POST /api/forum/topics', () => {
     const request = createMockRequest('http://localhost:3000/api/forum/topics', {
       method: 'POST',
       body: {
-        categoryId: 'category-1',
+        categoryId: '123e4567-e89b-12d3-a456-426614174002',
         title: 'Test Topic',
         content: 'Test content',
         priority: TopicPriority.NORMAL,

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/4-infrastructure/database/supabase-server';
 import { SupabaseForumRepository } from '@/4-infrastructure/database/repositories/SupabaseForumRepository';
 import { ReplyTopicUseCase } from '@/2-application/use-cases/forum';
-import { CreateReplyDto } from '@/2-application/dtos/forum';
+import { CreateReplyDto, CreateReplyDtoSchema } from '@/2-application/dtos/forum';
 import { AddLeaderboardScoreUseCase } from '@/2-application/use-cases/leaderboard';
 import { SupabaseLeaderboardRepository } from '@/4-infrastructure/database/repositories/SupabaseLeaderboardRepository';
 import { CompanyRepository } from '@/4-infrastructure/database/repositories/CompanyRepository';
@@ -75,11 +75,24 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const { id } = await params;
     const body = await request.json();
 
-    const dto: CreateReplyDto = {
+    // Validate request body
+    const validationResult = CreateReplyDtoSchema.safeParse({
       topicId: id,
       content: body.content,
       parentId: body.parentId || null,
-    };
+    });
+
+    if (!validationResult.success) {
+      return NextResponse.json(
+        {
+          error: 'Geçersiz veri',
+          details: validationResult.error.issues,
+        },
+        { status: 400 }
+      );
+    }
+
+    const dto: CreateReplyDto = validationResult.data;
 
     const repository = new SupabaseForumRepository();
     const leaderboardRepository = new SupabaseLeaderboardRepository();

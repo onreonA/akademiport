@@ -16,6 +16,7 @@ import {
   ForumActivity,
 } from '@/3-domain/entities/Forum';
 import { TopicStatus, TopicPriority } from '@/3-domain/enums/ForumEnums';
+import { trackSupabaseQuery } from '@/5-shared/middleware/query-performance';
 
 export class SupabaseForumRepository implements IForumRepository {
   private async getSupabaseClient() {
@@ -345,7 +346,22 @@ export class SupabaseForumRepository implements IForumRepository {
         query = query.range(filters.offset || 0, (filters.offset || 0) + filters.limit - 1);
       }
 
-      const { data, error, count } = await query;
+      const result = await trackSupabaseQuery(
+        'ForumRepository.findAllReplies',
+        async () => {
+          const result = await query;
+          return result;
+        },
+        {
+          filters: {
+            topicId: filters.topicId,
+            parentId: filters.parentId,
+            limit: filters.limit,
+            offset: filters.offset,
+          },
+        }
+      );
+      const { data, error, count } = result;
 
       if (error) {
         return Result.fail(`Konular listelenemedi: ${error.message}`);
@@ -459,8 +475,6 @@ export class SupabaseForumRepository implements IForumRepository {
     userId: string
   ): Promise<Result<ForumTopic>> {
     try {
-      const supabase = await this.getSupabaseClient();
-
       // Update topic
       const topicResult = await this.updateTopic(topicId, {
         solutionReplyId: replyId,
@@ -628,7 +642,22 @@ export class SupabaseForumRepository implements IForumRepository {
         query = query.range(filters.offset || 0, (filters.offset || 0) + filters.limit - 1);
       }
 
-      const { data, error, count } = await query;
+      const result = await trackSupabaseQuery(
+        'ForumRepository.findAllReplies',
+        async () => {
+          const result = await query;
+          return result;
+        },
+        {
+          filters: {
+            topicId: filters.topicId,
+            parentId: filters.parentId,
+            limit: filters.limit,
+            offset: filters.offset,
+          },
+        }
+      );
+      const { data, error, count } = result;
 
       if (error) {
         return Result.fail(`Yanıtlar listelenemedi: ${error.message}`);

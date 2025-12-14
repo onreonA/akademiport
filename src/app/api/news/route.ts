@@ -2,8 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/infrastructure/database/supabase-server';
 import { SupabaseNewsRepository } from '@/4-infrastructure/database/repositories/SupabaseNewsRepository';
 import { CreateNewsUseCase, GetNewsListUseCase } from '@/2-application/use-cases/news';
-import { CreateNewsDto } from '@/2-application/dtos/news';
+import { CreateNewsDto, CreateNewsDtoSchema } from '@/2-application/dtos/news';
 import { NewsFilters } from '@/3-domain/interfaces/repositories/INewsRepository';
+import { createPaginatedResponse } from '@/5-shared/utils/pagination';
+import { applyFieldSelection } from '@/5-shared/utils/field-selection';
 
 /**
  * GET /api/news
@@ -42,7 +44,21 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: result.error?.message || result.error }, { status: 400 });
     }
 
-    return NextResponse.json(result.value);
+    // Apply field selection if requested
+    const fieldsParam = searchParams.get('fields');
+    const news = fieldsParam
+      ? applyFieldSelection(result.value, fieldsParam, {
+          defaultFields: ['id', 'title', 'summary', 'category', 'publishedAt'],
+          requiredFields: ['id'],
+        })
+      : result.value;
+
+    // Calculate total for pagination (if repository returns array, use length)
+    const total = Array.isArray(news) ? news.length : result.value?.length || 0;
+    const newsArray = Array.isArray(news) ? news : result.value || [];
+
+    // Return paginated response
+    return NextResponse.json(createPaginatedResponse(newsArray, total, page, limit));
   } catch (error) {
     console.error('GET /api/news error:', error);
     return NextResponse.json({ error: 'Haberler listelenemedi' }, { status: 500 });
@@ -76,10 +92,24 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const dto: CreateNewsDto = {
+
+    // Validate request body
+    const validationResult = CreateNewsDtoSchema.safeParse({
       ...body,
       authorId: user.id,
-    };
+    });
+
+    if (!validationResult.success) {
+      return NextResponse.json(
+        {
+          error: 'Geçersiz veri',
+          details: validationResult.error.issues,
+        },
+        { status: 400 }
+      );
+    }
+
+    const dto: CreateNewsDto = validationResult.data;
 
     const repository = new SupabaseNewsRepository();
     const useCase = new CreateNewsUseCase(repository);

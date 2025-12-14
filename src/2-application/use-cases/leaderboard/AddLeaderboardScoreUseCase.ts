@@ -3,6 +3,7 @@ import { ICompanyRepository } from '@/3-domain/interfaces/ICompanyRepository';
 import { Result } from '@/6-core/result/Result';
 import { AppError } from '@/6-core/errors/AppError';
 import { AddScoreDto } from '@/2-application/dtos/leaderboard/AddScoreDto';
+import { cacheManager } from '@/5-shared/cache/cache-manager';
 import { getPointsForActivity } from '@/5-shared/constants/leaderboard';
 
 export class AddLeaderboardScoreUseCase {
@@ -45,6 +46,9 @@ export class AddLeaderboardScoreUseCase {
       this.leaderboardRepository.refreshRankings().catch((error) => {
         console.error('Failed to refresh leaderboard:', error);
       });
+
+      // Invalidate leaderboard cache after score update
+      await cacheManager.deletePattern('leaderboard:*');
 
       return Result.ok(undefined);
     } catch (error) {

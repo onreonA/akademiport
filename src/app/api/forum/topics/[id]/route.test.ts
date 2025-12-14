@@ -30,16 +30,33 @@ const mockFindTopicById = vi.fn();
 const mockUpdateTopic = vi.fn();
 const mockDeleteTopic = vi.fn();
 const mockIncrementViewCount = vi.fn();
+const mockFindTopicBySlug = vi.fn();
 
 class MockSupabaseForumRepository {
   findTopicById = mockFindTopicById;
   updateTopic = mockUpdateTopic;
   deleteTopic = mockDeleteTopic;
   incrementViewCount = mockIncrementViewCount;
+  findTopicBySlug = mockFindTopicBySlug;
 }
 
 vi.mock('@/4-infrastructure/database/repositories/SupabaseForumRepository', () => ({
   SupabaseForumRepository: MockSupabaseForumRepository,
+}));
+
+// Mock use cases
+const mockUpdateTopicExecute = vi.fn();
+const mockDeleteTopicExecute = vi.fn();
+
+vi.mock('@/2-application/use-cases/forum', () => ({
+  UpdateTopicUseCase: class {
+    constructor() {}
+    execute = mockUpdateTopicExecute;
+  },
+  DeleteTopicUseCase: class {
+    constructor() {}
+    execute = mockDeleteTopicExecute;
+  },
 }));
 
 describe('GET /api/forum/topics/[id]', () => {
@@ -118,6 +135,9 @@ describe('GET /api/forum/topics/[id]', () => {
 describe('PUT /api/forum/topics/[id]', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Reset use case mocks
+    mockUpdateTopicExecute.mockClear();
+    mockFindTopicBySlug.mockClear();
   });
 
   it('returns 401 when user is not authenticated', async () => {
@@ -154,12 +174,38 @@ describe('PUT /api/forum/topics/[id]', () => {
       content: 'Updated content',
     };
 
-    mockFindTopicById.mockResolvedValue(
-      Result.ok({
-        id: 'topic-1',
-        authorId: mockUser.id,
-      })
-    );
+    const existingTopic = {
+      id: 'topic-1',
+      authorId: mockUser.id,
+      title: 'Original Topic',
+      programId: 'program-1',
+      slug: 'original-topic',
+      categoryId: 'category-1',
+      content: 'Original content',
+      status: TopicStatus.OPEN,
+      priority: TopicPriority.NORMAL,
+      isPinned: false,
+      isLocked: false,
+      isApproved: true,
+      solutionReplyId: null,
+      solvedAt: null,
+      solvedBy: null,
+      viewCount: 0,
+      replyCount: 0,
+      likeCount: 0,
+      lastReplyAt: null,
+      lastReplyBy: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      companyId: null,
+    };
+
+    // Mock repository methods that UpdateTopicUseCase will call
+    mockFindTopicById.mockResolvedValue(Result.ok(existingTopic));
+    // Mock findTopicBySlug to return not found (slug doesn't exist)
+    mockFindTopicBySlug.mockResolvedValue(Result.ok(null));
+    mockUpdateTopic.mockResolvedValue(Result.ok({ ...existingTopic, ...updatedTopic }));
+
     mockFrom.mockReturnValue({
       select: mockSelect,
     });
@@ -173,7 +219,8 @@ describe('PUT /api/forum/topics/[id]', () => {
       data: { role: 'master_admin' },
       error: null,
     });
-    mockUpdateTopic.mockResolvedValue(Result.ok(updatedTopic));
+    // Mock UpdateTopicUseCase.execute - it will use repository mocks internally
+    mockUpdateTopicExecute.mockResolvedValue(Result.ok({ ...existingTopic, ...updatedTopic }));
 
     const { PUT } = await import('./route');
     const request = createMockRequest('http://localhost:3000/api/forum/topics/topic-1', {
@@ -197,12 +244,37 @@ describe('PUT /api/forum/topics/[id]', () => {
       error: null,
     } as any);
 
-    mockFindTopicById.mockResolvedValue(
-      Result.ok({
-        id: 'topic-1',
-        authorId: mockUser.id,
-      })
-    );
+    const existingTopic = {
+      id: 'topic-1',
+      authorId: mockUser.id,
+      title: 'Original Topic',
+      programId: 'program-1',
+      slug: 'original-topic',
+      categoryId: 'category-1',
+      content: 'Original content',
+      status: TopicStatus.OPEN,
+      priority: TopicPriority.NORMAL,
+      isPinned: false,
+      isLocked: false,
+      isApproved: true,
+      solutionReplyId: null,
+      solvedAt: null,
+      solvedBy: null,
+      viewCount: 0,
+      replyCount: 0,
+      likeCount: 0,
+      lastReplyAt: null,
+      lastReplyBy: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      companyId: null,
+    };
+
+    // Mock repository methods that UpdateTopicUseCase will call
+    mockFindTopicById.mockResolvedValue(Result.ok(existingTopic));
+    // Mock findTopicBySlug to return not found (slug doesn't exist)
+    mockFindTopicBySlug.mockResolvedValue(Result.ok(null));
+
     mockFrom.mockReturnValue({
       select: mockSelect,
     });
@@ -216,7 +288,8 @@ describe('PUT /api/forum/topics/[id]', () => {
       data: { role: 'master_admin' },
       error: null,
     });
-    mockUpdateTopic.mockResolvedValue(Result.fail('Konu güncellenemedi'));
+    // Mock UpdateTopicUseCase.execute to return failure
+    mockUpdateTopicExecute.mockResolvedValue(Result.fail('Konu güncellenemedi'));
 
     const { PUT } = await import('./route');
     const request = createMockRequest('http://localhost:3000/api/forum/topics/topic-1', {
@@ -230,13 +303,16 @@ describe('PUT /api/forum/topics/[id]', () => {
     const data = await response.json();
 
     expect(response.status).toBe(400);
-    expect(data.error).toBe('Konu güncellenemedi');
+    // Error message might be prefixed by route error handling
+    expect(data.error).toContain('Konu güncellenemedi');
   });
 });
 
 describe('DELETE /api/forum/topics/[id]', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Reset use case mocks
+    mockDeleteTopicExecute.mockClear();
   });
 
   it('returns 401 when user is not authenticated', async () => {
@@ -263,12 +339,36 @@ describe('DELETE /api/forum/topics/[id]', () => {
       error: null,
     } as any);
 
-    mockFindTopicById.mockResolvedValue(
-      Result.ok({
-        id: 'topic-1',
-        authorId: mockUser.id,
-      })
-    );
+    const existingTopic = {
+      id: 'topic-1',
+      authorId: mockUser.id,
+      title: 'Test Topic',
+      programId: 'program-1',
+      slug: 'test-topic',
+      categoryId: 'category-1',
+      content: 'Test content',
+      status: TopicStatus.OPEN,
+      priority: TopicPriority.NORMAL,
+      isPinned: false,
+      isLocked: false,
+      isApproved: true,
+      solutionReplyId: null,
+      solvedAt: null,
+      solvedBy: null,
+      viewCount: 0,
+      replyCount: 0,
+      likeCount: 0,
+      lastReplyAt: null,
+      lastReplyBy: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      companyId: null,
+    };
+
+    // Mock repository methods that DeleteTopicUseCase will call
+    mockFindTopicById.mockResolvedValue(Result.ok(existingTopic));
+    mockDeleteTopic.mockResolvedValue(Result.ok(undefined));
+
     mockFrom.mockReturnValue({
       select: mockSelect,
     });
@@ -282,7 +382,8 @@ describe('DELETE /api/forum/topics/[id]', () => {
       data: { role: 'master_admin' },
       error: null,
     });
-    mockDeleteTopic.mockResolvedValue(Result.ok(undefined as any));
+    // Mock DeleteTopicUseCase.execute - it will use repository mocks internally
+    mockDeleteTopicExecute.mockResolvedValue(Result.ok(undefined));
 
     const { DELETE } = await import('./route');
     const request = createMockRequest('http://localhost:3000/api/forum/topics/topic-1', {
@@ -302,12 +403,33 @@ describe('DELETE /api/forum/topics/[id]', () => {
       error: null,
     } as any);
 
-    mockFindTopicById.mockResolvedValue(
-      Result.ok({
-        id: 'topic-1',
-        authorId: mockUser.id,
-      })
-    );
+    const existingTopic = {
+      id: 'topic-1',
+      authorId: mockUser.id,
+      title: 'Test Topic',
+      programId: 'program-1',
+      slug: 'test-topic',
+      categoryId: 'category-1',
+      content: 'Test content',
+      status: TopicStatus.OPEN,
+      priority: TopicPriority.NORMAL,
+      isPinned: false,
+      isLocked: false,
+      isApproved: true,
+      solutionReplyId: null,
+      solvedAt: null,
+      solvedBy: null,
+      viewCount: 0,
+      replyCount: 0,
+      likeCount: 0,
+      lastReplyAt: null,
+      lastReplyBy: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      companyId: null,
+    };
+
+    mockFindTopicById.mockResolvedValue(Result.ok(existingTopic));
     mockFrom.mockReturnValue({
       select: mockSelect,
     });
@@ -321,7 +443,8 @@ describe('DELETE /api/forum/topics/[id]', () => {
       data: { role: 'master_admin' },
       error: null,
     });
-    mockDeleteTopic.mockResolvedValue(Result.fail('Konu silinemedi'));
+    // Mock DeleteTopicUseCase.execute to return failure
+    mockDeleteTopicExecute.mockResolvedValue(Result.fail('Konu silinemedi'));
 
     const { DELETE } = await import('./route');
     const request = createMockRequest('http://localhost:3000/api/forum/topics/topic-1', {

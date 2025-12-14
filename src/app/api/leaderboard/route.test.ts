@@ -11,13 +11,24 @@ import type { LeaderboardRanking } from '@/3-domain/entities/Leaderboard';
 
 // Mock Supabase client
 const mockGetUser = vi.fn();
+const mockFrom = vi.fn();
+const mockSelect = vi.fn();
+const mockEq = vi.fn();
+const mockSingle = vi.fn();
 
 vi.mock('@/4-infrastructure/database/supabase-server', () => ({
-  createClient: vi.fn(() => ({
+  createClient: vi.fn(async () => ({
     auth: {
       getUser: mockGetUser,
     },
+    from: mockFrom,
   })),
+}));
+
+// Mock rate limiter
+vi.mock('@/5-shared/middleware/rate-limiter', () => ({
+  rateLimitMiddleware: vi.fn(() => null), // null means continue
+  getRateLimitConfig: vi.fn(() => 'authenticated'),
 }));
 
 // Mock repository
@@ -58,6 +69,11 @@ vi.mock('@/2-application/use-cases/leaderboard', () => ({
 describe('GET /api/leaderboard', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Reset mocks
+    mockFrom.mockClear();
+    mockSelect.mockClear();
+    mockEq.mockClear();
+    mockSingle.mockClear();
   });
 
   it('returns 401 when user is not authenticated', async () => {
@@ -81,6 +97,21 @@ describe('GET /api/leaderboard', () => {
       data: { user: mockUser },
       error: null,
     } as any);
+
+    // Mock user data query
+    mockFrom.mockReturnValue({
+      select: mockSelect,
+    });
+    mockSelect.mockReturnValue({
+      eq: mockEq,
+    });
+    mockEq.mockReturnValue({
+      single: mockSingle,
+    });
+    mockSingle.mockResolvedValue({
+      data: { role: 'company_user', company_id: 'company-1' },
+      error: null,
+    });
 
     const lastActivityAt = new Date();
     const mockRankings: LeaderboardRanking[] = [
@@ -127,6 +158,21 @@ describe('GET /api/leaderboard', () => {
       error: null,
     } as any);
 
+    // Mock user data query
+    mockFrom.mockReturnValue({
+      select: mockSelect,
+    });
+    mockSelect.mockReturnValue({
+      eq: mockEq,
+    });
+    mockEq.mockReturnValue({
+      single: mockSingle,
+    });
+    mockSingle.mockResolvedValue({
+      data: { role: 'company_user', company_id: 'company-1' },
+      error: null,
+    });
+
     const mockRankings: LeaderboardRanking[] = [];
     mockGetLeaderboardUseCaseExecute.mockResolvedValue(Result.ok(mockRankings));
 
@@ -154,6 +200,21 @@ describe('GET /api/leaderboard', () => {
       error: null,
     } as any);
 
+    // Mock user data query
+    mockFrom.mockReturnValue({
+      select: mockSelect,
+    });
+    mockSelect.mockReturnValue({
+      eq: mockEq,
+    });
+    mockEq.mockReturnValue({
+      single: mockSingle,
+    });
+    mockSingle.mockResolvedValue({
+      data: { role: 'company_user', company_id: 'company-1' },
+      error: null,
+    });
+
     mockGetLeaderboardUseCaseExecute.mockResolvedValue(
       Result.fail(new Error('Failed to get leaderboard'))
     );
@@ -173,6 +234,21 @@ describe('GET /api/leaderboard', () => {
       data: { user: mockUser },
       error: null,
     } as any);
+
+    // Mock user data query
+    mockFrom.mockReturnValue({
+      select: mockSelect,
+    });
+    mockSelect.mockReturnValue({
+      eq: mockEq,
+    });
+    mockEq.mockReturnValue({
+      single: mockSingle,
+    });
+    mockSingle.mockResolvedValue({
+      data: { role: 'company_user', company_id: 'company-1' },
+      error: null,
+    });
 
     const mockRankings: LeaderboardRanking[] = [];
     mockGetLeaderboardUseCaseExecute.mockResolvedValue(Result.ok(mockRankings));
