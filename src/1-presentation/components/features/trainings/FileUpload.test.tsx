@@ -109,6 +109,7 @@ describe('FileUpload', () => {
 
   it('shows error when file type is not accepted', async () => {
     const user = userEvent.setup();
+    // Use a file extension that's definitely not in the accept list
     const invalidFile = new File(['test'], 'test.exe', { type: 'application/x-msdownload' });
 
     const { container } = render(
@@ -117,7 +118,15 @@ describe('FileUpload', () => {
 
     const fileInput = container.querySelector('input[type="file"]') as HTMLInputElement;
     if (fileInput) {
-      await user.upload(fileInput, invalidFile);
+      // Simulate file selection - the browser's accept attribute might prevent selection,
+      // so we need to manually trigger the change event
+      Object.defineProperty(fileInput, 'files', {
+        value: [invalidFile],
+        writable: false,
+      });
+
+      const changeEvent = new Event('change', { bubbles: true });
+      fileInput.dispatchEvent(changeEvent);
 
       await waitFor(
         () => {

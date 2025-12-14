@@ -5,7 +5,18 @@
  */
 
 import { expect } from 'vitest';
-import type { AxeResults } from 'axe-core';
+
+// Type definition for AxeResults (since axe-core types may not be available)
+interface AxeResults {
+  violations: Array<{
+    id: string;
+    description: string;
+    nodes: Array<{ html: string }>;
+  }>;
+  passes: unknown[];
+  incomplete: unknown[];
+  inapplicable: unknown[];
+}
 
 // Note: jest-axe is not compatible with Vitest
 // Using axe-core directly instead

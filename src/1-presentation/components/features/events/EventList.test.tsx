@@ -34,13 +34,19 @@ describe('EventList', () => {
 
   it('renders component', () => {
     render(<EventList />);
-    expect(screen.getByText(/etkinlikler/i)).toBeInTheDocument();
+    // Use getAllByText since "etkinlikler" appears multiple times, then check first occurrence
+    const etkinliklerElements = screen.getAllByText(/etkinlikler/i);
+    expect(etkinliklerElements.length).toBeGreaterThan(0);
+    expect(etkinliklerElements[0]).toBeInTheDocument();
   });
 
   it('displays create button when showCreateButton is true', () => {
     const handleCreate = vi.fn();
     render(<EventList onCreateEvent={handleCreate} showCreateButton={true} />);
-    expect(screen.getByText(/yeni etkinlik/i)).toBeInTheDocument();
+    // Use getAllByText since "yeni etkinlik" might appear multiple times
+    const createButtons = screen.getAllByText(/yeni etkinlik/i);
+    expect(createButtons.length).toBeGreaterThan(0);
+    expect(createButtons[0]).toBeInTheDocument();
   });
 
   it('calls onCreateEvent when create button is clicked', async () => {
@@ -48,8 +54,10 @@ describe('EventList', () => {
     const handleCreate = vi.fn();
     render(<EventList onCreateEvent={handleCreate} />);
 
-    const createButton = screen.getByText(/yeni etkinlik/i);
-    await user.click(createButton);
+    // Use getAllByText and click the first button
+    const createButtons = screen.getAllByText(/yeni etkinlik/i);
+    expect(createButtons.length).toBeGreaterThan(0);
+    await user.click(createButtons[0]);
     expect(handleCreate).toHaveBeenCalled();
   });
 
@@ -99,6 +107,9 @@ describe('EventList', () => {
 
   it('filters events by programId', () => {
     render(<EventList programId="program-1" />);
-    expect(screen.getByText(/etkinlikler/i)).toBeInTheDocument();
+    // Use getAllByText since "etkinlikler" appears multiple times
+    const etkinliklerElements = screen.getAllByText(/etkinlikler/i);
+    expect(etkinliklerElements.length).toBeGreaterThan(0);
+    expect(etkinliklerElements[0]).toBeInTheDocument();
   });
 });

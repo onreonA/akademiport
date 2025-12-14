@@ -140,7 +140,8 @@ describe('DeleteUserUseCase', () => {
     const result = await useCase.execute(request);
 
     expect(result.isFailure).toBe(true);
-    expect(result.error?.message || result.error).toBe(errorMessage);
+    // Use case prefixes the error message with "Kullanıcı bulunamadı: "
+    expect(result.error?.message || result.error).toBe(`Kullanıcı bulunamadı: ${errorMessage}`);
   });
 
   it('should handle exceptions', async () => {

@@ -2,25 +2,43 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { TokenTrackerService } from './token-tracker.service';
 import { AIProvider, AIUseCase, AIRequestStatus, AIModel } from '@/3-domain/enums/AIEnums';
 
-// Mock Supabase client
-const mockSupabaseQuery = {
-  select: vi.fn(() => mockSupabaseQuery),
-  insert: vi.fn(() => mockSupabaseQuery),
-  eq: vi.fn(() => mockSupabaseQuery),
-  gte: vi.fn(() => mockSupabaseQuery),
-  lte: vi.fn(() => mockSupabaseQuery),
+// Store mocks globally before vi.mock hoisting
+(globalThis as any).__mockSupabaseQuery = {
+  select: vi.fn(function (this: any) {
+    return this || (globalThis as any).__mockSupabaseQuery;
+  }),
+  insert: vi.fn(function (this: any) {
+    return this || (globalThis as any).__mockSupabaseQuery;
+  }),
+  eq: vi.fn(function (this: any) {
+    return this || (globalThis as any).__mockSupabaseQuery;
+  }),
+  gte: vi.fn(function (this: any) {
+    return this || (globalThis as any).__mockSupabaseQuery;
+  }),
+  lte: vi.fn(function (this: any) {
+    return this || (globalThis as any).__mockSupabaseQuery;
+  }),
   single: vi.fn(),
 };
 
-const mockSupabaseClient = {
-  from: vi.fn(() => mockSupabaseQuery),
+(globalThis as any).__mockSupabaseClient = {
+  from: vi.fn(() => (globalThis as any).__mockSupabaseQuery),
 };
 
 vi.mock('@/4-infrastructure/database/supabase-server', () => {
   return {
-    createClient: vi.fn().mockResolvedValue(mockSupabaseClient),
+    createClient: vi.fn(async () => (globalThis as any).__mockSupabaseClient),
   };
 });
+
+// Access mocks from globalThis
+function getMockSupabaseQuery() {
+  return (globalThis as any).__mockSupabaseQuery;
+}
+function getMockSupabaseClient() {
+  return (globalThis as any).__mockSupabaseClient;
+}
 
 describe('TokenTrackerService', () => {
   let service: TokenTrackerService;
@@ -47,6 +65,7 @@ describe('TokenTrackerService', () => {
         created_at: new Date().toISOString(),
       };
 
+      const mockSupabaseQuery = getMockSupabaseQuery();
       mockSupabaseQuery.single.mockResolvedValue({
         data: mockLog,
         error: null,
@@ -74,6 +93,7 @@ describe('TokenTrackerService', () => {
     });
 
     it('should handle errors', async () => {
+      const mockSupabaseQuery = getMockSupabaseQuery();
       mockSupabaseQuery.single.mockResolvedValue({
         data: null,
         error: { message: 'Database error' },
@@ -124,6 +144,7 @@ describe('TokenTrackerService', () => {
       };
 
       // Mock from() to return different chains for each call
+      const mockSupabaseClient = getMockSupabaseClient();
       vi.mocked(mockSupabaseClient.from)
         .mockReturnValueOnce(mockQueryChain1 as any)
         .mockReturnValueOnce(mockQueryChain2 as any);
@@ -161,6 +182,7 @@ describe('TokenTrackerService', () => {
         select: vi.fn().mockResolvedValue({ data: [], error: null }),
       };
 
+      const mockSupabaseClient = getMockSupabaseClient();
       vi.mocked(mockSupabaseClient.from)
         .mockReturnValueOnce(mockQueryChain1 as any)
         .mockReturnValueOnce(mockQueryChain2 as any);
@@ -203,6 +225,7 @@ describe('TokenTrackerService', () => {
         }),
       };
 
+      const mockSupabaseClient = getMockSupabaseClient();
       vi.mocked(mockSupabaseClient.from).mockReturnValue(mockQueryChain as any);
 
       const result = await service.getUsageStats();
