@@ -490,7 +490,7 @@ export class UserRepository implements IUserRepository {
       const sortOrder = filters.sortOrder || UserFilterDefaults.sortOrder;
       const offset = (page - 1) * limit;
 
-      // Build query
+      // Build query - select will be modified if programId filter is used
       let query = supabase.from(this.tableName).select('*', { count: 'exact' });
 
       // Apply filters
@@ -512,27 +512,25 @@ export class UserRepository implements IUserRepository {
         );
       }
 
-      // Program filter requires join
+      // Program filter - use JOIN to avoid N+1 query
       if (filters.programId) {
-        // This is more complex, we need to join with user_programs
-        // For now, we'll fetch program users separately and filter
-        const programUsersResult = await this.findByProgramId(filters.programId);
-        if (programUsersResult.isFailure) {
-          return Result.fail(programUsersResult.error || 'Program kullanıcıları alınamadı');
-        }
-
-        const programUserIds = programUsersResult.value?.map((u) => u.id) || [];
-        if (programUserIds.length === 0) {
-          return Result.ok({
-            users: [],
-            total: 0,
-            page,
-            limit,
-            totalPages: 0,
-          });
-        }
-
-        query = query.in('id', programUserIds);
+        // Use inner join with user_programs to filter by program
+        // This avoids an extra query by using JOIN instead of fetching all program users first
+        // Note: Supabase requires selecting from the join table, so we rebuild the query
+        query = supabase
+          .from(this.tableName)
+          .select(
+            `
+            *,
+            user_programs!inner(
+              program_id,
+              is_active
+            )
+          `,
+            { count: 'exact' }
+          )
+          .eq('user_programs.program_id', filters.programId)
+          .eq('user_programs.is_active', true);
       }
 
       // Apply sorting

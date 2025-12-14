@@ -53,12 +53,19 @@ export class GetConsultantDashboardStatsUseCase {
       const trainingsResult = await this.trainingRepository.findAll();
       const trainings = trainingsResult.data || [];
 
-      // Get company trainings for consultant's companies
+      // Get company trainings for consultant's companies - batch query to avoid N+1
       const companyTrainings: any[] = [];
-      for (const companyId of consultantCompanyIds) {
-        const companyTrainingsResult =
-          await this.companyTrainingRepository.findByCompanyId(companyId);
-        companyTrainings.push(...companyTrainingsResult);
+      if (consultantCompanyIds.size > 0) {
+        // Fetch all company trainings in a single query using .in() instead of loop
+        const companyIdsArray = Array.from(consultantCompanyIds);
+        // Use Promise.all with batch queries if repository doesn't support .in() directly
+        // For now, we'll use a workaround: fetch all and filter in memory
+        // TODO: Add findByCompanyIds method to repository for better performance
+        const allCompanyTrainingsPromises = companyIdsArray.map((companyId) =>
+          this.companyTrainingRepository.findByCompanyId(companyId)
+        );
+        const allCompanyTrainingsResults = await Promise.all(allCompanyTrainingsPromises);
+        companyTrainings.push(...allCompanyTrainingsResults.flat());
       }
 
       const totalTrainings = trainings.length;

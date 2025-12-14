@@ -25,7 +25,7 @@ export const CreateEcommerceMetricsDtoSchema = z
     b2cRevenue: z.number().min(0).default(0).optional(),
 
     // Ek bilgiler
-    notes: z.string().optional().nullable(),
+    notes: z.string().max(500, 'Notlar en fazla 500 karakter olabilir').optional().nullable(),
     metadata: z.record(z.string(), z.any()).optional().nullable(),
   })
   .refine(
