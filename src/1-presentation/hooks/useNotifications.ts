@@ -4,10 +4,12 @@
  * Hook for fetching and managing notifications
  */
 
+'use client';
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { NotificationFilterDto } from '@/2-application/dtos/notification/NotificationFilterDto';
 import { NotificationType } from '@/3-domain/enums/NotificationEnums';
-import { logger } from '@/5-shared/utils/logger';
+import { Notification } from '@/3-domain/entities/Notification';
+import { useNotificationRealtime } from './useNotificationRealtime';
 
 export interface UseNotificationsOptions {
   isRead?: boolean;
@@ -18,23 +20,7 @@ export interface UseNotificationsOptions {
 }
 
 export interface NotificationResponse {
-  notifications: Array<{
-    id: string;
-    userId: string;
-    type: string;
-    title: string;
-    message: string;
-    actionUrl?: string;
-    metadata: Record<string, unknown>;
-    priority: string;
-    isRead: boolean;
-    readAt?: string;
-    channels: string[];
-    emailSent: boolean;
-    pushSent: boolean;
-    createdAt: string;
-    expiresAt?: string;
-  }>;
+  notifications: Notification[];
 }
 
 export interface UnreadCountResponse {
@@ -45,8 +31,6 @@ export interface UnreadCountResponse {
  * Hook to fetch user notifications
  */
 export function useNotifications(options: UseNotificationsOptions = {}) {
-  const queryClient = useQueryClient();
-
   return useQuery({
     queryKey: ['notifications', options.isRead, options.type, options.limit, options.offset],
     queryFn: async () => {
@@ -77,9 +61,15 @@ export function useNotifications(options: UseNotificationsOptions = {}) {
 }
 
 /**
- * Hook to get unread notification count
+ * Hook to get unread notification count with real-time updates
  */
 export function useUnreadNotificationCount() {
+  // Enable real-time updates
+  useNotificationRealtime({
+    enableBrowserNotifications: false,
+    enableSound: false,
+  });
+
   return useQuery({
     queryKey: ['notifications', 'unread-count'],
     queryFn: async () => {
@@ -91,7 +81,8 @@ export function useUnreadNotificationCount() {
       const data: UnreadCountResponse = await response.json();
       return data.count;
     },
-    refetchInterval: 30000, // Refetch every 30 seconds
+    staleTime: 0, // Always refetch to get latest data
+    refetchOnWindowFocus: true,
   });
 }
 
@@ -122,7 +113,7 @@ export function useMarkNotificationAsRead() {
 }
 
 /**
- * Hook to mark all notifications as read
+ * Hook to mark all notifications as read with optimistic updates
  */
 export function useMarkAllNotificationsAsRead() {
   const queryClient = useQueryClient();
@@ -140,7 +131,39 @@ export function useMarkAllNotificationsAsRead() {
       const data = await response.json();
       return data.count;
     },
+    onMutate: async () => {
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ['notifications'] });
+      await queryClient.cancelQueries({ queryKey: ['notifications', 'unread-count'] });
+
+      // Snapshot previous values
+      const previousNotifications = queryClient.getQueryData<Notification[]>(['notifications']);
+      const previousCount = queryClient.getQueryData<number>(['notifications', 'unread-count']);
+
+      // Optimistically update
+      if (previousNotifications) {
+        const now = new Date().toISOString();
+        queryClient.setQueryData<Notification[]>(
+          ['notifications'],
+          previousNotifications.map((n) => ({ ...n, isRead: true, readAt: now }))
+        );
+      }
+
+      queryClient.setQueryData<number>(['notifications', 'unread-count'], 0);
+
+      return { previousNotifications, previousCount };
+    },
+    onError: (err, variables, context) => {
+      // Rollback on error
+      if (context?.previousNotifications) {
+        queryClient.setQueryData(['notifications'], context.previousNotifications);
+      }
+      if (context?.previousCount !== undefined) {
+        queryClient.setQueryData(['notifications', 'unread-count'], context.previousCount);
+      }
+    },
     onSuccess: () => {
+      // Invalidate queries to refetch
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
       queryClient.invalidateQueries({ queryKey: ['notifications', 'unread-count'] });
     },
@@ -148,7 +171,7 @@ export function useMarkAllNotificationsAsRead() {
 }
 
 /**
- * Hook to delete notification
+ * Hook to delete notification with optimistic updates
  */
 export function useDeleteNotification() {
   const queryClient = useQueryClient();
@@ -165,7 +188,45 @@ export function useDeleteNotification() {
 
       return await response.json();
     },
+    onMutate: async (notificationId: string) => {
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ['notifications'] });
+      await queryClient.cancelQueries({ queryKey: ['notifications', 'unread-count'] });
+
+      // Snapshot previous values
+      const previousNotifications = queryClient.getQueryData<Notification[]>(['notifications']);
+      const previousCount = queryClient.getQueryData<number>(['notifications', 'unread-count']);
+
+      // Optimistically update
+      if (previousNotifications) {
+        const deleted = previousNotifications.find((n) => n.id === notificationId);
+        queryClient.setQueryData<Notification[]>(
+          ['notifications'],
+          previousNotifications.filter((n) => n.id !== notificationId)
+        );
+
+        // Update unread count if deleted notification was unread
+        if (deleted && !deleted.isRead && previousCount !== undefined) {
+          queryClient.setQueryData<number>(
+            ['notifications', 'unread-count'],
+            Math.max(0, previousCount - 1)
+          );
+        }
+      }
+
+      return { previousNotifications, previousCount };
+    },
+    onError: (err, notificationId, context) => {
+      // Rollback on error
+      if (context?.previousNotifications) {
+        queryClient.setQueryData(['notifications'], context.previousNotifications);
+      }
+      if (context?.previousCount !== undefined) {
+        queryClient.setQueryData(['notifications', 'unread-count'], context.previousCount);
+      }
+    },
     onSuccess: () => {
+      // Invalidate queries to refetch
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
       queryClient.invalidateQueries({ queryKey: ['notifications', 'unread-count'] });
     },

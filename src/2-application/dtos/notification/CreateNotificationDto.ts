@@ -11,21 +11,23 @@ import {
   NotificationChannel,
 } from '@/3-domain/enums/NotificationEnums';
 
+import { commonStringSchemas } from '@/5-shared/validation/common-schemas';
+
 export const CreateNotificationDtoSchema = z.object({
-  userId: z.string().uuid('Geçerli bir kullanıcı ID gerekli'),
+  userId: commonStringSchemas.uuid('Geçerli bir kullanıcı ID gerekli'),
   type: z.nativeEnum(NotificationType, {
     message: 'Geçerli bir bildirim tipi gerekli',
   }),
-  title: z.string().min(1, 'Başlık gerekli').max(255, 'Başlık en fazla 255 karakter olabilir'),
-  message: z.string().min(1, 'Mesaj gerekli'),
-  actionUrl: z.string().url('Geçerli bir URL gerekli').optional(),
+  title: commonStringSchemas.title(1, 255, 'Bildirim başlığı'),
+  message: commonStringSchemas.content(1, 1000, 'Bildirim mesajı'),
+  actionUrl: commonStringSchemas.url('Geçerli bir URL gerekli').optional(),
   metadata: z.record(z.string(), z.unknown()).optional().default({}),
   priority: z.nativeEnum(NotificationPriority).optional().default(NotificationPriority.NORMAL),
   channels: z
     .array(z.nativeEnum(NotificationChannel))
     .optional()
     .default([NotificationChannel.IN_APP]),
-  expiresAt: z.string().datetime().optional(),
+  expiresAt: z.string().datetime('Geçersiz tarih formatı').optional(),
 });
 
 export type CreateNotificationDto = z.infer<typeof CreateNotificationDtoSchema>;

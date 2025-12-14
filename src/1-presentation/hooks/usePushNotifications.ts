@@ -16,6 +16,7 @@ export function usePushNotifications() {
   const [isSupported, setIsSupported] = useState(false);
   const [permission, setPermission] = useState<NotificationPermission>('default');
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [subscription, setSubscription] = useState<PushSubscription | null>(null);
   const subscribeMutation = useSubscribeToPushNotifications();
   const unsubscribeMutation = useUnsubscribeFromPushNotifications();
 
@@ -79,6 +80,7 @@ export function usePushNotifications() {
       // Send subscription to server
       const result = await subscribeMutation.mutateAsync(subscription.toJSON() as any);
       if (result) {
+        setSubscription(subscription);
         setIsSubscribed(true);
         return true;
       }
@@ -113,9 +115,11 @@ export function usePushNotifications() {
     isSupported,
     permission,
     isSubscribed,
+    subscription,
     requestPermission,
     subscribe,
     unsubscribe,
+    checkSubscription,
     isLoading: subscribeMutation.isPending || unsubscribeMutation.isPending,
   };
 }
