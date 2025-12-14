@@ -4,8 +4,8 @@ type LogArgs = unknown[];
 
 const shouldMuteInfo = process.env.NODE_ENV === 'test';
 
-function log(level: 'info' | 'warn' | 'error', ...args: LogArgs) {
-  if (level === 'info' && shouldMuteInfo) {
+function log(level: 'info' | 'warn' | 'error' | 'debug', ...args: LogArgs) {
+  if ((level === 'info' || level === 'debug') && shouldMuteInfo) {
     return;
   }
 
@@ -19,6 +19,16 @@ function log(level: 'info' | 'warn' | 'error', ...args: LogArgs) {
     return;
   }
 
+  if (level === 'debug') {
+    // In development, use console.debug, otherwise use console.log
+    if (process.env.NODE_ENV === 'development') {
+      console.debug(...args);
+    } else {
+      console.log(...args);
+    }
+    return;
+  }
+
   console.log(...args);
 }
 
@@ -26,6 +36,7 @@ export const logger = {
   info: (...args: LogArgs) => log('info', ...args),
   warn: (...args: LogArgs) => log('warn', ...args),
   error: (...args: LogArgs) => log('error', ...args),
+  debug: (...args: LogArgs) => log('debug', ...args),
 };
 
 export default logger;
