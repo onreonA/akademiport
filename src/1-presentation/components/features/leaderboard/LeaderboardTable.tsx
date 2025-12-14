@@ -8,10 +8,10 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/presentation/components/ui/atoms/table';
-import { Badge } from '@/presentation/components/ui/atoms/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/presentation/components/ui/atoms/avatar';
-import { TrendingUp, TrendingDown, Minus, Loader2 } from 'lucide-react';
+} from '@/1-presentation/components/ui/atoms/table';
+import { Badge } from '@/1-presentation/components/ui/atoms/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/1-presentation/components/ui/atoms/avatar';
+import { Minus, Loader2 } from 'lucide-react';
 import { LeaderboardFilterDto } from '@/2-application/dtos/leaderboard';
 
 interface LeaderboardTableProps {

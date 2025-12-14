@@ -2,14 +2,19 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { LeaderboardTable, BadgeGallery } from '@/1-presentation/components/features/leaderboard';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/presentation/components/ui/atoms/tabs';
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@/1-presentation/components/ui/atoms/tabs';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/presentation/components/ui/atoms/select';
+} from '@/1-presentation/components/ui/atoms/select';
 
 interface Program {
   id: string;
@@ -34,8 +39,8 @@ export default function ConsultantLeaderboardPage() {
           setSelectedProgramId(fetchedPrograms[0].id);
         }
       }
-    } catch (error) {
-      console.error('Failed to fetch consultant programs:', error);
+    } catch {
+      // Error handled silently - UI will show empty state
     } finally {
       setLoading(false);
     }

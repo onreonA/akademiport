@@ -3,6 +3,8 @@ import { SupabaseLeaderboardRepository } from '@/4-infrastructure/database/repos
 import { GetLeaderboardUseCase } from '@/2-application/use-cases/leaderboard';
 import { LeaderboardFilterDtoSchema } from '@/2-application/dtos/leaderboard';
 import { withApiHandler } from '@/5-shared/middleware/api-wrapper';
+import { parsePaginationParams } from '@/5-shared/utils/pagination';
+import { applyFieldSelection } from '@/5-shared/utils/field-selection';
 
 /**
  * GET /api/leaderboard
@@ -18,20 +20,44 @@ export const GET = withApiHandler(
     const searchParams = request.nextUrl.searchParams;
 
     // Parse pagination parameters
-    const { page, limit, offset } = parsePaginationParams(searchParams, {
+    const { limit, offset } = parsePaginationParams(searchParams, {
       page: 1,
       limit: 50,
       maxLimit: 100,
     });
 
-    const filterData = {
-      programId: searchParams.get('programId') || undefined,
-      companyId: searchParams.get('companyId') || undefined,
+    const programIdParam = searchParams.get('programId');
+    const companyIdParam = searchParams.get('companyId');
+
+    const filterData: {
+      programId?: string;
+      companyId?: string;
+      limit: number;
+      offset: number;
+    } = {
       limit,
       offset,
     };
 
+    // Only include programId/companyId if they are valid UUIDs (not empty strings)
+    if (
+      programIdParam &&
+      programIdParam.trim() &&
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(programIdParam)
+    ) {
+      filterData.programId = programIdParam;
+    }
+
+    if (
+      companyIdParam &&
+      companyIdParam.trim() &&
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(companyIdParam)
+    ) {
+      filterData.companyId = companyIdParam;
+    }
+
     const filterResult = LeaderboardFilterDtoSchema.safeParse(filterData);
+
     if (!filterResult.success) {
       return NextResponse.json(
         { error: 'Geçersiz filtre parametreleri', details: filterResult.error.issues },
@@ -56,8 +82,8 @@ export const GET = withApiHandler(
         })
       : result.value;
 
-    // Return paginated response
-    return NextResponse.json(createPaginatedResponse(rankings, rankings.length, page, limit));
+    // Return response in format expected by useLeaderboard hook
+    return NextResponse.json({ rankings });
   },
   {
     requireAuth: true,
