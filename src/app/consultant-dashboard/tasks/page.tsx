@@ -8,41 +8,21 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ListTodo, Clock, CheckCircle2, AlertCircle, Eye } from 'lucide-react';
-import { GradientHeader } from '@/presentation/components/ui/molecules/gradient-header';
-import { EnhancedCard } from '@/presentation/components/ui/atoms/enhanced-card';
-import { ModernStatCard } from '@/presentation/components/ui/atoms/modern-stat-card';
-import { Badge } from '@/presentation/components/ui/atoms/badge';
-import { Button } from '@/presentation/components/ui/atoms/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/presentation/components/ui/atoms/tabs';
-import { Pagination } from '@/presentation/components/ui/molecules/pagination';
-import { useConsultantTasks, useConsultantTasksAll } from '@/shared/hooks/api';
-
-interface Task {
-  id: string;
-  title: string;
-  description?: string;
-  status: string;
-  priority: string;
-  completed_at?: string;
-  sub_project?: {
-    id: string;
-    name: string;
-    project?: {
-      id: string;
-      name: string;
-      company?: {
-        id: string;
-        name: string;
-      };
-    };
-  };
-  assigned_user?: {
-    id: string;
-    full_name: string;
-    email: string;
-  };
-}
+import { ListTodo, Clock, CheckCircle2, AlertCircle, Eye, Link2 } from 'lucide-react';
+import { GradientHeader } from '@/1-presentation/components/ui/molecules/gradient-header';
+import { EnhancedCard } from '@/1-presentation/components/ui/atoms/enhanced-card';
+import { ModernStatCard } from '@/1-presentation/components/ui/atoms/modern-stat-card';
+import { Badge } from '@/1-presentation/components/ui/atoms/badge';
+import { Button } from '@/1-presentation/components/ui/atoms/button';
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@/1-presentation/components/ui/atoms/tabs';
+import { Pagination } from '@/1-presentation/components/ui/molecules/pagination';
+import { useConsultantTasks, useConsultantTasksAll } from '@/5-shared/hooks/api';
+import { useTaskDependencies } from '@/1-presentation/hooks/useTaskDependencies';
 
 const priorityConfig = {
   low: { label: 'Düşük', color: 'bg-gray-400' },
@@ -50,6 +30,37 @@ const priorityConfig = {
   high: { label: 'Yüksek', color: 'bg-orange-400' },
   urgent: { label: 'Acil', color: 'bg-red-500' },
 };
+
+function TaskDependencyBadge({ taskId }: { taskId: string }) {
+  const { dependencyInfo } = useTaskDependencies(taskId);
+
+  if (!dependencyInfo || !dependencyInfo.hasDependencies) {
+    return null;
+  }
+
+  if (dependencyInfo.hasBlockingDependencies && dependencyInfo.incompleteBlockingDependencies > 0) {
+    return (
+      <Badge
+        variant="outline"
+        className="text-xs text-yellow-600 border-yellow-500 flex items-center gap-1"
+      >
+        <Link2 className="h-3 w-3" />
+        {dependencyInfo.incompleteBlockingDependencies} Bağımlılık
+      </Badge>
+    );
+  }
+
+  if (dependencyInfo.totalDependencies > 0) {
+    return (
+      <Badge variant="outline" className="text-xs text-muted-foreground flex items-center gap-1">
+        <Link2 className="h-3 w-3" />
+        {dependencyInfo.totalDependencies} Bağımlılık
+      </Badge>
+    );
+  }
+
+  return null;
+}
 
 const statusConfig = {
   todo: { label: 'Yapılacak', color: 'bg-gray-400' },
@@ -283,6 +294,7 @@ function ConsultantTasksPageContent() {
                         {priorityConfig[task.priority as keyof typeof priorityConfig]?.label ||
                           task.priority}
                       </Badge>
+                      <TaskDependencyBadge taskId={task.id} />
                     </div>
 
                     {/* Info */}
