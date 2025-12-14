@@ -1,23 +1,27 @@
 'use client';
 
 import { useState } from 'react';
-import { Calendar, Plus, Loader2 } from 'lucide-react';
-import { Card, CardContent } from '@/presentation/components/ui/atoms/card';
-import { Button } from '@/presentation/components/ui/atoms/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/presentation/components/ui/atoms/tabs';
+import { Calendar, Loader2 } from 'lucide-react';
+import { Card, CardContent } from '@/1-presentation/components/ui/atoms/card';
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@/1-presentation/components/ui/atoms/tabs';
 import {
   AppointmentList,
   AppointmentDetail,
-} from '@/presentation/components/features/appointments';
-import { useConsultantProgram } from '@/shared/contexts/ConsultantProgramContext';
-import { ProgramSelector } from '@/presentation/components/features/consultant';
-import { UnifiedCalendar } from '@/presentation/components/features/calendar';
-import { useAppointments } from '@/shared/hooks/api/useAppointments';
-import { useEvents } from '@/shared/hooks/api/useEvents';
-import { useAvailability, useUnavailableDates } from '@/shared/hooks/api/useAvailability';
-import { useAuth } from '@/shared/hooks/useAuth';
-import type { AppointmentResponseDto } from '@/application/dto/appointment';
-import type { EventResponseDto } from '@/application/dto/event';
+} from '@/1-presentation/components/features/appointments';
+import { useConsultantProgram } from '@/5-shared/contexts/ConsultantProgramContext';
+import { ProgramSelector } from '@/1-presentation/components/features/consultant';
+import { UnifiedCalendar } from '@/1-presentation/components/features/calendar';
+import { useAppointments } from '@/5-shared/hooks/api/useAppointments';
+import { useEvents } from '@/5-shared/hooks/api/useEvents';
+import { useAvailability, useUnavailableDates } from '@/5-shared/hooks/api/useAvailability';
+import { useAuth } from '@/5-shared/hooks/useAuth';
+import type { AppointmentResponseDto } from '@/2-application/dto/appointment';
+import type { EventResponseDto } from '@/2-application/dto/event';
 
 export default function ConsultantAppointmentsPage() {
   const { selectedProgram, programs, isLoading: isLoadingPrograms } = useConsultantProgram();
