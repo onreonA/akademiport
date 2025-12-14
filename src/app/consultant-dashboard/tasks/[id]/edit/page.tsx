@@ -13,7 +13,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/1-presentation/components/ui/atoms/select';
-import { GradientHeader } from '@/1-presentation/components/ui/molecules/gradient-header';
 import { EnhancedCard } from '@/1-presentation/components/ui/atoms/enhanced-card';
 import { ArrowLeft, Save, Loader2, Trash2, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
@@ -100,13 +99,18 @@ export default function EditTaskPage() {
       if (data.subProjectId) {
         await fetchCompanyUsers(data.subProjectId);
       }
-    } catch (error) {
-      console.error('Error fetching task:', error);
+    } catch {
       toast.error('Görev yüklenemedi');
     } finally {
       setLoading(false);
     }
-  }, [taskId]);
+  }, [taskId, fetchCompanyUsers]);
+
+  useEffect(() => {
+    if (taskId) {
+      fetchTask();
+    }
+  }, [taskId, fetchTask]);
 
   const fetchCompanyUsers = async (subProjectId: string) => {
     try {
@@ -131,8 +135,7 @@ export default function EditTaskPage() {
           setUsers(usersData.users || []);
         }
       }
-    } catch (error) {
-      console.error('Error fetching company users:', error);
+    } catch {
       // Fallback to all users if company users fetch fails
       fetchAllUsers();
     }
@@ -154,6 +157,22 @@ export default function EditTaskPage() {
     setSaving(true);
 
     try {
+      // If status is being changed to 'in_progress', check dependencies first
+      if (formData.status === 'in_progress' && task?.status !== 'in_progress') {
+        const checkResponse = await fetch(`/api/tasks/${taskId}/dependencies/check`);
+        if (checkResponse.ok) {
+          const checkData = await checkResponse.json();
+          if (!checkData.allComplete && checkData.incompleteDependencies.length > 0) {
+            toast.error(
+              `Bu görevi başlatmak için ${checkData.incompleteDependencies.length} bağımlı görevin tamamlanması gerekiyor. Lütfen önce bağımlı görevleri tamamlayın.`,
+              { duration: 5000 }
+            );
+            setSaving(false);
+            return;
+          }
+        }
+      }
+
       const response = await fetch(`/api/tasks/${taskId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -175,7 +194,6 @@ export default function EditTaskPage() {
       toast.success('Görev başarıyla güncellendi!');
       router.push('/consultant-dashboard/tasks/review');
     } catch (error) {
-      console.error('Error updating task:', error);
       toast.error(error instanceof Error ? error.message : 'Bir hata oluştu');
     } finally {
       setSaving(false);
@@ -202,7 +220,6 @@ export default function EditTaskPage() {
       toast.success('Görev başarıyla silindi!');
       router.push('/consultant-dashboard/tasks/review');
     } catch (error) {
-      console.error('Error deleting task:', error);
       toast.error(error instanceof Error ? error.message : 'Bir hata oluştu');
     } finally {
       setDeleting(false);

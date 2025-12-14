@@ -3,18 +3,18 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Plus, FolderKanban, Search, Filter } from 'lucide-react';
-import { GradientHeader } from '@/presentation/components/ui/molecules/gradient-header';
-import { EnhancedCard } from '@/presentation/components/ui/atoms/enhanced-card';
-import { Button } from '@/presentation/components/ui/atoms/button';
-import { Input } from '@/presentation/components/ui/atoms/input';
-import { Badge } from '@/presentation/components/ui/atoms/badge';
+import { GradientHeader } from '@/1-presentation/components/ui/molecules/gradient-header';
+import { EnhancedCard } from '@/1-presentation/components/ui/atoms/enhanced-card';
+import { Button } from '@/1-presentation/components/ui/atoms/button';
+import { Input } from '@/1-presentation/components/ui/atoms/input';
+import { Badge } from '@/1-presentation/components/ui/atoms/badge';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/presentation/components/ui/atoms/select';
+} from '@/1-presentation/components/ui/atoms/select';
 
 interface Project {
   id: string;
@@ -42,17 +42,23 @@ export default function ConsultantProjectsPage() {
       if (statusFilter !== 'all') params.append('status', statusFilter);
 
       const response = await fetch(`/api/projects?${params}`);
+
       if (!response.ok) throw new Error('Failed to fetch projects');
 
       const data = await response.json();
+
       // API returns { projects: [...], total, page, limit }
       setProjects(data.projects || data.data || []);
-    } catch (error) {
-      console.error('Error fetching projects:', error);
+    } catch {
+      // Error handled by UI state
     } finally {
       setLoading(false);
     }
   }, [statusFilter]);
+
+  useEffect(() => {
+    fetchProjects();
+  }, [fetchProjects]);
 
   const filteredProjects = projects.filter((project) =>
     project.name.toLowerCase().includes(searchTerm.toLowerCase())
