@@ -13,34 +13,43 @@ vi.mock('@/4-infrastructure/api/helpers/auth', () => ({
   getAuthenticatedUser: vi.fn(),
 }));
 
-// Create mock instances that will be shared
-const mockEventRepository = {
-  findById: vi.fn(),
-};
+// Mock EventRepository - return mock instance from constructor
+vi.mock('@/4-infrastructure/database/repositories/EventRepository', () => {
+  const mockRepo = {
+    findById: vi.fn(),
+  };
+  (globalThis as any).__mockEventRepository = mockRepo;
+  return {
+    EventRepository: class {
+      constructor() {
+        return (globalThis as any).__mockEventRepository;
+      }
+    },
+  };
+});
 
-const mockCompanyRepository = {
-  findById: vi.fn(),
-};
+// Mock CompanyRepository - return mock instance from constructor
+vi.mock('@/4-infrastructure/database/repositories/CompanyRepository', () => {
+  const mockRepo = {
+    findById: vi.fn(),
+  };
+  (globalThis as any).__mockCompanyRepository = mockRepo;
+  return {
+    CompanyRepository: class {
+      constructor() {
+        return (globalThis as any).__mockCompanyRepository;
+      }
+    },
+  };
+});
 
-// Store mocks globally before vi.mock hoisting
-(globalThis as any).__mockEventRepository = mockEventRepository;
-(globalThis as any).__mockCompanyRepository = mockCompanyRepository;
-
-vi.mock('@/4-infrastructure/database/repositories/EventRepository', () => ({
-  EventRepository: class {
-    constructor() {
-      return (globalThis as any).__mockEventRepository;
-    }
-  },
-}));
-
-vi.mock('@/4-infrastructure/database/repositories/CompanyRepository', () => ({
-  CompanyRepository: class {
-    constructor() {
-      return (globalThis as any).__mockCompanyRepository;
-    }
-  },
-}));
+// Access mocks from globalThis (set in vi.mock)
+function getMockEventRepository() {
+  return (globalThis as any).__mockEventRepository;
+}
+function getMockCompanyRepository() {
+  return (globalThis as any).__mockCompanyRepository;
+}
 
 vi.mock('@/4-infrastructure/database/repositories/SupabaseLeaderboardRepository', () => ({
   SupabaseLeaderboardRepository: vi.fn(),
@@ -69,7 +78,10 @@ vi.mock('@/2-application/use-cases/leaderboard', () => ({
 
 vi.mock('@/5-shared/utils/logger', () => ({
   logger: {
-    error: vi.fn(),
+    error: vi.fn((...args: any[]) => {
+      // Log error for debugging
+      console.error('Logger error:', ...args);
+    }),
     warn: vi.fn(),
     info: vi.fn(),
   },
@@ -80,18 +92,23 @@ describe('GET /api/events/[id]/attendance', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    // Setup default mocks
-    mockEventRepository.findById.mockResolvedValue({
+    // Setup default mocks - access from globalThis
+    const mockEventRepo = getMockEventRepository();
+    const mockCompanyRepo = getMockCompanyRepository();
+
+    mockEventRepo.findById.mockResolvedValue({
       id: 'event-1',
       programId: 'program-1',
     } as any);
-    mockCompanyRepository.findById.mockResolvedValue({
-      isFailure: false,
-      value: {
+    // Mock companyRepository.findById to return Result.ok format
+    mockCompanyRepo.findById.mockResolvedValue(
+      Result.ok({
         id: 'company-1',
         programId: 'program-1',
-      },
-    } as any);
+      } as any)
+    );
+    // Mock GetEventAttendeesUseCase to return success
+    mockGetAttendeesExecute.mockResolvedValue(Result.ok([]));
   });
 
   it('should return 401 when user is not authenticated', async () => {
@@ -141,7 +158,8 @@ describe('GET /api/events/[id]/attendance', () => {
     const user = createMockUser({ role: UserRole.MASTER_ADMIN });
     vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
 
-    mockEventRepository.findById.mockResolvedValue(null);
+    const mockEventRepo = getMockEventRepository();
+    mockEventRepo.findById.mockResolvedValue(null);
 
     const request = createMockRequest('http://localhost:3000/api/events/non-existent/attendance');
     const response = await GET(request, {
@@ -159,25 +177,49 @@ describe('GET /api/events/[id]/attendance', () => {
       role: UserRole.COMPANY_ADMIN,
       companyId: 'company-1',
     });
-    vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
+    // Ensure companyId is set (not just company_id) - match AuthenticatedUser interface
+    const userWithCompanyId: any = {
+      ...user,
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      companyId: 'company-1', // Explicitly set companyId
+    };
+    vi.mocked(getAuthenticatedUser).mockResolvedValue(userWithCompanyId);
 
-    mockEventRepository.findById.mockResolvedValue({
+    const mockEventRepo = getMockEventRepository();
+    const mockCompanyRepo = getMockCompanyRepository();
+
+    mockEventRepo.findById.mockResolvedValue({
       id: 'event-1',
       programId: 'program-2', // Different program
     } as any);
 
-    mockCompanyRepository.findById.mockResolvedValue(
-      Result.ok({
-        id: 'company-1',
-        programId: 'program-1', // Different program
-      } as any)
-    );
+    // Mock companyRepository.findById to return Result.ok with different program
+    // This must return a Promise<Result<Company | null>>
+    const companyResult = Result.ok({
+      id: 'company-1',
+      programId: 'program-1', // Different program
+    } as any);
+    mockCompanyRepo.findById.mockResolvedValue(companyResult);
+
+    // Mock GetEventAttendeesUseCase - this won't be called if 403 is returned first
+    mockGetAttendeesExecute.mockResolvedValue(Result.ok([]));
 
     const request = createMockRequest('http://localhost:3000/api/events/event-1/attendance');
     const response = await GET(request, {
       params: Promise.resolve({ id: 'event-1' }),
     });
     const data = await response.json();
+
+    // Debug: Log response if test fails
+    if (response.status !== 403) {
+      console.log('Response status:', response.status);
+      console.log('Response data:', JSON.stringify(data, null, 2));
+      console.log('User companyId:', userWithCompanyId.companyId);
+      const mockCompanyRepo = getMockCompanyRepository();
+      console.log('Mock called:', mockCompanyRepo.findById.mock.calls.length);
+    }
 
     expect(response.status).toBe(403);
     expect(data.error).toBe('Forbidden');
@@ -189,18 +231,20 @@ describe('POST /api/events/[id]/attendance', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    // Setup default mocks
-    mockEventRepository.findById.mockResolvedValue({
+    // Setup default mocks - access from globalThis
+    const mockEventRepo = getMockEventRepository();
+    const mockCompanyRepo = getMockCompanyRepository();
+
+    mockEventRepo.findById.mockResolvedValue({
       id: 'event-1',
       programId: 'program-1',
     } as any);
-    mockCompanyRepository.findById.mockResolvedValue({
-      isFailure: false,
-      value: {
+    mockCompanyRepo.findById.mockResolvedValue(
+      Result.ok({
         id: 'company-1',
         programId: 'program-1',
-      },
-    } as any);
+      } as any)
+    );
   });
 
   it('should return 401 when user is not authenticated', async () => {
@@ -238,29 +282,37 @@ describe('POST /api/events/[id]/attendance', () => {
 
   it('should register attendance successfully', async () => {
     const { getAuthenticatedUser } = await import('@/4-infrastructure/api/helpers/auth');
+    // Use valid UUID v4 format for validation (4th character must be '4', 13th must be 8/9/a/b)
+    const userId = '123e4567-e89b-4123-a456-426614174000';
+    const companyId = '123e4567-e89b-4123-a456-426614174001';
+    const eventId = '123e4567-e89b-4123-a456-426614174002';
+
     const user = createMockUser({
       role: UserRole.COMPANY_ADMIN,
-      companyId: 'company-1',
-      id: 'user-1',
+      companyId: companyId,
+      id: userId,
     });
     vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
 
     const mockAttendance = {
-      id: 'attendance-1',
-      eventId: 'event-1',
-      userId: 'user-1',
-      companyId: 'company-1',
+      id: '123e4567-e89b-4123-a456-426614174003',
+      eventId: eventId,
+      userId: userId,
+      companyId: companyId,
       status: 'registered',
     };
 
     mockRegisterAttendanceExecute.mockResolvedValue(Result.ok(mockAttendance));
 
-    const request = createMockRequest('http://localhost:3000/api/events/event-1/attendance', {
+    const request = createMockRequest(`http://localhost:3000/api/events/${eventId}/attendance`, {
       method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+      },
       body: JSON.stringify({ notes: 'Test notes' }),
     });
     const response = await POST(request, {
-      params: Promise.resolve({ id: 'event-1' }),
+      params: Promise.resolve({ id: eventId }),
     });
     const data = await response.json();
 

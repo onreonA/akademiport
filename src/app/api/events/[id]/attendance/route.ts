@@ -12,6 +12,7 @@ import { RegisterAttendanceDtoSchema } from '@/2-application/dtos/event/Register
 import { logger } from '@/5-shared/utils/logger';
 import { AppError } from '@/6-core/errors/AppError';
 
+// Create repositories - can be mocked in tests
 const eventRepository = new EventRepository();
 const leaderboardRepository = new SupabaseLeaderboardRepository();
 const companyRepository = new CompanyRepository();

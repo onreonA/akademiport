@@ -7,29 +7,47 @@ import { PATCH } from './route';
 import { createMockRequest, createMockUser } from '@/shared/test/api-helpers';
 import { UserRole } from '@/domain/enums/UserRole';
 import { Result } from '@/6-core/result/Result';
+import { AppError } from '@/6-core/errors/AppError';
 import { setupTestIsolation } from '@/shared/test/test-isolation';
 
 vi.mock('@/4-infrastructure/api/helpers/auth', () => ({
   getAuthenticatedUser: vi.fn(),
 }));
 
-vi.mock('@/4-infrastructure/database/repositories/EventRepository', () => ({
-  EventRepository: vi.fn().mockImplementation(() => ({
+// Mock EventRepository - return mock instance from constructor
+vi.mock('@/4-infrastructure/database/repositories/EventRepository', () => {
+  const mockRepo = {
     findById: vi.fn(),
-  })),
-}));
+  };
+  (globalThis as any).__mockEventRepository = mockRepo;
+  return {
+    EventRepository: class {
+      constructor() {
+        return (globalThis as any).__mockEventRepository;
+      }
+    },
+  };
+});
+
+// Access mock from globalThis
+function getMockEventRepository() {
+  return (globalThis as any).__mockEventRepository;
+}
 
 const mockMarkAttendanceExecute = vi.fn();
 
 vi.mock('@/2-application/use-cases/event', () => ({
-  MarkEventAttendanceAsAttendedUseCase: vi.fn().mockImplementation(() => ({
-    execute: mockMarkAttendanceExecute,
-  })),
+  MarkEventAttendanceAsAttendedUseCase: class {
+    constructor() {}
+    execute = mockMarkAttendanceExecute;
+  },
 }));
 
 vi.mock('@/5-shared/utils/logger', () => ({
   logger: {
-    error: vi.fn(),
+    error: vi.fn((...args: any[]) => {
+      console.error('Logger error:', ...args);
+    }),
     warn: vi.fn(),
     info: vi.fn(),
   },
@@ -40,6 +58,9 @@ describe('PATCH /api/events/[id]/attendance/[attendanceId]', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    // Reset mock repository
+    const mockEventRepo = getMockEventRepository();
+    mockEventRepo.findById.mockClear();
   });
 
   it('should return 401 when user is not authenticated', async () => {
@@ -83,11 +104,9 @@ describe('PATCH /api/events/[id]/attendance/[attendanceId]', () => {
     const user = createMockUser({ role: UserRole.CONSULTANT, id: consultantId });
     vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
 
-    const { EventRepository } = await import(
-      '@/4-infrastructure/database/repositories/EventRepository'
-    );
-    const mockEventRepository = new EventRepository();
-    vi.mocked(mockEventRepository.findById).mockResolvedValue({
+    // Use the mocked repository from globalThis
+    const mockEventRepository = getMockEventRepository();
+    mockEventRepository.findById.mockResolvedValue({
       id: 'event-1',
       consultantId: consultantId,
     } as any);
@@ -124,11 +143,9 @@ describe('PATCH /api/events/[id]/attendance/[attendanceId]', () => {
     const user = createMockUser({ role: UserRole.MASTER_ADMIN, id: adminId });
     vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
 
-    const { EventRepository } = await import(
-      '@/4-infrastructure/database/repositories/EventRepository'
-    );
-    const mockEventRepository = new EventRepository();
-    vi.mocked(mockEventRepository.findById).mockResolvedValue({
+    // Use the mocked repository from globalThis
+    const mockEventRepository = getMockEventRepository();
+    mockEventRepository.findById.mockResolvedValue({
       id: 'event-1',
       consultantId: consultantId,
     } as any);
@@ -162,11 +179,9 @@ describe('PATCH /api/events/[id]/attendance/[attendanceId]', () => {
     const user = createMockUser({ role: UserRole.CONSULTANT, id: 'consultant-1' });
     vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
 
-    const { EventRepository } = await import(
-      '@/4-infrastructure/database/repositories/EventRepository'
-    );
-    const mockEventRepository = new EventRepository();
-    vi.mocked(mockEventRepository.findById).mockResolvedValue(null);
+    // Use the mocked repository from globalThis
+    const mockEventRepository = getMockEventRepository();
+    mockEventRepository.findById.mockResolvedValue(null);
 
     const request = createMockRequest(
       'http://localhost:3000/api/events/non-existent/attendance/attendance-1',
@@ -186,11 +201,9 @@ describe('PATCH /api/events/[id]/attendance/[attendanceId]', () => {
     const user = createMockUser({ role: UserRole.CONSULTANT, id: 'consultant-1' });
     vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
 
-    const { EventRepository } = await import(
-      '@/4-infrastructure/database/repositories/EventRepository'
-    );
-    const mockEventRepository = new EventRepository();
-    vi.mocked(mockEventRepository.findById).mockResolvedValue({
+    // Use the mocked repository from globalThis
+    const mockEventRepository = getMockEventRepository();
+    mockEventRepository.findById.mockResolvedValue({
       id: 'event-1',
       consultantId: 'consultant-2', // Different consultant
     } as any);
@@ -213,17 +226,15 @@ describe('PATCH /api/events/[id]/attendance/[attendanceId]', () => {
     const user = createMockUser({ role: UserRole.CONSULTANT, id: 'consultant-1' });
     vi.mocked(getAuthenticatedUser).mockResolvedValue(user as any);
 
-    const { EventRepository } = await import(
-      '@/4-infrastructure/database/repositories/EventRepository'
-    );
-    const mockEventRepository = new EventRepository();
-    vi.mocked(mockEventRepository.findById).mockResolvedValue({
+    // Use the mocked repository from globalThis
+    const mockEventRepository = getMockEventRepository();
+    mockEventRepository.findById.mockResolvedValue({
       id: 'event-1',
       consultantId: 'consultant-1',
     } as any);
 
     mockMarkAttendanceExecute.mockResolvedValue(
-      Result.fail(new Error('Failed to mark attendance'))
+      Result.fail(new AppError('Failed to mark attendance', 500))
     );
 
     const request = createMockRequest(
@@ -239,4 +250,3 @@ describe('PATCH /api/events/[id]/attendance/[attendanceId]', () => {
     expect(data.error).toBe('Failed to mark attendance');
   });
 });
-
