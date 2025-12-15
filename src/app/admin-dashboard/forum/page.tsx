@@ -5,6 +5,7 @@ import { TopicList } from '@/1-presentation/components/features/forum/TopicList'
 import { TopicForm } from '@/1-presentation/components/features/forum/TopicForm';
 import { useCreateTopic, useCategories } from '@/1-presentation/hooks/useForum';
 import { CreateTopicDto, UpdateTopicDto } from '@/2-application/dtos/forum';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   Dialog,
   DialogContent,
@@ -24,7 +25,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 export default function AdminForumPage() {
-  const router = useRouter();
+  const queryClient = useQueryClient();
   const [selectedProgramId, setSelectedProgramId] = useState<string | undefined>(undefined);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const createTopic = useCreateTopic();
@@ -41,12 +42,14 @@ export default function AdminForumPage() {
       // Type guard: ensure it's CreateTopicDto
       if ('programId' in dto || !('id' in dto)) {
         await createTopic.mutateAsync({ ...dto, programId: selectedProgramId } as CreateTopicDto);
-        toast.success('Konu başarıyla oluşturuldu');
+        // Toast is already shown in useCreateTopic hook
         setIsCreateDialogOpen(false);
+        // Force refetch topics list
+        await queryClient.refetchQueries({ queryKey: ['forum', 'topics'] });
       }
     } catch (error) {
       console.error('Error creating topic:', error);
-      toast.error('Konu oluşturulamadı');
+      // Error toast is already shown in useCreateTopic hook
     }
   };
 

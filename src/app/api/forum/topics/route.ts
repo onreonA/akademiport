@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
     // Get user's company and program
     const { data: userData } = await supabase
       .from('users')
-      .select('company_id, role, companies!inner(program_id)')
+      .select('company_id, role')
       .eq('id', user.id)
       .single();
 
@@ -35,15 +35,26 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Kullanıcı bilgileri bulunamadı' }, { status: 404 });
     }
 
-    const programId = userData.companies?.[0]?.program_id;
+    // Get program_id from company if user has a company
+    let programId: string | undefined;
+    if (userData.company_id) {
+      const { data: companyData } = await supabase
+        .from('companies')
+        .select('program_id')
+        .eq('id', userData.company_id)
+        .single();
+
+      programId = companyData?.program_id;
+    }
 
     // Get query params
     const searchParams = request.nextUrl.searchParams;
+    const isAdmin = userData.role === 'master_admin';
 
-    // Company users için sadece onaylanmış konuları göster
+    // Company users için RLS politikası kendi konularını da gösterir
+    // Bu yüzden isApproved filtresini undefined yapıyoruz
     const userRole = userData.role;
-    const defaultIsApproved =
-      userRole === 'company_user' || userRole === 'company_admin' ? true : undefined;
+    const defaultIsApproved = undefined; // RLS politikası zaten yönetiyor
 
     // Parse pagination parameters
     const { page, limit } = parsePaginationParams(searchParams, {
@@ -52,8 +63,15 @@ export async function GET(request: NextRequest) {
       maxLimit: 100,
     });
 
+    // For admin, if no programId in query params, don't filter by programId (show all)
+    // For other users, use their company's programId
+    const queryProgramId = searchParams.get('programId');
+    const finalProgramId = isAdmin
+      ? queryProgramId || undefined // Admin: use query param or undefined (all programs)
+      : queryProgramId || programId; // Others: use query param or their program
+
     const filters: TopicFilterDto = {
-      programId: searchParams.get('programId') || programId,
+      programId: finalProgramId,
       categoryId: searchParams.get('categoryId') || undefined,
       authorId: searchParams.get('authorId') || undefined,
       companyId: searchParams.get('companyId') || undefined,
@@ -74,15 +92,28 @@ export async function GET(request: NextRequest) {
       sortOrder: (searchParams.get('sortOrder') as 'asc' | 'desc') || 'desc',
     };
 
-    console.log('Forum topics filters:', { programId, filters, userRole });
+    console.log('Forum topics filters:', {
+      isAdmin,
+      queryProgramId,
+      finalProgramId,
+      programId,
+      filters,
+      userRole,
+    });
 
     const repository = new SupabaseForumRepository();
     const useCase = new ListTopicsUseCase(repository);
     const result = await useCase.execute(filters);
 
     if (result.isFailure) {
+      console.error('ListTopicsUseCase error:', result.error);
       return NextResponse.json({ error: result.error?.message || result.error }, { status: 400 });
     }
+
+    console.log('Forum topics result:', {
+      topicsCount: result.value?.topics?.length || 0,
+      total: result.value?.total || 0,
+    });
 
     // Apply field selection if requested
     const fieldsParam = searchParams.get('fields');
@@ -119,7 +150,7 @@ export async function POST(request: NextRequest) {
     // Get user's role and company
     const { data: userData } = await supabase
       .from('users')
-      .select('company_id, role, companies!inner(program_id)')
+      .select('company_id, role')
       .eq('id', user.id)
       .single();
 
@@ -142,7 +173,19 @@ export async function POST(request: NextRequest) {
       if (!userData.company_id) {
         return NextResponse.json({ error: 'Firma bilgisi bulunamadı' }, { status: 404 });
       }
-      programId = userData.companies?.[0]?.program_id || body.programId || '';
+
+      // Get company's program_id
+      const { data: companyData } = await supabase
+        .from('companies')
+        .select('program_id')
+        .eq('id', userData.company_id)
+        .single();
+
+      if (!companyData?.program_id) {
+        return NextResponse.json({ error: 'Program bilgisi bulunamadı' }, { status: 404 });
+      }
+
+      programId = companyData.program_id || body.programId || '';
       companyId = userData.company_id;
     }
 
@@ -175,8 +218,12 @@ export async function POST(request: NextRequest) {
       companyRepository
     );
     const useCase = new CreateTopicUseCase(repository, addLeaderboardScore);
-    // For admin, pass empty string as companyId (use case should handle this)
-    // Note: Admin topics won't have leaderboard scores
+    // For admin, companyId is null, but use case expects a string
+    // We need to handle this case - admin topics should not have companyId
+    if (!companyId && !isAdmin) {
+      return NextResponse.json({ error: 'Firma bilgisi gereklidir' }, { status: 400 });
+    }
+    // Pass empty string for admin (will be handled in use case)
     const result = await useCase.execute(dto, user.id, companyId || '');
 
     if (result.isFailure) {

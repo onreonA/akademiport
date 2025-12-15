@@ -29,7 +29,49 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
 
-    return NextResponse.json(result.value);
+    const task = result.value;
+
+    // Fetch sub-project and project information
+    const { createClient } = await import('@/infrastructure/database/supabase-server');
+    const supabase = await createClient();
+
+      const { data: subProject } = await supabase
+      .from('sub_projects')
+      .select('id, name, project_id')
+      .eq('id', task.subProjectId)
+      .single();
+
+    let projectData = null;
+    if (subProject?.project_id) {
+      const { data: project } = await supabase
+        .from('projects')
+        .select('id, name')
+        .eq('id', subProject.project_id)
+        .single();
+      projectData = project;
+    }
+
+    // Return task with sub-project and project information
+    return NextResponse.json({
+      ...task,
+      sub_project: subProject
+        ? {
+            id: subProject.id,
+            name: subProject.name,
+            project: projectData
+              ? {
+                  id: projectData.id,
+                  name: projectData.name,
+                }
+              : subProject.project_id
+                ? {
+                    id: subProject.project_id,
+                    name: null,
+                  }
+                : null,
+          }
+        : null,
+    });
   } catch (error) {
     console.error('Error in GET /api/tasks/[id]:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

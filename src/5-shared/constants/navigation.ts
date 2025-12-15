@@ -13,7 +13,6 @@ import {
   BarChart3,
   Settings,
   User,
-  Plus,
   ListTodo,
   FileStack,
   Calendar,
@@ -24,7 +23,6 @@ import {
   Trophy,
   ShoppingCart,
   Globe,
-  Image,
   type LucideIcon,
 } from 'lucide-react';
 import { UserRole } from '@/domain/enums/UserRole';
@@ -408,6 +406,18 @@ export const CONSULTANT_NAVIGATION: NavigationConfig = {
       label: 'Forum',
       icon: MessageSquare,
       href: '/consultant-dashboard/forum',
+      children: [
+        {
+          id: 'forum-topics',
+          label: 'Konular',
+          href: '/consultant-dashboard/forum',
+        },
+        {
+          id: 'forum-categories',
+          label: 'Kategoriler',
+          href: '/consultant-dashboard/forum/categories',
+        },
+      ],
     },
     {
       id: 'leaderboard',
@@ -486,6 +496,24 @@ export const COMPANY_ADMIN_NAVIGATION: NavigationConfig = {
       label: 'Haberler',
       icon: Newspaper,
       href: '/company-dashboard/news',
+    },
+    {
+      id: 'forum',
+      label: 'Forum',
+      icon: MessageSquare,
+      href: '/company-dashboard/forum',
+      children: [
+        {
+          id: 'forum-topics',
+          label: 'Konular',
+          href: '/company-dashboard/forum',
+        },
+        {
+          id: 'forum-categories',
+          label: 'Kategoriler',
+          href: '/company-dashboard/forum/categories',
+        },
+      ],
     },
     {
       id: 'leaderboard',

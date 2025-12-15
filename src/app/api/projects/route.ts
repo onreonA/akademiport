@@ -31,6 +31,22 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/ab0a7b4f-c491-4309-8654-c71caae1abf6', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        location: 'api/projects/route.ts:29',
+        message: 'User authenticated',
+        data: { userId: user.id, role: user.role, companyId: user.companyId },
+        timestamp: Date.now(),
+        sessionId: 'debug-session',
+        runId: 'run1',
+        hypothesisId: 'D',
+      }),
+    }).catch(() => {});
+    // #endregion
+
     const { searchParams } = new URL(request.url);
     let companyId = searchParams.get('companyId') || undefined;
     let consultantId = searchParams.get('consultantId') || undefined;
@@ -52,6 +68,22 @@ export async function GET(request: NextRequest) {
     if (user.role === 'consultant') {
       // Force filter by consultant's user ID
       consultantId = user.id;
+
+      // #region agent log
+      fetch('http://127.0.0.1:7243/ingest/ab0a7b4f-c491-4309-8654-c71caae1abf6', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          location: 'api/projects/route.ts:54',
+          message: 'Consultant filter applied',
+          data: { consultantId, userId: user.id },
+          timestamp: Date.now(),
+          sessionId: 'debug-session',
+          runId: 'run1',
+          hypothesisId: 'B',
+        }),
+      }).catch(() => {});
+      // #endregion
     }
 
     // Get templates
@@ -70,6 +102,23 @@ export async function GET(request: NextRequest) {
 
     // List projects
     const listProjectsUseCase = new ListProjectsUseCase(projectRepository);
+
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/ab0a7b4f-c491-4309-8654-c71caae1abf6', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        location: 'api/projects/route.ts:73',
+        message: 'Calling ListProjectsUseCase',
+        data: { companyId, consultantId, status, isTemplate, page, limit },
+        timestamp: Date.now(),
+        sessionId: 'debug-session',
+        runId: 'run1',
+        hypothesisId: 'B',
+      }),
+    }).catch(() => {});
+    // #endregion
+
     const result = await listProjectsUseCase.execute({
       companyId,
       consultantId,
@@ -79,15 +128,88 @@ export async function GET(request: NextRequest) {
       limit,
     });
 
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/ab0a7b4f-c491-4309-8654-c71caae1abf6', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        location: 'api/projects/route.ts:80',
+        message: 'ListProjectsUseCase result',
+        data: {
+          isSuccess: result.isSuccess,
+          isFailure: result.isFailure,
+          dataCount: result.isSuccess ? result.value.data.length : 0,
+          total: result.isSuccess ? result.value.total : 0,
+        },
+        timestamp: Date.now(),
+        sessionId: 'debug-session',
+        runId: 'run1',
+        hypothesisId: 'B,E',
+      }),
+    }).catch(() => {});
+    // #endregion
+
     if (result.isFailure) {
       const error =
         result.error instanceof AppError ? result.error : new AppError('Unknown error', 500);
       return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
 
+    // Enrich projects with sub-project and task counts
+    const { createClient } = await import('@/infrastructure/database/supabase-server');
+    const supabase = await createClient();
+
+    const enrichedProjects = await Promise.all(
+      result.value.data.map(async (project) => {
+        // Get sub-project count
+        const { count: subProjectCount } = await supabase
+          .from('sub_projects')
+          .select('*', { count: 'exact', head: true })
+          .eq('project_id', project.id)
+          .is('deleted_at', null);
+
+        // Get task counts
+        const { data: subProjects } = await supabase
+          .from('sub_projects')
+          .select('id')
+          .eq('project_id', project.id)
+          .is('deleted_at', null);
+
+        const subProjectIds = subProjects?.map((sp) => sp.id) || [];
+
+        let taskCount = 0;
+        let completedTaskCount = 0;
+
+        if (subProjectIds.length > 0) {
+          const { count: totalTasks } = await supabase
+            .from('tasks')
+            .select('*', { count: 'exact', head: true })
+            .in('sub_project_id', subProjectIds)
+            .is('deleted_at', null);
+
+          const { count: completedTasks } = await supabase
+            .from('tasks')
+            .select('*', { count: 'exact', head: true })
+            .in('sub_project_id', subProjectIds)
+            .eq('status', 'done')
+            .is('deleted_at', null);
+
+          taskCount = totalTasks || 0;
+          completedTaskCount = completedTasks || 0;
+        }
+
+        return {
+          ...project,
+          sub_project_count: subProjectCount || 0,
+          task_count: taskCount,
+          completed_task_count: completedTaskCount,
+        };
+      })
+    );
+
     // Return projects in format expected by frontend
     return NextResponse.json({
-      projects: result.value.data,
+      projects: enrichedProjects,
       total: result.value.total,
       page: result.value.page,
       limit: result.value.limit,

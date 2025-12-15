@@ -27,6 +27,7 @@ type ProjectListItem = {
   progress: number;
   companyName?: string | null;
   consultantName?: string | null;
+  consultantId?: string | null;
   startDate?: string | null;
   endDate?: string | null;
   start_date?: string | null;
@@ -92,6 +93,7 @@ export default function AdminProjectsPage() {
           progress: project.progress ?? 0,
           companyName: project.companyName ?? project.company_name ?? null,
           consultantName: project.consultantName ?? project.consultant_name ?? null,
+          consultantId: project.consultantId ?? project.consultant_id ?? null,
           startDate,
           endDate,
           start_date: startDate,
@@ -275,6 +277,7 @@ export default function AdminProjectsPage() {
                 key={project.id}
                 project={project as any}
                 onDelete={() => handleDelete(project)}
+                onConsultantChanged={fetchProjects}
               />
             ))}
           </div>

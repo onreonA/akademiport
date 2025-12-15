@@ -38,11 +38,21 @@ export class GetAssignmentMatrixUseCase {
 
       // DÜZELTME: Projeye ait tüm firmaları bul
       // 1. Proje programId'ye sahipse direkt o programdaki firmaları bul
+      // 2. Eğer programId yoksa, projenin companyId'sinden programId'yi bul
       const allCompanyIds = new Set<string>();
+      let resolvedProgramId: string | null = project.programId || null;
 
-      if (project.programId) {
+      // Eğer programId yoksa ama companyId varsa, company'den programId'yi bul
+      if (!resolvedProgramId && project.companyId) {
+        const companyResult = await this.companyRepository.findById(project.companyId);
+        if (companyResult.isSuccess && companyResult.value?.programId) {
+          resolvedProgramId = companyResult.value.programId;
+        }
+      }
+
+      if (resolvedProgramId) {
         // Performans iyileştirmesi: Direkt programId kullan
-        const companiesResult = await this.companyRepository.findByProgramId(project.programId);
+        const companiesResult = await this.companyRepository.findByProgramId(resolvedProgramId);
         if (companiesResult.isSuccess && companiesResult.value) {
           companiesResult.value.forEach((company) => {
             allCompanyIds.add(company.id);

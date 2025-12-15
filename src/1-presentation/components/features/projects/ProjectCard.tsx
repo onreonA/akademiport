@@ -8,6 +8,7 @@
 'use client';
 
 import * as React from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import {
   Card,
@@ -18,7 +19,17 @@ import {
 } from '@/presentation/components/ui/atoms/card';
 import { Badge } from '@/presentation/components/ui/atoms/badge';
 import { Button } from '@/presentation/components/ui/atoms/button';
-import { Building2, User, Calendar, Eye, Trash2, FolderKanban, TrendingUp } from 'lucide-react';
+import {
+  Building2,
+  User,
+  Calendar,
+  Eye,
+  Trash2,
+  FolderKanban,
+  TrendingUp,
+  Pencil,
+} from 'lucide-react';
+import ConsultantChangeDialog from './ConsultantChangeDialog';
 
 export interface Project {
   id: string;
@@ -29,6 +40,7 @@ export interface Project {
   progress: number;
   companyName?: string;
   consultantName?: string;
+  consultantId?: string | null;
   createdAt: string;
   start_date?: string;
   end_date?: string;
@@ -38,9 +50,12 @@ export interface ProjectCardProps {
   project: Project;
   onEdit?: (project: Project) => void;
   onDelete?: (project: Project) => void;
+  onConsultantChanged?: () => void;
 }
 
-export function ProjectCard({ project, onEdit, onDelete }: ProjectCardProps) {
+export function ProjectCard({ project, onEdit, onDelete, onConsultantChanged }: ProjectCardProps) {
+  const [consultantDialogOpen, setConsultantDialogOpen] = useState(false);
+
   const statusColors = {
     planning:
       'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800',
@@ -194,20 +209,44 @@ export function ProjectCard({ project, onEdit, onDelete }: ProjectCardProps) {
 
           {/* Consultant Metric */}
           {project.consultantName ? (
-            <div className="bg-green-50 dark:bg-green-950/20 rounded-lg p-3 border border-green-200 dark:border-green-800">
+            <div className="bg-green-50 dark:bg-green-950/20 rounded-lg p-3 border border-green-200 dark:border-green-800 group/consultant relative">
               <div className="flex items-center gap-2 mb-1">
                 <User className="h-4 w-4 text-green-600 dark:text-green-400" />
               </div>
               <div className="text-xs font-medium text-green-700 dark:text-green-300 truncate">
                 {project.consultantName}
               </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="absolute top-1 right-1 opacity-0 group-hover/consultant:opacity-100 transition-opacity h-6 w-6 p-0"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setConsultantDialogOpen(true);
+                }}
+                title="Danışman değiştir"
+              >
+                <Pencil className="h-3 w-3" />
+              </Button>
             </div>
           ) : (
             <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
               <div className="flex items-center gap-2 mb-1">
                 <FolderKanban className="h-4 w-4 text-gray-600 dark:text-gray-400" />
               </div>
-              <div className="text-xs font-medium text-gray-700 dark:text-gray-300">Proje</div>
+              <Button
+                variant="link"
+                size="sm"
+                className="h-auto p-0 text-xs font-medium text-gray-700 dark:text-gray-300"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setConsultantDialogOpen(true);
+                }}
+              >
+                Danışman Ata
+              </Button>
             </div>
           )}
         </div>
@@ -226,11 +265,24 @@ export function ProjectCard({ project, onEdit, onDelete }: ProjectCardProps) {
 
           {/* Consultant */}
           {project.consultantName && (
-            <div className="flex items-center gap-2 text-sm">
+            <div className="flex items-center gap-2 text-sm group/consultant-info">
               <User className="h-4 w-4 text-gray-500 dark:text-gray-400 shrink-0" />
-              <span className="text-gray-700 dark:text-gray-300 truncate">
+              <span className="text-gray-700 dark:text-gray-300 truncate flex-1">
                 {project.consultantName}
               </span>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="opacity-0 group-hover/consultant-info:opacity-100 transition-opacity h-6 w-6 p-0"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setConsultantDialogOpen(true);
+                }}
+                title="Danışman değiştir"
+              >
+                <Pencil className="h-3 w-3" />
+              </Button>
             </div>
           )}
 
@@ -278,6 +330,14 @@ export function ProjectCard({ project, onEdit, onDelete }: ProjectCardProps) {
           )}
         </div>
       </CardFooter>
+      <ConsultantChangeDialog
+        open={consultantDialogOpen}
+        onOpenChange={setConsultantDialogOpen}
+        projectId={project.id}
+        currentConsultantId={project.consultantId}
+        currentConsultantName={project.consultantName}
+        onSuccess={onConsultantChanged}
+      />
     </Card>
   );
 }

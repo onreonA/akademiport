@@ -36,11 +36,18 @@ interface ProjectTemplate {
   description?: string;
 }
 
+interface Consultant {
+  id: string;
+  full_name: string;
+  email: string;
+}
+
 export default function NewProjectPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [companies, setCompanies] = useState<Company[]>([]);
   const [templates, setTemplates] = useState<ProjectTemplate[]>([]);
+  const [consultants, setConsultants] = useState<Consultant[]>([]);
   const [selectedCompanyIds, setSelectedCompanyIds] = useState<Set<string>>(new Set());
   const [companySearchTerm, setCompanySearchTerm] = useState('');
   const [formData, setFormData] = useState({
@@ -51,6 +58,7 @@ export default function NewProjectPage() {
     start_date: '',
     end_date: '',
     template_id: '',
+    consultant_id: '',
   });
 
   useEffect(() => {
@@ -121,12 +129,30 @@ export default function NewProjectPage() {
     }
   };
 
+    const _fetchConsultants = async () => {
+    try {
+      const response = await fetch('/api/users?role=consultant');
+      if (!response.ok) throw new Error('Failed to fetch consultants');
+      const data = await response.json();
+      setConsultants(data.data || data.users || []);
+    } catch (err) {
+      console.error('Error fetching consultants:', err);
+      toast.error('Danışmanlar yüklenemedi');
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     // Validation: At least one company must be selected
     if (selectedCompanyIds.size === 0) {
       toast.error('Lütfen en az bir firma seçin');
+      return;
+    }
+
+    // Validation: Consultant must be selected
+    if (!formData.consultant_id) {
+      toast.error('Lütfen bir danışman seçin');
       return;
     }
 
@@ -205,6 +231,32 @@ export default function NewProjectPage() {
         {/* Form */}
         <EnhancedCard variant="glass" className="p-6 md:p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Consultant Selection */}
+            <div className="space-y-2">
+              <Label htmlFor="consultant_id">
+                Danışman <span className="text-destructive">*</span>
+              </Label>
+              <Select
+                value={formData.consultant_id || undefined}
+                onValueChange={(value) => handleChange('consultant_id', value)}
+                disabled={loading}
+              >
+                <SelectTrigger id="consultant_id">
+                  <SelectValue placeholder="Danışman seçin" />
+                </SelectTrigger>
+                <SelectContent>
+                  {consultants.map((consultant) => (
+                    <SelectItem key={consultant.id} value={consultant.id}>
+                      {consultant.full_name} ({consultant.email})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {!formData.consultant_id && (
+                <p className="text-sm text-destructive">Danışman seçmelisiniz</p>
+              )}
+            </div>
+
             {/* Template Selection (Optional) */}
             <div className="space-y-2">
               <Label htmlFor="template_id" className="flex items-center gap-2">

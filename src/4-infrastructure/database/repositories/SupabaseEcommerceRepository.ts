@@ -36,10 +36,13 @@ export class SupabaseEcommerceRepository implements IEcommerceRepository {
           period_month: params.periodMonth,
           platform_type: params.platformType,
           alibaba_visitors: params.alibabaVisitors ?? 0,
+          alibaba_visitor_sector_avg: params.alibabaVisitorSectorAvg ?? 0,
           alibaba_products: params.alibabaProducts ?? 0,
           alibaba_rfq_count: params.alibabaRfqCount ?? 0,
           alibaba_orders: params.alibabaOrders ?? 0,
           alibaba_revenue: params.alibabaRevenue ?? 0,
+          alibaba_message_sector_avg: params.alibabaMessageSectorAvg ?? 0,
+          alibaba_serious_buyer_count: params.alibabaSeriousBuyerCount ?? 0,
           b2c_visitors: params.b2cVisitors ?? 0,
           b2c_products: params.b2cProducts ?? 0,
           b2c_orders: params.b2cOrders ?? 0,
@@ -72,12 +75,18 @@ export class SupabaseEcommerceRepository implements IEcommerceRepository {
 
       if (params.alibabaVisitors !== undefined)
         updateData.alibaba_visitors = params.alibabaVisitors;
+      if (params.alibabaVisitorSectorAvg !== undefined)
+        updateData.alibaba_visitor_sector_avg = params.alibabaVisitorSectorAvg;
       if (params.alibabaProducts !== undefined)
         updateData.alibaba_products = params.alibabaProducts;
       if (params.alibabaRfqCount !== undefined)
         updateData.alibaba_rfq_count = params.alibabaRfqCount;
       if (params.alibabaOrders !== undefined) updateData.alibaba_orders = params.alibabaOrders;
       if (params.alibabaRevenue !== undefined) updateData.alibaba_revenue = params.alibabaRevenue;
+      if (params.alibabaMessageSectorAvg !== undefined)
+        updateData.alibaba_message_sector_avg = params.alibabaMessageSectorAvg;
+      if (params.alibabaSeriousBuyerCount !== undefined)
+        updateData.alibaba_serious_buyer_count = params.alibabaSeriousBuyerCount;
       if (params.b2cVisitors !== undefined) updateData.b2c_visitors = params.b2cVisitors;
       if (params.b2cProducts !== undefined) updateData.b2c_products = params.b2cProducts;
       if (params.b2cOrders !== undefined) updateData.b2c_orders = params.b2cOrders;
@@ -492,10 +501,13 @@ export class SupabaseEcommerceRepository implements IEcommerceRepository {
       periodMonth: data.period_month,
       platformType: data.platform_type as EcommercePlatformType,
       alibabaVisitors: data.alibaba_visitors || 0,
+      alibabaVisitorSectorAvg: data.alibaba_visitor_sector_avg ?? undefined,
       alibabaProducts: data.alibaba_products || 0,
       alibabaRfqCount: data.alibaba_rfq_count || 0,
       alibabaOrders: data.alibaba_orders || 0,
       alibabaRevenue: Number(data.alibaba_revenue || 0),
+      alibabaMessageSectorAvg: data.alibaba_message_sector_avg ?? undefined,
+      alibabaSeriousBuyerCount: data.alibaba_serious_buyer_count ?? undefined,
       b2cVisitors: data.b2c_visitors || 0,
       b2cProducts: data.b2c_products || 0,
       b2cOrders: data.b2c_orders || 0,

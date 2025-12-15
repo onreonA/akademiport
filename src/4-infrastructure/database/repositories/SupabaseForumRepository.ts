@@ -209,7 +209,7 @@ export class SupabaseForumRepository implements IForumRepository {
           category_id: topic.categoryId,
           program_id: topic.programId,
           author_id: topic.authorId,
-          company_id: topic.companyId,
+          company_id: topic.companyId || null, // Convert empty string to null for admin users
           title: topic.title,
           slug: topic.slug,
           content: topic.content,
@@ -347,15 +347,15 @@ export class SupabaseForumRepository implements IForumRepository {
       }
 
       const result = await trackSupabaseQuery(
-        'ForumRepository.findAllReplies',
+        'ForumRepository.findAllTopics',
         async () => {
           const result = await query;
           return result;
         },
         {
           filters: {
-            topicId: filters.topicId,
-            parentId: filters.parentId,
+            programId: filters.programId,
+            categoryId: filters.categoryId,
             limit: filters.limit,
             offset: filters.offset,
           },

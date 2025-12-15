@@ -45,6 +45,7 @@ export interface UserFormProps {
   isEdit?: boolean;
   hideRoleSelection?: boolean;
   hideCompanySelection?: boolean;
+  allowedRoles?: UserRole[]; // If provided, only show these roles in the dropdown
 }
 
 export const UserForm: React.FC<UserFormProps> = ({
@@ -54,6 +55,7 @@ export const UserForm: React.FC<UserFormProps> = ({
   isEdit = false,
   hideRoleSelection = false,
   hideCompanySelection = false,
+  allowedRoles,
 }) => {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
@@ -200,11 +202,20 @@ export const UserForm: React.FC<UserFormProps> = ({
               <SelectValue placeholder="Rol seçin" />
             </SelectTrigger>
             <SelectContent>
-              {Object.entries(UserRoleLabels).map(([key, label]) => (
-                <SelectItem key={key} value={key}>
-                  {label}
-                </SelectItem>
-              ))}
+              {Object.entries(UserRoleLabels)
+                .filter(([key]) => {
+                  // If allowedRoles is provided, only show those roles
+                  if (allowedRoles && allowedRoles.length > 0) {
+                    return allowedRoles.includes(key as UserRole);
+                  }
+                  // Otherwise show all roles
+                  return true;
+                })
+                .map(([key, label]) => (
+                  <SelectItem key={key} value={key}>
+                    {label}
+                  </SelectItem>
+                ))}
             </SelectContent>
           </Select>
           {errors.role && <p className="text-sm text-destructive">{errors.role.message}</p>}

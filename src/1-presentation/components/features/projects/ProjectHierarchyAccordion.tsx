@@ -261,7 +261,7 @@ function TaskItem({ task, mode, ...props }: TaskItemProps) {
     <div className="p-3 border border-gray-200 dark:border-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
       <div className="flex items-start justify-between gap-4">
         {/* Left: Checkbox + Title + Badges */}
-        <div className="flex items-start gap-3 flex-1 min-w-0">
+        <div className="flex items-start gap-3 flex-1 min-w-0 max-w-[calc(100%-200px)]">
           {mode === 'company' && props.completable && (
             <div className="mt-0.5">
               <Checkbox
@@ -318,7 +318,7 @@ function TaskItem({ task, mode, ...props }: TaskItemProps) {
 
             {/* Description */}
             {task.description && (
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 line-clamp-3 break-words">
                 {task.description}
               </p>
             )}

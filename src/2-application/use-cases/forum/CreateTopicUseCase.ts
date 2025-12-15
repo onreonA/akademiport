@@ -39,6 +39,9 @@ export class CreateTopicUseCase {
       }
 
       // Create topic data
+      // Handle empty companyId for admin users
+      const finalCompanyId = companyId && companyId.trim() !== '' ? companyId : null;
+
       const topicData: Omit<
         ForumTopic,
         | 'id'
@@ -53,7 +56,7 @@ export class CreateTopicUseCase {
         categoryId: dto.categoryId,
         programId: dto.programId,
         authorId: userId,
-        companyId,
+        companyId: finalCompanyId,
         title: dto.title,
         slug,
         content: dto.content,

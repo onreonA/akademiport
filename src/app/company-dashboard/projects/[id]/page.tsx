@@ -16,6 +16,7 @@ import {
   TrendingUp,
   User,
   Loader2,
+  Edit,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/presentation/components/ui/atoms/card';
 import { Badge } from '@/presentation/components/ui/atoms/badge';
@@ -459,6 +460,15 @@ export default function CompanyProjectDetailPage() {
             )}
           </div>
           <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => router.push(`/company-dashboard/projects/${projectId}/edit`)}
+              className="gap-2"
+            >
+              <Edit className="w-4 h-4" />
+              Düzenle
+            </Button>
             <div className="text-right">
               <p className="text-sm text-gray-600 dark:text-gray-400">Genel İlerleme</p>
               <p className="text-3xl font-semibold text-gray-900 dark:text-white">

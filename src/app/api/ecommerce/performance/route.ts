@@ -53,6 +53,27 @@ export async function GET(request: NextRequest) {
     }
 
     const repository = new SupabaseEcommerceRepository();
+
+    // Auto-refresh view if it seems stale (for admin users)
+    if (userData?.role === 'master_admin') {
+      // Check if view needs refresh by comparing companies count
+      const { data: companiesCount } = await supabase
+        .from('companies')
+        .select('id', { count: 'exact', head: true })
+        .eq('is_active', true);
+
+      const { data: viewCount } = await supabase
+        .from('ecommerce_performance')
+        .select('company_id', { count: 'exact', head: true });
+
+      // If view has significantly fewer companies, refresh it
+      if (companiesCount && viewCount && companiesCount > viewCount * 2) {
+        await repository.refreshPerformance().catch((err) => {
+          console.error('Auto-refresh failed:', err);
+        });
+      }
+    }
+
     const useCase = new GetEcommercePerformanceUseCase(repository);
     const result = await useCase.execute(filterResult.data);
 

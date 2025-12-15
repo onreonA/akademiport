@@ -364,9 +364,12 @@ export default function ConsultantProjectDetailPage() {
     }
   };
 
-  const handleTaskView = (task: TaskDTO) => {
-    router.push(`/consultant-dashboard/tasks/${task.id}/edit`);
-  };
+  const handleTaskView = useCallback(
+    (task: TaskDTO) => {
+      router.push(`/consultant-dashboard/tasks/${task.id}/edit`);
+    },
+    [router]
+  );
 
   const formatDate = (dateString?: string) => {
     if (!dateString) return 'Belirtilmedi';

@@ -74,6 +74,101 @@ export class ProjectRepository implements IProjectRepository {
     const limit = filters?.limit || 10;
     const offset = (page - 1) * limit;
 
+    // Eğer companyId filtresi varsa, hem projects.company_id hem de company_project_assignments tablosunu kontrol et
+    if (filters?.companyId) {
+      // İki sorgu yap: 1) company_id'ye göre, 2) company_project_assignments'e göre
+      const companyId = filters.companyId;
+
+      // 1. projects.company_id = companyId olan projeleri bul
+      let query1 = supabase
+        .from('projects')
+        .select(PROJECT_SELECT_FIELDS)
+        .eq('company_id', companyId);
+
+      // 2. company_project_assignments tablosunda companyId'ye atanmış projeleri bul
+      const { data: assignments } = await supabase
+        .from('company_project_assignments')
+        .select('project_id')
+        .eq('company_id', companyId)
+        .eq('is_active', true);
+
+      const assignedProjectIds = assignments?.map((a) => a.project_id) || [];
+
+      // Soft delete kontrolü
+      if (!filters?.includeDeleted) {
+        query1 = query1.is('deleted_at', null);
+      }
+
+      // Status filtresi
+      if (filters?.status) {
+        query1 = query1.eq('status', filters.status);
+      }
+
+      // Template filtresi
+      if (filters?.isTemplate !== undefined) {
+        query1 = query1.eq('is_template', filters.isTemplate);
+      } else {
+        query1 = query1.eq('is_template', false);
+      }
+
+      const { data: projects1, error: error1 } = await query1;
+
+      // 2. Atanmış projeleri bul (eğer varsa)
+      let projects2: any[] = [];
+      if (assignedProjectIds.length > 0) {
+        let query2 = supabase
+          .from('projects')
+          .select(PROJECT_SELECT_FIELDS)
+          .in('id', assignedProjectIds);
+
+        // Soft delete kontrolü
+        if (!filters?.includeDeleted) {
+          query2 = query2.is('deleted_at', null);
+        }
+
+        // Status filtresi
+        if (filters?.status) {
+          query2 = query2.eq('status', filters.status);
+        }
+
+        // Template filtresi
+        if (filters?.isTemplate !== undefined) {
+          query2 = query2.eq('is_template', filters.isTemplate);
+        } else {
+          query2 = query2.eq('is_template', false);
+        }
+
+        const { data: data2, error: error2 } = await query2;
+        if (error2) {
+          throw new Error(`Failed to find assigned projects: ${error2.message}`);
+        }
+        projects2 = data2 || [];
+      }
+
+      if (error1) {
+        throw new Error(`Failed to find projects: ${error1.message}`);
+      }
+
+      // İki listeyi birleştir ve duplicate'leri kaldır
+      const allProjects = [...(projects1 || []), ...projects2];
+      const uniqueProjects = Array.from(new Map(allProjects.map((p) => [p.id, p])).values());
+
+      // Sırala ve pagination uygula
+      uniqueProjects.sort((a, b) => {
+        const dateA = new Date(a.created_at || 0).getTime();
+        const dateB = new Date(b.created_at || 0).getTime();
+        return dateB - dateA;
+      });
+
+      const paginatedProjects = uniqueProjects.slice(offset, offset + limit);
+
+      return {
+        data: paginatedProjects.map((p) => this.mapToEntity(p)),
+        total: uniqueProjects.length,
+      };
+    }
+
+    // Normal sorgu (companyId filtresi yoksa)
     let query = supabase.from('projects').select(PROJECT_SELECT_FIELDS, { count: 'exact' });
 
     // Soft delete kontrolü: includeDeleted true değilse sadece silinmemişleri getir
@@ -81,12 +176,24 @@ export class ProjectRepository implements IProjectRepository {
       query = query.is('deleted_at', null);
     }
 
-    if (filters?.companyId) {
-      query = query.eq('company_id', filters.companyId);
-    }
-
     if (filters?.consultantId) {
       query = query.eq('consultant_id', filters.consultantId);
+
+      // #region agent log
+      fetch('http://127.0.0.1:7243/ingest/ab0a7b4f-c491-4309-8654-c71caae1abf6', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          location: 'ProjectRepository.ts:180',
+          message: 'Consultant filter applied in repository',
+          data: { consultantId: filters.consultantId },
+          timestamp: Date.now(),
+          sessionId: 'debug-session',
+          runId: 'run1',
+          hypothesisId: 'B,E',
+        }),
+      }).catch(() => {});
+      // #endregion
     }
 
     if (filters?.status) {
@@ -105,6 +212,45 @@ export class ProjectRepository implements IProjectRepository {
     query = query.order('created_at', { ascending: false }).range(offset, offset + limit - 1);
 
     const { data: projects, error, count } = await query;
+
+    // Check all projects in database to see consultant_id values
+    const { data: allProjectsSample } = await supabase
+      .from('projects')
+      .select('id, name, consultant_id, is_template, deleted_at')
+      .eq('is_template', false)
+      .is('deleted_at', null)
+      .limit(20);
+
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/ab0a7b4f-c491-4309-8654-c71caae1abf6', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        location: 'ProjectRepository.ts:198',
+        message: 'Database query result',
+        data: {
+          hasError: !!error,
+          errorMessage: error?.message || null,
+          projectsCount: projects?.length || 0,
+          count,
+          filters: {
+            consultantId: filters?.consultantId,
+            status: filters?.status,
+            isTemplate: filters?.isTemplate,
+          },
+          allProjectsSample: allProjectsSample?.map((p) => ({
+            id: p.id,
+            name: p.name,
+            consultant_id: p.consultant_id,
+          })),
+        },
+        timestamp: Date.now(),
+        sessionId: 'debug-session',
+        runId: 'run1',
+        hypothesisId: 'E',
+      }),
+    }).catch(() => {});
+    // #endregion
 
     if (error) {
       throw new Error(`Failed to find projects: ${error.message}`);

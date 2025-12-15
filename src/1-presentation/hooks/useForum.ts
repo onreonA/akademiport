@@ -337,8 +337,9 @@ export function useCreateTopic() {
   return useMutation({
     mutationFn: createTopic,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: forumKeys.topics() });
-      toast.success('Konu oluşturuldu');
+      // Invalidate all topic list queries to refresh the list
+      // Use prefix matching to invalidate all queries starting with ['forum', 'topics']
+      queryClient.invalidateQueries({ queryKey: forumKeys.topics(), exact: false });
     },
     onError: (error: Error) => {
       toast.error(error.message);

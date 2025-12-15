@@ -144,222 +144,269 @@ export default function CompanyEcommercePage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="max-w-7xl mx-auto p-6 md:p-8">
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">E-ticaret Metrikleri</h1>
-          <p className="text-muted-foreground mt-2">Aylık e-ticaret verilerinizi giriniz</p>
-        </div>
-        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              Yeni Metrik Ekle
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Yeni E-ticaret Metrikleri</DialogTitle>
-              <DialogDescription>
-                Bu ay için e-ticaret metriklerinizi giriniz. Her platform için ayrı kayıt
-                oluşturabilirsiniz.
-              </DialogDescription>
-            </DialogHeader>
-            {isLoadingUserData ? (
-              <div className="text-center py-8">
-                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground">Firma ve program bilgileri yükleniyor...</p>
-              </div>
-            ) : companyId && programId ? (
-              <EcommerceMetricsForm
-                companyId={companyId}
-                programId={programId}
-                onSubmit={handleCreate}
-                onCancel={() => setIsCreateDialogOpen(false)}
-                isSubmitting={createMetrics.isPending}
-              />
-            ) : (
-              <div className="text-center py-8">
-                <p className="text-destructive mb-4">Firma veya program bilgisi bulunamadı.</p>
-                <Button onClick={fetchCurrentUser} variant="outline">
-                  Tekrar Dene
-                </Button>
-              </div>
-            )}
-          </DialogContent>
-        </Dialog>
-      </div>
-
-      {/* Metrics Chart */}
-      {metrics.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>E-ticaret Trend Analizi</CardTitle>
-            <CardDescription>
-              Aylık gelir, sipariş ve ziyaretçi trendinizi görüntüleyin
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <EcommerceMetricsChart
-              data={metrics
-                .sort((a: any, b: any) => {
-                  const dateA = new Date(a.periodYear, a.periodMonth - 1);
-                  const dateB = new Date(b.periodYear, b.periodMonth - 1);
-                  return dateA.getTime() - dateB.getTime();
-                })
-                .map((metric: any) => ({
-                  month: `${metric.periodYear}-${String(metric.periodMonth).padStart(2, '0')}`,
-                  revenue:
-                    metric.platformType === EcommercePlatformType.ALIBABA
-                      ? metric.alibabaRevenue
-                      : metric.b2cRevenue,
-                  orders:
-                    metric.platformType === EcommercePlatformType.ALIBABA
-                      ? metric.alibabaOrders
-                      : metric.b2cOrders,
-                  visitors:
-                    metric.platformType === EcommercePlatformType.ALIBABA
-                      ? metric.alibabaVisitors
-                      : metric.b2cVisitors,
-                }))}
-              height={400}
-            />
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Metrics List */}
-      {metrics.length === 0 ? (
-        <Card>
-          <CardContent className="py-12 text-center">
-            <p className="text-muted-foreground">Henüz metrik kaydı bulunmamaktadır.</p>
-            <Button className="mt-4" onClick={() => setIsCreateDialogOpen(true)} variant="outline">
-              <Plus className="mr-2 h-4 w-4" />
-              İlk Metrik Kaydını Oluştur
-            </Button>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="space-y-4">
-          {metrics.map((metric: any) => (
-            <Card key={metric.id}>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle>
-                      {metric.periodYear} - {metric.periodMonth}. Ay -{' '}
-                      {EcommercePlatformTypeLabels[metric.platformType as EcommercePlatformType]}
-                    </CardTitle>
-                    <CardDescription>
-                      {new Date(metric.createdAt).toLocaleDateString('tr-TR')} tarihinde oluşturuldu
-                    </CardDescription>
-                  </div>
-                  <Button variant="outline" size="sm" onClick={() => setEditingMetrics(metric)}>
-                    <Edit className="mr-2 h-4 w-4" />
-                    Düzenle
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="max-w-7xl mx-auto p-6 md:p-8 space-y-6">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
+              E-ticaret Metrikleri
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400 mt-2">
+              Aylık e-ticaret verilerinizi giriniz ve performansınızı takip edin
+            </p>
+          </div>
+          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+            <DialogTrigger asChild>
+              <Button size="lg" className="shadow-sm">
+                <Plus className="mr-2 h-4 w-4" />
+                Yeni Metrik Ekle
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Yeni E-ticaret Metrikleri</DialogTitle>
+                <DialogDescription>
+                  Bu ay için e-ticaret metriklerinizi giriniz. Her platform için ayrı kayıt
+                  oluşturabilirsiniz.
+                </DialogDescription>
+              </DialogHeader>
+              {isLoadingUserData ? (
+                <div className="text-center py-8">
+                  <Loader2 className="h-8 w-8 animate-spin text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground">Firma ve program bilgileri yükleniyor...</p>
+                </div>
+              ) : companyId && programId ? (
+                <EcommerceMetricsForm
+                  companyId={companyId}
+                  programId={programId}
+                  onSubmit={handleCreate}
+                  onCancel={() => setIsCreateDialogOpen(false)}
+                  isSubmitting={createMetrics.isPending}
+                />
+              ) : (
+                <div className="text-center py-8">
+                  <p className="text-destructive mb-4">Firma veya program bilgisi bulunamadı.</p>
+                  <Button onClick={fetchCurrentUser} variant="outline">
+                    Tekrar Dene
                   </Button>
                 </div>
-              </CardHeader>
-              <CardContent>
-                {metric.platformType === EcommercePlatformType.ALIBABA ? (
-                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                    <div>
-                      <p className="text-sm text-muted-foreground">Ziyaretçi</p>
-                      <p className="text-lg font-semibold">
-                        {metric.alibabaVisitors.toLocaleString()}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Ürün</p>
-                      <p className="text-lg font-semibold">
-                        {metric.alibabaProducts.toLocaleString()}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">RFQ</p>
-                      <p className="text-lg font-semibold">
-                        {metric.alibabaRfqCount.toLocaleString()}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Sipariş</p>
-                      <p className="text-lg font-semibold">
-                        {metric.alibabaOrders.toLocaleString()}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Gelir</p>
-                      <p className="text-lg font-semibold">
-                        {metric.alibabaRevenue.toLocaleString('tr-TR', {
-                          style: 'currency',
-                          currency: 'TRY',
-                        })}
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div>
-                      <p className="text-sm text-muted-foreground">Ziyaretçi</p>
-                      <p className="text-lg font-semibold">{metric.b2cVisitors.toLocaleString()}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Ürün</p>
-                      <p className="text-lg font-semibold">{metric.b2cProducts.toLocaleString()}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Sipariş</p>
-                      <p className="text-lg font-semibold">{metric.b2cOrders.toLocaleString()}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Gelir</p>
-                      <p className="text-lg font-semibold">
-                        {metric.b2cRevenue.toLocaleString('tr-TR', {
-                          style: 'currency',
-                          currency: 'TRY',
-                        })}
-                      </p>
-                    </div>
-                  </div>
-                )}
-                {metric.notes && (
-                  <div className="mt-4 pt-4 border-t">
-                    <p className="text-sm text-muted-foreground">Notlar:</p>
-                    <p className="text-sm">{metric.notes}</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          ))}
+              )}
+            </DialogContent>
+          </Dialog>
         </div>
-      )}
 
-      {/* Edit Dialog */}
-      {editingMetrics && (
-        <Dialog open={!!editingMetrics} onOpenChange={(open) => !open && setEditingMetrics(null)}>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Metrikleri Düzenle</DialogTitle>
-              <DialogDescription>E-ticaret metriklerinizi güncelleyebilirsiniz.</DialogDescription>
-            </DialogHeader>
-            <EcommerceMetricsForm
-              metrics={editingMetrics}
-              companyId={companyId}
-              programId={programId}
-              onSubmit={handleUpdate}
-              onCancel={() => setEditingMetrics(null)}
-              isSubmitting={updateMetrics.isPending}
-            />
-          </DialogContent>
-        </Dialog>
-      )}
+        {/* Metrics Chart */}
+        {metrics.length > 0 && (
+          <Card className="border-gray-200 dark:border-gray-800 shadow-sm">
+            <CardHeader className="border-b border-gray-100 dark:border-gray-800">
+              <CardTitle className="text-xl text-gray-900 dark:text-white">
+                E-ticaret Trend Analizi
+              </CardTitle>
+              <CardDescription className="text-gray-600 dark:text-gray-400">
+                Aylık gelir, sipariş ve ziyaretçi trendinizi görüntüleyin
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <EcommerceMetricsChart
+                data={metrics
+                  .sort((a: any, b: any) => {
+                    const dateA = new Date(a.periodYear, a.periodMonth - 1);
+                    const dateB = new Date(b.periodYear, b.periodMonth - 1);
+                    return dateA.getTime() - dateB.getTime();
+                  })
+                  .map((metric: any) => ({
+                    month: `${metric.periodYear}-${String(metric.periodMonth).padStart(2, '0')}`,
+                    revenue:
+                      metric.platformType === EcommercePlatformType.ALIBABA
+                        ? metric.alibabaRevenue
+                        : metric.b2cRevenue,
+                    orders:
+                      metric.platformType === EcommercePlatformType.ALIBABA
+                        ? metric.alibabaOrders
+                        : metric.b2cOrders,
+                    visitors:
+                      metric.platformType === EcommercePlatformType.ALIBABA
+                        ? metric.alibabaVisitors
+                        : metric.b2cVisitors,
+                  }))}
+                height={400}
+              />
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Metrics List */}
+        {metrics.length === 0 ? (
+          <Card className="border-gray-200 dark:border-gray-800 shadow-sm">
+            <CardContent className="py-16 text-center">
+              <div className="max-w-md mx-auto space-y-4">
+                <div className="w-16 h-16 mx-auto rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center">
+                  <Plus className="h-8 w-8 text-primary" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                    Henüz Metrik Kaydı Yok
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    E-ticaret performansınızı takip etmek için ilk metrik kaydınızı oluşturun
+                  </p>
+                </div>
+                <Button className="mt-4" onClick={() => setIsCreateDialogOpen(true)} size="lg">
+                  <Plus className="mr-2 h-4 w-4" />
+                  İlk Metrik Kaydını Oluştur
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+              Metrik Kayıtları
+            </h2>
+            {metrics.map((metric: any) => (
+              <Card
+                key={metric.id}
+                className="border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow"
+              >
+                <CardHeader className="border-b border-gray-100 dark:border-gray-800">
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div>
+                      <CardTitle className="text-lg text-gray-900 dark:text-white">
+                        {metric.periodYear} - {metric.periodMonth}. Ay -{' '}
+                        {EcommercePlatformTypeLabels[metric.platformType as EcommercePlatformType]}
+                      </CardTitle>
+                      <CardDescription className="text-gray-600 dark:text-gray-400 mt-1">
+                        {new Date(metric.createdAt).toLocaleDateString('tr-TR')} tarihinde
+                        oluşturuldu
+                      </CardDescription>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setEditingMetrics(metric)}
+                      className="shrink-0"
+                    >
+                      <Edit className="mr-2 h-4 w-4" />
+                      Düzenle
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-6">
+                  {metric.platformType === EcommercePlatformType.ALIBABA ? (
+                    <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
+                      <div className="space-y-1">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Ziyaretçi</p>
+                        <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                          {metric.alibabaVisitors.toLocaleString()}
+                        </p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Ürün</p>
+                        <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                          {metric.alibabaProducts.toLocaleString()}
+                        </p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">RFQ</p>
+                        <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                          {metric.alibabaRfqCount.toLocaleString()}
+                        </p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Sipariş</p>
+                        <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                          {metric.alibabaOrders.toLocaleString()}
+                        </p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Gelir</p>
+                        <p className="text-2xl font-bold text-primary">
+                          {metric.alibabaRevenue.toLocaleString('tr-TR', {
+                            style: 'currency',
+                            currency: 'TRY',
+                          })}
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                      <div className="space-y-1">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Ziyaretçi</p>
+                        <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                          {metric.b2cVisitors.toLocaleString()}
+                        </p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Ürün</p>
+                        <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                          {metric.b2cProducts.toLocaleString()}
+                        </p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Sipariş</p>
+                        <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                          {metric.b2cOrders.toLocaleString()}
+                        </p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Gelir</p>
+                        <p className="text-2xl font-bold text-primary">
+                          {metric.b2cRevenue.toLocaleString('tr-TR', {
+                            style: 'currency',
+                            currency: 'TRY',
+                          })}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                  {metric.notes && (
+                    <div className="mt-6 pt-6 border-t border-gray-100 dark:border-gray-800">
+                      <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Notlar:
+                      </p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{metric.notes}</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+
+        {/* Edit Dialog */}
+        {editingMetrics && (
+          <Dialog open={!!editingMetrics} onOpenChange={(open) => !open && setEditingMetrics(null)}>
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Metrikleri Düzenle</DialogTitle>
+                <DialogDescription>
+                  E-ticaret metriklerinizi güncelleyebilirsiniz.
+                </DialogDescription>
+              </DialogHeader>
+              <EcommerceMetricsForm
+                metrics={editingMetrics}
+                companyId={companyId}
+                programId={programId}
+                onSubmit={handleUpdate}
+                onCancel={() => setEditingMetrics(null)}
+                isSubmitting={updateMetrics.isPending}
+              />
+            </DialogContent>
+          </Dialog>
+        )}
+      </div>
     </div>
   );
 }

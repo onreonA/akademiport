@@ -2,7 +2,19 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Briefcase, Clock, CheckCircle2, AlertCircle, TrendingUp } from 'lucide-react';
+import {
+  Briefcase,
+  Clock,
+  CheckCircle2,
+  AlertCircle,
+  TrendingUp,
+  Edit,
+  Calendar,
+  User,
+  FolderTree,
+  ListChecks,
+  ArrowRight,
+} from 'lucide-react';
 import { Card, CardContent } from '@/presentation/components/ui/atoms/card';
 import { Badge } from '@/presentation/components/ui/atoms/badge';
 import { Button } from '@/presentation/components/ui/atoms/button';
@@ -21,6 +33,9 @@ interface Project {
     id: string;
     full_name: string;
   };
+  sub_project_count?: number;
+  task_count?: number;
+  completed_task_count?: number;
 }
 
 const statusConfig = {
@@ -209,81 +224,197 @@ export default function CompanyProjectsPage() {
             </p>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-            {projects.map((project) => (
-              <Card
-                key={project.id}
-                className="border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-                onClick={() => handleProjectClick(project.id)}
-              >
-                <CardContent className="p-4 md:p-6">
-                  {/* Header */}
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-lg md:text-xl font-bold mb-2 truncate text-gray-900 dark:text-white">
-                        {project.name}
-                      </h3>
-                      {project.description && (
-                        <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
-                          {project.description}
-                        </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
+            {projects.map((project) => {
+              const statusInfo = statusConfig[project.status];
+              const priorityInfo = priorityConfig[project.priority];
+              const daysRemaining = project.end_date
+                ? Math.ceil(
+                    (new Date(project.end_date).getTime() - new Date().getTime()) /
+                      (1000 * 60 * 60 * 24)
+                  )
+                : null;
+
+              return (
+                <Card
+                  key={project.id}
+                  className="group border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all duration-300 cursor-pointer overflow-hidden"
+                  onClick={() => handleProjectClick(project.id)}
+                >
+                  {/* Colored Top Border */}
+                  <div className={`h-1.5 ${statusInfo.color}`} />
+
+                  <CardContent className="p-5 md:p-6">
+                    {/* Header with Title and Edit Button */}
+                    <div className="flex items-start justify-between mb-4 gap-3">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div
+                            className={`p-2 rounded-lg ${statusInfo.color.replace('bg-', 'bg-')}/10`}
+                          >
+                            <Briefcase
+                              className={`w-5 h-5 ${statusInfo.color.replace('bg-', 'text-')}`}
+                            />
+                          </div>
+                          <h3 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white line-clamp-1 group-hover:text-primary transition-colors">
+                            {project.name}
+                          </h3>
+                        </div>
+                        {project.description && (
+                          <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 leading-relaxed">
+                            {project.description}
+                          </p>
+                        )}
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          router.push(`/company-dashboard/projects/${project.id}/edit`);
+                        }}
+                        className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                    </div>
+
+                    {/* Status and Priority Badges */}
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      <Badge className={`${statusInfo.color} text-white border-0 text-xs`}>
+                        {statusInfo.label}
+                      </Badge>
+                      <Badge className={`${priorityInfo.color} text-white border-0 text-xs`}>
+                        {priorityInfo.label}
+                      </Badge>
+                      {daysRemaining !== null && daysRemaining <= 7 && daysRemaining >= 0 && (
+                        <Badge
+                          variant="outline"
+                          className="border-orange-500 text-orange-600 dark:text-orange-400 text-xs"
+                        >
+                          <Clock className="w-3 h-3 mr-1" />
+                          {daysRemaining} gün kaldı
+                        </Badge>
+                      )}
+                      {daysRemaining !== null && daysRemaining < 0 && (
+                        <Badge
+                          variant="outline"
+                          className="border-red-500 text-red-600 dark:text-red-400 text-xs"
+                        >
+                          <AlertCircle className="w-3 h-3 mr-1" />
+                          Gecikmiş
+                        </Badge>
                       )}
                     </div>
-                  </div>
 
-                  {/* Badges */}
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {project.status && statusConfig[project.status] && (
-                      <Badge
-                        className={`${statusConfig[project.status].color} text-white border-0`}
-                      >
-                        {statusConfig[project.status].label}
-                      </Badge>
-                    )}
-                    {project.priority && priorityConfig[project.priority] && (
-                      <Badge
-                        className={`${priorityConfig[project.priority].color} text-white border-0`}
-                      >
-                        {priorityConfig[project.priority].label}
-                      </Badge>
-                    )}
-                  </div>
-
-                  {/* Progress */}
-                  <div className="mb-4">
-                    <div className="flex items-center justify-between text-sm mb-2">
-                      <span className="text-gray-600 dark:text-gray-400">İlerleme</span>
-                      <span className="font-semibold text-gray-900 dark:text-white">
-                        {project.progress ?? 0}%
-                      </span>
+                    {/* Progress Bar */}
+                    <div className="mb-5">
+                      <div className="flex items-center justify-between text-sm mb-2">
+                        <span className="text-gray-600 dark:text-gray-400 font-medium">
+                          İlerleme
+                        </span>
+                        <span className="font-bold text-gray-900 dark:text-white">
+                          {project.progress ?? 0}%
+                        </span>
+                      </div>
+                      <div className="h-2.5 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full ${statusInfo.color} transition-all duration-1000 ease-out`}
+                          style={{ width: `${project.progress ?? 0}%` }}
+                        />
+                      </div>
                     </div>
-                    <div className="h-2 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-primary transition-all duration-1000"
-                        style={{ width: `${project.progress ?? 0}%` }}
-                      />
-                    </div>
-                  </div>
 
-                  {/* Footer */}
-                  <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400 pt-4 border-t border-gray-200 dark:border-gray-800">
-                    {project.consultant && (
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-xs font-semibold text-primary">
-                          {project.consultant.full_name.charAt(0)}
+                    {/* Project Stats */}
+                    <div className="grid grid-cols-2 gap-3 mb-5">
+                      <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+                        <div className="p-1.5 bg-blue-100 dark:bg-blue-900/30 rounded">
+                          <FolderTree className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                         </div>
-                        <span className="truncate">{project.consultant.full_name}</span>
+                        <div>
+                          <p className="text-xs text-gray-600 dark:text-gray-400">Alt Proje</p>
+                          <p className="text-sm font-bold text-gray-900 dark:text-white">
+                            {project.sub_project_count ?? 0}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+                        <div className="p-1.5 bg-green-100 dark:bg-green-900/30 rounded">
+                          <ListChecks className="w-4 h-4 text-green-600 dark:text-green-400" />
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-600 dark:text-gray-400">Görev</p>
+                          <p className="text-sm font-bold text-gray-900 dark:text-white">
+                            {project.completed_task_count ?? 0}/{project.task_count ?? 0}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Dates */}
+                    {(project.start_date || project.end_date) && (
+                      <div className="flex items-center gap-4 mb-4 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+                        <div className="flex items-center gap-2 flex-1">
+                          <Calendar className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                          <div className="flex-1">
+                            <p className="text-xs text-gray-600 dark:text-gray-400 mb-0.5">
+                              Başlangıç
+                            </p>
+                            <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                              {project.start_date
+                                ? new Date(project.start_date).toLocaleDateString('tr-TR', {
+                                    day: '2-digit',
+                                    month: 'short',
+                                    year: 'numeric',
+                                  })
+                                : '-'}
+                            </p>
+                          </div>
+                        </div>
+                        <ArrowRight className="w-4 h-4 text-gray-400" />
+                        <div className="flex items-center gap-2 flex-1">
+                          <Calendar className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                          <div className="flex-1">
+                            <p className="text-xs text-gray-600 dark:text-gray-400 mb-0.5">Bitiş</p>
+                            <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                              {project.end_date
+                                ? new Date(project.end_date).toLocaleDateString('tr-TR', {
+                                    day: '2-digit',
+                                    month: 'short',
+                                    year: 'numeric',
+                                  })
+                                : '-'}
+                            </p>
+                          </div>
+                        </div>
                       </div>
                     )}
-                    {project.end_date && (
-                      <span className="text-xs">
-                        {new Date(project.end_date).toLocaleDateString('tr-TR')}
-                      </span>
+
+                    {/* Consultant Info */}
+                    {project.consultant && (
+                      <div className="flex items-center gap-3 pt-4 border-t border-gray-200 dark:border-gray-800">
+                        <div className="flex items-center gap-2 flex-1">
+                          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-sm font-bold text-white shadow-md">
+                            {project.consultant.full_name.charAt(0).toUpperCase()}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs text-gray-600 dark:text-gray-400 mb-0.5">
+                              Danışman
+                            </p>
+                            <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+                              {project.consultant.full_name}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                          <ArrowRight className="w-5 h-5 text-primary" />
+                        </div>
+                      </div>
                     )}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         )}
       </div>

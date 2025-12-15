@@ -93,16 +93,26 @@ export function TaskDependencies({ taskId, projectId }: TaskDependenciesProps) {
   }, [taskId]);
 
   const fetchTasks = useCallback(async () => {
+    if (!projectId) {
+      console.warn('TaskDependencies: projectId is required but not provided');
+      return;
+    }
+
     try {
-      const response = await fetch(`/api/projects/${projectId}/tasks`);
-      if (!response.ok) throw new Error('Failed to fetch tasks');
+      const url = `/api/projects/${projectId}/tasks`;
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to fetch tasks: ${response.status} ${response.statusText}`);
+      }
 
       const data = await response.json();
       setTasks(data.tasks || data.data || []);
     } catch (error) {
       console.error('Error fetching tasks:', error);
     }
-  }, [projectId]);
+  }, [projectId, taskId]);
 
   const checkDependencies = useCallback(async () => {
     try {

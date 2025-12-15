@@ -41,16 +41,100 @@ export default function ConsultantProjectsPage() {
       params.append('isTemplate', 'false'); // Şablonları hariç tut
       if (statusFilter !== 'all') params.append('status', statusFilter);
 
+      // #region agent log
+      fetch('http://127.0.0.1:7243/ingest/ab0a7b4f-c491-4309-8654-c71caae1abf6', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          location: 'consultant-dashboard/projects/page.tsx:44',
+          message: 'Fetching projects - request sent',
+          data: { url: `/api/projects?${params}`, statusFilter },
+          timestamp: Date.now(),
+          sessionId: 'debug-session',
+          runId: 'run1',
+          hypothesisId: 'A',
+        }),
+      }).catch(() => {});
+      // #endregion
+
       const response = await fetch(`/api/projects?${params}`);
+
+      // #region agent log
+      fetch('http://127.0.0.1:7243/ingest/ab0a7b4f-c491-4309-8654-c71caae1abf6', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          location: 'consultant-dashboard/projects/page.tsx:46',
+          message: 'Fetch response received',
+          data: { status: response.status, ok: response.ok },
+          timestamp: Date.now(),
+          sessionId: 'debug-session',
+          runId: 'run1',
+          hypothesisId: 'A',
+        }),
+      }).catch(() => {});
+      // #endregion
 
       if (!response.ok) throw new Error('Failed to fetch projects');
 
       const data = await response.json();
 
+      // #region agent log
+      fetch('http://127.0.0.1:7243/ingest/ab0a7b4f-c491-4309-8654-c71caae1abf6', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          location: 'consultant-dashboard/projects/page.tsx:48',
+          message: 'Data parsed from API',
+          data: {
+            hasProjects: !!data.projects,
+            hasData: !!data.data,
+            projectsCount: data.projects?.length || 0,
+            dataCount: data.data?.length || 0,
+            total: data.total,
+          },
+          timestamp: Date.now(),
+          sessionId: 'debug-session',
+          runId: 'run1',
+          hypothesisId: 'C',
+        }),
+      }).catch(() => {});
+      // #endregion
+
       // API returns { projects: [...], total, page, limit }
       setProjects(data.projects || data.data || []);
-    } catch {
-      // Error handled by UI state
+
+      // #region agent log
+      fetch('http://127.0.0.1:7243/ingest/ab0a7b4f-c491-4309-8654-c71caae1abf6', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          location: 'consultant-dashboard/projects/page.tsx:51',
+          message: 'Projects state updated',
+          data: { projectsSetCount: (data.projects || data.data || []).length },
+          timestamp: Date.now(),
+          sessionId: 'debug-session',
+          runId: 'run1',
+          hypothesisId: 'C',
+        }),
+      }).catch(() => {});
+      // #endregion
+    } catch (error) {
+      // #region agent log
+      fetch('http://127.0.0.1:7243/ingest/ab0a7b4f-c491-4309-8654-c71caae1abf6', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          location: 'consultant-dashboard/projects/page.tsx:52',
+          message: 'Error in fetchProjects',
+          data: { error: error instanceof Error ? error.message : String(error) },
+          timestamp: Date.now(),
+          sessionId: 'debug-session',
+          runId: 'run1',
+          hypothesisId: 'A',
+        }),
+      }).catch(() => {});
+      // #endregion
     } finally {
       setLoading(false);
     }

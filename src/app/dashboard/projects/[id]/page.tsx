@@ -161,7 +161,7 @@ export default function AdminProjectDetailPage() {
   const [taskDatesOpen, setTaskDatesOpen] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [bulkAllDatesOpen, setBulkAllDatesOpen] = useState(false);
-  const [bulkAllDatesSubmitting, setBulkAllDatesSubmitting] = useState(false);
+  // const [bulkAllDatesSubmitting, setBulkAllDatesSubmitting] = useState(false);
 
   const fetchHierarchy = useCallback(async () => {
     // Don't fetch if id is "new"
@@ -443,9 +443,12 @@ export default function AdminProjectDetailPage() {
     toast.info(`Alt proje detay ekranı yakında: ${subProject.name}`);
   }, []);
 
-  const handleViewTask = useCallback((task: TaskDTO) => {
-    toast.info(`Görev detay ekranı yakında: ${task.title}`);
-  }, []);
+  const handleViewTask = useCallback(
+    (task: TaskDTO) => {
+      router.push(`/dashboard/tasks/${task.id}`);
+    },
+    [router]
+  );
 
   const handleTaskDates = useCallback((taskId: string) => {
     setSelectedTaskId(taskId);
@@ -757,8 +760,11 @@ export default function AdminProjectDetailPage() {
               priorityColorClass={priorityBadge?.badgeClass ?? null}
               companyName={project.companyName ?? null}
               consultantName={project.consultantName ?? null}
+              consultantId={project.consultantId ?? null}
+              projectId={projectId}
               startDate={startDateLabel}
               endDate={endDateLabel}
+              onConsultantChanged={fetchHierarchy}
             />
           </div>
         </div>

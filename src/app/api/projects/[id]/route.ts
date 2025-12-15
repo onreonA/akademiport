@@ -58,13 +58,88 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Only master_admin and consultant can update projects
+    const { id } = await params;
+    const body = await request.json();
+
+    // Company users can only update their own projects (limited fields)
+    if (user.role === 'company_user' || user.role === 'company_admin') {
+      if (!user.companyId) {
+        return NextResponse.json({ error: 'Firma bilgisi bulunamadı' }, { status: 403 });
+      }
+
+      // Verify the project belongs to the company
+      const getProjectUseCase = new GetProjectUseCase(projectRepository);
+      const projectResult = await getProjectUseCase.execute(id);
+
+      if (projectResult.isFailure) {
+        return NextResponse.json(
+          { error: (projectResult.error as any)?.message || 'Failed to fetch project' },
+          { status: (projectResult.error as any)?.statusCode || 500 }
+        );
+      }
+
+      const project = projectResult.value;
+
+      // Check if project is assigned to this company via company_project_assignments
+      // or if project.companyId matches user.companyId
+      const isAssignedToCompany = project.companyId === user.companyId;
+
+      // Also check company_project_assignments
+      let isAssignedViaAssignments = false;
+      if (!isAssignedToCompany) {
+        try {
+          const { createClient } = await import('@/infrastructure/database/supabase-server');
+          const supabase = await createClient();
+          const { data: assignment } = await supabase
+            .from('company_project_assignments')
+            .select('id')
+            .eq('company_id', user.companyId)
+            .eq('project_id', id)
+            .eq('is_active', true)
+            .single();
+
+          isAssignedViaAssignments = !!assignment;
+        } catch {
+          // Silently fail if assignment check fails
+        }
+      }
+
+      if (!isAssignedToCompany && !isAssignedViaAssignments) {
+        return NextResponse.json({ error: 'Bu projeyi düzenleme yetkiniz yok' }, { status: 403 });
+      }
+
+      // Company users can only update limited fields (name, description, dates)
+      // They cannot change status, priority, companyId, consultantId
+      const updateProjectUseCase = new UpdateProjectUseCase(projectRepository, addLeaderboardScore);
+      const result = await updateProjectUseCase.execute(id, {
+        name: body.name,
+        description: body.description,
+        startDate:
+          body.startDate || body.start_date
+            ? new Date(body.startDate || body.start_date)
+            : undefined,
+        endDate:
+          body.endDate || body.end_date ? new Date(body.endDate || body.end_date) : undefined,
+        // Don't allow company users to change these fields
+        companyId: project.companyId,
+        consultantId: project.consultantId,
+        status: project.status,
+        priority: project.priority,
+      });
+
+      if (result.isFailure) {
+        const error =
+          result.error instanceof AppError ? result.error : new AppError('Unknown error', 500);
+        return NextResponse.json({ error: error.message }, { status: error.statusCode });
+      }
+
+      return NextResponse.json({ success: true });
+    }
+
+    // Master admin and consultant can update all fields
     if (user.role !== 'master_admin' && user.role !== 'consultant') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
-
-    const { id } = await params;
-    const body = await request.json();
 
     const updateProjectUseCase = new UpdateProjectUseCase(projectRepository, addLeaderboardScore);
     const result = await updateProjectUseCase.execute(id, {

@@ -83,9 +83,8 @@ export function EcommerceMetricsForm({
   const {
     register,
     handleSubmit,
-    formState: { errors, isValid, isSubmitting: formIsSubmitting },
+    formState: { errors, isSubmitting: formIsSubmitting },
     setValue,
-    watch,
     trigger,
   } = useForm<CreateEcommerceMetricsDto>({
     resolver: zodResolver(CreateEcommerceMetricsDtoSchema),
@@ -98,10 +97,13 @@ export function EcommerceMetricsForm({
           periodMonth: metrics.periodMonth,
           platformType: metrics.platformType,
           alibabaVisitors: metrics.alibabaVisitors,
+          alibabaVisitorSectorAvg: metrics.alibabaVisitorSectorAvg ?? 0,
           alibabaProducts: metrics.alibabaProducts,
           alibabaRfqCount: metrics.alibabaRfqCount,
           alibabaOrders: metrics.alibabaOrders,
           alibabaRevenue: metrics.alibabaRevenue,
+          alibabaMessageSectorAvg: metrics.alibabaMessageSectorAvg ?? 0,
+          alibabaSeriousBuyerCount: metrics.alibabaSeriousBuyerCount ?? 0,
           b2cVisitors: metrics.b2cVisitors,
           b2cProducts: metrics.b2cProducts,
           b2cOrders: metrics.b2cOrders,
@@ -115,10 +117,13 @@ export function EcommerceMetricsForm({
           periodMonth: new Date().getMonth() + 1,
           platformType: EcommercePlatformType.ALIBABA,
           alibabaVisitors: 0,
+          alibabaVisitorSectorAvg: 0,
           alibabaProducts: 0,
           alibabaRfqCount: 0,
           alibabaOrders: 0,
           alibabaRevenue: 0,
+          alibabaMessageSectorAvg: 0,
+          alibabaSeriousBuyerCount: 0,
           b2cVisitors: 0,
           b2cProducts: 0,
           b2cOrders: 0,
@@ -248,6 +253,22 @@ export function EcommerceMetricsForm({
               </div>
 
               <div className="space-y-2">
+                <Label htmlFor="alibabaVisitorSectorAvg">Ziyaretçi (Sektör Ort)</Label>
+                <Input
+                  id="alibabaVisitorSectorAvg"
+                  type="number"
+                  min="0"
+                  {...register('alibabaVisitorSectorAvg', { valueAsNumber: true })}
+                  placeholder="0"
+                />
+                {errors.alibabaVisitorSectorAvg && (
+                  <p className="text-sm text-destructive">
+                    {errors.alibabaVisitorSectorAvg.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-2">
                 <Label htmlFor="alibabaProducts">Ürün Sayısı</Label>
                 <Input
                   id="alibabaProducts"
@@ -301,6 +322,38 @@ export function EcommerceMetricsForm({
                 />
                 {errors.alibabaRevenue && (
                   <p className="text-sm text-destructive">{errors.alibabaRevenue.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="alibabaMessageSectorAvg">Mesaj Sektör Ortalaması</Label>
+                <Input
+                  id="alibabaMessageSectorAvg"
+                  type="number"
+                  min="0"
+                  {...register('alibabaMessageSectorAvg', { valueAsNumber: true })}
+                  placeholder="0"
+                />
+                {errors.alibabaMessageSectorAvg && (
+                  <p className="text-sm text-destructive">
+                    {errors.alibabaMessageSectorAvg.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="alibabaSeriousBuyerCount">Ciddi Alıcı Sayısı (L3-L4)</Label>
+                <Input
+                  id="alibabaSeriousBuyerCount"
+                  type="number"
+                  min="0"
+                  {...register('alibabaSeriousBuyerCount', { valueAsNumber: true })}
+                  placeholder="0"
+                />
+                {errors.alibabaSeriousBuyerCount && (
+                  <p className="text-sm text-destructive">
+                    {errors.alibabaSeriousBuyerCount.message}
+                  </p>
                 )}
               </div>
             </div>

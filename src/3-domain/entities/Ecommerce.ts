@@ -16,10 +16,13 @@ export interface EcommerceMetrics {
 
   // Alibaba (B2B) Metrikleri
   alibabaVisitors: number;
+  alibabaVisitorSectorAvg?: number;
   alibabaProducts: number;
   alibabaRfqCount: number;
   alibabaOrders: number;
   alibabaRevenue: number;
+  alibabaMessageSectorAvg?: number;
+  alibabaSeriousBuyerCount?: number;
 
   // B2C Platform Metrikleri
   b2cVisitors: number;
@@ -91,10 +94,13 @@ export class EcommerceMetricsEntity implements EcommerceMetrics {
   periodMonth!: number;
   platformType!: EcommercePlatformType;
   alibabaVisitors!: number;
+  alibabaVisitorSectorAvg?: number;
   alibabaProducts!: number;
   alibabaRfqCount!: number;
   alibabaOrders!: number;
   alibabaRevenue!: number;
+  alibabaMessageSectorAvg?: number;
+  alibabaSeriousBuyerCount?: number;
   b2cVisitors!: number;
   b2cProducts!: number;
   b2cOrders!: number;

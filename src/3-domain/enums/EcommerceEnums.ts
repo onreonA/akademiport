@@ -9,9 +9,7 @@ export enum EcommercePlatformType {
   AMAZON = 'amazon',
   ETSY = 'etsy',
   TRENDYOL = 'trendyol',
-  HEPSIBURADA = 'hepsiburada',
-  N11 = 'n11',
-  GITTI_GIDIYOR = 'gitti-gidiyor',
+  OZON = 'ozon',
   OTHER = 'other',
 }
 
@@ -20,9 +18,7 @@ export const EcommercePlatformTypeLabels: Record<EcommercePlatformType, string> 
   [EcommercePlatformType.AMAZON]: 'Amazon',
   [EcommercePlatformType.ETSY]: 'Etsy',
   [EcommercePlatformType.TRENDYOL]: 'Trendyol',
-  [EcommercePlatformType.HEPSIBURADA]: 'Hepsiburada',
-  [EcommercePlatformType.N11]: 'N11',
-  [EcommercePlatformType.GITTI_GIDIYOR]: 'Gitti Gidiyor',
+  [EcommercePlatformType.OZON]: 'Ozon',
   [EcommercePlatformType.OTHER]: 'Diğer',
 };
 

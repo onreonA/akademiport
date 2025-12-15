@@ -72,7 +72,7 @@ export default function CompanyUsersPage() {
   };
 
   const handleAddUser = () => {
-    alert('Kullanıcı ekleme özelliği yakında eklenecek');
+    router.push('/company-dashboard/users/new');
   };
 
   const handleRemoveUser = async (userId: string) => {

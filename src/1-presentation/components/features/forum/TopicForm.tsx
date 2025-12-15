@@ -80,24 +80,26 @@ export function TopicForm({
           render={({ field }: { field: any }) => (
             <FormItem>
               <FormLabel>Kategori *</FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-                disabled={!!initialData}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Kategori seçiniz" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {categories.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      {category.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              {categories.length === 0 ? (
+                <div className="py-4 text-center text-sm text-muted-foreground border border-dashed rounded-lg">
+                  Henüz kategori bulunmuyor. Lütfen admin veya danışman ile iletişime geçin.
+                </div>
+              ) : (
+                <Select onValueChange={field.onChange} value={field.value} disabled={!!initialData}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Kategori seçiniz" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {categories.map((category) => (
+                      <SelectItem key={category.id} value={category.id}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
               <FormDescription>Konunun ait olduğu kategori</FormDescription>
               <FormMessage />
             </FormItem>
