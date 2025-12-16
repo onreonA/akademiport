@@ -25,13 +25,14 @@ export async function POST(request: NextRequest) {
     );
 
     // Güvenli authentication cookie set et
+    const isProduction = process.env.NODE_ENV === 'production';
     response.cookies.set('auth-token', jwtToken, {
       httpOnly: true, // XSS koruması
-      secure: false, // Development için false (production'da true olacak)
+      secure: isProduction, // Production'da HTTPS için true
       sameSite: 'lax', // CSRF koruması
       maxAge: 60 * 60 * 2, // 2 saat
       path: '/',
-      domain: undefined, // Explicit domain belirtme (localhost için)
+      domain: isProduction ? '.akademiport.com' : undefined, // Production'da domain belirt
     });
     return response;
   } catch (error: any) {
