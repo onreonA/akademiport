@@ -13,7 +13,7 @@ import { Button } from '@/presentation/components/ui/atoms/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/presentation/components/ui/atoms/card';
 import { UserForm, type UserFormData } from '@/presentation/components/features/users/UserForm';
 import { User } from '@/domain/entities/User';
-import { ArrowLeft, Loader2, Users, AlertCircle } from 'lucide-react';
+import { ArrowLeft, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function EditUserPage({ params }: { params: Promise<{ id: string }> }) {
