@@ -46,17 +46,19 @@ export class AuthService {
 
     let userData: any = null;
     let userError: any = null;
-    const companyUserError: any = null;
-    const adminError: any = null;
+    let companyUserError: any = null;
+    let adminError: any = null;
 
     try {
       // HYBRID YAKLAŞIM: Önce company_users tablosundan kontrol et
       console.log('🔍 Checking company_users table...');
-      const { data: companyUser, error: companyUserError } = await supabase
+      const { data: companyUser, error: companyUserQueryError } = await supabase
         .from('company_users')
         .select('*')
         .eq('email', email)
         .single();
+
+      companyUserError = companyUserQueryError;
 
       if (companyUser && !companyUserError) {
         console.log('✅ Company user found:', {
@@ -85,15 +87,26 @@ export class AuthService {
           updated_at: companyUser.updated_at,
         };
       } else {
-        console.log('⚠️ Company user not found, checking users table...', {
-          error: companyUserError?.message,
-        });
+        // Company users tablosu hatası varsa logla ama devam et
+        if (companyUserError) {
+          console.log(
+            '⚠️ Company users table error (continuing to check users table):',
+            {
+              error: companyUserError.message,
+              code: companyUserError.code,
+            }
+          );
+        } else {
+          console.log('⚠️ Company user not found, checking users table...');
+        }
         // Company user bulunamadı - users tablosundan kontrol et (admin kullanıcıları)
-        const { data: adminUser, error: adminError } = await supabase
+        const { data: adminUser, error: adminQueryError } = await supabase
           .from('users')
           .select('*')
           .eq('email', email)
           .single();
+
+        adminError = adminQueryError;
 
         if (adminUser && !adminError) {
           console.log('✅ Admin user found:', {
