@@ -36,11 +36,22 @@ export class AuthService {
     const supabase = createClient();
     const { email, password } = credentials;
 
+    console.log('🔐 Login attempt:', {
+      email,
+      supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL
+        ? 'configured'
+        : 'missing',
+      timestamp: new Date().toISOString(),
+    });
+
     let userData: any = null;
     let userError: any = null;
+    const companyUserError: any = null;
+    const adminError: any = null;
 
     try {
       // HYBRID YAKLAŞIM: Önce company_users tablosundan kontrol et
+      console.log('🔍 Checking company_users table...');
       const { data: companyUser, error: companyUserError } = await supabase
         .from('company_users')
         .select('*')
@@ -48,11 +59,16 @@ export class AuthService {
         .single();
 
       if (companyUser && !companyUserError) {
+        console.log('✅ Company user found:', {
+          id: companyUser.id,
+          email: companyUser.email,
+        });
         // Company user bulundu - şifre kontrolü
         const isPasswordValid = await bcrypt.compare(
           password,
           companyUser.password_hash
         );
+        console.log('🔑 Password check result:', isPasswordValid);
         if (!isPasswordValid) {
           throw new Error('Invalid login credentials');
         }
@@ -69,6 +85,9 @@ export class AuthService {
           updated_at: companyUser.updated_at,
         };
       } else {
+        console.log('⚠️ Company user not found, checking users table...', {
+          error: companyUserError?.message,
+        });
         // Company user bulunamadı - users tablosundan kontrol et (admin kullanıcıları)
         const { data: adminUser, error: adminError } = await supabase
           .from('users')
@@ -77,11 +96,16 @@ export class AuthService {
           .single();
 
         if (adminUser && !adminError) {
+          console.log('✅ Admin user found:', {
+            id: adminUser.id,
+            email: adminUser.email,
+          });
           // Admin user bulundu - şifre kontrolü
           const isPasswordValid = await bcrypt.compare(
             password,
             adminUser.password_hash
           );
+          console.log('🔑 Password check result:', isPasswordValid);
           if (!isPasswordValid) {
             throw new Error('Invalid login credentials');
           }
@@ -90,14 +114,33 @@ export class AuthService {
           userData = adminUser;
           userData.role = adminUser.role || 'admin';
         } else {
+          console.log('❌ Admin user not found:', {
+            error: adminError?.message,
+            code: adminError?.code,
+          });
           userError = companyUserError || adminError;
         }
       }
-    } catch (error) {
+    } catch (error: any) {
+      console.error('❌ SignIn error caught:', {
+        message: error.message,
+        stack: error.stack,
+      });
       userError = error;
     }
 
     if (!userData || userError) {
+      // Daha detaylı error logging
+      console.error('❌ Authentication failed:', {
+        email,
+        companyUserError: companyUserError?.message,
+        companyUserErrorCode: companyUserError?.code,
+        adminError: adminError?.message,
+        adminErrorCode: adminError?.code,
+        userError: userError?.message,
+        hasPassword: !!password,
+        supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
+      });
       throw new Error('User not found or invalid credentials');
     }
     // JWT token oluştur

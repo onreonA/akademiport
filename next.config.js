@@ -13,10 +13,8 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
 
-  // ESLint configuration - GEÇICI OLARAK KAPALI
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
+  // ESLint configuration removed - Next.js 16 uses separate linting
+  // ESLint config should be in eslint.config.js or .eslintrc.json
 
   // Bundle optimization
   webpack: (config, { dev, isServer }) => {
