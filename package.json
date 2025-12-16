@@ -97,7 +97,8 @@
     "typescript": "^5",
     "xlsx": "^0.18.5",
     "zod": "^3.25.76",
-    "zustand": "^4.5.7"
+    "zustand": "^4.5.7",
+    "cross-env": "^7.0.3"
   },
   "devDependencies": {
     "@playwright/test": "^1.56.0",
@@ -113,7 +114,6 @@
     "@typescript-eslint/eslint-plugin": "^8.43.0",
     "@typescript-eslint/parser": "^8.43.0",
     "concurrently": "^8.2.2",
-    "cross-env": "^7.0.3",
     "eslint": "^8.56.0",
     "eslint-config-next": "15.3.2",
     "eslint-config-prettier": "^10.1.8",
