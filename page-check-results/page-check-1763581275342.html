@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Page Check Report</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    .container { max-width: 1400px; margin: 0 auto; }
+    h1 { color: #333; margin-bottom: 10px; }
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin: 20px 0;
+    }
+    .summary-card {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .summary-card h3 { font-size: 14px; color: #666; margin-bottom: 10px; }
+    .summary-card .number { font-size: 32px; font-weight: bold; }
+    .summary-card.success .number { color: #10b981; }
+    .summary-card.error .number { color: #ef4444; }
+    .summary-card.warning .number { color: #f59e0b; }
+    .section { margin: 30px 0; }
+    .section h2 {
+      color: #333;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #e5e7eb;
+    }
+    table {
+      width: 100%;
+      background: white;
+      border-collapse: collapse;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    th {
+      background: #f9fafb;
+      padding: 12px;
+      text-align: left;
+      font-weight: 600;
+      color: #374151;
+      border-bottom: 2px solid #e5e7eb;
+    }
+    td {
+      padding: 12px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    tr:hover { background: #f9fafb; }
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .status-success { background: #d1fae5; color: #065f46; }
+    .status-error { background: #fee2e2; color: #991b1b; }
+    .status-redirect { background: #fef3c7; color: #92400e; }
+    .status-timeout { background: #e0e7ff; color: #3730a3; }
+    .check-icon { color: #10b981; }
+    .x-icon { color: #ef4444; }
+    .url { color: #3b82f6; text-decoration: none; }
+    .url:hover { text-decoration: underline; }
+    .role-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      background: #e0e7ff;
+      color: #3730a3;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📊 Page Check Report</h1>
+    <p style="color: #666; margin-bottom: 20px;">
+      Generated: 19.11.2025 22:42:15<br>
+      Base URL: http://localhost:3000
+    </p>
+
+    <div class="summary">
+      <div class="summary-card success">
+        <h3>✅ Success</h3>
+        <div class="number">0</div>
+      </div>
+      <div class="summary-card error">
+        <h3>❌ Errors</h3>
+        <div class="number">0</div>
+      </div>
+      <div class="summary-card warning">
+        <h3>↪️ Redirects</h3>
+        <div class="number">60</div>
+      </div>
+      <div class="summary-card warning">
+        <h3>⏱️ Timeouts</h3>
+        <div class="number">0</div>
+      </div>
+      <div class="summary-card warning">
+        <h3>📱 Missing Sidebar</h3>
+        <div class="number">0</div>
+      </div>
+      <div class="summary-card warning">
+        <h3>🔝 Missing Header</h3>
+        <div class="number">0</div>
+      </div>
+    </div>
+
+    
+
+    
+    <div class="section">
+      <h2>↪️ Redirects (60)</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Role</th>
+            <th>Label</th>
+            <th>From</th>
+            <th>To</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Dashboard</td>
+              <td><a href="http://localhost:3000/dashboard" target="_blank" class="url">/dashboard</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fdashboard" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fdashboard</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Programlar > Tüm Programlar</td>
+              <td><a href="http://localhost:3000/dashboard/programs" target="_blank" class="url">/dashboard/programs</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fdashboard%2Fprograms" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fdashboard%2Fprograms</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Programlar > Yeni Program</td>
+              <td><a href="http://localhost:3000/dashboard/programs/new" target="_blank" class="url">/dashboard/programs/new</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fdashboard%2Fprograms%2Fnew" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fdashboard%2Fprograms%2Fnew</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Firmalar > Tüm Firmalar</td>
+              <td><a href="http://localhost:3000/dashboard/companies" target="_blank" class="url">/dashboard/companies</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fdashboard%2Fcompanies" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fdashboard%2Fcompanies</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Firmalar > Yeni Firma</td>
+              <td><a href="http://localhost:3000/dashboard/companies/new" target="_blank" class="url">/dashboard/companies/new</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fdashboard%2Fcompanies%2Fnew" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fdashboard%2Fcompanies%2Fnew</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Kullanıcılar > Tüm Kullanıcılar</td>
+              <td><a href="http://localhost:3000/dashboard/users" target="_blank" class="url">/dashboard/users</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fdashboard%2Fusers" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fdashboard%2Fusers</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Kullanıcılar > Yeni Kullanıcı</td>
+              <td><a href="http://localhost:3000/dashboard/users/new" target="_blank" class="url">/dashboard/users/new</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fdashboard%2Fusers%2Fnew" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fdashboard%2Fusers%2Fnew</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Projeler > Tüm Projeler</td>
+              <td><a href="http://localhost:3000/dashboard/projects" target="_blank" class="url">/dashboard/projects</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fdashboard%2Fprojects" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fdashboard%2Fprojects</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Projeler > Silinen Projeler</td>
+              <td><a href="http://localhost:3000/dashboard/projects/deleted" target="_blank" class="url">/dashboard/projects/deleted</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fdashboard%2Fprojects%2Fdeleted" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fdashboard%2Fprojects%2Fdeleted</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Eğitimler > Tüm Eğitimler</td>
+              <td><a href="http://localhost:3000/dashboard/trainings" target="_blank" class="url">/dashboard/trainings</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fdashboard%2Ftrainings" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fdashboard%2Ftrainings</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Eğitimler > Yeni Eğitim</td>
+              <td><a href="http://localhost:3000/dashboard/trainings/new" target="_blank" class="url">/dashboard/trainings/new</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fdashboard%2Ftrainings%2Fnew" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fdashboard%2Ftrainings%2Fnew</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Etkinlikler > Tüm Etkinlikler</td>
+              <td><a href="http://localhost:3000/dashboard/events" target="_blank" class="url">/dashboard/events</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fdashboard%2Fevents" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fdashboard%2Fevents</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Etkinlikler > Yeni Etkinlik</td>
+              <td><a href="http://localhost:3000/dashboard/events/new" target="_blank" class="url">/dashboard/events/new</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fdashboard%2Fevents%2Fnew" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fdashboard%2Fevents%2Fnew</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Randevular</td>
+              <td><a href="http://localhost:3000/dashboard/appointments" target="_blank" class="url">/dashboard/appointments</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fdashboard%2Fappointments" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fdashboard%2Fappointments</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Haberler > Tüm Haberler</td>
+              <td><a href="http://localhost:3000/admin-dashboard/news" target="_blank" class="url">/admin-dashboard/news</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fadmin-dashboard%2Fnews" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fadmin-dashboard%2Fnews</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Haberler > Yeni Haber</td>
+              <td><a href="http://localhost:3000/admin-dashboard/news/new" target="_blank" class="url">/admin-dashboard/news/new</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fadmin-dashboard%2Fnews%2Fnew" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fadmin-dashboard%2Fnews%2Fnew</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Forum > Konular</td>
+              <td><a href="http://localhost:3000/admin-dashboard/forum" target="_blank" class="url">/admin-dashboard/forum</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fadmin-dashboard%2Fforum" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fadmin-dashboard%2Fforum</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Forum > Kategoriler</td>
+              <td><a href="http://localhost:3000/admin-dashboard/forum/categories" target="_blank" class="url">/admin-dashboard/forum/categories</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fadmin-dashboard%2Fforum%2Fcategories" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fadmin-dashboard%2Fforum%2Fcategories</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Liderlik Tablosu > Sıralama</td>
+              <td><a href="http://localhost:3000/admin-dashboard/leaderboard" target="_blank" class="url">/admin-dashboard/leaderboard</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fadmin-dashboard%2Fleaderboard" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fadmin-dashboard%2Fleaderboard</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Liderlik Tablosu > Rozet Yönetimi</td>
+              <td><a href="http://localhost:3000/admin-dashboard/leaderboard/badges" target="_blank" class="url">/admin-dashboard/leaderboard/badges</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fadmin-dashboard%2Fleaderboard%2Fbadges" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fadmin-dashboard%2Fleaderboard%2Fbadges</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>E-ticaret</td>
+              <td><a href="http://localhost:3000/admin-dashboard/ecommerce" target="_blank" class="url">/admin-dashboard/ecommerce</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fadmin-dashboard%2Fecommerce" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fadmin-dashboard%2Fecommerce</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Bakanlık Dashboard</td>
+              <td><a href="http://localhost:3000/admin-dashboard/ministry" target="_blank" class="url">/admin-dashboard/ministry</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fadmin-dashboard%2Fministry" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fadmin-dashboard%2Fministry</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Proje Şablonları > Tüm Şablonlar</td>
+              <td><a href="http://localhost:3000/dashboard/project-templates" target="_blank" class="url">/dashboard/project-templates</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fdashboard%2Fproject-templates" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fdashboard%2Fproject-templates</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Proje Şablonları > Yeni Şablon</td>
+              <td><a href="http://localhost:3000/dashboard/project-templates/new" target="_blank" class="url">/dashboard/project-templates/new</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fdashboard%2Fproject-templates%2Fnew" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fdashboard%2Fproject-templates%2Fnew</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Raporlar > AI Raporlar</td>
+              <td><a href="http://localhost:3000/dashboard/reports" target="_blank" class="url">/dashboard/reports</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fdashboard%2Freports" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fdashboard%2Freports</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Raporlar > Yeni Rapor Oluştur</td>
+              <td><a href="http://localhost:3000/dashboard/reports/generate" target="_blank" class="url">/dashboard/reports/generate</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fdashboard%2Freports%2Fgenerate" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fdashboard%2Freports%2Fgenerate</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Raporlar > Özel Raporlar</td>
+              <td><a href="http://localhost:3000/dashboard/custom-reports" target="_blank" class="url">/dashboard/custom-reports</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fdashboard%2Fcustom-reports" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fdashboard%2Fcustom-reports</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Raporlar > Yeni Özel Rapor</td>
+              <td><a href="http://localhost:3000/dashboard/custom-reports/new" target="_blank" class="url">/dashboard/custom-reports/new</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fdashboard%2Fcustom-reports%2Fnew" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fdashboard%2Fcustom-reports%2Fnew</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>CMS > Sayfalar</td>
+              <td><a href="http://localhost:3000/dashboard/cms/pages" target="_blank" class="url">/dashboard/cms/pages</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fdashboard%2Fcms%2Fpages" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fdashboard%2Fcms%2Fpages</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>CMS > Medya</td>
+              <td><a href="http://localhost:3000/dashboard/cms/media" target="_blank" class="url">/dashboard/cms/media</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fdashboard%2Fcms%2Fmedia" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fdashboard%2Fcms%2Fmedia</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>CMS > Site Ayarları</td>
+              <td><a href="http://localhost:3000/dashboard/cms/settings" target="_blank" class="url">/dashboard/cms/settings</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fdashboard%2Fcms%2Fsettings" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fdashboard%2Fcms%2Fsettings</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Ayarlar</td>
+              <td><a href="http://localhost:3000/dashboard/settings" target="_blank" class="url">/dashboard/settings</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fdashboard%2Fsettings" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fdashboard%2Fsettings</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Consultant</span></td>
+              <td>Dashboard</td>
+              <td><a href="http://localhost:3000/consultant-dashboard" target="_blank" class="url">/consultant-dashboard</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fconsultant-dashboard" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fconsultant-dashboard</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Consultant</span></td>
+              <td>Programlarım</td>
+              <td><a href="http://localhost:3000/consultant-dashboard/programs" target="_blank" class="url">/consultant-dashboard/programs</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fconsultant-dashboard%2Fprograms" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fconsultant-dashboard%2Fprograms</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Consultant</span></td>
+              <td>Firmalar</td>
+              <td><a href="http://localhost:3000/consultant-dashboard/companies" target="_blank" class="url">/consultant-dashboard/companies</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fconsultant-dashboard%2Fcompanies" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fconsultant-dashboard%2Fcompanies</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Consultant</span></td>
+              <td>Projeler > Tüm Projeler</td>
+              <td><a href="http://localhost:3000/consultant-dashboard/projects" target="_blank" class="url">/consultant-dashboard/projects</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fconsultant-dashboard%2Fprojects" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fconsultant-dashboard%2Fprojects</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Consultant</span></td>
+              <td>Projeler > Yeni Proje</td>
+              <td><a href="http://localhost:3000/consultant-dashboard/projects/new" target="_blank" class="url">/consultant-dashboard/projects/new</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fconsultant-dashboard%2Fprojects%2Fnew" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fconsultant-dashboard%2Fprojects%2Fnew</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Consultant</span></td>
+              <td>Görevler</td>
+              <td><a href="http://localhost:3000/consultant-dashboard/tasks" target="_blank" class="url">/consultant-dashboard/tasks</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fconsultant-dashboard%2Ftasks" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fconsultant-dashboard%2Ftasks</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Consultant</span></td>
+              <td>Eğitimler</td>
+              <td><a href="http://localhost:3000/consultant-dashboard/trainings" target="_blank" class="url">/consultant-dashboard/trainings</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fconsultant-dashboard%2Ftrainings" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fconsultant-dashboard%2Ftrainings</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Consultant</span></td>
+              <td>Etkinlikler</td>
+              <td><a href="http://localhost:3000/consultant-dashboard/events" target="_blank" class="url">/consultant-dashboard/events</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fconsultant-dashboard%2Fevents" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fconsultant-dashboard%2Fevents</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Consultant</span></td>
+              <td>Randevular</td>
+              <td><a href="http://localhost:3000/consultant-dashboard/appointments" target="_blank" class="url">/consultant-dashboard/appointments</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fconsultant-dashboard%2Fappointments" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fconsultant-dashboard%2Fappointments</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Consultant</span></td>
+              <td>Müsaitlik</td>
+              <td><a href="http://localhost:3000/consultant-dashboard/availability" target="_blank" class="url">/consultant-dashboard/availability</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fconsultant-dashboard%2Favailability" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fconsultant-dashboard%2Favailability</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Consultant</span></td>
+              <td>Haberler</td>
+              <td><a href="http://localhost:3000/consultant-dashboard/news" target="_blank" class="url">/consultant-dashboard/news</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fconsultant-dashboard%2Fnews" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fconsultant-dashboard%2Fnews</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Consultant</span></td>
+              <td>Forum</td>
+              <td><a href="http://localhost:3000/consultant-dashboard/forum" target="_blank" class="url">/consultant-dashboard/forum</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fconsultant-dashboard%2Fforum" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fconsultant-dashboard%2Fforum</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Consultant</span></td>
+              <td>Liderlik Tablosu</td>
+              <td><a href="http://localhost:3000/consultant-dashboard/leaderboard" target="_blank" class="url">/consultant-dashboard/leaderboard</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fconsultant-dashboard%2Fleaderboard" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fconsultant-dashboard%2Fleaderboard</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Consultant</span></td>
+              <td>E-ticaret</td>
+              <td><a href="http://localhost:3000/consultant-dashboard/ecommerce" target="_blank" class="url">/consultant-dashboard/ecommerce</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fconsultant-dashboard%2Fecommerce" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fconsultant-dashboard%2Fecommerce</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Consultant</span></td>
+              <td>Raporlarım</td>
+              <td><a href="http://localhost:3000/consultant-dashboard/reports" target="_blank" class="url">/consultant-dashboard/reports</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fconsultant-dashboard%2Freports" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fconsultant-dashboard%2Freports</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Company User</span></td>
+              <td>Profil</td>
+              <td><a href="http://localhost:3000/profile" target="_blank" class="url">/profile</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fprofile" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fprofile</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Company User</span></td>
+              <td>Dashboard</td>
+              <td><a href="http://localhost:3000/company-dashboard" target="_blank" class="url">/company-dashboard</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fcompany-dashboard" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fcompany-dashboard</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Company Admin</span></td>
+              <td>Kullanıcılar</td>
+              <td><a href="http://localhost:3000/company-dashboard/users" target="_blank" class="url">/company-dashboard/users</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fcompany-dashboard%2Fusers" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fcompany-dashboard%2Fusers</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Company User</span></td>
+              <td>Projelerim</td>
+              <td><a href="http://localhost:3000/company-dashboard/projects" target="_blank" class="url">/company-dashboard/projects</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fcompany-dashboard%2Fprojects" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fcompany-dashboard%2Fprojects</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Company User</span></td>
+              <td>Eğitimlerim</td>
+              <td><a href="http://localhost:3000/company-dashboard/trainings" target="_blank" class="url">/company-dashboard/trainings</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fcompany-dashboard%2Ftrainings" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fcompany-dashboard%2Ftrainings</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Company User</span></td>
+              <td>Etkinlikler</td>
+              <td><a href="http://localhost:3000/company-dashboard/events" target="_blank" class="url">/company-dashboard/events</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fcompany-dashboard%2Fevents" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fcompany-dashboard%2Fevents</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Company User</span></td>
+              <td>Randevular</td>
+              <td><a href="http://localhost:3000/company-dashboard/appointments" target="_blank" class="url">/company-dashboard/appointments</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fcompany-dashboard%2Fappointments" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fcompany-dashboard%2Fappointments</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Company User</span></td>
+              <td>Haberler</td>
+              <td><a href="http://localhost:3000/company-dashboard/news" target="_blank" class="url">/company-dashboard/news</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fcompany-dashboard%2Fnews" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fcompany-dashboard%2Fnews</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Company Admin</span></td>
+              <td>Liderlik Tablosu</td>
+              <td><a href="http://localhost:3000/company-dashboard/leaderboard" target="_blank" class="url">/company-dashboard/leaderboard</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fcompany-dashboard%2Fleaderboard" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fcompany-dashboard%2Fleaderboard</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Company Admin</span></td>
+              <td>E-ticaret Metrikleri</td>
+              <td><a href="http://localhost:3000/company-dashboard/ecommerce" target="_blank" class="url">/company-dashboard/ecommerce</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fcompany-dashboard%2Fecommerce" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fcompany-dashboard%2Fecommerce</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Company Admin</span></td>
+              <td>Raporlar</td>
+              <td><a href="http://localhost:3000/company-dashboard/reports" target="_blank" class="url">/company-dashboard/reports</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fcompany-dashboard%2Freports" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fcompany-dashboard%2Freports</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Company Admin</span></td>
+              <td>Firma Ayarları</td>
+              <td><a href="http://localhost:3000/company-dashboard/settings" target="_blank" class="url">/company-dashboard/settings</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fcompany-dashboard%2Fsettings" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fcompany-dashboard%2Fsettings</a></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Company User</span></td>
+              <td>Forum</td>
+              <td><a href="http://localhost:3000/company-dashboard/forum" target="_blank" class="url">/company-dashboard/forum</a></td>
+              <td><a href="http://localhost:3000/login?redirect=%2Fcompany-dashboard%2Fforum" target="_blank" class="url">http://localhost:3000/login?redirect=%2Fcompany-dashboard%2Fforum</a></td>
+            </tr>
+          
+        </tbody>
+      </table>
+    </div>
+    
+
+    
+
+    
+
+    <div class="section">
+      <h2>✨ "Yeni" Pages Check (10)</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Role</th>
+            <th>Label</th>
+            <th>URL</th>
+            <th>Status</th>
+            <th>Sidebar</th>
+            <th>Header</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Programlar > Yeni Program</td>
+              <td><a href="http://localhost:3000/dashboard/programs/new" target="_blank" class="url">/dashboard/programs/new</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Firmalar > Yeni Firma</td>
+              <td><a href="http://localhost:3000/dashboard/companies/new" target="_blank" class="url">/dashboard/companies/new</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Kullanıcılar > Yeni Kullanıcı</td>
+              <td><a href="http://localhost:3000/dashboard/users/new" target="_blank" class="url">/dashboard/users/new</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Eğitimler > Yeni Eğitim</td>
+              <td><a href="http://localhost:3000/dashboard/trainings/new" target="_blank" class="url">/dashboard/trainings/new</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Etkinlikler > Yeni Etkinlik</td>
+              <td><a href="http://localhost:3000/dashboard/events/new" target="_blank" class="url">/dashboard/events/new</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Haberler > Yeni Haber</td>
+              <td><a href="http://localhost:3000/admin-dashboard/news/new" target="_blank" class="url">/admin-dashboard/news/new</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Proje Şablonları > Yeni Şablon</td>
+              <td><a href="http://localhost:3000/dashboard/project-templates/new" target="_blank" class="url">/dashboard/project-templates/new</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Raporlar > Yeni Rapor Oluştur</td>
+              <td><a href="http://localhost:3000/dashboard/reports/generate" target="_blank" class="url">/dashboard/reports/generate</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Raporlar > Yeni Özel Rapor</td>
+              <td><a href="http://localhost:3000/dashboard/custom-reports/new" target="_blank" class="url">/dashboard/custom-reports/new</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Consultant</span></td>
+              <td>Projeler > Yeni Proje</td>
+              <td><a href="http://localhost:3000/consultant-dashboard/projects/new" target="_blank" class="url">/consultant-dashboard/projects/new</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+            </tr>
+          
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <h2>📋 All Results (60)</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Role</th>
+            <th>Label</th>
+            <th>URL</th>
+            <th>Status</th>
+            <th>Sidebar</th>
+            <th>Header</th>
+            <th>Error</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Dashboard</td>
+              <td><a href="http://localhost:3000/dashboard" target="_blank" class="url">/dashboard</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Programlar > Tüm Programlar</td>
+              <td><a href="http://localhost:3000/dashboard/programs" target="_blank" class="url">/dashboard/programs</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Programlar > Yeni Program</td>
+              <td><a href="http://localhost:3000/dashboard/programs/new" target="_blank" class="url">/dashboard/programs/new</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Firmalar > Tüm Firmalar</td>
+              <td><a href="http://localhost:3000/dashboard/companies" target="_blank" class="url">/dashboard/companies</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Firmalar > Yeni Firma</td>
+              <td><a href="http://localhost:3000/dashboard/companies/new" target="_blank" class="url">/dashboard/companies/new</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Kullanıcılar > Tüm Kullanıcılar</td>
+              <td><a href="http://localhost:3000/dashboard/users" target="_blank" class="url">/dashboard/users</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Kullanıcılar > Yeni Kullanıcı</td>
+              <td><a href="http://localhost:3000/dashboard/users/new" target="_blank" class="url">/dashboard/users/new</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Projeler > Tüm Projeler</td>
+              <td><a href="http://localhost:3000/dashboard/projects" target="_blank" class="url">/dashboard/projects</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Projeler > Silinen Projeler</td>
+              <td><a href="http://localhost:3000/dashboard/projects/deleted" target="_blank" class="url">/dashboard/projects/deleted</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Eğitimler > Tüm Eğitimler</td>
+              <td><a href="http://localhost:3000/dashboard/trainings" target="_blank" class="url">/dashboard/trainings</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Eğitimler > Yeni Eğitim</td>
+              <td><a href="http://localhost:3000/dashboard/trainings/new" target="_blank" class="url">/dashboard/trainings/new</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Etkinlikler > Tüm Etkinlikler</td>
+              <td><a href="http://localhost:3000/dashboard/events" target="_blank" class="url">/dashboard/events</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Etkinlikler > Yeni Etkinlik</td>
+              <td><a href="http://localhost:3000/dashboard/events/new" target="_blank" class="url">/dashboard/events/new</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Randevular</td>
+              <td><a href="http://localhost:3000/dashboard/appointments" target="_blank" class="url">/dashboard/appointments</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Haberler > Tüm Haberler</td>
+              <td><a href="http://localhost:3000/admin-dashboard/news" target="_blank" class="url">/admin-dashboard/news</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Haberler > Yeni Haber</td>
+              <td><a href="http://localhost:3000/admin-dashboard/news/new" target="_blank" class="url">/admin-dashboard/news/new</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Forum > Konular</td>
+              <td><a href="http://localhost:3000/admin-dashboard/forum" target="_blank" class="url">/admin-dashboard/forum</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Forum > Kategoriler</td>
+              <td><a href="http://localhost:3000/admin-dashboard/forum/categories" target="_blank" class="url">/admin-dashboard/forum/categories</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Liderlik Tablosu > Sıralama</td>
+              <td><a href="http://localhost:3000/admin-dashboard/leaderboard" target="_blank" class="url">/admin-dashboard/leaderboard</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Liderlik Tablosu > Rozet Yönetimi</td>
+              <td><a href="http://localhost:3000/admin-dashboard/leaderboard/badges" target="_blank" class="url">/admin-dashboard/leaderboard/badges</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>E-ticaret</td>
+              <td><a href="http://localhost:3000/admin-dashboard/ecommerce" target="_blank" class="url">/admin-dashboard/ecommerce</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Bakanlık Dashboard</td>
+              <td><a href="http://localhost:3000/admin-dashboard/ministry" target="_blank" class="url">/admin-dashboard/ministry</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Proje Şablonları > Tüm Şablonlar</td>
+              <td><a href="http://localhost:3000/dashboard/project-templates" target="_blank" class="url">/dashboard/project-templates</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Proje Şablonları > Yeni Şablon</td>
+              <td><a href="http://localhost:3000/dashboard/project-templates/new" target="_blank" class="url">/dashboard/project-templates/new</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Raporlar > AI Raporlar</td>
+              <td><a href="http://localhost:3000/dashboard/reports" target="_blank" class="url">/dashboard/reports</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Raporlar > Yeni Rapor Oluştur</td>
+              <td><a href="http://localhost:3000/dashboard/reports/generate" target="_blank" class="url">/dashboard/reports/generate</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Raporlar > Özel Raporlar</td>
+              <td><a href="http://localhost:3000/dashboard/custom-reports" target="_blank" class="url">/dashboard/custom-reports</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Raporlar > Yeni Özel Rapor</td>
+              <td><a href="http://localhost:3000/dashboard/custom-reports/new" target="_blank" class="url">/dashboard/custom-reports/new</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>CMS > Sayfalar</td>
+              <td><a href="http://localhost:3000/dashboard/cms/pages" target="_blank" class="url">/dashboard/cms/pages</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>CMS > Medya</td>
+              <td><a href="http://localhost:3000/dashboard/cms/media" target="_blank" class="url">/dashboard/cms/media</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>CMS > Site Ayarları</td>
+              <td><a href="http://localhost:3000/dashboard/cms/settings" target="_blank" class="url">/dashboard/cms/settings</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Master Admin</span></td>
+              <td>Ayarlar</td>
+              <td><a href="http://localhost:3000/dashboard/settings" target="_blank" class="url">/dashboard/settings</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Consultant</span></td>
+              <td>Dashboard</td>
+              <td><a href="http://localhost:3000/consultant-dashboard" target="_blank" class="url">/consultant-dashboard</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Consultant</span></td>
+              <td>Programlarım</td>
+              <td><a href="http://localhost:3000/consultant-dashboard/programs" target="_blank" class="url">/consultant-dashboard/programs</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Consultant</span></td>
+              <td>Firmalar</td>
+              <td><a href="http://localhost:3000/consultant-dashboard/companies" target="_blank" class="url">/consultant-dashboard/companies</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Consultant</span></td>
+              <td>Projeler > Tüm Projeler</td>
+              <td><a href="http://localhost:3000/consultant-dashboard/projects" target="_blank" class="url">/consultant-dashboard/projects</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Consultant</span></td>
+              <td>Projeler > Yeni Proje</td>
+              <td><a href="http://localhost:3000/consultant-dashboard/projects/new" target="_blank" class="url">/consultant-dashboard/projects/new</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Consultant</span></td>
+              <td>Görevler</td>
+              <td><a href="http://localhost:3000/consultant-dashboard/tasks" target="_blank" class="url">/consultant-dashboard/tasks</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Consultant</span></td>
+              <td>Eğitimler</td>
+              <td><a href="http://localhost:3000/consultant-dashboard/trainings" target="_blank" class="url">/consultant-dashboard/trainings</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Consultant</span></td>
+              <td>Etkinlikler</td>
+              <td><a href="http://localhost:3000/consultant-dashboard/events" target="_blank" class="url">/consultant-dashboard/events</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Consultant</span></td>
+              <td>Randevular</td>
+              <td><a href="http://localhost:3000/consultant-dashboard/appointments" target="_blank" class="url">/consultant-dashboard/appointments</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Consultant</span></td>
+              <td>Müsaitlik</td>
+              <td><a href="http://localhost:3000/consultant-dashboard/availability" target="_blank" class="url">/consultant-dashboard/availability</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Consultant</span></td>
+              <td>Haberler</td>
+              <td><a href="http://localhost:3000/consultant-dashboard/news" target="_blank" class="url">/consultant-dashboard/news</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Consultant</span></td>
+              <td>Forum</td>
+              <td><a href="http://localhost:3000/consultant-dashboard/forum" target="_blank" class="url">/consultant-dashboard/forum</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Consultant</span></td>
+              <td>Liderlik Tablosu</td>
+              <td><a href="http://localhost:3000/consultant-dashboard/leaderboard" target="_blank" class="url">/consultant-dashboard/leaderboard</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Consultant</span></td>
+              <td>E-ticaret</td>
+              <td><a href="http://localhost:3000/consultant-dashboard/ecommerce" target="_blank" class="url">/consultant-dashboard/ecommerce</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Consultant</span></td>
+              <td>Raporlarım</td>
+              <td><a href="http://localhost:3000/consultant-dashboard/reports" target="_blank" class="url">/consultant-dashboard/reports</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Company User</span></td>
+              <td>Profil</td>
+              <td><a href="http://localhost:3000/profile" target="_blank" class="url">/profile</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Company User</span></td>
+              <td>Dashboard</td>
+              <td><a href="http://localhost:3000/company-dashboard" target="_blank" class="url">/company-dashboard</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Company Admin</span></td>
+              <td>Kullanıcılar</td>
+              <td><a href="http://localhost:3000/company-dashboard/users" target="_blank" class="url">/company-dashboard/users</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Company User</span></td>
+              <td>Projelerim</td>
+              <td><a href="http://localhost:3000/company-dashboard/projects" target="_blank" class="url">/company-dashboard/projects</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Company User</span></td>
+              <td>Eğitimlerim</td>
+              <td><a href="http://localhost:3000/company-dashboard/trainings" target="_blank" class="url">/company-dashboard/trainings</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Company User</span></td>
+              <td>Etkinlikler</td>
+              <td><a href="http://localhost:3000/company-dashboard/events" target="_blank" class="url">/company-dashboard/events</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Company User</span></td>
+              <td>Randevular</td>
+              <td><a href="http://localhost:3000/company-dashboard/appointments" target="_blank" class="url">/company-dashboard/appointments</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Company User</span></td>
+              <td>Haberler</td>
+              <td><a href="http://localhost:3000/company-dashboard/news" target="_blank" class="url">/company-dashboard/news</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Company Admin</span></td>
+              <td>Liderlik Tablosu</td>
+              <td><a href="http://localhost:3000/company-dashboard/leaderboard" target="_blank" class="url">/company-dashboard/leaderboard</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Company Admin</span></td>
+              <td>E-ticaret Metrikleri</td>
+              <td><a href="http://localhost:3000/company-dashboard/ecommerce" target="_blank" class="url">/company-dashboard/ecommerce</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Company Admin</span></td>
+              <td>Raporlar</td>
+              <td><a href="http://localhost:3000/company-dashboard/reports" target="_blank" class="url">/company-dashboard/reports</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Company Admin</span></td>
+              <td>Firma Ayarları</td>
+              <td><a href="http://localhost:3000/company-dashboard/settings" target="_blank" class="url">/company-dashboard/settings</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+            <tr>
+              <td><span class="role-badge">Company User</span></td>
+              <td>Forum</td>
+              <td><a href="http://localhost:3000/company-dashboard/forum" target="_blank" class="url">/company-dashboard/forum</a></td>
+              <td><span class="status-badge status-redirect">200</span></td>
+              <td><span class="x-icon">❌</span></td>
+              <td><span class="check-icon">✅</span></td>
+              <td>Redirected to login (authentication required)</td>
+            </tr>
+          
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>

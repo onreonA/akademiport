@@ -1,0 +1,84 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link "AKADEMİ PORT" [ref=e5] [cursor=pointer]:
+          - /url: /
+          - img [ref=e7]
+          - generic [ref=e10]: AKADEMİ PORT
+        - navigation [ref=e11]:
+          - link "Anasayfa" [ref=e12] [cursor=pointer]:
+            - /url: "#"
+          - link "Program Hakkında" [ref=e13] [cursor=pointer]:
+            - /url: "#"
+          - link "Destekler" [ref=e14] [cursor=pointer]:
+            - /url: "#"
+          - link "Platform Özellikleri" [ref=e15] [cursor=pointer]:
+            - /url: "#"
+          - link "Başarı Hikayeleri" [ref=e16] [cursor=pointer]:
+            - /url: "#"
+          - link "SSS" [ref=e17] [cursor=pointer]:
+            - /url: "#"
+        - button "Giriş" [ref=e18]:
+          - img
+          - text: Giriş
+    - main [ref=e19]:
+      - generic [ref=e21]:
+        - img [ref=e24]
+        - heading "Giriş Yap" [level=1] [ref=e26]
+        - paragraph [ref=e27]: E-posta adresiniz ve şifrenizle sisteme giriş yapın
+        - generic [ref=e28]:
+          - generic [ref=e29]:
+            - text: E-posta Adresi
+            - generic [ref=e30]:
+              - img [ref=e31]
+              - textbox "E-posta Adresi" [ref=e34]:
+                - /placeholder: info@mundo.com
+                - text: admin@test.com
+          - generic [ref=e35]:
+            - text: Şifre
+            - generic [ref=e36]:
+              - img [ref=e37]
+              - textbox "Şifre" [ref=e40]:
+                - /placeholder: ••••••••
+                - text: Test123!
+          - generic [ref=e41]: Email veya şifre hatalı
+          - button "Giriş Yap" [ref=e42]
+          - link "Şifremi Unuttum" [ref=e44] [cursor=pointer]:
+            - /url: /forgot-password
+        - generic [ref=e45]:
+          - heading "Sisteme Giriş Yaptıktan Sonra" [level=3] [ref=e46]
+          - generic [ref=e47]:
+            - generic [ref=e48]:
+              - img [ref=e49]
+              - generic [ref=e53]: Firma Paneli
+            - generic [ref=e54]:
+              - img [ref=e55]
+              - generic [ref=e57]: Admin Paneli
+            - generic [ref=e58]:
+              - img [ref=e59]
+              - generic [ref=e61]: Güvenli Erişim
+            - generic [ref=e62]:
+              - img [ref=e63]
+              - generic [ref=e65]: Otomatik Yönlendirme
+        - generic [ref=e66]:
+          - text: Henüz kaydınız yok mu?
+          - link "Kayıt Ol" [ref=e67] [cursor=pointer]:
+            - /url: /register
+  - region "Notifications alt+T"
+  - generic [ref=e72] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e73]:
+      - img [ref=e74]
+    - generic [ref=e77]:
+      - button "Open issues overlay" [ref=e78]:
+        - generic [ref=e79]:
+          - generic [ref=e80]: "0"
+          - generic [ref=e81]: "1"
+        - generic [ref=e82]: Issue
+      - button "Collapse issues badge" [ref=e83]:
+        - img [ref=e84]
+  - alert [ref=e86]
+```
